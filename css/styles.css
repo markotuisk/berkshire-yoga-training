@@ -591,6 +591,46 @@ p + p { margin-top: var(--spacing-default); }
   letter-spacing: 0.02em;
 }
 
+/* Role marks — initials in rounded-square logo style (not portrait circles) */
+.role-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: var(--accent);
+  color: var(--accent-on);
+  font-family: var(--font-primary);
+  font-weight: var(--text-weight-bold);
+  border-radius: var(--radius);
+  letter-spacing: 0.04em;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  line-height: 1;
+}
+
+.role-mark--sm {
+  width: 2.5rem;
+  height: 2.5rem;
+  font-size: 0.7rem;
+}
+
+.role-mark--md {
+  width: 3.5rem;
+  height: 3.5rem;
+  font-size: 0.75rem;
+}
+
+.role-mark--lg {
+  width: 4.5rem;
+  height: 4.5rem;
+  font-size: 0.85rem;
+}
+
+.role-mark--xl {
+  width: 5.5rem;
+  height: 5.5rem;
+  font-size: 1rem;
+}
+
 .logo-text {
   font-family: var(--font-primary);
   font-size: 1.05rem;
@@ -3721,10 +3761,7 @@ a.contact-v1-slide-link:hover {
   opacity: 0.92;
 }
 
-.about-team-avatar {
-  width: 88px;
-  height: 88px;
-  border-radius: 50%;
+.about-team-card .role-mark {
   margin: 0 auto var(--spacing-default);
 }
 
@@ -3868,21 +3905,28 @@ a.contact-v1-slide-link:hover {
   border-bottom: 1px solid rgba(26, 26, 26, 0.08);
 }
 
-.team-profile-photo {
-  border-radius: var(--radius-medium);
-  box-shadow: var(--shadow-lg);
-}
-
-.team-profile-img {
+.team-profile-mark {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-small);
   aspect-ratio: 4 / 5;
+  padding: var(--spacing-regular);
+  background: var(--bg-light);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-medium);
+  box-shadow: var(--shadow);
 }
 
-.team-profile-img--alt {
-  background: linear-gradient(160deg, var(--placeholder-neutral) 0%, var(--placeholder-blue) 100%);
-}
-
-.team-profile-img--warm {
-  background: linear-gradient(160deg, var(--placeholder-sage-light) 0%, var(--placeholder-sage) 100%);
+.team-profile-mark-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.35;
 }
 
 .team-profile-badge {
@@ -4022,6 +4066,10 @@ a.about-team-card:hover .about-team-link {
     text-align: center;
   }
 
+  .team-profile-mark {
+    width: 100%;
+  }
+
   .team-profile-social {
     justify-content: center;
   }
@@ -4105,11 +4153,7 @@ a.about-team-card:hover .about-team-link {
   font-size: 0.9rem;
 }
 
-.article-author-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: var(--gradient-placeholder);
+.article-author-inline .role-mark {
   flex-shrink: 0;
 }
 
@@ -4263,11 +4307,7 @@ a.about-team-card:hover .about-team-link {
   border: 1px solid rgba(26, 26, 26, 0.04);
 }
 
-.article-author-card-avatar {
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  background: var(--gradient-placeholder);
+.article-author-card .role-mark {
   flex-shrink: 0;
 }
 
@@ -4333,7 +4373,7 @@ a.about-team-card:hover .about-team-link {
     text-align: center;
   }
 
-  .article-author-card-avatar {
+  .article-author-card .role-mark {
     margin: 0 auto;
   }
 }
