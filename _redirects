@@ -1,2 +1,2 @@
-# Partner demo: full site at root (index.html). To restore coming-soon at /, add:
-# / /coming-soon.html 200
+/ /coming-soon.html 200
+# Owners and developers: open /index.html on this domain for the full site (no rewrite on that path).

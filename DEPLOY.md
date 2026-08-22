@@ -1,22 +1,31 @@
-# Deployment — berkshireyogatraining.co.uk
+# Deployment: berkshireyogatraining.co.uk
 
-## Share with partners
+## Public vs owners
 
-**Live now (full site):**
+| Audience | URL | What you see |
+|----------|-----|----------------|
+| **Public** | [https://berkshireyogatraining.co.uk/](https://berkshireyogatraining.co.uk/) | Coming soon (`coming-soon.html` via `_redirects`) |
+| **Owners / dev (custom domain)** | [https://berkshireyogatraining.co.uk/index.html](https://berkshireyogatraining.co.uk/index.html) | Full site (rewrite does not apply to `/index.html`) |
+| **Owners / dev (GitHub Pages)** | [https://markotuisk.github.io/berkshire-yoga-training/](https://markotuisk.github.io/berkshire-yoga-training/) | Full site at `/` (GitHub Pages does **not** read `_redirects`) |
 
-- [https://berkshire-yoga-training.pages.dev/](https://berkshire-yoga-training.pages.dev/) (Cloudflare Pages)
-- [https://markotuisk.github.io/berkshire-yoga-training/](https://markotuisk.github.io/berkshire-yoga-training/) (GitHub Pages)
+**Cloudflare Pages preview host:** [https://berkshire-yoga-training.pages.dev/](https://berkshire-yoga-training.pages.dev/) behaves like the custom domain: `/` serves coming soon, `/index.html` serves the full site.
 
-**Custom domain:** [https://berkshireyogatraining.co.uk](https://berkshireyogatraining.co.uk) — attached on the Pages project but **DNS must be set** in Cloudflare (Workers & Pages → berkshire-yoga-training → Custom domains → configure DNS, or DNS → add proxied CNAME `@` → `berkshire-yoga-training.pages.dev`).
-
-The root URL serves the **full site** (`index.html`), not coming soon. To show coming soon at `/` again, add `/ /coming-soon.html 200` to `_redirects` (see `DEPLOY-COMING-SOON.md`).
+**Custom domain DNS:** attach `berkshireyogatraining.co.uk` on the Pages project and set DNS in Cloudflare (Workers & Pages → berkshire-yoga-training → Custom domains, or DNS → proxied CNAME `@` → `berkshire-yoga-training.pages.dev`).
 
 ## What is live
 
-| Mode | Root `/` | Notes |
-|------|----------|--------|
-| **Partner demo (current)** | `index.html` | `_redirects` has no active rewrite |
-| Pre-launch | `coming-soon.html` | Add `/ /coming-soon.html 200` to `_redirects` |
+| Host | Root `/` | Full site |
+|------|----------|-----------|
+| Cloudflare Pages (production + pages.dev) | `coming-soon.html` (200 rewrite) | `/index.html` and all other HTML paths |
+| GitHub Pages | `index.html` (full site) | Same as always |
+
+Active rule in `_redirects` (Cloudflare only):
+
+```
+/ /coming-soon.html 200
+```
+
+Remove or comment out that line when the full site should be public at `/`. See `DEPLOY-COMING-SOON.md`.
 
 ## Cloudflare Pages
 
@@ -24,7 +33,7 @@ The root URL serves the **full site** (`index.html`), not coming soon. To show c
 |---------|--------|
 | Project name | `berkshire-yoga-training` |
 | Production branch | `main` |
-| Build command | *(none — static HTML)* |
+| Build command | (none, static HTML) |
 | Build output | `/` (repo root) |
 | Preview URL | `https://berkshire-yoga-training.pages.dev` |
 

@@ -1,6 +1,15 @@
 # Deploy coming soon page
 
-Use this when **berkshireyogatraining.co.uk** should show the holding page while the full site remains in the repo for development.
+Use this when **berkshireyogatraining.co.uk** should show the holding page at `/` while the full site remains in the repo for owners and developers.
+
+## URLs (current setup)
+
+| Audience | URL |
+|----------|-----|
+| Public | [https://berkshireyogatraining.co.uk/](https://berkshireyogatraining.co.uk/) |
+| Owners on custom domain | [https://berkshireyogatraining.co.uk/index.html](https://berkshireyogatraining.co.uk/index.html) |
+| Owners on GitHub Pages (full site at `/`, no `_redirects`) | [https://markotuisk.github.io/berkshire-yoga-training/](https://markotuisk.github.io/berkshire-yoga-training/) |
+| Cloudflare pages.dev (same rewrite as custom domain) | [https://berkshire-yoga-training.pages.dev/](https://berkshire-yoga-training.pages.dev/) → coming soon; full site at `/index.html` |
 
 ## Preview locally
 
@@ -15,17 +24,23 @@ Open `/coming-soon.html` in the browser before going live.
 
 Choose **one** approach. The full `index.html` is never deleted; `index-full.html` is an additional backup of the homepage.
 
-### Option A: Cloudflare Pages rewrite (recommended)
+### Option A: Cloudflare Pages rewrite (recommended, active)
 
-Add or enable `_redirects` at the repo root (already included):
+`_redirects` at the repo root:
 
 ```
 / /coming-soon.html 200
 ```
 
-This serves `coming-soon.html` at the domain root while keeping the full site at `/index.html` for preview. Remove or comment out the rule when the full site should be live at `/`.
+Cloudflare Pages serves `coming-soon.html` at `/` with a 200 rewrite. The full site stays at `/index.html` and all other paths. **GitHub Pages ignores `_redirects`**, so the GitHub Pages URL still shows the full site at `/`.
 
-Deploy by pushing to `main` (GitHub Actions) or `npx wrangler pages deploy . --project-name=berkshire-yoga-training`.
+Deploy by pushing to `main` (GitHub Actions) or:
+
+```bash
+npx wrangler pages deploy . --project-name=berkshire-yoga-training --branch=main
+```
+
+Remove or comment out the rule when the full site should be public at `/`.
 
 ### Option B: Swap files on the server
 
@@ -58,9 +73,9 @@ In Cloudflare → Rules → Redirect Rules (or Page Rules), redirect `berkshirey
 
 The subscribe form in `coming-soon.html` is **markup only** (no backend). To collect emails you need one of:
 
-- **Formspree / Netlify Forms / Cloudflare Workers** — set `action` on the form
+- **Formspree / Netlify Forms / Cloudflare Workers**: set `action` on the form
 - **Mailchimp / Buttondown** embed
-- **mailto fallback** — footer link `info@thameswellnessacademy.co.uk` works today
+- **mailto fallback**: footer link `info@thameswellnessacademy.co.uk` works today
 
 Until connected, the note under the form tells visitors to email directly.
 
@@ -70,9 +85,9 @@ Until connected, the note under the form tells visitors to email directly.
 |------|------|
 | `coming-soon.html` | Standalone coming soon page |
 | `coming-soon.css` | Scoped styles (not `css/styles.css`) |
-| `index.html` | Full site homepage (production when not using rewrite) |
+| `index.html` | Full site homepage |
 | `index-full.html` | Backup copy of full homepage |
-| `_redirects` | Optional Cloudflare Pages root → coming soon |
+| `_redirects` | Cloudflare Pages root → coming soon (not used on GitHub Pages) |
 
 ## Typography and brand
 

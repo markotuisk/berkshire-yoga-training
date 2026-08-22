@@ -2,20 +2,21 @@
 
 Static marketing site for professional wellness education in Berkshire and Buckinghamshire.
 
-## Share with partners (full site)
+## Public vs owners
 
-The **entire site** is live at the root URL (home, programmes, about, team, journal, contact). Coming soon is **not** shown at `/`.
+| Audience | Link |
+|----------|------|
+| **Public** (coming soon) | [https://berkshireyogatraining.co.uk/](https://berkshireyogatraining.co.uk/) (Cloudflare; needs DNS) |
+| **Public** (pages.dev) | [https://berkshire-yoga-training.pages.dev/](https://berkshire-yoga-training.pages.dev/) |
+| **Owners / dev** | [https://berkshireyogatraining.co.uk/index.html](https://berkshireyogatraining.co.uk/index.html) or [https://markotuisk.github.io/berkshire-yoga-training/](https://markotuisk.github.io/berkshire-yoga-training/) (full site at `/`, no Cloudflare rewrite) |
 
-**Share this link now:**
+Cloudflare Pages uses `_redirects` so `/` serves `coming-soon.html`. GitHub Pages does **not** use `_redirects`, so the GitHub link is the simplest owner preview.
 
-- **Cloudflare Pages:** https://berkshire-yoga-training.pages.dev/
-- **GitHub Pages:** https://markotuisk.github.io/berkshire-yoga-training/
-
-Custom domain **https://berkshireyogatraining.co.uk** needs DNS in Cloudflare (see `DEPLOY.md`).
+## Site map (full site)
 
 | Page | URL |
 |------|-----|
-| Home | `/` |
+| Home | `/` or `/index.html` on Cloudflare when rewrite is active |
 | About | `/about.html` |
 | Foundation Training | `/foundation-training.html` |
 | CPD | `/cpd.html` |
@@ -26,9 +27,9 @@ Custom domain **https://berkshireyogatraining.co.uk** needs DNS in Cloudflare (s
 | Contact | `/contact.html` |
 | Join | `/join.html` |
 
-Coming soon (pre-launch only): `/coming-soon.html`
+Coming soon page (also served at `/` on Cloudflare): `/coming-soon.html`
 
-Custom domain when DNS is configured: **https://berkshireyogatraining.co.uk** (see `DEPLOY.md`).
+Custom domain DNS: see `DEPLOY.md`.
 
 Social previews use `assets/og-image.jpg` and Open Graph meta on every page. `og:url` and `og:image` use the GitHub Pages host until the custom domain is live.
 
@@ -49,8 +50,8 @@ Open `http://localhost:8765`
 
 ## Deploy
 
-- **GitHub Pages:** auto-deploys from `main` (partner link above)
+- **GitHub Pages:** auto-deploys from `main` (full site at `/` for owners)
 - **Cloudflare Pages:** push `main` or see `.github/workflows/deploy.yml` (needs API secrets)
 - **Manual:** `npx wrangler pages deploy . --project-name=berkshire-yoga-training`
 
-See `DEPLOY.md` for custom domain on Cloudflare.
+See `DEPLOY.md` and `DEPLOY-COMING-SOON.md` for coming soon vs full site behaviour.
