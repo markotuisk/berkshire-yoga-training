@@ -16,7 +16,8 @@ Detailed token and pattern reference. Read when implementing new sections or ext
 | `--text-primary` | `#1D1D1F` | Headings, primary text |
 | `--text-secondary` | `#6E6E73` | Body secondary |
 | `--text-muted` | `#86868B` | Meta, labels |
-| `--accent` | `#F5BF03` | Links, badges, primary actions |
+| `--accent` | `#F5BF03` | Buttons, fills, links on white |
+| `--accent-text` | `#735600` | Tag/pill text on `--accent-light` backgrounds |
 | `--accent-dark` | `#1D1D1F` | Dark CTA bands, emphasis |
 | `--accent-light` | `rgba(245,191,3,0.14)` | Tag backgrounds |
 | `--accent-muted` | `#E8E8ED` | Nav active pill |
