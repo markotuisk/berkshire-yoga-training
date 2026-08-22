@@ -2,7 +2,14 @@
 
 ## What is live
 
-The **full site** (`index.html` and all programme pages) is deployed. `coming-soon.html` is kept for pre-launch use only.
+**Pre-launch (default in repo):** `_redirects` rewrites `/` to `coming-soon.html` on Cloudflare Pages. Visitors see the coming soon page at the root; the full site remains available at `/index.html` for preview.
+
+**Go live with full site:** delete `_redirects` (or remove the rewrite line) and push to `main`. See `DEPLOY-COMING-SOON.md` for swap and restore options.
+
+| Mode | Root `/` | Dev / preview |
+|------|----------|----------------|
+| Pre-launch | `coming-soon.html` (via `_redirects`) | `/index.html` |
+| Full site | `index.html` | same |
 
 ## Cloudflare Pages
 
