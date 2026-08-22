@@ -1,55 +1,58 @@
 # Deployment — berkshireyogatraining.co.uk
 
+## Share with partners
+
+**Open:** [https://berkshire-yoga-training.pages.dev](https://berkshire-yoga-training.pages.dev)
+
+When custom DNS is configured: [https://berkshireyogatraining.co.uk](https://berkshireyogatraining.co.uk)
+
+The root URL serves the **full site** (`index.html`) for partner demos. To show coming soon at `/` again, restore the rewrite in `_redirects` (see `DEPLOY-COMING-SOON.md`).
+
 ## What is live
 
-The **full site** is served at `/` (`index.html` and all programme pages). `coming-soon.html` remains in the repo for optional pre-launch use only (no `_redirects` rewrite).
+| Mode | Root `/` | Notes |
+|------|----------|--------|
+| **Partner demo (current)** | `index.html` | `_redirects` has no active rewrite |
+| Pre-launch | `coming-soon.html` | Add `/ /coming-soon.html 200` to `_redirects` |
 
-## GitHub
+## Cloudflare Pages
 
-- Repo: https://github.com/markotuisk/berkshire-yoga-training
-- Branch: `main`
+| Setting | Value |
+|---------|--------|
+| Project name | `berkshire-yoga-training` |
+| Production branch | `main` |
+| Build command | *(none — static HTML)* |
+| Build output | `/` (repo root) |
+| Preview URL | `https://berkshire-yoga-training.pages.dev` |
 
-## Cloudflare Pages (recommended: Connect Git)
+## Custom domain
 
-Your domain already uses Cloudflare nameservers (`jamie.ns.cloudflare.com`, `yahir.ns.cloudflare.com`).
+1. Add `berkshireyogatraining.co.uk` (and optionally `www`) in Cloudflare Pages → Custom domains.
+2. If the domain is already on Cloudflare, DNS records are added automatically.
+3. If the domain is elsewhere, point nameservers to Cloudflare or add a CNAME to the Pages hostname.
 
-1. Log in to [Cloudflare Dashboard](https://dash.cloudflare.com) → **Workers & Pages** → **Create** → **Pages** → **Connect to Git**.
-2. Authorise GitHub and select **markotuisk/berkshire-yoga-training**.
-3. Build settings:
-   - **Framework preset:** None
-   - **Build command:** *(leave empty)*
-   - **Build output directory:** `/` or `.`
-   - **Production branch:** `main`
-4. **Project name:** `berkshire-yoga-training` (must match workflow if using Actions).
-5. Deploy, then **Custom domains** → add **berkshireyogatraining.co.uk** and **www.berkshireyogatraining.co.uk** (optional).
-6. Cloudflare will create DNS records on the zone automatically.
+## GitHub Actions secrets (required for auto-deploy)
 
-## GitHub Actions (optional auto-deploy on push)
+In the GitHub repo → Settings → Secrets and variables → Actions, add:
 
-Workflow: `.github/workflows/deploy.yml`
+| Secret | Where to find it |
+|--------|------------------|
+| `CLOUDFLARE_API_TOKEN` | Cloudflare dashboard → My Profile → API Tokens → Create token with **Cloudflare Pages Edit** |
+| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare dashboard → any zone → right sidebar **Account ID** |
 
-Add repo secrets (**Settings → Secrets and variables → Actions**):
+After secrets are set, every push to `main` redeploys the site. Previous workflow runs failed because these secrets were not configured.
 
-| Secret | Value |
-|--------|--------|
-| `CLOUDFLARE_API_TOKEN` | API token with **Account → Cloudflare Pages → Edit** |
-| `CLOUDFLARE_ACCOUNT_ID` | Dashboard → Workers & Pages → right sidebar **Account ID** |
-
-Then re-run the workflow or push to `main`.
-
-## Manual deploy (Wrangler CLI)
+## Manual deploy (without GitHub Actions)
 
 ```bash
-npx wrangler login          # complete browser OAuth once
+npx wrangler login
 npx wrangler pages deploy . --project-name=berkshire-yoga-training --branch=main
-npx wrangler pages domain add berkshireyogatraining.co.uk --project-name=berkshire-yoga-training
 ```
 
-## Verify
+Or set `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` in your environment.
 
-```bash
-curl -I https://berkshire-yoga-training.pages.dev
-curl -I https://berkshireyogatraining.co.uk
-```
+## Open Graph
 
-Expect `200` or `301`/`302` to HTTPS once DNS and SSL are active (can take a few minutes).
+- Default share image: `assets/og-image.jpg` (1200×630)
+- Canonical URLs use `https://berkshireyogatraining.co.uk`
+- All main HTML pages include `og:*` and `twitter:*` meta tags
