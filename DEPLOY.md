@@ -2,9 +2,12 @@
 
 ## Share with partners
 
-**Live now (full site):** [https://markotuisk.github.io/berkshire-yoga-training/](https://markotuisk.github.io/berkshire-yoga-training/)
+**Live now (full site):**
 
-**Custom domain (after Cloudflare Pages):** [https://berkshireyogatraining.co.uk](https://berkshireyogatraining.co.uk)
+- [https://berkshire-yoga-training.pages.dev/](https://berkshire-yoga-training.pages.dev/) (Cloudflare Pages)
+- [https://markotuisk.github.io/berkshire-yoga-training/](https://markotuisk.github.io/berkshire-yoga-training/) (GitHub Pages)
+
+**Custom domain:** [https://berkshireyogatraining.co.uk](https://berkshireyogatraining.co.uk) — attached on the Pages project but **DNS must be set** in Cloudflare (Workers & Pages → berkshire-yoga-training → Custom domains → configure DNS, or DNS → add proxied CNAME `@` → `berkshire-yoga-training.pages.dev`).
 
 The root URL serves the **full site** (`index.html`), not coming soon. To show coming soon at `/` again, add `/ /coming-soon.html 200` to `_redirects` (see `DEPLOY-COMING-SOON.md`).
 

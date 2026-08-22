@@ -8,7 +8,10 @@ The **entire site** is live at the root URL (home, programmes, about, team, jour
 
 **Share this link now:**
 
-**https://markotuisk.github.io/berkshire-yoga-training/**
+- **Cloudflare Pages:** https://berkshire-yoga-training.pages.dev/
+- **GitHub Pages:** https://markotuisk.github.io/berkshire-yoga-training/
+
+Custom domain **https://berkshireyogatraining.co.uk** needs DNS in Cloudflare (see `DEPLOY.md`).
 
 | Page | URL |
 |------|-----|
@@ -25,7 +28,7 @@ The **entire site** is live at the root URL (home, programmes, about, team, jour
 
 Coming soon (pre-launch only): `/coming-soon.html`
 
-Custom domain when Cloudflare Pages is connected: **https://berkshireyogatraining.co.uk** (see `DEPLOY.md`).
+Custom domain when DNS is configured: **https://berkshireyogatraining.co.uk** (see `DEPLOY.md`).
 
 Social previews use `assets/og-image.jpg` and Open Graph meta on every page. `og:url` and `og:image` use the GitHub Pages host until the custom domain is live.
 
