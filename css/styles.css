@@ -3477,6 +3477,10 @@ a.contact-v1-slide-link:hover {
   .hero-gallery-col--3 { transform: translateY(0.75rem); }
   .hero-gallery-col--4 { transform: translateY(-0.5rem); }
 
+  .hero-gallery .hero-gallery-img .placeholder-label {
+    display: none;
+  }
+
   .hero-deco--left { left: -1rem; top: 20%; }
   .hero-deco--right { right: -1rem; top: 14%; }
   .hero-deco--center { bottom: -0.25rem; }
@@ -3575,7 +3579,7 @@ a.contact-v1-slide-link:hover {
   .hero-visual { max-width: 100%; }
   .hero-gallery { padding: 0; }
 
-  .hero-gallery .placeholder-label {
+  .hero-gallery .hero-gallery-img .placeholder-label {
     display: none;
   }
 
