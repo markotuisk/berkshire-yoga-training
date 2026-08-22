@@ -251,7 +251,7 @@ Sections documented there (translate to TWA tokens, do not copy verbatim):
 - **Lists** — `.feature-list`, `.checklist`, `.pricing-features-list`
 - **Icons / avatars** — inline SVG in markup; `.about-team-avatar`, `.badge-icon`
 - **Inputs** — `.form-row` fields; newsletter uses pill radius (`999px`)
-- **Badges** — `.section-tag`, `.journal-category`, `.hero-badge`
+- **Badges** — `.section-tag`, `.journal-category`, `.journal-filter.is-active`, `.programme-topic-tag`, `.pricing-badge` (use `--accent-text` on `--accent-light`; `--accent-on` on solid gold fills)
 - **Rich text** — future article pages: semantic `h2`–`h4`, `ul`/`ol`, `blockquote`
 - **Spacers** — prefer spacing tokens over LearnBuddy utility class names
 

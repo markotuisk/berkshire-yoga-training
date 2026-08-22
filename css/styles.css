@@ -1032,7 +1032,7 @@ p + p { margin-top: var(--spacing-default); }
   width: 44px;
   height: 44px;
   flex-shrink: 0;
-  color: var(--accent-dark);
+  color: var(--accent-text);
   background: var(--accent-light);
   border-radius: 50%;
 }
@@ -1765,6 +1765,7 @@ p + p { margin-top: var(--spacing-default); }
 
 .topic-tags li,
 .journal-category,
+.journal-filter.is-active,
 .hero-card-tag,
 .pricing-badge,
 .team-profile-badge {
@@ -2234,7 +2235,7 @@ p + p { margin-top: var(--spacing-default); }
 }
 
 .journal-filter.is-active {
-  color: var(--text-primary);
+  color: var(--accent-text);
   background: var(--accent-light);
 }
 
@@ -2934,9 +2935,8 @@ a.contact-v1-slide-link:hover {
    ============================================= */
 
 .main-nav a[aria-current="page"],
-.main-nav a.nav-link--active,
-.footer-nav a[aria-current="page"] {
-  color: var(--text-primary);
+.main-nav a.nav-link--active {
+  color: var(--accent-text);
   background: var(--accent-light);
   font-weight: 600;
 }
