@@ -7,9 +7,9 @@ Use this when **berkshireyogatraining.co.uk** should show the holding page at `/
 | Audience | URL |
 |----------|-----|
 | Public | [https://berkshireyogatraining.co.uk/](https://berkshireyogatraining.co.uk/) |
-| Owners on custom domain | [https://berkshireyogatraining.co.uk/index.html](https://berkshireyogatraining.co.uk/index.html) |
+| Owners on custom domain (Cloudflare) | [https://berkshireyogatraining.co.uk/index-full](https://berkshireyogatraining.co.uk/index-full) |
 | Owners on GitHub Pages (full site at `/`, no `_redirects`) | [https://markotuisk.github.io/berkshire-yoga-training/](https://markotuisk.github.io/berkshire-yoga-training/) |
-| Cloudflare pages.dev (same rewrite as custom domain) | [https://berkshire-yoga-training.pages.dev/](https://berkshire-yoga-training.pages.dev/) → coming soon; full site at `/index.html` |
+| Cloudflare pages.dev (same rewrite as custom domain) | [https://berkshire-yoga-training.pages.dev/](https://berkshire-yoga-training.pages.dev/) → coming soon; full homepage at `/index-full` (`/index.html` redirects to `/` on Cloudflare) |
 
 ## Preview locally
 
@@ -32,7 +32,7 @@ Choose **one** approach. The full `index.html` is never deleted; `index-full.htm
 / /coming-soon.html 200
 ```
 
-Cloudflare Pages serves `coming-soon.html` at `/` with a 200 rewrite. The full site stays at `/index.html` and all other paths. **GitHub Pages ignores `_redirects`**, so the GitHub Pages URL still shows the full site at `/`.
+Cloudflare Pages serves `coming-soon.html` at `/` with a 200 rewrite. The full homepage is at `/index-full` (`index-full.html`). Other HTML pages are unchanged. `/index.html` is redirected to `/` by Pages, so it shows coming soon. **GitHub Pages ignores `_redirects`**, so the GitHub Pages URL still shows the full site at `/`.
 
 Deploy by pushing to `main` (GitHub Actions) or:
 

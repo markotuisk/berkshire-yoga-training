@@ -5,10 +5,10 @@
 | Audience | URL | What you see |
 |----------|-----|----------------|
 | **Public** | [https://berkshireyogatraining.co.uk/](https://berkshireyogatraining.co.uk/) | Coming soon (`coming-soon.html` via `_redirects`) |
-| **Owners / dev (custom domain)** | [https://berkshireyogatraining.co.uk/index.html](https://berkshireyogatraining.co.uk/index.html) | Full site (rewrite does not apply to `/index.html`) |
+| **Owners / dev (custom domain, Cloudflare)** | [https://berkshireyogatraining.co.uk/index-full](https://berkshireyogatraining.co.uk/index-full) | Full homepage (`index-full.html`; Pages redirects `/index.html` to `/`) |
 | **Owners / dev (GitHub Pages)** | [https://markotuisk.github.io/berkshire-yoga-training/](https://markotuisk.github.io/berkshire-yoga-training/) | Full site at `/` (GitHub Pages does **not** read `_redirects`) |
 
-**Cloudflare Pages preview host:** [https://berkshire-yoga-training.pages.dev/](https://berkshire-yoga-training.pages.dev/) behaves like the custom domain: `/` serves coming soon, `/index.html` serves the full site.
+**Cloudflare Pages preview host:** [https://berkshire-yoga-training.pages.dev/](https://berkshire-yoga-training.pages.dev/) behaves like the custom domain: `/` serves coming soon; full homepage at `/index-full` (not `/index.html`, which Pages maps to `/`).
 
 **Custom domain DNS:** attach `berkshireyogatraining.co.uk` on the Pages project and set DNS in Cloudflare (Workers & Pages → berkshire-yoga-training → Custom domains, or DNS → proxied CNAME `@` → `berkshire-yoga-training.pages.dev`).
 
@@ -16,7 +16,7 @@
 
 | Host | Root `/` | Full site |
 |------|----------|-----------|
-| Cloudflare Pages (production + pages.dev) | `coming-soon.html` (200 rewrite) | `/index.html` and all other HTML paths |
+| Cloudflare Pages (production + pages.dev) | `coming-soon.html` (200 rewrite) | `/index-full` for homepage; other pages (e.g. `/about.html`) unchanged |
 | GitHub Pages | `index.html` (full site) | Same as always |
 
 Active rule in `_redirects` (Cloudflare only):

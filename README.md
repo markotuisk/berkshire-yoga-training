@@ -8,7 +8,7 @@ Static marketing site for professional wellness education in Berkshire and Bucki
 |----------|------|
 | **Public** (coming soon) | [https://berkshireyogatraining.co.uk/](https://berkshireyogatraining.co.uk/) (Cloudflare; needs DNS) |
 | **Public** (pages.dev) | [https://berkshire-yoga-training.pages.dev/](https://berkshire-yoga-training.pages.dev/) |
-| **Owners / dev** | [https://berkshireyogatraining.co.uk/index.html](https://berkshireyogatraining.co.uk/index.html) or [https://markotuisk.github.io/berkshire-yoga-training/](https://markotuisk.github.io/berkshire-yoga-training/) (full site at `/`, no Cloudflare rewrite) |
+| **Owners / dev** | [https://berkshireyogatraining.co.uk/index-full](https://berkshireyogatraining.co.uk/index-full) on Cloudflare, or [https://markotuisk.github.io/berkshire-yoga-training/](https://markotuisk.github.io/berkshire-yoga-training/) (full site at `/`, no `_redirects`) |
 
 Cloudflare Pages uses `_redirects` so `/` serves `coming-soon.html`. GitHub Pages does **not** use `_redirects`, so the GitHub link is the simplest owner preview.
 
@@ -16,7 +16,7 @@ Cloudflare Pages uses `_redirects` so `/` serves `coming-soon.html`. GitHub Page
 
 | Page | URL |
 |------|-----|
-| Home | `/` or `/index.html` on Cloudflare when rewrite is active |
+| Home (owners on Cloudflare) | `/index-full` |
 | About | `/about.html` |
 | Foundation Training | `/foundation-training.html` |
 | CPD | `/cpd.html` |

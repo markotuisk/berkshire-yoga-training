@@ -1,2 +1,3 @@
 / /coming-soon.html 200
-# Owners and developers: open /index.html on this domain for the full site (no rewrite on that path).
+# Cloudflare Pages redirects /index.html to / before rewrites; use /index-full for the full homepage on this host.
+# Owners and developers: GitHub Pages serves the full site at / with no _redirects.
