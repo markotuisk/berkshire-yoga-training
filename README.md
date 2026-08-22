@@ -2,14 +2,32 @@
 
 Static marketing site for professional wellness education in Berkshire and Buckinghamshire.
 
-## Share with partners
+## Share with partners (full site)
 
-Open the live site (full homepage, not coming soon):
+The **entire site** is live at the root URL (home, programmes, about, team, journal, contact). Coming soon is **not** shown at `/`.
 
-- **Pages preview:** [https://berkshire-yoga-training.pages.dev](https://berkshire-yoga-training.pages.dev)
-- **Custom domain (when DNS is live):** [https://berkshireyogatraining.co.uk](https://berkshireyogatraining.co.uk)
+**Share this link now:**
 
-Social link previews use `assets/og-image.jpg` (1200×630) and Open Graph meta on every page.
+**https://markotuisk.github.io/berkshire-yoga-training/**
+
+| Page | URL |
+|------|-----|
+| Home | `/` |
+| About | `/about.html` |
+| Foundation Training | `/foundation-training.html` |
+| CPD | `/cpd.html` |
+| Workshops | `/workshops.html` |
+| Retreats | `/retreats.html` |
+| Research | `/research.html` |
+| Journal | `/journal.html` |
+| Contact | `/contact.html` |
+| Join | `/join.html` |
+
+Coming soon (pre-launch only): `/coming-soon.html`
+
+Custom domain when Cloudflare Pages is connected: **https://berkshireyogatraining.co.uk** (see `DEPLOY.md`).
+
+Social previews use `assets/og-image.jpg` and Open Graph meta on every page.
 
 ## Local preview
 
@@ -19,18 +37,10 @@ python3 -m http.server 8765
 
 Open `http://localhost:8765`
 
-## Share with partners
-
-| URL | What they see |
-|-----|----------------|
-| `http://localhost:8765/` | Full site (home, programmes, team) |
-| `http://localhost:8765/coming-soon.html` | LearnBuddy-style coming soon page |
-
-Once Cloudflare Pages is connected (see `DEPLOY.md`), use **https://berkshireyogatraining.co.uk** for the full site. Coming soon stays at `/coming-soon.html` until you add `_redirects` for pre-launch.
-
 ## Deploy
 
-- **GitHub:** push `main` to trigger Cloudflare Pages (see `.github/workflows/deploy.yml`)
-- **Manual:** `npx wrangler pages deploy . --project-name=berkshire-yoga-training --branch=main`
+- **GitHub Pages:** auto-deploys from `main` (partner link above)
+- **Cloudflare Pages:** push `main` or see `.github/workflows/deploy.yml` (needs API secrets)
+- **Manual:** `npx wrangler pages deploy . --project-name=berkshire-yoga-training`
 
-Requires Cloudflare API token (Pages Edit) and account ID. See `DEPLOY.md`.
+See `DEPLOY.md` for custom domain on Cloudflare.

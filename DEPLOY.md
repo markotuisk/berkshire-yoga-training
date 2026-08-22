@@ -2,11 +2,11 @@
 
 ## Share with partners
 
-**Open:** [https://berkshire-yoga-training.pages.dev](https://berkshire-yoga-training.pages.dev)
+**Live now (full site):** [https://markotuisk.github.io/berkshire-yoga-training/](https://markotuisk.github.io/berkshire-yoga-training/)
 
-When custom DNS is configured: [https://berkshireyogatraining.co.uk](https://berkshireyogatraining.co.uk)
+**Custom domain (after Cloudflare Pages):** [https://berkshireyogatraining.co.uk](https://berkshireyogatraining.co.uk)
 
-The root URL serves the **full site** (`index.html`) for partner demos. To show coming soon at `/` again, restore the rewrite in `_redirects` (see `DEPLOY-COMING-SOON.md`).
+The root URL serves the **full site** (`index.html`), not coming soon. To show coming soon at `/` again, add `/ /coming-soon.html 200` to `_redirects` (see `DEPLOY-COMING-SOON.md`).
 
 ## What is live
 
