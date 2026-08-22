@@ -1,3 +1,0 @@
-# Cloudflare Pages: serve coming soon at root while full site stays at /index.html
-# Remove or delete this file when the full site should be live at /
-/ /coming-soon.html 200

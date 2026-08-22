@@ -2,43 +2,54 @@
 
 ## What is live
 
-**Pre-launch (default in repo):** `_redirects` rewrites `/` to `coming-soon.html` on Cloudflare Pages. Visitors see the coming soon page at the root; the full site remains available at `/index.html` for preview.
+The **full site** is served at `/` (`index.html` and all programme pages). `coming-soon.html` remains in the repo for optional pre-launch use only (no `_redirects` rewrite).
 
-**Go live with full site:** delete `_redirects` (or remove the rewrite line) and push to `main`. See `DEPLOY-COMING-SOON.md` for swap and restore options.
+## GitHub
 
-| Mode | Root `/` | Dev / preview |
-|------|----------|----------------|
-| Pre-launch | `coming-soon.html` (via `_redirects`) | `/index.html` |
-| Full site | `index.html` | same |
+- Repo: https://github.com/markotuisk/berkshire-yoga-training
+- Branch: `main`
 
-## Cloudflare Pages
+## Cloudflare Pages (recommended: Connect Git)
 
-| Setting | Value |
-|---------|--------|
-| Project name | `berkshire-yoga-training` |
-| Production branch | `main` |
-| Build command | *(none — static HTML)* |
-| Build output | `/` (repo root) |
+Your domain already uses Cloudflare nameservers (`jamie.ns.cloudflare.com`, `yahir.ns.cloudflare.com`).
 
-## Custom domain
+1. Log in to [Cloudflare Dashboard](https://dash.cloudflare.com) → **Workers & Pages** → **Create** → **Pages** → **Connect to Git**.
+2. Authorise GitHub and select **markotuisk/berkshire-yoga-training**.
+3. Build settings:
+   - **Framework preset:** None
+   - **Build command:** *(leave empty)*
+   - **Build output directory:** `/` or `.`
+   - **Production branch:** `main`
+4. **Project name:** `berkshire-yoga-training` (must match workflow if using Actions).
+5. Deploy, then **Custom domains** → add **berkshireyogatraining.co.uk** and **www.berkshireyogatraining.co.uk** (optional).
+6. Cloudflare will create DNS records on the zone automatically.
 
-1. Add `berkshireyogatraining.co.uk` (and optionally `www`) in Cloudflare Pages → Custom domains.
-2. If the domain is already on Cloudflare, DNS records are added automatically.
-3. If the domain is elsewhere, point nameservers to Cloudflare or add a CNAME to the Pages hostname.
+## GitHub Actions (optional auto-deploy on push)
 
-## GitHub Actions secrets
+Workflow: `.github/workflows/deploy.yml`
 
-In the GitHub repo → Settings → Secrets and variables → Actions:
+Add repo secrets (**Settings → Secrets and variables → Actions**):
 
-| Secret | Where to find it |
-|--------|------------------|
-| `CLOUDFLARE_API_TOKEN` | Cloudflare dashboard → My Profile → API Tokens → Create token with **Cloudflare Pages Edit** |
-| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare dashboard → any zone → right sidebar **Account ID** |
+| Secret | Value |
+|--------|--------|
+| `CLOUDFLARE_API_TOKEN` | API token with **Account → Cloudflare Pages → Edit** |
+| `CLOUDFLARE_ACCOUNT_ID` | Dashboard → Workers & Pages → right sidebar **Account ID** |
 
-After secrets are set, every push to `main` redeploys the site.
+Then re-run the workflow or push to `main`.
 
-## Manual deploy (without GitHub Actions)
+## Manual deploy (Wrangler CLI)
 
 ```bash
+npx wrangler login          # complete browser OAuth once
 npx wrangler pages deploy . --project-name=berkshire-yoga-training --branch=main
+npx wrangler pages domain add berkshireyogatraining.co.uk --project-name=berkshire-yoga-training
 ```
+
+## Verify
+
+```bash
+curl -I https://berkshire-yoga-training.pages.dev
+curl -I https://berkshireyogatraining.co.uk
+```
+
+Expect `200` or `301`/`302` to HTTPS once DNS and SSL are active (can take a few minutes).
