@@ -27,7 +27,14 @@ Coming soon (pre-launch only): `/coming-soon.html`
 
 Custom domain when Cloudflare Pages is connected: **https://berkshireyogatraining.co.uk** (see `DEPLOY.md`).
 
-Social previews use `assets/og-image.jpg` and Open Graph meta on every page.
+Social previews use `assets/og-image.jpg` and Open Graph meta on every page. `og:url` and `og:image` use the GitHub Pages host until the custom domain is live.
+
+**Test social previews** (paste the GitHub Pages URL):
+
+- [opengraph.xyz](https://www.opengraph.xyz/)
+- [LinkedIn Post Inspector](https://www.linkedin.com/post-inspector/)
+
+Example image URL: `https://markotuisk.github.io/berkshire-yoga-training/assets/og-image.jpg`
 
 ## Local preview
 
