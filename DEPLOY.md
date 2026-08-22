@@ -56,3 +56,20 @@ Or set `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` in your environment.
 - Default share image: `assets/og-image.jpg` (1200×630)
 - Canonical URLs use `https://berkshireyogatraining.co.uk`
 - All main HTML pages include `og:*` and `twitter:*` meta tags
+
+## First-time setup in the Cloudflare dashboard (no API token)
+
+If you prefer not to use GitHub Actions secrets yet:
+
+1. Log in to [Cloudflare](https://dash.cloudflare.com) → **Workers & Pages** → **Create** → **Pages** → **Connect to Git**.
+2. Authorise GitHub and select **markotuisk/berkshire-yoga-training**, branch **main**.
+3. Build settings: **Framework preset** None, **Build command** empty, **Build output directory** `/` (site files at repo root).
+4. Deploy, then **Custom domains** → add **berkshireyogatraining.co.uk** (and **www** if needed). DNS is created automatically when the zone is on Cloudflare nameservers.
+5. Optional: disable the GitHub Actions workflow or add the same secrets so pushes to `main` also deploy via Actions.
+
+After a manual `wrangler` deploy, add the domain with:
+
+```bash
+npx wrangler pages project list
+npx wrangler pages domain add berkshire-yoga-training berkshireyogatraining.co.uk
+```
