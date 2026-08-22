@@ -1542,6 +1542,73 @@ p + p { margin-top: var(--spacing-default); }
   margin-top: 0.25rem;
 }
 
+/* Yoga Alliance Professionals certification logo */
+.yap-cert {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.yap-cert--align-start {
+  align-items: flex-start;
+}
+
+.yap-cert-label,
+.footer-cert .yap-cert-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+
+.yap-logo {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.yap-logo--hero {
+  max-height: 40px;
+}
+
+.yap-logo--badge {
+  max-height: 56px;
+}
+
+.yap-logo--section {
+  max-height: 52px;
+}
+
+.yap-logo--footer {
+  max-height: 36px;
+}
+
+.standards-cert {
+  margin-bottom: var(--spacing-default);
+}
+
+.footer-cert {
+  margin-top: 0.75rem;
+  align-items: flex-start;
+}
+
+.team-profile-cert-badge {
+  margin-top: var(--spacing-large);
+  padding: var(--spacing-large);
+  background: var(--white);
+  border-radius: var(--radius-medium);
+  border: 1px solid rgba(26, 26, 26, 0.06);
+  box-shadow: var(--shadow);
+}
+
+.hero-card--cert .yap-cert {
+  align-items: flex-start;
+  gap: 0.35rem;
+}
+
 .quality-copy .section-tag { margin-bottom: var(--spacing-xsmall); }
 
 .quality-copy h2 { margin-bottom: var(--spacing-default); }
