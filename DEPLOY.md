@@ -40,6 +40,8 @@ In the GitHub repo → Settings → Secrets and variables → Actions, add:
 | `CLOUDFLARE_API_TOKEN` | Cloudflare dashboard → My Profile → API Tokens → Create token with **Cloudflare Pages Edit** |
 | `CLOUDFLARE_ACCOUNT_ID` | Cloudflare dashboard → any zone → right sidebar **Account ID** |
 
+
+Before the workflow deploys, set repository variable **CLOUDFLARE_PAGES_ENABLED** to `true` (Settings → Secrets and variables → Actions → Variables). Leave it unset or `false` until secrets below are ready; pushes will then skip Cloudflare deploy without failing.
 After secrets are set, every push to `main` redeploys the site. Previous workflow runs failed because these secrets were not configured.
 
 ## Manual deploy (without GitHub Actions)
