@@ -18,10 +18,11 @@ Cloudflare Pages uses `_redirects` so `/` serves `coming-soon.html`. GitHub Page
 |------|-----|
 | Home (owners on Cloudflare) | `/owners` or `/index-full` |
 | About | `/about.html` |
-| Foundation Training | `/foundation-training.html` |
-| CPD | `/cpd.html` |
-| Workshops | `/workshops.html` |
-| Retreats | `/retreats.html` |
+| Services | `/services/` |
+| Foundation Training | `/services/foundation-training/` |
+| CPD | `/services/cpd/` |
+| Workshops | `/services/workshops/` |
+| Retreats | `/services/retreats/` |
 | Research | `/research.html` |
 | Journal | `/journal.html` |
 | Contact | `/contact.html` |

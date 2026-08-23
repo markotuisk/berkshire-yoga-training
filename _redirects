@@ -4,3 +4,17 @@
 / /coming-soon.html 200
 # Cloudflare Pages strips .html and treats index*.html specially; full-home.html avoids redirect loops.
 # Owners: /owners (preferred), /index-full (alias), or GitHub Pages (full site at /).
+
+# Services URL migration (301)
+/foundation-training /services/foundation-training/ 301
+/foundation-training/ /services/foundation-training/ 301
+/foundation-training.html /services/foundation-training/ 301
+/cpd /services/cpd/ 301
+/cpd/ /services/cpd/ 301
+/cpd.html /services/cpd/ 301
+/workshops /services/workshops/ 301
+/workshops/ /services/workshops/ 301
+/workshops.html /services/workshops/ 301
+/retreats /services/retreats/ 301
+/retreats/ /services/retreats/ 301
+/retreats.html /services/retreats/ 301

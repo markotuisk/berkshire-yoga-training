@@ -62,7 +62,13 @@ thameswellnessacademy.co.uk/
 ├── join.html               # Enquiry / apply (pricing-style CTA + form)
 ├── contact.html            # Contact (contact-v1 layout reference)
 ├── journal.html            # Blog listing (blog-v3 reference)
-├── foundation-training.html, cpd.html, workshops.html, retreats.html, research.html
+├── services/               # Services hub + programme pages
+│   ├── index.html
+│   ├── foundation-training/index.html
+│   ├── cpd/index.html
+│   ├── workshops/index.html
+│   └── retreats/index.html
+├── research.html
 ├── team/*.html             # Team member profiles (team-member reference)
 ├── css/styles.css          # Single stylesheet — extend here
 └── js/main.js              # Nav toggle, tabs, header scroll

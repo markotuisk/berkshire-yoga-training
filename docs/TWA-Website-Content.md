@@ -58,10 +58,11 @@
 |------|------|-------------|
 | `/` | Home | `index.html` |
 | `/about.html` | About the Academy | `about.html` |
-| `/foundation-training.html` | Foundation Training | `foundation-training.html` |
-| `/cpd.html` | CPD | `cpd.html` |
-| `/workshops.html` | Workshops | `workshops.html` |
-| `/retreats.html` | Retreats | `retreats.html` |
+| `/services/` | Services overview | `services/index.html` |
+| `/services/foundation-training/` | Foundation Training | `services/foundation-training/index.html` |
+| `/services/cpd/` | CPD | `services/cpd/index.html` |
+| `/services/workshops/` | Workshops | `services/workshops/index.html` |
+| `/services/retreats/` | Retreats | `services/retreats/index.html` |
 | `/research.html` | Research | `research.html` |
 | `/journal.html` | Journal | `journal.html` |
 | `/journal/breath-work-in-teaching.html` | Article: Breath work in teaching | `journal/breath-work-in-teaching.html` |
@@ -74,7 +75,7 @@
 | `/join.html` | Join / Apply | `join.html` |
 | `/coming-soon.html` | Coming Soon (pre-launch) | `coming-soon.html` |
 
-**Navigation (primary):** Foundation Training, Workshops, Retreats, Research, Journal, About / Team, Contact
+**Navigation (primary):** Services (Foundation Training, CPD, Workshops, Retreats), Research, Journal, About / Team, Contact
 
 **Header CTA:** Join Us (`/join.html`)
 
@@ -163,8 +164,8 @@
 
 ### Foundation Training | Yoga Teacher Training in Berkshire & Buckinghamshire
 
-**URL:** `https://berkshireyogatraining.co.uk/foundation-training.html`  
-**File:** `foundation-training.html`
+**URL:** `https://berkshireyogatraining.co.uk/services/foundation-training/`
+**File:** `services/foundation-training/index.html`
 
 **Meta description:** Yoga Alliance Professionals-certified Foundation Training from 200-hour to 500-hour Advanced. Teacher-led, on-site programmes across Berkshire and Buckinghamshire.
 
@@ -200,8 +201,8 @@
 
 ### CPD | Continuing Professional Development in Berkshire
 
-**URL:** `https://berkshireyogatraining.co.uk/cpd.html`  
-**File:** `cpd.html`
+**URL:** `https://berkshireyogatraining.co.uk/services/cpd/`
+**File:** `services/cpd/index.html`
 
 **Meta description:** On-site CPD for wellness teachers and practitioners in Berkshire and Buckinghamshire. Evidence-informed short courses in anatomy, mobility, pain-aware teaching and more.
 
@@ -233,8 +234,8 @@
 
 ### Workshops | Specialist Wellness Workshops in Berkshire
 
-**URL:** `https://berkshireyogatraining.co.uk/workshops.html`  
-**File:** `workshops.html`
+**URL:** `https://berkshireyogatraining.co.uk/services/workshops/`
+**File:** `services/workshops/index.html`
 
 **Meta description:** Hands-on specialist wellness workshops in Berkshire and Buckinghamshire. Sleep health, breath work, menopause support, trauma-informed teaching and more.
 
@@ -279,8 +280,8 @@
 
 ### Retreats | Wellness Retreats in Berkshire
 
-**URL:** `https://berkshireyogatraining.co.uk/retreats.html`  
-**File:** `retreats.html`
+**URL:** `https://berkshireyogatraining.co.uk/services/retreats/`
+**File:** `services/retreats/index.html`
 
 **Meta description:** Immersive wellness retreats from Thames Wellness Academy. Register your interest for restorative, teacher-led experiences in Berkshire and Buckinghamshire.
 
