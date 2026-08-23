@@ -132,14 +132,17 @@
 **URL:** `https://berkshireyogatraining.co.uk/about.html`  
 **File:** `about.html`
 
-**Meta description:** About Thames Wellness Academy: Yoga Alliance Professionals certified wellness education in Berkshire, blending academic rigour with personal growth.
+**Meta description:** About Thames Wellness Academy: women-owned wellness education in Berkshire, founded by Raili Maripuu and Katia Major. Yoga Alliance Professionals certified training.
 
 **H1:** Recognised standards in wellness education
 
 **Section headings (H2):**
 - Our approach
+- Building a leading local wellness training centre (Founders)
 - Meet our educators
 - Begin your journey with us
+
+**Founders:** Raili Maripuu (Goyoga Tallinn, Ashtanga) and Katia Major (Yoga Reading). Women-owned; partnership story and external links on page.
 
 **Key body copy:**
 - Certified by Yoga Alliance Professionals, combining academic rigour with personal growth.
