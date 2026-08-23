@@ -1,22 +1,29 @@
 # Deployment: berkshireyogatraining.co.uk
 
+## Custom domain status
+
+| Domain | Status |
+|--------|--------|
+| `berkshireyogatraining.co.uk` | **LIVE** (Cloudflare Pages, HTTPS, HTTP→HTTPS redirect) |
+| `www.berkshireyogatraining.co.uk` | Not configured (no DNS record) |
+
 ## Public vs owners
 
 | Audience | URL | What you see |
 |----------|-----|----------------|
 | **Public** | [https://berkshireyogatraining.co.uk/](https://berkshireyogatraining.co.uk/) | Coming soon (`coming-soon.html` via `_redirects`) |
-| **Owners / dev (custom domain, Cloudflare)** | [https://berkshireyogatraining.co.uk/index-full](https://berkshireyogatraining.co.uk/index-full) | Full homepage (`index-full.html`; Pages redirects `/index.html` to `/`) |
+| **Owners / dev (custom domain, Cloudflare)** | [https://berkshireyogatraining.co.uk/owners](https://berkshireyogatraining.co.uk/owners) | Full homepage (`full-home.html` via `_redirects`; `/index-full` is an alias) |
 | **Owners / dev (GitHub Pages)** | [https://markotuisk.github.io/berkshire-yoga-training/](https://markotuisk.github.io/berkshire-yoga-training/) | Full site at `/` (GitHub Pages does **not** read `_redirects`) |
 
-**Cloudflare Pages preview host:** [https://berkshire-yoga-training.pages.dev/](https://berkshire-yoga-training.pages.dev/) behaves like the custom domain: `/` serves coming soon; full homepage at `/index-full` (not `/index.html`, which Pages maps to `/`).
+**Cloudflare Pages preview host:** [https://berkshire-yoga-training.pages.dev/](https://berkshire-yoga-training.pages.dev/) behaves like the custom domain: `/` serves coming soon; full homepage at `/owners` (not `/index.html`, which Pages maps to `/`).
 
-**Custom domain DNS:** attach `berkshireyogatraining.co.uk` on the Pages project and set DNS in Cloudflare (Workers & Pages → berkshire-yoga-training → Custom domains, or DNS → proxied CNAME `@` → `berkshire-yoga-training.pages.dev`).
+**Custom domain:** `berkshireyogatraining.co.uk` is attached on the Pages project and DNS is active on Cloudflare.
 
 ## What is live
 
 | Host | Root `/` | Full site |
 |------|----------|-----------|
-| Cloudflare Pages (production + pages.dev) | `coming-soon.html` (200 rewrite) | `/index-full` for homepage; other pages (e.g. `/about.html`) unchanged |
+| Cloudflare Pages (production + pages.dev) | `coming-soon.html` (200 rewrite) | `/owners` for homepage; other pages (e.g. `/about.html`) unchanged |
 | GitHub Pages | `index.html` (full site) | Same as always |
 
 Active rule in `_redirects` (Cloudflare only):
@@ -75,7 +82,7 @@ Or set `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` in your environment.
 
 - `sitemap.xml` and `robots.txt` live at the repo root and are served at `/sitemap.xml` and `/robots.txt`.
 - Canonical URLs in the sitemap use `https://berkshireyogatraining.co.uk`.
-- After custom domain DNS is live, submit `https://berkshireyogatraining.co.uk/sitemap.xml` in [Google Search Console](https://search.google.com/search-console) (Sitemaps) for the property.
+- Submit `https://berkshireyogatraining.co.uk/sitemap.xml` in [Google Search Console](https://search.google.com/search-console) (Sitemaps) for the property.
 
 ## First-time setup in the Cloudflare dashboard (no API token)
 

@@ -1,6 +1,6 @@
-/owners /index-full.html 200
-/owners/ /index-full.html 200
-/index-full /index-full.html 200
+/owners /full-home.html 200
+/owners/ /full-home.html 200
+/index-full /full-home.html 200
 / /coming-soon.html 200
-# Cloudflare Pages redirects /index.html to / before rewrites, so / shows coming soon.
-# Owners: /owners or /index-full on this host, or GitHub Pages (full site at /).
+# Cloudflare Pages strips .html and treats index*.html specially; full-home.html avoids redirect loops.
+# Owners: /owners (preferred), /index-full (alias), or GitHub Pages (full site at /).

@@ -6,7 +6,7 @@ Static marketing site for professional wellness education in Berkshire and Bucki
 
 | Audience | Link |
 |----------|------|
-| **Public** (coming soon) | [https://berkshireyogatraining.co.uk/](https://berkshireyogatraining.co.uk/) (Cloudflare; needs DNS) |
+| **Public** (coming soon) | [https://berkshireyogatraining.co.uk/](https://berkshireyogatraining.co.uk/) **LIVE** (Cloudflare) |
 | **Public** (pages.dev) | [https://berkshire-yoga-training.pages.dev/](https://berkshire-yoga-training.pages.dev/) |
 | **Owners / dev** | [https://berkshireyogatraining.co.uk/owners](https://berkshireyogatraining.co.uk/owners) or `/index-full` on Cloudflare (`/index.html` cannot bypass coming soon on Cloudflare). Or [GitHub Pages](https://markotuisk.github.io/berkshire-yoga-training/) (full site at `/`). |
 
@@ -29,16 +29,16 @@ Cloudflare Pages uses `_redirects` so `/` serves `coming-soon.html`. GitHub Page
 
 Coming soon page (also served at `/` on Cloudflare): `/coming-soon.html`
 
-Custom domain DNS: see `DEPLOY.md`.
+**Custom domain:** `berkshireyogatraining.co.uk` is **LIVE** on Cloudflare Pages (apex only; `www` is not configured). See `DEPLOY.md`.
 
-Social previews use `assets/og-image.jpg` and Open Graph meta on every page. `og:url` and `og:image` use the GitHub Pages host until the custom domain is live.
+Social previews use `assets/og-image.jpg` and Open Graph meta on every page. `og:url`, `canonical`, and `twitter:image` use `https://berkshireyogatraining.co.uk`.
 
-**Test social previews** (paste the GitHub Pages URL):
+**Test social previews** (paste a production URL, e.g. `https://berkshireyogatraining.co.uk/about.html`):
 
 - [opengraph.xyz](https://www.opengraph.xyz/)
 - [LinkedIn Post Inspector](https://www.linkedin.com/post-inspector/)
 
-Example image URL: `https://markotuisk.github.io/berkshire-yoga-training/assets/og-image.jpg`
+Example image URL: `https://berkshireyogatraining.co.uk/assets/og-image.jpg`
 
 ## Local preview
 

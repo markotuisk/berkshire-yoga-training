@@ -7,9 +7,9 @@ Use this when **berkshireyogatraining.co.uk** should show the holding page at `/
 | Audience | URL |
 |----------|-----|
 | Public | [https://berkshireyogatraining.co.uk/](https://berkshireyogatraining.co.uk/) |
-| Owners on custom domain (Cloudflare) | [https://berkshireyogatraining.co.uk/index-full](https://berkshireyogatraining.co.uk/index-full) |
+| Owners on custom domain (Cloudflare) | [https://berkshireyogatraining.co.uk/owners](https://berkshireyogatraining.co.uk/owners) |
 | Owners on GitHub Pages (full site at `/`, no `_redirects`) | [https://markotuisk.github.io/berkshire-yoga-training/](https://markotuisk.github.io/berkshire-yoga-training/) |
-| Cloudflare pages.dev (same rewrite as custom domain) | [https://berkshire-yoga-training.pages.dev/](https://berkshire-yoga-training.pages.dev/) → coming soon; full homepage at `/index-full` (`/index.html` redirects to `/` on Cloudflare) |
+| Cloudflare pages.dev (same rewrite as custom domain) | [https://berkshire-yoga-training.pages.dev/](https://berkshire-yoga-training.pages.dev/) → coming soon; full homepage at `/owners` (`/index.html` redirects to `/` on Cloudflare) |
 
 ## Preview locally
 
@@ -22,7 +22,7 @@ Open `/coming-soon.html` in the browser before going live.
 
 ## Production options
 
-Choose **one** approach. The full `index.html` is never deleted; `index-full.html` is an additional backup of the homepage.
+Choose **one** approach. The full `index.html` is never deleted; `full-home.html` is an additional backup of the homepage.
 
 ### Option A: Cloudflare Pages rewrite (recommended, active)
 
@@ -32,7 +32,7 @@ Choose **one** approach. The full `index.html` is never deleted; `index-full.htm
 / /coming-soon.html 200
 ```
 
-Cloudflare Pages serves `coming-soon.html` at `/` with a 200 rewrite. The full homepage is at `/index-full` (`index-full.html`). Other HTML pages are unchanged. `/index.html` is redirected to `/` by Pages, so it shows coming soon. **GitHub Pages ignores `_redirects`**, so the GitHub Pages URL still shows the full site at `/`.
+Cloudflare Pages serves `coming-soon.html` at `/` with a 200 rewrite. The full homepage is at `/owners` (`full-home.html`). Other HTML pages are unchanged. `/index.html` is redirected to `/` by Pages, so it shows coming soon. **GitHub Pages ignores `_redirects`**, so the GitHub Pages URL still shows the full site at `/`.
 
 Deploy by pushing to `main` (GitHub Actions) or:
 
@@ -46,7 +46,7 @@ Remove or comment out the rule when the full site should be public at `/`.
 
 ```bash
 # Backup full homepage (if not already done)
-cp index.html index-full.html
+cp index.html full-home.html
 
 # Go live with coming soon at root
 mv index.html index-dev.html
@@ -86,7 +86,7 @@ Until connected, the note under the form tells visitors to email directly.
 | `coming-soon.html` | Standalone coming soon page |
 | `coming-soon.css` | Scoped styles (not `css/styles.css`) |
 | `index.html` | Full site homepage |
-| `index-full.html` | Backup copy of full homepage |
+| `full-home.html` | Backup copy of full homepage |
 | `_redirects` | Cloudflare Pages root → coming soon (not used on GitHub Pages) |
 
 ## Typography and brand
