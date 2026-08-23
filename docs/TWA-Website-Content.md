@@ -142,7 +142,7 @@
 - Meet our educators
 - Begin your journey with us
 
-**Founders:** Raili Maripuu (Goyoga Tallinn, Ashtanga) and Katia Major (Yoga Reading). Women-owned; partnership story and external links on page.
+**Founders:** Editorial partnership band (women-owned tag, overlapping portraits, partnership quote) followed by alternating magazine-style founder profiles with credential tags, scannable highlights and external links. Raili Maripuu (Goyoga Tallinn, Ashtanga) and Katia Major (Yoga Reading).
 
 **Key body copy:**
 - Certified by Yoga Alliance Professionals, combining academic rigour with personal growth.
