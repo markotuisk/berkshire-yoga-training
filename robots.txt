@@ -1,0 +1,6 @@
+# Pre-launch: public / serves coming soon; programme and content pages are
+# indexable for search discovery. Remove this note after full site launch.
+User-agent: *
+Allow: /
+
+Sitemap: https://berkshireyogatraining.co.uk/sitemap.xml

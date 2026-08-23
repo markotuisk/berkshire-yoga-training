@@ -71,6 +71,12 @@ Or set `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` in your environment.
 - Canonical URLs use `https://berkshireyogatraining.co.uk`
 - All main HTML pages include `og:*` and `twitter:*` meta tags
 
+## Sitemap and search indexing
+
+- `sitemap.xml` and `robots.txt` live at the repo root and are served at `/sitemap.xml` and `/robots.txt`.
+- Canonical URLs in the sitemap use `https://berkshireyogatraining.co.uk`.
+- After custom domain DNS is live, submit `https://berkshireyogatraining.co.uk/sitemap.xml` in [Google Search Console](https://search.google.com/search-console) (Sitemaps) for the property.
+
 ## First-time setup in the Cloudflare dashboard (no API token)
 
 If you prefer not to use GitHub Actions secrets yet:
