@@ -40,11 +40,12 @@
 
     mainNav.querySelectorAll('a').forEach(link => {
       link.addEventListener('click', () => {
-        if (!link.closest('.nav-item--has-menu > .nav-link') || !isDesktopNav()) {
-          mainNav.classList.remove('open');
-          navToggle.setAttribute('aria-expanded', 'false');
-          closeAllSubmenus();
-        }
+        const isMenuTrigger = link.matches('.nav-item--has-menu > .nav-link');
+        if (isMenuTrigger && !isDesktopNav()) return;
+
+        mainNav.classList.remove('open');
+        navToggle.setAttribute('aria-expanded', 'false');
+        closeAllSubmenus();
       });
     });
   }
