@@ -14,6 +14,10 @@
         {
           "href": "https://berkshireyogatraining.co.uk/",
           "type": "text/markdown"
+        },
+        {
+          "href": "https://berkshireyogatraining.co.uk/auth.md",
+          "type": "text/markdown"
         }
       ],
       "service-meta": [

@@ -22,6 +22,8 @@ curl -H "Accept: text/markdown" https://berkshireyogatraining.co.uk/
 
 Machine-readable site index: `/.well-known/llms.txt` (also at `/llms.txt`).
 
+Agent authentication instructions: `/auth.md` (public read-only site; no OAuth or API registration required).
+
 ## Key pages
 
 - [Home](https://berkshireyogatraining.co.uk/): Overview of programmes, standards and how to get started
