@@ -1,6 +1,8 @@
 User-agent: *
 Allow: /
 
+# llms.txt and /.well-known/llms.txt are allowed for AI crawler discoverability
+
 Disallow: /coming-soon.html
 Disallow: /coming-soon
 Disallow: /full-home.html
