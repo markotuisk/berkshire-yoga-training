@@ -2820,10 +2820,60 @@ a.contact-v1-slide-link:hover {
   min-height: 220px;
 }
 
+.contact-v1-locations-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 22rem) minmax(0, 1fr);
+  gap: var(--spacing-xlarge);
+  align-items: start;
+}
+
 .contact-v1-locations-track {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 1fr;
   gap: var(--spacing-regular);
+}
+
+.contact-v1-location-meta {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent-text);
+  margin-bottom: var(--spacing-xsmall);
+}
+
+.contact-v1-location-note {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: var(--spacing-small) 0 var(--spacing-regular);
+}
+
+.contact-v1-studio-callout {
+  padding: var(--spacing-xlarge);
+  background: var(--bg-light);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-medium);
+}
+
+.contact-v1-studio-callout .section-tag {
+  margin-bottom: var(--spacing-small);
+}
+
+.contact-v1-studio-callout h3 {
+  font-size: 1.35rem;
+  margin-bottom: var(--spacing-default);
+}
+
+.contact-v1-studio-callout p {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: var(--spacing-default);
+}
+
+.contact-v1-studio-callout .button-row {
+  margin-top: var(--spacing-regular);
 }
 
 .contact-v1-location-card {
@@ -2881,6 +2931,10 @@ a.contact-v1-slide-link:hover {
   }
 
   .contact-v1-locations-track {
+    grid-template-columns: 1fr;
+  }
+
+  .contact-v1-locations-layout {
     grid-template-columns: 1fr;
   }
 
