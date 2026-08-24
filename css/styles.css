@@ -4251,6 +4251,13 @@ a.contact-v1-slide-link:hover {
   line-height: 0;
 }
 
+.founder-credential-logo-link--badge {
+  padding: var(--spacing-xsmall);
+  background: var(--bg-white);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+}
+
 .founder-credential-logo {
   display: block;
   width: auto;
@@ -4263,6 +4270,11 @@ a.contact-v1-slide-link:hover {
 .founder-credential-logo--wide {
   max-width: 7.5rem;
   max-height: 2.75rem;
+}
+
+.founder-credential-logo--badge {
+  max-width: 4.5rem;
+  max-height: 4.5rem;
 }
 
 .about-team-grid {
