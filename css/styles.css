@@ -4260,6 +4260,11 @@ a.contact-v1-slide-link:hover {
   object-fit: contain;
 }
 
+.founder-credential-logo--wide {
+  max-width: 7.5rem;
+  max-height: 2.75rem;
+}
+
 .about-team-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
