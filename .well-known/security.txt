@@ -1,0 +1,4 @@
+Contact: mailto:info@thameswellnessacademy.co.uk
+Expires: 2027-08-24T23:59:59.000Z
+Preferred-Languages: en
+Canonical: https://berkshireyogatraining.co.uk/.well-known/security.txt

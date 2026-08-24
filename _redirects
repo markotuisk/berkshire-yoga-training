@@ -1,3 +1,6 @@
+# security.txt (RFC 9116) — legacy path redirect
+/security.txt /.well-known/security.txt 301
+
 /owners /full-home.html 200
 /owners/ /full-home.html 200
 /index-full /full-home.html 200
