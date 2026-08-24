@@ -119,6 +119,7 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html {
+  overflow-x: clip;
   scroll-behavior: smooth;
   scroll-padding-top: var(--header-height);
 }
@@ -708,24 +709,77 @@ p + p { margin-top: var(--spacing-default); }
   position: relative;
 }
 
+.nav-item--has-menu > .nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.nav-item--has-menu > .nav-link::after {
+  content: '';
+  width: 0.35rem;
+  height: 0.35rem;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg) translateY(-1px);
+  opacity: 0.55;
+  transition: transform 0.2s ease;
+}
+
+.nav-item--has-menu.is-open > .nav-link::after,
+.nav-item--has-menu:hover > .nav-link::after {
+  transform: rotate(-135deg) translateY(1px);
+}
+
 .nav-submenu {
   list-style: none;
-  display: none;
   position: absolute;
-  top: calc(100% + 0.2rem);
+  top: 100%;
   left: 0;
   min-width: 12.5rem;
+  margin: 0;
   padding: 0.35rem;
   background: var(--white);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-xsmall);
   box-shadow: var(--shadow-lg);
   z-index: 200;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(0.35rem);
+  transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
 }
 
-.nav-item--has-menu:hover .nav-submenu,
-.nav-item--has-menu:focus-within .nav-submenu {
-  display: block;
+.nav-submenu::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  height: 0.5rem;
+}
+
+.nav-item--has-menu.is-open > .nav-submenu {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0.25rem);
+}
+
+@media (min-width: 1281px) {
+  .nav-item--has-menu.is-open {
+    z-index: 210;
+  }
+
+  .main-nav > ul {
+    gap: 0.05rem;
+  }
+
+  .main-nav > ul > li > .nav-link {
+    padding: var(--spacing-xsmall) 0.55rem;
+    font-size: 0.8125rem;
+  }
 }
 
 .nav-submenu a {
@@ -3542,10 +3596,10 @@ a.contact-v1-slide-link:hover {
 }
 
 /* =============================================
-   Responsive: 1100px (nav / header)
+   Responsive: 1280px (nav / header)
    ============================================= */
 
-@media (max-width: 1100px) {
+@media (max-width: 1280px) {
   .logo-text { display: none; }
 
   .header-inner {
@@ -3563,6 +3617,9 @@ a.contact-v1-slide-link:hover {
     top: var(--header-height);
     left: 0;
     right: 0;
+    max-height: calc(100vh - var(--header-height));
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     background: var(--white);
     border: var(--border-width) solid var(--border-subtle);
     padding: var(--spacing-default) var(--spacing-regular) var(--spacing-regular);
@@ -3593,20 +3650,37 @@ a.contact-v1-slide-link:hover {
     align-items: center;
   }
 
+  .nav-item--has-menu > .nav-link::after {
+    margin-left: auto;
+  }
+
   .nav-submenu {
     position: static;
-    display: block;
+    display: none;
     min-width: 0;
     padding: 0 0 0 0.75rem;
     margin-top: 0.15rem;
     background: transparent;
     border: none;
     box-shadow: none;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: none;
+    transition: none;
+  }
+
+  .nav-submenu::before {
+    display: none;
+  }
+
+  .nav-item--has-menu.is-open > .nav-submenu {
+    display: block;
   }
 
   .nav-submenu a {
     font-size: 0.875rem;
-    min-height: 2.5rem;
+    min-height: 2.75rem;
   }
 
   .nav-join-mobile {
@@ -3633,7 +3707,26 @@ a.contact-v1-slide-link:hover {
     background: var(--accent) !important;
     color: var(--white) !important;
   }
+
+  .floating-card {
+    position: relative;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: auto !important;
+    transform: none !important;
+    margin-top: var(--spacing-small);
+  }
+
+  .floating-showcase {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .floating-showcase-main { order: -1; }
 }
+
+/* Legacy alias — keep tablet rules grouped below */
 
 /* =============================================
    Responsive: 991px (tablet)
@@ -3651,11 +3744,6 @@ a.contact-v1-slide-link:hover {
   }
 
   .split-grid--left-image .split-visual { order: -1; }
-
-  .floating-card--1 { left: 0; top: 8%; }
-  .floating-card--2 { right: 0; top: 6%; }
-  .floating-card--3 { left: 2%; bottom: 14%; }
-  .floating-card--4 { right: 0; bottom: 10%; }
 
   .stats-float-card {
     left: 0;
@@ -3733,6 +3821,10 @@ a.contact-v1-slide-link:hover {
 @media screen and (max-width: 767px) {
   .hidden-landscape { display: none; }
   .show-landscape { display: block; }
+
+  .text-no-wrap {
+    white-space: normal;
+  }
 
   .grid-4.hero-v1-grid {
     grid-template-columns: 1fr 1fr 1fr;

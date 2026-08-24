@@ -9,27 +9,100 @@
     }, { passive: true });
   }
 
-  // Mobile nav toggle
+  // Mobile nav toggle + dropdown menus
   const navToggle = document.querySelector('.nav-toggle');
   const mainNav = document.querySelector('.main-nav');
+  const menuItems = document.querySelectorAll('.nav-item--has-menu');
+  const desktopNavQuery = window.matchMedia('(min-width: 1281px)');
+
+  const isDesktopNav = () => desktopNavQuery.matches;
+
+  const closeAllSubmenus = () => {
+    menuItems.forEach(item => {
+      item.classList.remove('is-open');
+      const trigger = item.querySelector(':scope > .nav-link');
+      trigger?.setAttribute('aria-expanded', 'false');
+    });
+  };
+
+  const setSubmenuOpen = (item, open) => {
+    const trigger = item.querySelector(':scope > .nav-link');
+    item.classList.toggle('is-open', open);
+    trigger?.setAttribute('aria-expanded', open ? 'true' : 'false');
+  };
 
   if (navToggle && mainNav) {
     navToggle.addEventListener('click', () => {
       const isOpen = mainNav.classList.toggle('open');
       navToggle.setAttribute('aria-expanded', isOpen);
+      if (!isOpen) closeAllSubmenus();
     });
 
     mainNav.querySelectorAll('a').forEach(link => {
       link.addEventListener('click', () => {
-        mainNav.classList.remove('open');
-        navToggle.setAttribute('aria-expanded', 'false');
+        if (!link.closest('.nav-item--has-menu > .nav-link') || !isDesktopNav()) {
+          mainNav.classList.remove('open');
+          navToggle.setAttribute('aria-expanded', 'false');
+          closeAllSubmenus();
+        }
       });
     });
   }
 
+  menuItems.forEach(item => {
+    const trigger = item.querySelector(':scope > .nav-link');
+    if (!trigger) return;
+
+    trigger.setAttribute('aria-haspopup', 'true');
+    trigger.setAttribute('aria-expanded', 'false');
+
+    trigger.addEventListener('click', event => {
+      if (!isDesktopNav()) {
+        event.preventDefault();
+        const willOpen = !item.classList.contains('is-open');
+        closeAllSubmenus();
+        if (willOpen) setSubmenuOpen(item, true);
+      }
+    });
+
+    item.addEventListener('mouseenter', () => {
+      if (!isDesktopNav()) return;
+      closeAllSubmenus();
+      setSubmenuOpen(item, true);
+    });
+
+    item.addEventListener('mouseleave', () => {
+      if (!isDesktopNav()) return;
+      setSubmenuOpen(item, false);
+    });
+
+    item.addEventListener('focusin', () => {
+      if (!isDesktopNav()) return;
+      closeAllSubmenus();
+      setSubmenuOpen(item, true);
+    });
+  });
+
+  mainNav?.addEventListener('focusout', event => {
+    if (!isDesktopNav()) return;
+    if (!mainNav.contains(event.relatedTarget)) closeAllSubmenus();
+  });
+
+  document.addEventListener('click', event => {
+    if (!mainNav || mainNav.contains(event.target)) return;
+    closeAllSubmenus();
+  });
+
+  desktopNavQuery.addEventListener('change', () => {
+    closeAllSubmenus();
+    mainNav?.classList.remove('open');
+    navToggle?.setAttribute('aria-expanded', 'false');
+  });
+
   document.querySelector('.header-cta')?.addEventListener('click', () => {
     mainNav?.classList.remove('open');
     navToggle?.setAttribute('aria-expanded', 'false');
+    closeAllSubmenus();
   });
 
   // Foundation sub-tabs (foundation-training page)
