@@ -7,4 +7,8 @@ Disallow: /full-home.html
 Disallow: /owners
 Disallow: /index-full
 
+Disallow: /team/senior-educator.html
+Disallow: /team/clinical-specialist.html
+Disallow: /team/therapeutic-educator.html
+
 Sitemap: https://berkshireyogatraining.co.uk/sitemap.xml
