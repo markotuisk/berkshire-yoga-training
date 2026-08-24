@@ -17,6 +17,7 @@ Canonical site: https://berkshireyogatraining.co.uk/
 - [Team](https://berkshireyogatraining.co.uk/team.html): Co-founders and faculty
 - [Partners](https://berkshireyogatraining.co.uk/partners.html): Founding studio partners Yoga Reading (Katia Major) and Goyoga Tallinn (Raili Maripuu)
 - [Services](https://berkshireyogatraining.co.uk/services/): Programme hub
+- [Solutions](https://berkshireyogatraining.co.uk/solutions/): How TWA supports practitioners, studios and organisations
 - [Contact](https://berkshireyogatraining.co.uk/contact.html): Enquiries and questions
 - [Join](https://berkshireyogatraining.co.uk/join.html): Apply or enquire about training
 - [Privacy](https://berkshireyogatraining.co.uk/privacy.html): Privacy policy
@@ -29,6 +30,12 @@ Canonical site: https://berkshireyogatraining.co.uk/
 - [CPD](https://berkshireyogatraining.co.uk/services/cpd/): Continuing professional development for qualified teachers and practitioners
 - [Workshops](https://berkshireyogatraining.co.uk/services/workshops/): Specialist short courses on topics such as breath work, menopause support and trauma-informed teaching
 - [Retreats](https://berkshireyogatraining.co.uk/services/retreats/): Immersive retreat programmes combining academic rigour with restorative practice
+
+## Solutions
+
+- [Your Path](https://berkshireyogatraining.co.uk/solutions/your-path/): Routes into wellness teaching, Foundation Training and supervised practicum
+- [Your Growth](https://berkshireyogatraining.co.uk/solutions/your-growth/): CPD, specialist workshops and evidence-informed professional development
+- [Your Opportunities](https://berkshireyogatraining.co.uk/solutions/your-opportunities/): Studio partnerships, corporate wellness and career pathways
 
 ## Founders and studio heritage
 
