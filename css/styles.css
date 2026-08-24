@@ -4238,6 +4238,28 @@ a.contact-v1-slide-link:hover {
   color: var(--accent-text);
 }
 
+.founder-credential-badges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-small);
+  margin-bottom: var(--spacing-regular);
+}
+
+.founder-credential-logo-link {
+  display: block;
+  line-height: 0;
+}
+
+.founder-credential-logo {
+  display: block;
+  width: auto;
+  max-width: 5.5rem;
+  max-height: 3.25rem;
+  height: auto;
+  object-fit: contain;
+}
+
 .about-team-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
