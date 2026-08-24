@@ -2,22 +2,23 @@
 
 Static marketing site for professional wellness education in Berkshire and Buckinghamshire.
 
-## Public vs owners
+## Public site
 
 | Audience | Link |
 |----------|------|
-| **Public** (coming soon) | [https://berkshireyogatraining.co.uk/](https://berkshireyogatraining.co.uk/) **LIVE** (Cloudflare) |
-| **Public** (pages.dev) | [https://berkshire-yoga-training.pages.dev/](https://berkshire-yoga-training.pages.dev/) |
-| **Owners / dev** | [https://berkshireyogatraining.co.uk/owners](https://berkshireyogatraining.co.uk/owners) or `/index-full` on Cloudflare (`/index.html` cannot bypass coming soon on Cloudflare). Or [GitHub Pages](https://markotuisk.github.io/berkshire-yoga-training/) (full site at `/`). |
+| **Public** | [https://berkshireyogatraining.co.uk/](https://berkshireyogatraining.co.uk/) **LIVE** (Cloudflare) |
+| **Preview** | [https://berkshire-yoga-training.pages.dev/](https://berkshire-yoga-training.pages.dev/) |
+| **GitHub Pages** | [https://markotuisk.github.io/berkshire-yoga-training/](https://markotuisk.github.io/berkshire-yoga-training/) |
 
-Cloudflare Pages uses `_redirects` so `/` serves `coming-soon.html`. GitHub Pages does **not** use `_redirects`, so the GitHub link is the simplest owner preview.
+The full site is served at `/` on Cloudflare Pages (`index.html`). Owner preview copies remain at `/owners` and `/index-full` (not indexed).
 
-## Site map (full site)
+## Site map
 
 | Page | URL |
 |------|-----|
-| Home (owners on Cloudflare) | `/owners` or `/index-full` |
+| Home | `/` |
 | About | `/about.html` |
+| Team | `/team.html` |
 | Services | `/services/` |
 | Foundation Training | `/services/foundation-training/` |
 | CPD | `/services/cpd/` |
@@ -27,8 +28,6 @@ Cloudflare Pages uses `_redirects` so `/` serves `coming-soon.html`. GitHub Page
 | Journal | `/journal.html` |
 | Contact | `/contact.html` |
 | Join | `/join.html` |
-
-Coming soon page (also served at `/` on Cloudflare): `/coming-soon.html`
 
 **Custom domain:** `berkshireyogatraining.co.uk` is **LIVE** on Cloudflare Pages (apex only; `www` is not configured). See `DEPLOY.md`.
 
@@ -55,4 +54,4 @@ Open `http://localhost:8765`
 - **Cloudflare Pages:** push `main` or see `.github/workflows/deploy.yml` (needs API secrets)
 - **Manual:** `npx wrangler pages deploy . --project-name=berkshire-yoga-training`
 
-See `DEPLOY.md` and `DEPLOY-COMING-SOON.md` for coming soon vs full site behaviour.
+See `DEPLOY.md` for deployment and Search Console setup.

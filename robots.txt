@@ -1,6 +1,10 @@
-# Pre-launch: public / serves coming soon; programme and content pages are
-# indexable for search discovery. Remove this note after full site launch.
 User-agent: *
 Allow: /
+
+Disallow: /coming-soon.html
+Disallow: /coming-soon
+Disallow: /full-home.html
+Disallow: /owners
+Disallow: /index-full
 
 Sitemap: https://berkshireyogatraining.co.uk/sitemap.xml

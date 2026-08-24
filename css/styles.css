@@ -4224,6 +4224,167 @@ a.contact-v1-slide-link:hover {
   color: var(--text-primary);
 }
 
+/* About — timeline */
+.about-timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-width: 48rem;
+  margin-inline: auto;
+}
+
+.about-timeline-item {
+  display: grid;
+  grid-template-columns: 5.5rem 1fr;
+  gap: var(--spacing-regular);
+  padding-bottom: var(--spacing-large);
+  position: relative;
+}
+
+.about-timeline-item:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  left: 2.65rem;
+  top: 2rem;
+  bottom: 0;
+  width: 2px;
+  background: var(--border-subtle);
+}
+
+.about-timeline-year {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--accent-text);
+  padding-top: 0.15rem;
+}
+
+.about-timeline-content h3 {
+  font-size: 1.1rem;
+  margin-bottom: var(--spacing-xsmall);
+}
+
+.about-timeline-content p {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* About — brand identity */
+.about-brand-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-xlarge);
+  align-items: start;
+}
+
+.about-brand-copy h3,
+.about-brand-colours h3 {
+  font-size: 1.2rem;
+  margin-bottom: var(--spacing-default);
+}
+
+.about-brand-copy p {
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-default);
+  line-height: 1.65;
+}
+
+.about-colour-swatches {
+  list-style: none;
+  margin: var(--spacing-regular) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-regular);
+}
+
+.about-colour-swatch {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-regular);
+}
+
+.about-colour-chip {
+  flex-shrink: 0;
+  width: 3rem;
+  height: 3rem;
+  border-radius: var(--radius);
+}
+
+.about-colour-chip--border {
+  border: 1px solid var(--border-subtle);
+}
+
+.about-colour-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.about-colour-detail strong {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.about-colour-detail span {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+/* Contact — details panel */
+.contact-details-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-regular);
+  margin-bottom: var(--spacing-xlarge);
+}
+
+.contact-detail-card {
+  padding: var(--spacing-regular);
+  background: var(--white);
+  border-radius: var(--radius-medium);
+  border: 1px solid var(--border-subtle);
+}
+
+.contact-detail-card h2 {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: var(--spacing-small);
+}
+
+.contact-detail-card p,
+.contact-detail-card address {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  font-style: normal;
+  margin: 0;
+}
+
+.contact-detail-card a {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.contact-detail-card a:hover {
+  color: var(--accent-text);
+}
+
+.contact-v1-map-embed {
+  width: 100%;
+  border: 0;
+  border-radius: var(--radius-medium);
+  min-height: 22rem;
+  display: block;
+}
+
 @media (max-width: 991px) {
   .about-story-grid { grid-template-columns: 1fr; }
   .about-trust-grid { grid-template-columns: repeat(2, 1fr); }
@@ -4251,14 +4412,21 @@ a.contact-v1-slide-link:hover {
   }
   .about-team-grid { grid-template-columns: repeat(2, 1fr); }
   .about-location-grid { grid-template-columns: 1fr; }
+  .about-brand-grid { grid-template-columns: 1fr; }
+  .contact-details-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media screen and (max-width: 767px) {
   .about-trust-grid,
   .about-values-grid,
   .about-stats,
-  .about-team-grid {
+  .about-team-grid,
+  .contact-details-grid {
     grid-template-columns: 1fr;
+  }
+
+  .about-timeline-item {
+    grid-template-columns: 4.5rem 1fr;
   }
 
   .about-founders-story {

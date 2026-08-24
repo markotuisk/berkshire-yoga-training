@@ -7,32 +7,26 @@
 | `berkshireyogatraining.co.uk` | **LIVE** (Cloudflare Pages, HTTPS, HTTP→HTTPS redirect) |
 | `www.berkshireyogatraining.co.uk` | Not configured (no DNS record) |
 
-## Public vs owners
+## Public site (live)
 
 | Audience | URL | What you see |
 |----------|-----|----------------|
-| **Public** | [https://berkshireyogatraining.co.uk/](https://berkshireyogatraining.co.uk/) | Coming soon (`coming-soon.html` via `_redirects`) |
-| **Owners / dev (custom domain, Cloudflare)** | [https://berkshireyogatraining.co.uk/owners](https://berkshireyogatraining.co.uk/owners) | Full homepage (`full-home.html` via `_redirects`; `/index-full` is an alias) |
-| **Owners / dev (GitHub Pages)** | [https://markotuisk.github.io/berkshire-yoga-training/](https://markotuisk.github.io/berkshire-yoga-training/) | Full site at `/` (GitHub Pages does **not** read `_redirects`) |
+| **Public** | [https://berkshireyogatraining.co.uk/](https://berkshireyogatraining.co.uk/) | Full site (`index.html` at `/`) |
+| **Owners / dev preview** | [https://berkshireyogatraining.co.uk/owners](https://berkshireyogatraining.co.uk/owners) | Homepage backup (`full-home.html`) |
+| **GitHub Pages** | [https://markotuisk.github.io/berkshire-yoga-training/](https://markotuisk.github.io/berkshire-yoga-training/) | Full site at `/` (GitHub Pages does **not** read `_redirects`) |
 
-**Cloudflare Pages preview host:** [https://berkshire-yoga-training.pages.dev/](https://berkshire-yoga-training.pages.dev/) behaves like the custom domain: `/` serves coming soon; full homepage at `/owners` (not `/index.html`, which Pages maps to `/`).
+**Cloudflare Pages preview host:** [https://berkshire-yoga-training.pages.dev/](https://berkshire-yoga-training.pages.dev/) mirrors the custom domain.
 
 **Custom domain:** `berkshireyogatraining.co.uk` is attached on the Pages project and DNS is active on Cloudflare.
 
 ## What is live
 
-| Host | Root `/` | Full site |
-|------|----------|-----------|
-| Cloudflare Pages (production + pages.dev) | `coming-soon.html` (200 rewrite) | `/owners` for homepage; other pages (e.g. `/about.html`) unchanged |
+| Host | Root `/` | Notes |
+|------|----------|-------|
+| Cloudflare Pages (production + pages.dev) | `index.html` (full homepage) | `/coming-soon.html` redirects to `/` |
 | GitHub Pages | `index.html` (full site) | Same as always |
 
-Active rule in `_redirects` (Cloudflare only):
-
-```
-/ /coming-soon.html 200
-```
-
-Remove or comment out that line when the full site should be public at `/`. See `DEPLOY-COMING-SOON.md`.
+Legacy `/coming-soon.html` requests receive a 301 redirect to `/` via `_redirects`.
 
 ## Cloudflare Pages
 

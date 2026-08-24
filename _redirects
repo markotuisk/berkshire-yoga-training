@@ -1,9 +1,10 @@
 /owners /full-home.html 200
 /owners/ /full-home.html 200
 /index-full /full-home.html 200
-/ /coming-soon.html 200
-# Cloudflare Pages strips .html and treats index*.html specially; full-home.html avoids redirect loops.
-# Owners: /owners (preferred), /index-full (alias), or GitHub Pages (full site at /).
+
+# Coming soon retired — redirect legacy URL to homepage
+/coming-soon / 301
+/coming-soon.html / 301
 
 # Services URL migration (301)
 /foundation-training /services/foundation-training/ 301

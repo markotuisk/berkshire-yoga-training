@@ -1,5 +1,7 @@
 # Deploy coming soon page
 
+> **Status: retired (August 2026).** The full site is live at `/`. Legacy `/coming-soon.html` redirects to the homepage. This document is kept for reference only.
+
 Use this when **berkshireyogatraining.co.uk** should show the holding page at `/` while the full site remains in the repo for owners and developers.
 
 ## URLs (current setup)

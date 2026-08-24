@@ -58,7 +58,8 @@ thameswellnessacademy.co.uk/
 ├── coming-soon.css         # Scoped styles for coming-soon only (not styles.css)
 ├── index-full.html         # Backup of full homepage before go-live swap
 ├── DEPLOY-COMING-SOON.md   # Manual deploy/restore steps — do not auto-swap index
-├── about.html              # About + team grid
+├── about.html              # About us (brand, mission, values)
+├── team.html               # Team / leadership page
 ├── join.html               # Enquiry / apply (pricing-style CTA + form)
 ├── contact.html            # Contact (contact-v1 layout reference)
 ├── journal.html            # Blog listing (blog-v3 reference)
@@ -87,7 +88,8 @@ Use LearnBuddy demos for **section structure only**. Style guide for agents:
 | LearnBuddy reference | TWA file | Primary TWA patterns |
 |---------------------|----------|----------------------|
 | home-v1 | `index.html` | `.hero_section`, `.grid-4.hero-v1-grid`, `.frame-section` / `.section-card`, `.floating-showcase`, `.split-grid` |
-| about | `about.html` | `.page-hero`, `.quality-grid`, `.about-team-grid`, `.about-values-grid`, `.about-location-grid` |
+| about | `about.html` | `.page-hero`, `.about-story-grid`, `.about-values-grid`, `.about-timeline`, `.about-brand-grid`, `.about-stats` |
+| team | `team.html` | `.about-founders-*`, `.about-team-grid`, `.about-founder-block` |
 | pricing | `join.html`, programme pricing sections | `.pricing-toggle`, `.pricing-card`, `.section-gradient`, `.join-enquiry-grid` |
 | blog-v3 | `journal.html` | `.journal-grid`, `.journal-featured`, `.journal-card`, `.journal-newsletter-inner` |
 | contact-v1 | `contact.html` | `.contact-v1-*` (layout), `.contact-form`, `.faq-list` or `.contact-v1-faq-*` |
