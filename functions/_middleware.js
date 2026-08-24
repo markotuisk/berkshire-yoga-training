@@ -7,6 +7,9 @@ import { htmlToMarkdown } from './lib/html-to-markdown.js';
 
 const STATIC_ASSET = /\.(css|js|mjs|png|jpe?g|gif|svg|webp|ico|woff2?|ttf|eot|webmanifest|pdf|map|txt|xml)$/i;
 
+const AGENT_LINK_HEADER =
+  '</.well-known/api-catalog>; rel="api-catalog", </llms.txt>; rel="describedby"; type="text/plain", </sitemap.xml>; rel="sitemap"; type="application/xml"';
+
 function prefersMarkdown(accept) {
   return !!accept && /\btext\/markdown\b/i.test(accept);
 }
@@ -30,10 +33,15 @@ function estimateTokens(text) {
   return String(Math.ceil(text.length / 4));
 }
 
+function applyAgentLinkHeaders(headers) {
+  headers.set('Link', AGENT_LINK_HEADER);
+}
+
 function markdownResponse(body, sourceHeaders) {
   const headers = new Headers(sourceHeaders);
   headers.set('Content-Type', 'text/markdown; charset=utf-8');
   headers.set('Vary', 'Accept');
+  applyAgentLinkHeaders(headers);
   headers.set('x-markdown-tokens', estimateTokens(body));
   headers.set('Content-Signal', 'ai-train=yes, search=yes, ai-input=yes');
   headers.delete('Content-Encoding');
@@ -48,7 +56,14 @@ export async function onRequest(context) {
   const accept = request.headers.get('Accept') || '';
 
   if (!['GET', 'HEAD'].includes(request.method) || !prefersMarkdown(accept)) {
-    return next();
+    const response = await next();
+    const contentType = response.headers.get('content-type') || '';
+    if (response.ok && /text\/html/i.test(contentType)) {
+      const headers = new Headers(response.headers);
+      applyAgentLinkHeaders(headers);
+      return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+    }
+    return response;
   }
 
   const url = new URL(request.url);
@@ -81,6 +96,7 @@ export async function onRequest(context) {
     const headers = new Headers(response.headers);
     headers.set('Content-Type', 'text/markdown; charset=utf-8');
     headers.set('Vary', 'Accept');
+    applyAgentLinkHeaders(headers);
     headers.set('x-markdown-tokens', estimateTokens(markdown));
     headers.set('Content-Signal', 'ai-train=yes, search=yes, ai-input=yes');
     headers.delete('Content-Encoding');
