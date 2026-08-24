@@ -18,6 +18,10 @@
         {
           "href": "https://berkshireyogatraining.co.uk/auth.md",
           "type": "text/markdown"
+        },
+        {
+          "href": "https://berkshireyogatraining.co.uk/.well-known/agent-card.json",
+          "type": "application/json"
         }
       ],
       "service-meta": [
@@ -32,6 +36,18 @@
         {
           "href": "https://berkshireyogatraining.co.uk/.well-known/security.txt",
           "type": "text/plain"
+        },
+        {
+          "href": "https://berkshireyogatraining.co.uk/.well-known/oauth-protected-resource",
+          "type": "application/json"
+        },
+        {
+          "href": "https://berkshireyogatraining.co.uk/.well-known/oauth-authorization-server",
+          "type": "application/json"
+        },
+        {
+          "href": "https://berkshireyogatraining.co.uk/.well-known/openid-configuration",
+          "type": "application/json"
         }
       ]
     }

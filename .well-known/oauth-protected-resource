@@ -1,0 +1,8 @@
+{
+  "resource": "https://berkshireyogatraining.co.uk/",
+  "authorization_servers": [],
+  "bearer_methods_supported": [],
+  "scopes_supported": [],
+  "resource_documentation": "https://berkshireyogatraining.co.uk/auth.md",
+  "resource_signing_alg_values_supported": []
+}

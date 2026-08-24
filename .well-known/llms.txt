@@ -24,6 +24,14 @@ Machine-readable site index: `/.well-known/llms.txt` (also at `/llms.txt`).
 
 Agent authentication instructions: `/auth.md` (public read-only site; no OAuth or API registration required).
 
+## Agent discovery
+
+- Agent card (A2A): `/.well-known/agent-card.json` (public content resource; not an interactive A2A agent)
+- OAuth protected resource metadata (RFC 9728): `/.well-known/oauth-protected-resource` (all content is public; no bearer tokens required)
+- OAuth authorisation server metadata (RFC 8414): `/.well-known/oauth-authorization-server` (no authorisation server operated)
+- OpenID Connect discovery: `/.well-known/openid-configuration` (no OIDC provider operated)
+- API catalog: `/.well-known/api-catalog`
+
 ## Key pages
 
 - [Home](https://berkshireyogatraining.co.uk/): Overview of programmes, standards and how to get started

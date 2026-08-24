@@ -49,11 +49,16 @@ Agents should not attempt to submit forms on behalf of users without explicit hu
 | User claimed (OAuth device flow) | Not supported |
 | Anonymous public read | Supported for all public pages |
 
-No `/.well-known/oauth-protected-resource` or `/.well-known/oauth-authorization-server` metadata is published because this site does not operate an OAuth-protected API.
+OAuth and OIDC discovery metadata is published honestly to declare that no authorisation server or protected API is operated:
+
+- [/.well-known/oauth-protected-resource](https://berkshireyogatraining.co.uk/.well-known/oauth-protected-resource): RFC 9728 metadata; `authorization_servers` is empty because all content is public
+- [/.well-known/oauth-authorization-server](https://berkshireyogatraining.co.uk/.well-known/oauth-authorization-server): RFC 8414 metadata; no OAuth endpoints are offered
+- [/.well-known/openid-configuration](https://berkshireyogatraining.co.uk/.well-known/openid-configuration): OIDC discovery metadata; no OIDC provider is operated
 
 ## Discovery
 
 - Machine-readable site index: [/.well-known/llms.txt](https://berkshireyogatraining.co.uk/.well-known/llms.txt)
+- Agent card (A2A): [/.well-known/agent-card.json](https://berkshireyogatraining.co.uk/.well-known/agent-card.json)
 - API catalog (site resources): [/.well-known/api-catalog](https://berkshireyogatraining.co.uk/.well-known/api-catalog)
 - Security contact: [/.well-known/security.txt](https://berkshireyogatraining.co.uk/.well-known/security.txt)
 - Robots and content signals: [/robots.txt](https://berkshireyogatraining.co.uk/robots.txt)

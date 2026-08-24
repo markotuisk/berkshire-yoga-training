@@ -1,0 +1,8 @@
+{
+  "issuer": "https://berkshireyogatraining.co.uk",
+  "service_documentation": "https://berkshireyogatraining.co.uk/auth.md",
+  "grant_types_supported": [],
+  "response_types_supported": [],
+  "token_endpoint_auth_methods_supported": [],
+  "code_challenge_methods_supported": []
+}
