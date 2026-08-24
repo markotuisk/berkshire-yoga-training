@@ -13,22 +13,22 @@
   const navToggle = document.querySelector('.nav-toggle');
   const mainNav = document.querySelector('.main-nav');
   const menuItems = document.querySelectorAll('.nav-item--has-menu');
-  const desktopNavQuery = window.matchMedia('(min-width: 1281px)');
+  const desktopNavQuery = window.matchMedia('(min-width: 1441px)');
 
   const isDesktopNav = () => desktopNavQuery.matches;
 
   const closeAllSubmenus = () => {
     menuItems.forEach(item => {
-      item.classList.remove('is-open');
-      const trigger = item.querySelector(':scope > .nav-link');
-      trigger?.setAttribute('aria-expanded', 'false');
+      setSubmenuOpen(item, false);
     });
   };
 
   const setSubmenuOpen = (item, open) => {
     const trigger = item.querySelector(':scope > .nav-link');
+    const submenu = item.querySelector(':scope > .nav-submenu');
     item.classList.toggle('is-open', open);
     trigger?.setAttribute('aria-expanded', open ? 'true' : 'false');
+    submenu?.setAttribute('aria-hidden', open ? 'false' : 'true');
   };
 
   if (navToggle && mainNav) {
@@ -55,6 +55,7 @@
 
     trigger.setAttribute('aria-haspopup', 'true');
     trigger.setAttribute('aria-expanded', 'false');
+    item.querySelector(':scope > .nav-submenu')?.setAttribute('aria-hidden', 'true');
 
     trigger.addEventListener('click', event => {
       if (!isDesktopNav()) {

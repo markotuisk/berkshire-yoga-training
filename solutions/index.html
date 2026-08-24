@@ -30,7 +30,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/styles.css?v=202608247">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -98,11 +98,16 @@
               <li><a href="your-opportunities/" class="nav-link">Your Opportunities</a></li>
             </ul>
           </li>
-          <li><a href="../research.html" class="nav-link">Research</a></li>
+          <li class="nav-item nav-item--has-menu">
+            <a href="../research.html" class="nav-link">Research</a>
+            <ul class="nav-submenu" id="nav-research-menu">
+              <li><a href="../research.html" class="nav-link">Overview</a></li>
+              <li><a href="../research/partners/" class="nav-link">Partners</a></li>
+            </ul>
+          </li>
           <li><a href="../journal.html" class="nav-link">Journal</a></li>
           <li><a href="../about.html" class="nav-link">About</a></li>
           <li><a href="../team.html" class="nav-link">Team</a></li>
-          <li><a href="../partners.html" class="nav-link">Partners</a></li>
           <li><a href="../contact.html" class="nav-link">Contact</a></li>
           <li class="nav-join-mobile"><a href="../join.html" class="nav-join-link">Join</a></li>
         </ul>
@@ -122,7 +127,7 @@
       </nav>
       <span class="section-tag">How we help</span>
       <h1>Wellness education that meets you where you are</h1>
-      <p class="page-hero-lead"><a href="../about.html">Thames Wellness Academy</a> works with aspiring teachers, qualified practitioners, studios and organisations across Berkshire and Buckinghamshire. Whether you are starting out, deepening your expertise or exploring new professional horizons, our teacher-led programmes provide clear structure, credible certification and practical support at every stage.</p>
+      <p class="page-hero-lead">Teacher-led programmes for aspiring teachers, qualified practitioners, studios and organisations across Berkshire and Buckinghamshire. Clear structure, credible certification and practical support at every stage.</p>
     </div>
   </section>
 
@@ -134,37 +139,27 @@
           <h2 id="solutions-intro-heading" class="display-8">Three ways we support your practice</h2>
           <p class="main-content-lead">We do not offer one-size-fits-all training. Instead, we help you find the right entry point, build skills that matter in real teaching environments, and connect you with opportunities that align with your goals. Every programme is delivered on site by senior educators, with clinical input where it counts.</p>
         </div>
-      </div>
-    </div>
-  </section>
 
-  <section class="section" aria-labelledby="solutions-cards-heading">
-    <div class="container">
-      <div class="section-header inner-container-center max-w-43-75rem text-align-center">
-        <span class="section-tag">Explore solutions</span>
-        <h2 id="solutions-cards-heading" class="display-8">Find the support you need</h2>
-        <p class="main-content-lead">Each area below links to practical guidance on how TWA can help practitioners, studio owners and wellbeing leads.</p>
-      </div>
-
-      <div class="home-intro-grid services-hub-grid">
-        <a href="your-path/" class="home-intro-card">
-          <span class="section-tag">Starting out</span>
-          <h3>Your Path</h3>
-          <p>Clear routes into teaching for career changers, experienced practitioners and studio trainees. From <a href="../services/foundation-training/">Foundation Training</a> through supervised practicum to certification.</p>
-          <span class="home-intro-link">Explore your path</span>
-        </a>
-        <a href="your-growth/" class="home-intro-card">
-          <span class="section-tag">Deepening expertise</span>
-          <h3>Your Growth</h3>
-          <p>Structured <a href="../services/cpd/">CPD</a> and specialist <a href="../services/workshops/">workshops</a> to stay current with anatomy, breath work, pain-aware teaching and evidence-informed practice.</p>
-          <span class="home-intro-link">Explore your growth</span>
-        </a>
-        <a href="your-opportunities/" class="home-intro-card">
-          <span class="section-tag">Professional horizons</span>
-          <h3>Your Opportunities</h3>
-          <p>Studio partnerships, corporate wellness programmes, teaching placements and career pathways supported by our faculty network across the Thames Valley.</p>
-          <span class="home-intro-link">Explore your opportunities</span>
-        </a>
+        <div class="home-intro-grid solutions-hub-grid">
+          <a href="your-path/" class="home-intro-card">
+            <span class="section-tag">Starting out</span>
+            <h3 class="display-5">Your Path</h3>
+            <p>Clear routes into teaching for career changers, experienced practitioners and studio trainees. From Foundation Training through supervised practicum to certification.</p>
+            <span class="home-intro-link">Explore your path</span>
+          </a>
+          <a href="your-growth/" class="home-intro-card">
+            <span class="section-tag">Deepening expertise</span>
+            <h3 class="display-5">Your Growth</h3>
+            <p>Structured CPD and specialist workshops to stay current with anatomy, breath work, pain-aware teaching and evidence-informed practice.</p>
+            <span class="home-intro-link">Explore your growth</span>
+          </a>
+          <a href="your-opportunities/" class="home-intro-card">
+            <span class="section-tag">Professional horizons</span>
+            <h3 class="display-5">Your Opportunities</h3>
+            <p>Studio partnerships, corporate wellness programmes, teaching placements and career pathways supported by our faculty network across the Thames Valley.</p>
+            <span class="home-intro-link">Explore your opportunities</span>
+          </a>
+        </div>
       </div>
     </div>
   </section>
@@ -192,7 +187,7 @@
           </ul>
           <div class="button-row">
             <a href="../join.html" class="btn btn-primary btn-sm">Apply or enquire</a>
-            <a href="../partners.html" class="btn btn-secondary btn-sm">Studio partners</a>
+            <a href="../research/partners/" class="btn btn-secondary btn-sm">Studio partners</a>
           </div>
         </div>
         <div class="split-visual">
@@ -245,7 +240,7 @@
           <li><a href="../journal.html">Journal</a></li>
           <li><a href="../about.html">About</a></li>
           <li><a href="../team.html">Team</a></li>
-          <li><a href="../partners.html">Partners</a></li>
+          <li><a href="../research/partners/">Partners</a></li>
           <li><a href="../join.html">Join</a></li>
           <li><a href="../contact.html">Contact</a></li>
           <li><a href="../privacy.html">Privacy</a></li>
@@ -255,6 +250,6 @@
     </div>
   </footer>
 
-  <script src="../js/main.js"></script>
+  <script src="../js/main.js?v=202608247"></script>
 </body>
 </html>

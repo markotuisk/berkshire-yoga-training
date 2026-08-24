@@ -30,7 +30,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/styles.css?v=202608247">
 </head>
 <body>
 
@@ -67,11 +67,16 @@
           <li><a href="../solutions/your-opportunities/" class="nav-link">Your Opportunities</a></li>
             </ul>
           </li>
-          <li><a href="../research.html" class="nav-link">Research</a></li>
+          <li class="nav-item nav-item--has-menu">
+            <a href="../research.html" class="nav-link">Research</a>
+            <ul class="nav-submenu" id="nav-research-menu">
+              <li><a href="../research.html" class="nav-link">Overview</a></li>
+              <li><a href="../research/partners/" class="nav-link">Partners</a></li>
+            </ul>
+          </li>
           <li><a href="../journal.html" class="nav-link">Journal</a></li>
           <li><a href="../about.html" class="nav-link">About</a></li>
           <li><a href="../team.html" class="nav-link">Team</a></li>
-          <li><a href="../partners.html" class="nav-link">Partners</a></li>
           <li><a href="../contact.html" class="nav-link">Contact</a></li>
           <li class="nav-join-mobile"><a href="../join.html" class="nav-join-link">Join</a></li>
         </ul>
@@ -89,88 +94,47 @@
         <span class="breadcrumb-sep" aria-hidden="true">/</span>
         <span>Services</span>
       </nav>
-      <span class="section-tag">Services at TWA</span>
+      <span class="section-tag">What we offer</span>
       <h1>Wellness education, delivered on site</h1>
-      <p class="page-hero-lead"><a href="../about.html">Thames Wellness Academy</a> offers teacher-led programmes for aspiring yoga teachers, qualified practitioners and organisations across Berkshire and Buckinghamshire. Every service is <a href="https://www.yogaallianceprofessionals.org/" target="_blank" rel="noopener noreferrer">Yoga Alliance Professionals</a> certified or aligned, and delivered in person across studio, corporate and therapeutic settings.</p>
+      <p class="page-hero-lead">Teacher-led programmes for aspiring teachers, qualified practitioners and organisations across Berkshire and Buckinghamshire. Clear pathways from accredited training through CPD, workshops and retreats.</p>
     </div>
   </section>
 
-  <section class="frame-section section-pd-bottom-none" aria-labelledby="pathway-heading">
+  <section class="frame-section section-pd-bottom-none" aria-labelledby="services-heading">
     <div class="section-card">
       <div class="container">
         <div class="inner-container-center max-w-60rem text-align-center">
           <span class="section-tag">Your learning journey</span>
-          <h2 id="pathway-heading" class="display-8">How our services connect</h2>
-          <p class="main-content-lead">Our four offerings form a clear progression. Begin with accredited teacher training, deepen your expertise through CPD, explore specialist workshops, and gather for immersive retreats. Each programme stands alone, yet they are designed to complement one another as your practice evolves.</p>
+          <h2 id="services-heading" class="display-8">Four programmes, one clear progression</h2>
+          <p class="main-content-lead">Begin with accredited teacher training, deepen your expertise through CPD, explore specialist workshops, and gather for immersive retreats. Each programme stands alone, yet they are designed to complement one another as your practice evolves.</p>
         </div>
 
-        <div class="steps-grid grid-4 gap-content">
-          <article class="step-card">
-            <div class="step-card-visual image-wrapper">
-              <div class="step-icon placeholder-img-sm" aria-hidden="true"></div>
-            </div>
-            <h3 class="display-5">1. Foundation Training</h3>
-            <p>Build your teaching credentials from 200-hour Foundation through to 500-hour Advanced level with <a href="https://www.yogaallianceprofessionals.org/" target="_blank" rel="noopener noreferrer">Yoga Alliance Professionals</a> certification.</p>
-          </article>
-          <article class="step-card">
-            <div class="step-card-visual image-wrapper">
-              <div class="step-icon placeholder-img-sm" aria-hidden="true"></div>
-            </div>
-            <h3 class="display-5">2. CPD</h3>
-            <p>Stay current with short, on-site courses in anatomy, mobility, pain-aware teaching and professional wellbeing for qualified practitioners.</p>
-          </article>
-          <article class="step-card">
-            <div class="step-card-visual image-wrapper">
-              <div class="step-icon placeholder-img-sm" aria-hidden="true"></div>
-            </div>
-            <h3 class="display-5">3. Workshops</h3>
-            <p>Go deeper in focused areas such as breath work, sleep health, menopause support and trauma-informed teaching through hands-on specialist sessions.</p>
-          </article>
-          <article class="step-card">
-            <div class="step-card-visual image-wrapper">
-              <div class="step-icon placeholder-img-sm" aria-hidden="true"></div>
-            </div>
-            <h3 class="display-5">4. Retreats</h3>
-            <p>Step away for restorative, teacher-led experiences that combine in-depth learning with space to reflect and reconnect. Programmes in development.</p>
-          </article>
+        <div class="home-intro-grid services-hub-grid">
+          <a href="foundation-training/" class="home-intro-card">
+            <span class="section-tag">200–500 hour</span>
+            <h3 class="display-5">Foundation Training</h3>
+            <p>Internationally recognised teacher training from Foundation to Advanced level, with Yoga Alliance Professionals certification.</p>
+            <span class="home-intro-link">View Foundation Training</span>
+          </a>
+          <a href="cpd/" class="home-intro-card">
+            <span class="section-tag">Professional development</span>
+            <h3 class="display-5">CPD</h3>
+            <p>Short, on-site courses in anatomy, mobility, pain-aware teaching and wellbeing for practising professionals.</p>
+            <span class="home-intro-link">View CPD courses</span>
+          </a>
+          <a href="workshops/" class="home-intro-card">
+            <span class="section-tag">Specialist training</span>
+            <h3 class="display-5">Workshops</h3>
+            <p>Immersive, hands-on workshops in sleep health, breath work, menopause support, trauma-informed teaching and more.</p>
+            <span class="home-intro-link">View workshops</span>
+          </a>
+          <a href="retreats/" class="home-intro-card">
+            <span class="section-tag">Coming soon</span>
+            <h3 class="display-5">Retreats</h3>
+            <p>Restorative, teacher-led retreat experiences for in-depth learning away from everyday demands. Programmes in development.</p>
+            <span class="home-intro-link">Register interest</span>
+          </a>
         </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="section" aria-labelledby="services-heading">
-    <div class="container">
-      <div class="section-header inner-container-center max-w-43-75rem text-align-center">
-        <span class="section-tag">What we offer</span>
-        <h2 id="services-heading" class="display-8">Choose your pathway</h2>
-        <p class="main-content-lead">Teacher-led programmes for aspiring teachers, qualified practitioners and organisations seeking evidence-informed wellness education.</p>
-      </div>
-
-      <div class="home-intro-grid services-hub-grid">
-        <a href="foundation-training/" class="home-intro-card">
-          <span class="section-tag">200–500 hour</span>
-          <h3>Foundation Training</h3>
-          <p>Internationally recognised teacher training from Foundation to Advanced level, with <a href="https://www.yogaallianceprofessionals.org/" target="_blank" rel="noopener noreferrer">Yoga Alliance Professionals</a> certification.</p>
-          <span class="home-intro-link">View Foundation Training</span>
-        </a>
-        <a href="cpd/" class="home-intro-card">
-          <span class="section-tag">Professional development</span>
-          <h3>CPD</h3>
-          <p>Short, on-site courses in anatomy, mobility, pain-aware teaching and wellbeing for practising professionals.</p>
-          <span class="home-intro-link">View CPD courses</span>
-        </a>
-        <a href="workshops/" class="home-intro-card">
-          <span class="section-tag">Specialist training</span>
-          <h3>Workshops</h3>
-          <p>Immersive, hands-on workshops in sleep health, breath work, menopause support, trauma-informed teaching and more.</p>
-          <span class="home-intro-link">View workshops</span>
-        </a>
-        <a href="retreats/" class="home-intro-card">
-          <span class="section-tag">Coming soon</span>
-          <h3>Retreats</h3>
-          <p>Restorative, teacher-led retreat experiences for in-depth learning away from everyday demands. Programmes in development.</p>
-          <span class="home-intro-link">Register interest</span>
-        </a>
       </div>
     </div>
   </section>
@@ -233,7 +197,7 @@
         <p>Thames Wellness Academy<br>Professional wellness education in Berkshire</p>
         <div class="footer-cert yap-cert">
           <p class="yap-cert-label">Certified by</p>
-          <img src="../../assets/yoga-alliance-professionals-logo.png" alt="Yoga Alliance Professionals" class="yap-logo yap-logo--footer" width="146" height="45">
+          <img src="../assets/yoga-alliance-professionals-logo.png" alt="Yoga Alliance Professionals" class="yap-logo yap-logo--footer" width="146" height="45">
         </div>
       </div>
       <nav class="footer-nav" aria-label="Footer navigation">
@@ -251,7 +215,7 @@
           <li><a href="../journal.html">Journal</a></li>
           <li><a href="../about.html">About</a></li>
           <li><a href="../team.html">Team</a></li>
-          <li><a href="../partners.html">Partners</a></li>
+          <li><a href="../research/partners/">Partners</a></li>
           <li><a href="../join.html">Join</a></li>
           <li><a href="../contact.html">Contact</a></li>
           <li><a href="../privacy.html">Privacy</a></li>
@@ -261,6 +225,6 @@
     </div>
   </footer>
 
-  <script src="../js/main.js"></script>
+  <script src="../js/main.js?v=202608247"></script>
 </body>
 </html>

@@ -10,12 +10,24 @@ Contact: info@thameswellnessacademy.co.uk
 
 Canonical site: https://berkshireyogatraining.co.uk/
 
+## Content negotiation (Markdown for Agents)
+
+Public HTML pages support HTTP content negotiation for AI agents. Send `Accept: text/markdown` (optionally with `text/html`) to any page URL and the site returns `text/markdown; charset=utf-8` instead of HTML. The same canonical URLs apply; no separate `.md` paths are required.
+
+Example:
+
+```bash
+curl -H "Accept: text/markdown" https://berkshireyogatraining.co.uk/
+```
+
+Machine-readable site index: `/.well-known/llms.txt` (also at `/llms.txt`).
+
 ## Key pages
 
 - [Home](https://berkshireyogatraining.co.uk/): Overview of programmes, standards and how to get started
 - [About](https://berkshireyogatraining.co.uk/about.html): Mission, values, story and milestones
 - [Team](https://berkshireyogatraining.co.uk/team.html): Co-founders and faculty
-- [Partners](https://berkshireyogatraining.co.uk/partners.html): Founding studio partners Yoga Reading (Katia Major) and Goyoga Tallinn (Raili Maripuu)
+- [Partners](https://berkshireyogatraining.co.uk/research/partners/): Founding studio partners Yoga Reading (Katia Major) and Goyoga Tallinn (Raili Maripuu)
 - [Services](https://berkshireyogatraining.co.uk/services/): Programme hub
 - [Solutions](https://berkshireyogatraining.co.uk/solutions/): How TWA supports practitioners, studios and organisations
 - [Contact](https://berkshireyogatraining.co.uk/contact.html): Enquiries and questions

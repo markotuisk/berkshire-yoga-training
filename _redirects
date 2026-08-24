@@ -25,3 +25,8 @@
 /retreats /services/retreats/ 301
 /retreats/ /services/retreats/ 301
 /retreats.html /services/retreats/ 301
+
+# Partners URL migration (301)
+/partners /research/partners/ 301
+/partners/ /research/partners/ 301
+/partners.html /research/partners/ 301

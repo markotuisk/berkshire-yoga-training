@@ -1,0 +1,35 @@
+{
+  "linkset": [
+    {
+      "anchor": "https://berkshireyogatraining.co.uk/",
+      "service-doc": [
+        {
+          "href": "https://berkshireyogatraining.co.uk/.well-known/llms.txt",
+          "type": "text/plain"
+        },
+        {
+          "href": "https://berkshireyogatraining.co.uk/",
+          "type": "text/html"
+        },
+        {
+          "href": "https://berkshireyogatraining.co.uk/",
+          "type": "text/markdown"
+        }
+      ],
+      "service-meta": [
+        {
+          "href": "https://berkshireyogatraining.co.uk/sitemap.xml",
+          "type": "application/xml"
+        },
+        {
+          "href": "https://berkshireyogatraining.co.uk/robots.txt",
+          "type": "text/plain"
+        },
+        {
+          "href": "https://berkshireyogatraining.co.uk/.well-known/security.txt",
+          "type": "text/plain"
+        }
+      ]
+    }
+  ]
+}
