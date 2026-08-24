@@ -5144,3 +5144,43 @@ a.about-team-card:hover .about-team-link {
     grid-template-columns: 1fr;
   }
 }
+
+/* Partners page */
+.partners-intro {
+  margin-bottom: var(--spacing-xlarge);
+}
+
+.partners-intro .main-content-lead {
+  margin-bottom: var(--spacing-regular);
+}
+
+.partners-studio-list {
+  margin-top: var(--spacing-large);
+}
+
+.partner-studio-logo-link {
+  display: block;
+  margin-bottom: var(--spacing-regular);
+}
+
+.partner-studio-logo {
+  display: block;
+  width: auto;
+  max-width: 8.5rem;
+  max-height: 3.5rem;
+  height: auto;
+  object-fit: contain;
+}
+
+.partner-studio-photo {
+  object-position: center;
+}
+
+.partner-studio-block h3 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.partner-studio-block h3 a:hover {
+  color: var(--accent-text);
+}

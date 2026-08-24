@@ -15,6 +15,7 @@ Canonical site: https://berkshireyogatraining.co.uk/
 - [Home](https://berkshireyogatraining.co.uk/): Overview of programmes, standards and how to get started
 - [About](https://berkshireyogatraining.co.uk/about.html): Mission, values, story and milestones
 - [Team](https://berkshireyogatraining.co.uk/team.html): Co-founders and faculty
+- [Partners](https://berkshireyogatraining.co.uk/partners.html): Founding studio partners Yoga Reading (Katia Major) and Goyoga Tallinn (Raili Maripuu)
 - [Services](https://berkshireyogatraining.co.uk/services/): Programme hub
 - [Contact](https://berkshireyogatraining.co.uk/contact.html): Enquiries and questions
 - [Join](https://berkshireyogatraining.co.uk/join.html): Apply or enquire about training
@@ -30,6 +31,8 @@ Canonical site: https://berkshireyogatraining.co.uk/
 - [Retreats](https://berkshireyogatraining.co.uk/services/retreats/): Immersive retreat programmes combining academic rigour with restorative practice
 
 ## Founders and studio heritage
+
+Studio partners: [Yoga Reading](https://yogareading.co.uk) (Katia Major) and [Goyoga Tallinn](https://goyoga.ee) (Raili Maripuu). Practitioner blessing and support from certified and lineage-led teachers within both studios underpins academy education and skills development.
 
 - [Raili Maripuu](https://berkshireyogatraining.co.uk/team.html#raili-maripuu): Co-founder, studio founder, Yoga Alliance Professionals-certified teacher and Lino Miele-recognised Ashtanga educator. 500-hour Ashtanga Yoga in-depth study (2016, Ashtanga Yoga Research Institute). [railimaripuu.com](https://railimaripuu.com), [LinkedIn](https://www.linkedin.com/in/railimaripuu). Founder of [Goyoga Tallinn](https://goyoga.ee). Teaches in Tallinn, Reading and Twyford; corporate wellness and leadership programmes across Estonia and the UK.
 - [Katia Major](https://berkshireyogatraining.co.uk/team.html#katia-major): Co-founder, studio director and Level 5 soft tissue therapist. [katiamajor.com](https://www.katiamajor.com), [LinkedIn](https://www.linkedin.com/in/katia-major-845026162). Owner of [Yoga Reading](https://yogareading.co.uk). Qualified yoga teacher (2014), Oxford School of Sports Massage clinical training (2018), Pilates, strength and spin instruction.
