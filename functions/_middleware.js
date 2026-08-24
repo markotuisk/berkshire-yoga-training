@@ -1,6 +1,6 @@
 /**
  * Cloudflare Pages middleware: Markdown for Agents content negotiation.
- * GET requests with Accept: text/markdown receive text/markdown for HTML pages.
+ * GET/HEAD requests with Accept: text/markdown receive text/markdown for HTML pages.
  */
 
 import { htmlToMarkdown } from './lib/html-to-markdown.js';
@@ -14,9 +14,15 @@ function prefersMarkdown(accept) {
 function isHtmlPagePath(pathname) {
   if (pathname === '/' || pathname === '/index.html') return true;
   if (/\.html$/i.test(pathname)) return true;
-  if (pathname.endsWith('/') && !pathname.startsWith('/assets/') && !pathname.startsWith('/css/') && !pathname.startsWith('/js/')) {
-    return true;
-  }
+
+  const excludedPrefixes = ['/assets/', '/css/', '/js/'];
+  if (excludedPrefixes.some((prefix) => pathname.startsWith(prefix))) return false;
+
+  if (pathname.endsWith('/')) return true;
+
+  const lastSegment = pathname.split('/').pop();
+  if (lastSegment && !/\.[a-z0-9]+$/i.test(lastSegment)) return true;
+
   return false;
 }
 
@@ -56,7 +62,10 @@ export async function onRequest(context) {
     return next();
   }
 
-  const response = await next();
+  const htmlHeaders = new Headers(request.headers);
+  htmlHeaders.set('Accept', 'text/html,*/*');
+  const htmlRequest = new Request(request.url, { method: 'GET', headers: htmlHeaders });
+  const response = await next(htmlRequest);
   if (!response.ok) {
     return response;
   }
