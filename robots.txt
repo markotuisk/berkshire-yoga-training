@@ -1,14 +1,20 @@
 User-agent: *
 Allow: /
 
-# llms.txt and /.well-known/llms.txt are allowed for AI crawler discoverability
+# Public pages (including partners.html) are crawlable.
+# llms.txt and /.well-known/llms.txt are allowed for AI crawler discoverability.
 
+# Pre-launch, preview and placeholder content
 Disallow: /coming-soon.html
 Disallow: /coming-soon
 Disallow: /full-home.html
+Disallow: /full-home
 Disallow: /owners
+Disallow: /owners/
 Disallow: /index-full
+Disallow: /index-full.html
 
+# Placeholder team profiles (noindex in page meta)
 Disallow: /team/senior-educator.html
 Disallow: /team/clinical-specialist.html
 Disallow: /team/therapeutic-educator.html
