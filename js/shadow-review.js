@@ -1008,6 +1008,7 @@
         </div>
       </div>
 
+      <div id="shadow-pick-tooltip" hidden aria-hidden="true"></div>
       <div id="shadow-toast" class="shadow-toast" hidden></div>
     `;
     document.body.appendChild(root);
@@ -1208,18 +1209,70 @@
     return el;
   }
 
+  function pickTypeLabel(type) {
+    if (!type) return 'Element';
+    return type.charAt(0).toUpperCase() + type.slice(1);
+  }
+
+  function hidePickTooltip() {
+    const tip = qs('#shadow-pick-tooltip');
+    if (!tip) return;
+    tip.hidden = true;
+    tip.setAttribute('aria-hidden', 'true');
+  }
+
+  function updatePickTooltip(el, clientX, clientY) {
+    const tip = qs('#shadow-pick-tooltip');
+    if (!tip || !el) return;
+    const meta = elementMeta(el);
+    const raw = (meta.snippet || meta.label || '').trim();
+    const snippet = raw.length > 40 ? raw.slice(0, 40) + '…' : raw;
+    const typeLabel = pickTypeLabel(meta.type);
+    tip.textContent = snippet ? typeLabel + ' · ' + snippet : typeLabel;
+    tip.hidden = false;
+    tip.setAttribute('aria-hidden', 'false');
+
+    tip.style.left = '0';
+    tip.style.top = '0';
+    const tipW = tip.offsetWidth;
+    const tipH = tip.offsetHeight;
+    const rect = el.getBoundingClientRect();
+    const margin = 8;
+    let x = rect.left;
+    let y = rect.top - tipH - margin;
+
+    if (y < margin) {
+      x = clientX + 12;
+      y = clientY + 12;
+    }
+
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    if (x + tipW > vw - margin) x = vw - tipW - margin;
+    if (x < margin) x = margin;
+    if (y + tipH > vh - margin) y = vh - tipH - margin;
+    if (y < margin) y = margin;
+
+    tip.style.left = Math.round(x) + 'px';
+    tip.style.top = Math.round(y) + 'px';
+  }
+
   function clearPickHover() {
     if (pickHoverEl) {
       pickHoverEl.classList.remove('shadow-pick-hover');
       pickHoverEl = null;
     }
+    hidePickTooltip();
   }
 
-  function setPickHover(el) {
-    if (!el || el === pickHoverEl) return;
-    clearPickHover();
-    pickHoverEl = el;
-    pickHoverEl.classList.add('shadow-pick-hover');
+  function setPickHover(el, clientX, clientY) {
+    if (!el) return;
+    if (el !== pickHoverEl) {
+      if (pickHoverEl) pickHoverEl.classList.remove('shadow-pick-hover');
+      pickHoverEl = el;
+      pickHoverEl.classList.add('shadow-pick-hover');
+    }
+    updatePickTooltip(el, clientX, clientY);
   }
 
   function onPickPointerMove(event) {
@@ -1229,15 +1282,33 @@
       clearPickHover();
       return;
     }
-    setPickHover(el);
+    setPickHover(el, event.clientX, event.clientY);
   }
 
   function bindPickHover() {
     if (pickHoverBound) return;
     pickHoverBound = true;
-    const onMove = throttle(onPickPointerMove, 32);
-    document.addEventListener('mousemove', onMove, { passive: true });
+    let rafId = null;
+    let pendingEvent = null;
+
+    function flushPickMove() {
+      rafId = null;
+      if (!pendingEvent) return;
+      const ev = pendingEvent;
+      pendingEvent = null;
+      onPickPointerMove(ev);
+    }
+
+    document.addEventListener(
+      'mousemove',
+      (event) => {
+        pendingEvent = event;
+        if (!rafId) rafId = requestAnimationFrame(flushPickMove);
+      },
+      { passive: true }
+    );
     document.addEventListener('mouseleave', () => {
+      pendingEvent = null;
       if (document.body.classList.contains('shadow-pick-mode')) clearPickHover();
     });
   }

@@ -7,8 +7,17 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.5.3',
+    version: '1.5.4',
     releases: [
+      {
+        version: '1.5.4',
+        date: '2026-08-26',
+        title: 'Clearer pick mode preview',
+        user: [
+          'Pick element mode now shows a bold orange outline, dimmed page, and a label for the element under your cursor before you click'
+        ],
+        dev: []
+      },
       {
         version: '1.5.3',
         date: '2026-08-26',
