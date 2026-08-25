@@ -1,0 +1,273 @@
+/* Shadow review overlay — only loaded on shadow.berkshireyogatraining.co.uk */
+
+.shadow-toolbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 99980;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem;
+  background: #111;
+  color: #fff;
+  font-family: Figtree, system-ui, sans-serif;
+  font-size: 0.875rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.shadow-toolbar-label {
+  font-weight: 600;
+  color: #f5bf03;
+}
+
+.shadow-toolbar-hint {
+  opacity: 0.7;
+  font-size: 0.8rem;
+}
+
+body {
+  padding-top: 2.75rem;
+}
+
+body.shadow-pick-mode,
+body.shadow-pick-mode * {
+  cursor: crosshair !important;
+}
+
+.shadow-highlight {
+  outline: 3px solid #e8612e !important;
+  outline-offset: 2px;
+}
+
+.shadow-fab {
+  position: fixed;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  z-index: 99990;
+  border: none;
+  border-radius: 999px;
+  padding: 0.85rem 1.25rem;
+  background: #e8612e;
+  color: #fff;
+  font-family: Figtree, system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.shadow-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.shadow-modal[hidden] {
+  display: none !important;
+}
+
+.shadow-modal-card {
+  width: min(28rem, 100%);
+  max-height: min(90vh, 40rem);
+  overflow: auto;
+  background: #fff;
+  border-radius: 1rem;
+  padding: 1.25rem 1.35rem;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+  font-family: Figtree, system-ui, sans-serif;
+  color: #111;
+}
+
+.shadow-modal-wide {
+  width: min(36rem, 100%);
+}
+
+.shadow-modal-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.shadow-modal-card h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-family: "Cormorant Garamond", Georgia, serif;
+}
+
+.shadow-close {
+  border: none;
+  background: transparent;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  color: #666;
+}
+
+.shadow-hint {
+  margin: 0 0 1rem;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+.shadow-person-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.shadow-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 0.7rem 1.1rem;
+  background: #e8612e;
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.shadow-btn-secondary {
+  background: #f5f5f5;
+  color: #111;
+  border: 1px solid #ddd;
+}
+
+.shadow-btn-small {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
+}
+
+.shadow-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.shadow-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.shadow-form textarea,
+.shadow-form select {
+  font: inherit;
+  font-weight: 400;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  resize: vertical;
+}
+
+.shadow-ticket-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.shadow-ticket-row {
+  display: grid;
+  gap: 0.15rem;
+  text-align: left;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid #e5e5e5;
+  border-radius: 0.65rem;
+  background: #fafafa;
+  cursor: pointer;
+  font: inherit;
+}
+
+.shadow-ticket-row:hover {
+  border-color: #e8612e;
+}
+
+.shadow-ticket-id {
+  font-weight: 700;
+  color: #e8612e;
+}
+
+.shadow-ticket-meta {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.shadow-ticket-summary {
+  font-size: 0.9rem;
+}
+
+.shadow-dl {
+  display: grid;
+  grid-template-columns: 7rem 1fr;
+  gap: 0.35rem 0.75rem;
+  margin: 0 0 1rem;
+  font-size: 0.9rem;
+}
+
+.shadow-dl dt {
+  color: #666;
+  font-weight: 600;
+}
+
+.shadow-dl dd {
+  margin: 0;
+}
+
+.shadow-thread-title {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+}
+
+.shadow-thread {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin-bottom: 1rem;
+}
+
+.shadow-comment {
+  padding: 0.65rem 0.75rem;
+  background: #f5f5f5;
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.shadow-comment time {
+  color: #777;
+  font-size: 0.8rem;
+  font-weight: 400;
+}
+
+.shadow-comment p {
+  margin: 0.35rem 0 0;
+}
+
+.shadow-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 5rem;
+  transform: translateX(-50%);
+  z-index: 100000;
+  background: #111;
+  color: #fff;
+  padding: 0.75rem 1.1rem;
+  border-radius: 999px;
+  font-family: Figtree, system-ui, sans-serif;
+  font-size: 0.875rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+.shadow-toast[hidden] {
+  display: none !important;
+}

@@ -1,6 +1,7 @@
 /**
- * Cloudflare Pages middleware: Markdown for Agents content negotiation.
- * GET/HEAD requests with Accept: text/markdown receive text/markdown for HTML pages.
+ * Cloudflare Pages middleware (shadow branch):
+ * - Markdown for Agents content negotiation
+ * - Inject shadow review overlay + noindex into HTML
  */
 
 import { htmlToMarkdown } from './lib/html-to-markdown.js';
@@ -8,13 +9,20 @@ import { htmlToMarkdown } from './lib/html-to-markdown.js';
 const STATIC_ASSET = /\.(css|js|mjs|md|png|jpe?g|gif|svg|webp|ico|woff2?|ttf|eot|webmanifest|pdf|map|txt|xml)$/i;
 
 const AGENT_LINK_HEADER =
-  '</.well-known/api-catalog>; rel="api-catalog", </.well-known/agent-card.json>; rel="service-desc"; type="application/json", </llms.txt>; rel="describedby"; type="text/plain", </auth.md>; rel="service-doc"; type="text/markdown", </sitemap.xml>; rel="sitemap"; type="application/xml';
+  '</.well-known/api-catalog>; rel="api-catalog", </.well-known/agent-card.json>; rel="service-desc"; type="application/json", </llms.txt>; rel="describedby"; type="text/plain", </auth.md>; rel="service-doc"; type="text/markdown", </sitemap.xml>; rel="sitemap"; type="application/xml"';
+
+const SHADOW_INJECT = `
+<link rel="stylesheet" href="/css/shadow-review.css">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<script src="/js/shadow-review.js" defer></script>
+`;
 
 function prefersMarkdown(accept) {
   return !!accept && /\btext\/markdown\b/i.test(accept);
 }
 
 function isHtmlPagePath(pathname) {
+  if (pathname.startsWith('/api/')) return false;
   if (pathname === '/' || pathname === '/index.html') return true;
   if (/\.html$/i.test(pathname)) return true;
 
@@ -37,6 +45,17 @@ function applyAgentLinkHeaders(headers) {
   headers.set('Link', AGENT_LINK_HEADER);
 }
 
+function injectShadowReview(html) {
+  if (html.includes('shadow-review.js')) return html;
+  if (/<\/head>/i.test(html)) {
+    return html.replace(/<\/head>/i, SHADOW_INJECT + '</head>');
+  }
+  if (/<\/body>/i.test(html)) {
+    return html.replace(/<\/body>/i, SHADOW_INJECT + '</body>');
+  }
+  return html + SHADOW_INJECT;
+}
+
 function markdownResponse(body, sourceHeaders) {
   const headers = new Headers(sourceHeaders);
   headers.set('Content-Type', 'text/markdown; charset=utf-8');
@@ -51,23 +70,38 @@ function markdownResponse(body, sourceHeaders) {
   return new Response(body, { status: 200, headers });
 }
 
+async function htmlWithShadow(response) {
+  const html = await response.text();
+  const injected = injectShadowReview(html);
+  const headers = new Headers(response.headers);
+  applyAgentLinkHeaders(headers);
+  headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+  headers.delete('Content-Length');
+  return new Response(injected, {
+    status: response.status,
+    statusText: response.statusText,
+    headers
+  });
+}
+
 export async function onRequest(context) {
   const { request, next } = context;
+  const url = new URL(request.url);
+  const { pathname } = url;
   const accept = request.headers.get('Accept') || '';
+
+  if (pathname.startsWith('/api/')) {
+    return next();
+  }
 
   if (!['GET', 'HEAD'].includes(request.method) || !prefersMarkdown(accept)) {
     const response = await next();
     const contentType = response.headers.get('content-type') || '';
-    if (response.ok && /text\/html/i.test(contentType)) {
-      const headers = new Headers(response.headers);
-      applyAgentLinkHeaders(headers);
-      return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+    if (response.ok && /text\/html/i.test(contentType) && isHtmlPagePath(pathname)) {
+      return htmlWithShadow(response);
     }
     return response;
   }
-
-  const url = new URL(request.url);
-  const { pathname } = url;
 
   if (STATIC_ASSET.test(pathname) || pathname.startsWith('/.well-known/')) {
     return next();

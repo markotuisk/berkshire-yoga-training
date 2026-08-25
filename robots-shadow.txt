@@ -2,4 +2,4 @@ User-agent: *
 Disallow: /
 
 # Shadow review site — not for public indexing.
-# Live site: https://berkshireyogatraining.co.uk/robots.txt
+# Live site robots: https://berkshireyogatraining.co.uk/robots.txt
