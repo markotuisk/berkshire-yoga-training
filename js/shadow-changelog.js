@@ -7,8 +7,18 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.5.4',
+    version: '1.5.5',
     releases: [
+      {
+        version: '1.5.5',
+        date: '2026-08-26',
+        title: 'Edge resize on ticket windows',
+        user: [
+          'Drag any edge of inbox, ticket detail, and new-ticket windows to resize — not just the corners',
+          'Corners still work as before; hover an edge for a subtle highlight'
+        ],
+        dev: []
+      },
       {
         version: '1.5.4',
         date: '2026-08-26',

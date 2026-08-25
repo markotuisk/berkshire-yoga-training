@@ -433,6 +433,40 @@
     return el && el.classList && el.classList.contains('shadow-modal-resize');
   }
 
+  function applyEdgeResize(card, edge, startLeft, startTop, startW, startH, dx, dy) {
+    let newW = startW;
+    let newH = startH;
+    switch (edge) {
+      case 'top':
+        newH = startH - dy;
+        break;
+      case 'bottom':
+        newH = startH + dy;
+        break;
+      case 'left':
+        newW = startW - dx;
+        break;
+      case 'right':
+        newW = startW + dx;
+        break;
+      default:
+        return;
+    }
+    const size = clampModalSize(newW, newH);
+    card.style.width = size.width + 'px';
+    card.style.height = size.height + 'px';
+    card.style.maxHeight = 'none';
+
+    let newLeft = startLeft;
+    let newTop = startTop;
+    if (edge === 'top') newTop = startTop + startH - size.height;
+    if (edge === 'left') newLeft = startLeft + startW - size.width;
+
+    const pos = clampModalPosition(newLeft, newTop, card);
+    card.style.left = pos.left + 'px';
+    card.style.top = pos.top + 'px';
+  }
+
   function applyCornerResize(card, corner, startLeft, startTop, startW, startH, dx, dy) {
     let newW;
     let newH;
@@ -471,7 +505,7 @@
     card.style.top = pos.top + 'px';
   }
 
-  function bindCornerResize(grip, corner, modal, key, card) {
+  function bindModalResize(grip, mode, modal, key, card) {
     grip.addEventListener('pointerdown', (e) => {
       if (e.button !== 0) return;
       e.preventDefault();
@@ -500,7 +534,11 @@
           modal.classList.add('shadow-modal--resizing');
         }
         if (!resized) return;
-        applyCornerResize(card, corner, startLeft, startTop, startW, startH, dx, dy);
+        if (mode.type === 'corner') {
+          applyCornerResize(card, mode.id, startLeft, startTop, startW, startH, dx, dy);
+        } else {
+          applyEdgeResize(card, mode.id, startLeft, startTop, startW, startH, dx, dy);
+        }
       };
 
       const onUp = (ev) => {
@@ -519,6 +557,21 @@
   }
 
   function addModalResizeHandles(card, modal, key) {
+    const edges = [
+      { id: 'top', cursor: 'ns-resize' },
+      { id: 'bottom', cursor: 'ns-resize' },
+      { id: 'left', cursor: 'ew-resize' },
+      { id: 'right', cursor: 'ew-resize' }
+    ];
+    edges.forEach(({ id, cursor }) => {
+      const grip = document.createElement('div');
+      grip.className = 'shadow-modal-resize shadow-modal-resize--edge shadow-modal-resize--' + id;
+      grip.style.cursor = cursor;
+      grip.setAttribute('aria-hidden', 'true');
+      card.appendChild(grip);
+      bindModalResize(grip, { type: 'edge', id }, modal, key, card);
+    });
+
     const corners = [
       { id: 'nw', cursor: 'nwse-resize' },
       { id: 'ne', cursor: 'nesw-resize' },
@@ -527,11 +580,11 @@
     ];
     corners.forEach(({ id, cursor }) => {
       const grip = document.createElement('div');
-      grip.className = 'shadow-modal-resize shadow-modal-resize--' + id;
+      grip.className = 'shadow-modal-resize shadow-modal-resize--corner shadow-modal-resize--' + id;
       grip.style.cursor = cursor;
       grip.setAttribute('aria-hidden', 'true');
       card.appendChild(grip);
-      bindCornerResize(grip, id, modal, key, card);
+      bindModalResize(grip, { type: 'corner', id }, modal, key, card);
     });
   }
 
