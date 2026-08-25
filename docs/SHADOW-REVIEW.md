@@ -42,6 +42,16 @@ Do these once. Code for dual-write and the overlay is already on the `shadow` br
 
 Wrangler OAuth cannot create DNS (`zone:read` only). Use the dashboard or an API token with **Zone → DNS → Edit**.
 
+Optional one-shot (DNS + Access) if you create a token with DNS Edit + Access Apps Edit:
+
+```bash
+export CLOUDFLARE_API_TOKEN=...   # DNS Edit + Access: Apps and Policies Edit
+chmod +x docs/shadow-setup-access.sh
+./docs/shadow-setup-access.sh
+```
+
+Allowlist in that script: Marko, Katia (`Katia.major@thameswellness.com`), Raili (`raili.maripuu@thameswellness.com`).
+
 ### B. Cloudflare Access (login)
 
 1. **Zero Trust** → **Access** → **Applications** → **Add** → Self-hosted  
