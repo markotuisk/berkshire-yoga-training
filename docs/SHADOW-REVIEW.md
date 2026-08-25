@@ -47,6 +47,26 @@ npx wrangler pages deploy . --project-name=berkshire-yoga-training-shadow --bran
 3. Policy: Allow emails for Marko, Katia, Raili  
 4. Save and test in a private window
 
+#### Access login branding (dashboard)
+
+Cloudflare hosts the Access login page itself, so logo and colours are set in Zero Trust, not in site HTML:
+
+1. Zero Trust → Settings → **Custom Pages** (or **Customization** / **Account branding**, depending on plan)  
+2. Upload the Academy logo (prefer a clear PNG on transparent or white)  
+3. Set primary / accent colour to **`#E8612E`** where the UI allows  
+4. Optional: custom login message such as “Thames Wellness Academy · private review”
+
+Link previews (WhatsApp, iMessage, Slack) use the **page OG tags** below once Access has let the crawler through, or when the URL is shared after login. Those tags are rewritten by shadow middleware on every HTML page.
+
+### Link preview (Open Graph)
+
+On the shadow branch, middleware replaces title, description and social meta so shares feel intentional:
+
+- **Title:** Thames Wellness Academy · Private review  
+- **Description:** A calm, private room to refine the Academy site together. Flag copy, images and details before anything goes live. For Katia, Raili and Marko only.  
+- **Image:** `/assets/og-image.jpg` (absolute URL to the live asset)  
+- **theme-color:** `#E8612E`
+
 ## Ticket storage
 
 API stores tickets in memory per isolate by default, or Cloudflare KV when bound as `SHADOW_TICKETS`.
