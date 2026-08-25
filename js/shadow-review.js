@@ -354,12 +354,27 @@
     };
   }
 
+  function clampModalWidth(width) {
+    const limits = modalSizeLimits();
+    return Math.min(Math.max(limits.minW, width), limits.maxW);
+  }
+
   function clampModalSize(width, height) {
     const limits = modalSizeLimits();
     return {
-      width: Math.min(Math.max(limits.minW, width), limits.maxW),
+      width: clampModalWidth(width),
       height: Math.min(Math.max(limits.minH, height), limits.maxH)
     };
+  }
+
+  function isCardCollapsed(card, key) {
+    return card.classList.contains('shadow-modal-card--collapsed') || isModalCollapsed(key);
+  }
+
+  function enforceCollapsedCardHeight(card) {
+    card.style.height = MODAL_COLLAPSED_HEIGHT + 'px';
+    card.style.minHeight = MODAL_COLLAPSED_HEIGHT + 'px';
+    card.style.maxHeight = 'none';
   }
 
   function applyModalSize(card, width, height) {
@@ -552,7 +567,7 @@
     return el && el.classList && el.classList.contains('shadow-modal-resize');
   }
 
-  function applyEdgeResize(card, edge, startLeft, startTop, startW, startH, dx, dy) {
+  function applyEdgeResize(card, edge, startLeft, startTop, startW, startH, dx, dy, collapsed) {
     let newW = startW;
     let newH = startH;
     switch (edge) {
@@ -571,22 +586,36 @@
       default:
         return;
     }
-    const size = clampModalSize(newW, newH);
-    card.style.width = size.width + 'px';
-    card.style.height = size.height + 'px';
+
+    let width;
+    let height;
+    if (collapsed) {
+      width = clampModalWidth(newW);
+      height = MODAL_COLLAPSED_HEIGHT;
+    } else {
+      const size = clampModalSize(newW, newH);
+      width = size.width;
+      height = size.height;
+    }
+
+    card.style.width = width + 'px';
+    card.style.height = height + 'px';
     card.style.maxHeight = 'none';
+    if (collapsed) card.style.minHeight = MODAL_COLLAPSED_HEIGHT + 'px';
 
     let newLeft = startLeft;
     let newTop = startTop;
-    if (edge === 'top') newTop = startTop + startH - size.height;
-    if (edge === 'left') newLeft = startLeft + startW - size.width;
+    if (!collapsed && edge === 'top') newTop = startTop + startH - height;
+    if (edge === 'left') newLeft = startLeft + startW - width;
 
     const pos = clampModalPosition(newLeft, newTop, card);
     card.style.left = pos.left + 'px';
     card.style.top = pos.top + 'px';
   }
 
-  function applyCornerResize(card, corner, startLeft, startTop, startW, startH, dx, dy) {
+  function applyCornerResize(card, corner, startLeft, startTop, startW, startH, dx, dy, collapsed) {
+    if (collapsed) return;
+
     let newW;
     let newH;
     switch (corner) {
@@ -627,7 +656,8 @@
   function bindModalResize(grip, mode, modal, key, card) {
     grip.addEventListener('pointerdown', (e) => {
       if (e.button !== 0) return;
-      if (isModalCollapsed(key)) {
+      const collapsed = isCardCollapsed(card, key);
+      if (collapsed) {
         if (mode.type === 'corner') return;
         if (mode.type === 'edge' && mode.id !== 'left' && mode.id !== 'right') return;
       }
@@ -639,13 +669,14 @@
       const startLeft = rect.left;
       const startTop = rect.top;
       const startW = rect.width;
-      const startH = rect.height;
+      const startH = collapsed ? MODAL_COLLAPSED_HEIGHT : rect.height;
       let resized = false;
 
       card.style.position = 'fixed';
       card.style.margin = '0';
       card.style.left = startLeft + 'px';
       card.style.top = startTop + 'px';
+      if (collapsed) enforceCollapsedCardHeight(card);
 
       grip.setPointerCapture(e.pointerId);
 
@@ -658,10 +689,11 @@
         }
         if (!resized) return;
         if (mode.type === 'corner') {
-          applyCornerResize(card, mode.id, startLeft, startTop, startW, startH, dx, dy);
+          applyCornerResize(card, mode.id, startLeft, startTop, startW, startH, dx, dy, collapsed);
         } else {
-          applyEdgeResize(card, mode.id, startLeft, startTop, startW, startH, dx, dy);
+          applyEdgeResize(card, mode.id, startLeft, startTop, startW, startH, dx, dy, collapsed);
         }
+        if (collapsed) enforceCollapsedCardHeight(card);
       };
 
       const onUp = (ev) => {
@@ -670,7 +702,12 @@
         document.removeEventListener('pointerup', onUp);
         document.removeEventListener('pointercancel', onUp);
         modal.classList.remove('shadow-modal--resizing');
-        if (resized) saveModalState(key, card);
+        if (resized) {
+          if (isModalCollapsed(key)) {
+            applyModalCollapseState(key, modal, card, true);
+          }
+          saveModalState(key, card);
+        }
       };
 
       document.addEventListener('pointermove', onMove);

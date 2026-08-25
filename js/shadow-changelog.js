@@ -7,8 +7,17 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.5.7',
+    version: '1.5.8',
     releases: [
+      {
+        version: '1.5.8',
+        date: '2026-08-26',
+        title: 'Collapsed window resize fix',
+        user: [
+          'Resizing a collapsed ticket inbox or detail window now only changes width — it no longer jumps open or shows empty ticket content'
+        ],
+        dev: []
+      },
       {
         version: '1.5.7',
         date: '2026-08-26',
