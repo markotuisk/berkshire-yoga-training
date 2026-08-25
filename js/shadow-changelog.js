@@ -7,8 +7,18 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.5.6',
+    version: '1.5.7',
     releases: [
+      {
+        version: '1.5.7',
+        date: '2026-08-26',
+        title: 'Aligned ticket window headers',
+        user: [
+          'Ticket inbox and detail headers line up on one row — drag grip, title, collapse, and close sit evenly centred like an Apple toolbar',
+          'Long titles truncate cleanly; collapse and close are matching circular buttons on the right'
+        ],
+        dev: []
+      },
       {
         version: '1.5.6',
         date: '2026-08-26',

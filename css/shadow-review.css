@@ -212,11 +212,17 @@ body.shadow-pick-mode::before {
 
 .shadow-modal-card--collapsed {
   min-height: 48px;
-  padding-bottom: 0.55rem;
+  padding-bottom: 0;
+}
+
+.shadow-modal--floating .shadow-modal-card--collapsed {
+  padding: 2px 12px;
+  box-sizing: border-box;
 }
 
 .shadow-modal-card--collapsed .shadow-modal-head {
   margin-bottom: 0;
+  min-height: 44px;
 }
 
 .shadow-modal-card--collapsed .shadow-modal-scroll,
@@ -400,14 +406,29 @@ body.shadow-pick-mode::before {
 
 .shadow-modal-head {
   display: flex;
-  align-items: flex-start;
-  gap: 0.5rem;
+  align-items: center;
+  gap: 0;
+  min-height: 44px;
   margin-bottom: 0.75rem;
+  flex-shrink: 0;
 }
 
 .shadow-modal-head h2 {
-  flex: 1;
+  flex: 1 1 auto;
   min-width: 0;
+  margin: 0;
+  padding-left: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.shadow-modal-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  margin-left: 8px;
 }
 
 .shadow-modal-drag {
@@ -415,9 +436,9 @@ body.shadow-pick-mode::before {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 1.75rem;
-  height: 1.75rem;
-  margin: -0.15rem 0 0 -0.35rem;
+  width: 28px;
+  height: 32px;
+  margin: 0;
   padding: 0;
   border: none;
   border-radius: 0.35rem;
@@ -457,13 +478,14 @@ body.shadow-modal-drag-active {
   cursor: pointer;
 }
 
-.shadow-modal-collapse {
+.shadow-modal-collapse,
+.shadow-modal-head .shadow-close {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 1.75rem;
-  height: 1.75rem;
-  margin: -0.15rem 0 0 0;
+  width: 32px;
+  height: 32px;
+  margin: 0;
   padding: 0;
   border: none;
   border-radius: 50%;
@@ -472,7 +494,8 @@ body.shadow-modal-drag-active {
   transition: background var(--shadow-ease), color var(--shadow-ease);
 }
 
-.shadow-modal-collapse:hover {
+.shadow-modal-collapse:hover,
+.shadow-modal-head .shadow-close:hover {
   background: rgba(0, 0, 0, 0.06);
   color: var(--shadow-text);
 }
@@ -483,34 +506,15 @@ body.shadow-modal-drag-active {
 }
 
 .shadow-modal-card h2 {
-  margin: 0;
   font-size: 1.125rem;
   font-weight: 600;
   letter-spacing: -0.02em;
   font-family: var(--shadow-font);
 }
 
-.shadow-close {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.75rem;
-  height: 1.75rem;
-  margin: -0.15rem -0.25rem 0 0;
-  padding: 0;
-  border: none;
-  border-radius: 50%;
-  background: transparent;
+.shadow-modal-head .shadow-close {
   font-size: 1.25rem;
   line-height: 1;
-  cursor: pointer;
-  color: var(--shadow-text-secondary);
-  transition: background var(--shadow-ease), color var(--shadow-ease);
-}
-
-.shadow-close:hover {
-  background: rgba(0, 0, 0, 0.06);
-  color: var(--shadow-text);
 }
 
 .shadow-hint {

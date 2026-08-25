@@ -467,7 +467,8 @@
   }
 
   function initModalCollapse(key, modal, card, head) {
-    const closeBtn = qs('.shadow-close', head);
+    const actions = qs('.shadow-modal-head-actions', head);
+    const closeBtn = actions ? qs('.shadow-close', actions) : qs('.shadow-close', head);
     const collapseBtn = document.createElement('button');
     collapseBtn.type = 'button';
     collapseBtn.className = 'shadow-modal-collapse';
@@ -475,8 +476,9 @@
     collapseBtn.setAttribute('aria-label', collapseButtonLabel(key, false));
     collapseBtn.setAttribute('aria-expanded', 'true');
     collapseBtn.innerHTML = COLLAPSE_CHEVRON_DOWN;
-    if (closeBtn) head.insertBefore(collapseBtn, closeBtn);
-    else head.appendChild(collapseBtn);
+    const host = actions || head;
+    if (closeBtn) host.insertBefore(collapseBtn, closeBtn);
+    else host.appendChild(collapseBtn);
     collapseBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       toggleModalCollapse(key);
@@ -726,6 +728,16 @@
     return scroll;
   }
 
+  function setupModalHeadActions(head) {
+    if (qs('.shadow-modal-head-actions', head)) return;
+    const closeBtn = qs('.shadow-close', head);
+    if (!closeBtn) return;
+    const actions = document.createElement('div');
+    actions.className = 'shadow-modal-head-actions';
+    actions.appendChild(closeBtn);
+    head.appendChild(actions);
+  }
+
   function initDraggableModals() {
     Object.entries(DRAGGABLE_MODALS).forEach(([key, id]) => {
       const modal = qs('#' + id);
@@ -738,6 +750,8 @@
       const keepOutside =
         key === 'detail' ? [qs('#shadow-comment-form', modal)].filter(Boolean) : [];
       setupModalScrollArea(card, head, keepOutside);
+
+      setupModalHeadActions(head);
 
       const dragGrip = document.createElement('button');
       dragGrip.type = 'button';
