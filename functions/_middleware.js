@@ -18,17 +18,17 @@ const SHADOW_STYLE_SCRIPT = `
 <script src="/js/shadow-review.js" defer></script>
 `;
 
-/** Private review link previews (WhatsApp, iMessage, Slack) */
+/** Shadow review link previews (WhatsApp, iMessage, Slack) */
 const SHADOW_OG = {
-  title: 'Thames Wellness Academy · Private review',
+  title: 'Thames Wellness Academy · Shadow review',
   description:
-    'A calm, private room to refine the Academy site together. Flag copy, images and details before anything goes live. For Katia, Raili and Marko only.',
+    'A calm private Shadow review room to refine the Academy site together. Flag copy, images and details before anything goes live. For Katia, Raili and Marko only.',
   siteName: 'Thames Wellness Academy',
   image: 'https://berkshireyogatraining.co.uk/assets/og-image.jpg',
-  imageAlt: 'Thames Wellness Academy: private partner review',
-  twitterTitle: 'Thames Wellness Academy · Private review',
+  imageAlt: 'Thames Wellness Academy: Shadow review',
+  twitterTitle: 'Thames Wellness Academy · Shadow review',
   twitterDescription:
-    'Private partner review for Thames Wellness Academy. Comment on any detail. The public site stays untouched.'
+    'Shadow review for Thames Wellness Academy partners. Comment on any detail. The public site stays untouched.'
 };
 
 function prefersMarkdown(accept) {

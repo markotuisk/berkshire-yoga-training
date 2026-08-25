@@ -55,7 +55,7 @@ Cloudflare hosts the Access login page itself, so logo and colours are set in Ze
    (docs: https://developers.cloudflare.com/cloudflare-one/reusable-components/custom-pages/access-login-page/)  
 2. Organisation name: **Thames Wellness Academy**  
 3. Upload the Academy logo (clear PNG)  
-4. Header text e.g. **Private review** · footer e.g. **Partners only · not the public site**  
+4. Header text e.g. **Shadow review** · footer e.g. **Partners only · not the public site**  
 5. Background / text colours: use a calm light ground and accent where possible; brand orange is **`#E8612E`** (Access only exposes background + text colour, not a separate accent)
 
 These settings apply to **all** Access apps on the Zero Trust org.
@@ -64,10 +64,10 @@ Link previews (WhatsApp, iMessage, Slack) use the **page OG tags** below once th
 
 ### Link preview (Open Graph)
 
-On the shadow branch, middleware replaces title, description and social meta so shares feel intentional:
+On the shadow branch, middleware replaces title, description and social meta so shares clearly name the Shadow review site:
 
-- **Title:** Thames Wellness Academy · Private review  
-- **Description:** A calm, private room to refine the Academy site together. Flag copy, images and details before anything goes live. For Katia, Raili and Marko only.  
+- **Title:** Thames Wellness Academy · Shadow review  
+- **Description:** A calm private Shadow review room to refine the Academy site together. Flag copy, images and details before anything goes live. For Katia, Raili and Marko only.  
 - **Image:** `/assets/og-image.jpg` (absolute URL to the live asset)  
 - **theme-color:** `#E8612E`
 
