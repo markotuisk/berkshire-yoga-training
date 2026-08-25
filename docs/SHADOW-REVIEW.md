@@ -6,6 +6,9 @@ Private review copy of Thames Wellness Academy.
 - **Shadow preview:** https://berkshire-yoga-training-shadow.pages.dev  
 - **Live URL:** https://berkshireyogatraining.co.uk (unchanged)  
 - **Agent:** Meridian  
+- **Shadow tickets Sheet:** https://docs.google.com/spreadsheets/d/12syDpdZwS0ZtDPqKXLedHHfie0xyhGvJ3HFc_oEUDwY/edit  
+  ID: `12syDpdZwS0ZtDPqKXLedHHfie0xyhGvJ3HFc_oEUDwY`  
+  (mirror via Apps Script web app → `SHEETS_WEBHOOK_URL`; not the Sheet edit URL)
 
 ## Team
 
@@ -70,22 +73,27 @@ Allowlist in that script: Marko, Katia (`Katia.major@thameswellness.com`), Raili
 
 ### C. Google Sheet + Apps Script
 
-1. Create a Google Sheet named e.g. `TWA Shadow review — Meridian`  
-2. Create four tabs with headers from `docs/SHADOW-SHEETS-TEMPLATE.md`: `Tickets`, `Comments`, `Audit_Log`, `People`  
-3. **Extensions → Apps Script** → paste `docs/shadow-sheets-apps-script.js` → Save  
-4. **Deploy → New deployment → Web app**  
+**Spreadsheet (already created):**  
+https://docs.google.com/spreadsheets/d/12syDpdZwS0ZtDPqKXLedHHfie0xyhGvJ3HFc_oEUDwY/edit  
+ID: `12syDpdZwS0ZtDPqKXLedHHfie0xyhGvJ3HFc_oEUDwY`
+
+Do **not** put the spreadsheet edit URL into `SHEETS_WEBHOOK_URL`. That secret must be the Apps Script **web app** URL (`https://script.google.com/macros/s/.../exec`).
+
+1. Open **this** Sheet (link above).  
+2. Ensure four tabs exist with headers from `docs/SHADOW-SHEETS-TEMPLATE.md`: `Tickets`, `Comments`, `Audit_Log`, `People` (seed People rows from the template).  
+3. In **this** Sheet: **Extensions → Apps Script** → delete any stub code → paste the full contents of `docs/shadow-sheets-apps-script.js` → **Save** (disk icon).  
+4. **Deploy → New deployment** → type **Web app**  
    - Execute as: **Me**  
    - Who has access: **Anyone** (Cloudflare posts server-side; URL stays secret)  
-5. Copy the web app URL  
-6. Set the Pages secret:
+   - Deploy → authorize if prompted → **Copy** the web app URL  
+5. Set the Pages secret (paste the `script.google.com/macros/s/.../exec` URL when prompted — not the docs.google.com Sheet link):
 
 ```bash
 npx wrangler pages secret put SHEETS_WEBHOOK_URL --project-name=berkshire-yoga-training-shadow
-# paste the Apps Script web app URL when prompted
 ```
 
-7. Optional full resync after deploy: `POST https://berkshire-yoga-training-shadow.pages.dev/api/audit`  
-   (or the custom domain once Access allows you through)
+6. Full resync after the secret is set: `POST https://berkshire-yoga-training-shadow.pages.dev/api/audit`  
+   (or the custom domain once Access allows you through). Expect `{ ok: true }` — not `SHEETS_WEBHOOK_URL is not set`.
 
 People tab emails: Katia `Katia.major@thameswellness.com`, Raili `raili.maripuu@thameswellness.com`, Marko `markotuisk@gmail.com`.
 

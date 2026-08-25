@@ -1,7 +1,10 @@
 /**
- * Google Apps Script — paste into Extensions → Apps Script on the Meridian shadow Sheet.
- * Deploy as Web app: Execute as Me, Who has access: Anyone with the link.
- * Set Cloudflare Pages secret SHEETS_WEBHOOK_URL to the web app URL.
+ * Google Apps Script — paste into THIS Sheet only:
+ *   https://docs.google.com/spreadsheets/d/12syDpdZwS0ZtDPqKXLedHHfie0xyhGvJ3HFc_oEUDwY/edit
+ *   Extensions → Apps Script → paste this file → Save
+ * Deploy as Web app: Execute as Me, Who has access: Anyone
+ * Set Cloudflare Pages secret SHEETS_WEBHOOK_URL to the web app URL
+ *   (script.google.com/macros/s/.../exec — NOT the docs.google.com spreadsheet URL)
  *
  * Sheet tabs required: Tickets, Comments, Audit_Log, People (headers from SHADOW-SHEETS-TEMPLATE.md)
  */

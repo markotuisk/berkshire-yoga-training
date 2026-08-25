@@ -1,5 +1,9 @@
 # Google Sheets template for Meridian shadow review
+# Spreadsheet: https://docs.google.com/spreadsheets/d/12syDpdZwS0ZtDPqKXLedHHfie0xyhGvJ3HFc_oEUDwY/edit
+# ID: 12syDpdZwS0ZtDPqKXLedHHfie0xyhGvJ3HFc_oEUDwY
 # Create four tabs and paste these header rows.
+# Webhook: deploy docs/shadow-sheets-apps-script.js as a Web app from THIS sheet;
+# SHEETS_WEBHOOK_URL = script.google.com/.../exec (never the spreadsheet edit URL).
 
 ## Tickets
 Ticket ID	Created at	Created by	Page URL	Page path	Element type	Element label	CSS selector	Text snippet	Category	Priority	Status	Summary	Assigned to	Shadow fix URL	Live shipped URL	Closed at	Closed by	Last updated at	Last updated by
