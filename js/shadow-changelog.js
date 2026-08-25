@@ -7,8 +7,18 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.4.3',
+    version: '1.5.0',
     releases: [
+      {
+        version: '1.5.0',
+        date: '2026-08-26',
+        title: 'Corner resize and refined UI',
+        user: [
+          'Drag any corner of inbox, ticket detail, and new-ticket windows to resize — not just the bottom-right',
+          'Shadow mode overlay refreshed with a cleaner Apple-style look (toolbar, modals, tabs, and badges)'
+        ],
+        dev: []
+      },
       {
         version: '1.4.3',
         date: '2026-08-26',

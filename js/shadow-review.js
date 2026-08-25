@@ -343,12 +343,118 @@
     toast('Modal re-centred');
   }
 
+  function isResizeHandle(el) {
+    return el && el.classList && el.classList.contains('shadow-modal-resize');
+  }
+
+  function applyCornerResize(card, corner, startLeft, startTop, startW, startH, dx, dy) {
+    let newW;
+    let newH;
+    switch (corner) {
+      case 'se':
+        newW = startW + dx;
+        newH = startH + dy;
+        break;
+      case 'sw':
+        newW = startW - dx;
+        newH = startH + dy;
+        break;
+      case 'ne':
+        newW = startW + dx;
+        newH = startH - dy;
+        break;
+      case 'nw':
+        newW = startW - dx;
+        newH = startH - dy;
+        break;
+      default:
+        return;
+    }
+    const size = clampModalSize(newW, newH);
+    card.style.width = size.width + 'px';
+    card.style.height = size.height + 'px';
+    card.style.maxHeight = 'none';
+
+    let newLeft = startLeft;
+    let newTop = startTop;
+    if (corner === 'sw' || corner === 'nw') newLeft = startLeft + startW - size.width;
+    if (corner === 'ne' || corner === 'nw') newTop = startTop + startH - size.height;
+
+    const pos = clampModalPosition(newLeft, newTop, card);
+    card.style.left = pos.left + 'px';
+    card.style.top = pos.top + 'px';
+  }
+
+  function bindCornerResize(grip, corner, modal, key, card) {
+    grip.addEventListener('pointerdown', (e) => {
+      if (e.button !== 0) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const rect = card.getBoundingClientRect();
+      const startX = e.clientX;
+      const startY = e.clientY;
+      const startLeft = rect.left;
+      const startTop = rect.top;
+      const startW = rect.width;
+      const startH = rect.height;
+      let resized = false;
+
+      card.style.position = 'fixed';
+      card.style.margin = '0';
+      card.style.left = startLeft + 'px';
+      card.style.top = startTop + 'px';
+
+      grip.setPointerCapture(e.pointerId);
+
+      const onMove = (ev) => {
+        const dx = ev.clientX - startX;
+        const dy = ev.clientY - startY;
+        if (!resized && (Math.abs(dx) > 3 || Math.abs(dy) > 3)) {
+          resized = true;
+          modal.classList.add('shadow-modal--resizing');
+        }
+        if (!resized) return;
+        applyCornerResize(card, corner, startLeft, startTop, startW, startH, dx, dy);
+      };
+
+      const onUp = (ev) => {
+        grip.releasePointerCapture(ev.pointerId);
+        document.removeEventListener('pointermove', onMove);
+        document.removeEventListener('pointerup', onUp);
+        document.removeEventListener('pointercancel', onUp);
+        modal.classList.remove('shadow-modal--resizing');
+        if (resized) saveModalState(key, card);
+      };
+
+      document.addEventListener('pointermove', onMove);
+      document.addEventListener('pointerup', onUp);
+      document.addEventListener('pointercancel', onUp);
+    });
+  }
+
+  function addModalResizeHandles(card, modal, key) {
+    const corners = [
+      { id: 'nw', cursor: 'nwse-resize' },
+      { id: 'ne', cursor: 'nesw-resize' },
+      { id: 'sw', cursor: 'nesw-resize' },
+      { id: 'se', cursor: 'nwse-resize' }
+    ];
+    corners.forEach(({ id, cursor }) => {
+      const grip = document.createElement('div');
+      grip.className = 'shadow-modal-resize shadow-modal-resize--' + id;
+      grip.style.cursor = cursor;
+      grip.setAttribute('aria-hidden', 'true');
+      card.appendChild(grip);
+      bindCornerResize(grip, id, modal, key, card);
+    });
+  }
+
   function setupModalScrollArea(card, head, keepOutside) {
     const scroll = document.createElement('div');
     scroll.className = 'shadow-modal-scroll';
     const toMove = [];
     [...card.children].forEach((child) => {
-      if (child === head || child.classList.contains('shadow-modal-resize')) return;
+      if (child === head || isResizeHandle(child)) return;
       if (keepOutside && keepOutside.includes(child)) return;
       toMove.push(child);
     });
@@ -380,10 +486,7 @@
       dragGrip.innerHTML = DRAG_GRIP_SVG;
       head.insertBefore(dragGrip, head.firstChild);
 
-      const grip = document.createElement('div');
-      grip.className = 'shadow-modal-resize';
-      grip.setAttribute('aria-hidden', 'true');
-      card.appendChild(grip);
+      addModalResizeHandles(card, modal, key);
 
       head.addEventListener('dblclick', (e) => {
         if (e.target.closest('.shadow-close, .shadow-modal-drag')) return;
@@ -435,49 +538,6 @@
         document.addEventListener('pointermove', onMove);
         document.addEventListener('pointerup', onUp);
         document.addEventListener('pointercancel', onUp);
-      });
-
-      grip.addEventListener('pointerdown', (e) => {
-        if (e.button !== 0) return;
-        e.preventDefault();
-        e.stopPropagation();
-        const rect = card.getBoundingClientRect();
-        const startX = e.clientX;
-        const startY = e.clientY;
-        const startW = rect.width;
-        const startH = rect.height;
-        let resized = false;
-
-        card.style.position = 'fixed';
-        card.style.margin = '0';
-        if (!card.style.left) card.style.left = rect.left + 'px';
-        if (!card.style.top) card.style.top = rect.top + 'px';
-
-        const onMove = (ev) => {
-          const dx = ev.clientX - startX;
-          const dy = ev.clientY - startY;
-          if (!resized && (Math.abs(dx) > 3 || Math.abs(dy) > 3)) {
-            resized = true;
-            modal.classList.add('shadow-modal--resizing');
-          }
-          if (!resized) return;
-          const size = applyModalSize(card, startW + dx, startH + dy);
-          const pos = clampModalPosition(parseFloat(card.style.left), parseFloat(card.style.top), card);
-          card.style.left = pos.left + 'px';
-          card.style.top = pos.top + 'px';
-        };
-
-        const onUp = () => {
-          grip.removeEventListener('pointermove', onMove);
-          grip.removeEventListener('pointerup', onUp);
-          grip.removeEventListener('pointercancel', onUp);
-          modal.classList.remove('shadow-modal--resizing');
-          if (resized) saveModalState(key, card);
-        };
-
-        grip.addEventListener('pointermove', onMove);
-        grip.addEventListener('pointerup', onUp);
-        grip.addEventListener('pointercancel', onUp);
       });
     });
   }

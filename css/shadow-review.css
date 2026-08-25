@@ -1,5 +1,21 @@
 /* Shadow mode overlay — only loaded on shadow.berkshireyogatraining.co.uk */
 
+:root {
+  --shadow-font: -apple-system, BlinkMacSystemFont, "Figtree", system-ui, sans-serif;
+  --shadow-text: #1d1d1f;
+  --shadow-text-secondary: #6e6e73;
+  --shadow-accent: #e8612e;
+  --shadow-accent-hover: #d45628;
+  --shadow-surface: rgba(255, 255, 255, 0.92);
+  --shadow-border: rgba(0, 0, 0, 0.08);
+  --shadow-border-light: rgba(255, 255, 255, 0.12);
+  --shadow-radius-lg: 16px;
+  --shadow-radius-pill: 999px;
+  --shadow-ease: 200ms ease;
+  --shadow-shadow-modal: 0 24px 80px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(0, 0, 0, 0.04);
+  --shadow-shadow-toolbar: 0 -1px 0 rgba(0, 0, 0, 0.06), 0 -8px 32px rgba(0, 0, 0, 0.08);
+}
+
 .shadow-toolbar {
   position: fixed;
   bottom: 0;
@@ -9,23 +25,30 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.5rem 1rem;
-  background: #111;
-  color: #fff;
-  font-family: Figtree, system-ui, sans-serif;
-  font-size: 0.875rem;
-  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.2);
+  gap: 0.5rem;
+  padding: 0.45rem 1rem;
+  background: rgba(248, 248, 248, 0.78);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  color: var(--shadow-text);
+  font-family: var(--shadow-font);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  box-shadow: var(--shadow-shadow-toolbar);
+  border-top: 1px solid var(--shadow-border);
+  transition: background var(--shadow-ease);
 }
 
 .shadow-toolbar-label {
   font-weight: 600;
-  color: #f5bf03;
+  color: var(--shadow-accent);
+  letter-spacing: -0.01em;
 }
 
 .shadow-toolbar-hint {
-  opacity: 0.7;
-  font-size: 0.8rem;
+  color: var(--shadow-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 400;
 }
 
 .shadow-toolbar-spacer {
@@ -34,9 +57,9 @@
 }
 
 .shadow-toolbar-user {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 600;
-  color: #f5bf03;
+  color: var(--shadow-text-secondary);
   white-space: nowrap;
   max-width: 10rem;
   overflow: hidden;
@@ -53,7 +76,7 @@ body.shadow-pick-mode * {
 }
 
 .shadow-highlight {
-  outline: 3px solid #e8612e !important;
+  outline: 3px solid var(--shadow-accent) !important;
   outline-offset: 2px;
   animation: shadow-highlight-pulse 1.5s ease-in-out 2;
 }
@@ -61,7 +84,7 @@ body.shadow-pick-mode * {
 @keyframes shadow-highlight-pulse {
   0%,
   100% {
-    outline-color: #e8612e;
+    outline-color: var(--shadow-accent);
     outline-width: 3px;
   }
   50% {
@@ -76,15 +99,21 @@ body.shadow-pick-mode * {
   bottom: 4rem;
   z-index: 99990;
   border: none;
-  border-radius: 999px;
-  padding: 0.85rem 1.25rem;
-  background: #e8612e;
+  border-radius: var(--shadow-radius-pill);
+  padding: 0.75rem 1.2rem;
+  background: var(--shadow-accent);
   color: #fff;
-  font-family: Figtree, system-ui, sans-serif;
+  font-family: var(--shadow-font);
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   cursor: pointer;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 24px rgba(232, 97, 46, 0.35);
+  transition: background var(--shadow-ease), transform var(--shadow-ease), box-shadow var(--shadow-ease);
+}
+
+.shadow-fab:hover {
+  background: var(--shadow-accent-hover);
+  transform: translateY(-1px);
 }
 
 .shadow-modal {
@@ -95,19 +124,24 @@ body.shadow-pick-mode * {
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  transition: background var(--shadow-ease);
 }
 
 .shadow-modal--floating {
   display: block;
   padding: 0;
-  background: rgba(0, 0, 0, 0.12);
+  background: rgba(0, 0, 0, 0.06);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
   pointer-events: none;
 }
 
 .shadow-modal--floating.shadow-modal--dragging,
 .shadow-modal--floating.shadow-modal--resizing {
-  background: rgba(0, 0, 0, 0.08);
+  background: rgba(0, 0, 0, 0.04);
 }
 
 .shadow-modal--floating .shadow-modal-card {
@@ -130,29 +164,53 @@ body.shadow-pick-mode * {
 
 .shadow-modal-resize {
   position: absolute;
+  width: 12px;
+  height: 12px;
+  touch-action: none;
+  z-index: 3;
+}
+
+.shadow-modal-resize--nw {
+  top: 0;
+  left: 0;
+  cursor: nwse-resize;
+}
+
+.shadow-modal-resize--ne {
+  top: 0;
+  right: 0;
+  cursor: nesw-resize;
+}
+
+.shadow-modal-resize--sw {
+  bottom: 0;
+  left: 0;
+  cursor: nesw-resize;
+}
+
+.shadow-modal-resize--se {
   right: 0;
   bottom: 0;
   width: 18px;
   height: 18px;
   cursor: nwse-resize;
-  touch-action: none;
-  z-index: 2;
 }
 
-.shadow-modal-resize::after {
+.shadow-modal-resize--se::after {
   content: "";
   position: absolute;
   right: 5px;
   bottom: 5px;
   width: 8px;
   height: 8px;
-  border-right: 2px solid #bbb;
-  border-bottom: 2px solid #bbb;
+  border-right: 2px solid #c7c7cc;
+  border-bottom: 2px solid #c7c7cc;
   pointer-events: none;
+  transition: border-color var(--shadow-ease);
 }
 
-.shadow-modal-resize:hover::after {
-  border-color: #e8612e;
+.shadow-modal-resize--se:hover::after {
+  border-color: var(--shadow-accent);
 }
 
 .shadow-modal[hidden] {
@@ -163,12 +221,14 @@ body.shadow-pick-mode * {
   width: min(28rem, 100%);
   max-height: min(90vh, 40rem);
   overflow: auto;
-  background: #fff;
-  border-radius: 1rem;
-  padding: 1.25rem 1.35rem;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
-  font-family: Figtree, system-ui, sans-serif;
-  color: #111;
+  background: var(--shadow-surface);
+  border-radius: var(--shadow-radius-lg);
+  padding: 1.15rem 1.25rem;
+  box-shadow: var(--shadow-shadow-modal);
+  border: 1px solid var(--shadow-border);
+  font-family: var(--shadow-font);
+  color: var(--shadow-text);
+  transition: box-shadow var(--shadow-ease), transform var(--shadow-ease);
 }
 
 .shadow-modal-wide {
@@ -199,15 +259,15 @@ body.shadow-pick-mode * {
   border: none;
   border-radius: 0.35rem;
   background: transparent;
-  color: #999;
+  color: #aeaeb2;
   cursor: grab;
   touch-action: none;
-  transition: background 0.15s, color 0.15s, opacity 0.15s, transform 0.15s;
+  transition: background var(--shadow-ease), color var(--shadow-ease), opacity var(--shadow-ease), transform var(--shadow-ease);
 }
 
 .shadow-modal-drag:hover {
-  background: rgba(0, 0, 0, 0.06);
-  color: #666;
+  background: rgba(0, 0, 0, 0.05);
+  color: #8e8e93;
 }
 
 .shadow-modal-drag:active,
@@ -235,23 +295,40 @@ body.shadow-modal-drag-active {
 
 .shadow-modal-card h2 {
   margin: 0;
-  font-size: 1.25rem;
-  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  font-family: var(--shadow-font);
 }
 
 .shadow-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  margin: -0.15rem -0.25rem 0 0;
+  padding: 0;
   border: none;
+  border-radius: 50%;
   background: transparent;
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   line-height: 1;
   cursor: pointer;
-  color: #666;
+  color: var(--shadow-text-secondary);
+  transition: background var(--shadow-ease), color var(--shadow-ease);
+}
+
+.shadow-close:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--shadow-text);
 }
 
 .shadow-hint {
   margin: 0 0 1rem;
-  color: #555;
-  font-size: 0.9rem;
+  color: var(--shadow-text-secondary);
+  font-size: 0.875rem;
+  line-height: 1.45;
 }
 
 .shadow-person-list {
@@ -262,25 +339,39 @@ body.shadow-modal-drag-active {
 
 .shadow-btn {
   border: none;
-  border-radius: 999px;
-  padding: 0.7rem 1.1rem;
-  background: #e8612e;
+  border-radius: var(--shadow-radius-pill);
+  padding: 0.55rem 1rem;
+  background: var(--shadow-accent);
   color: #fff;
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.8125rem;
   cursor: pointer;
   font-family: inherit;
+  letter-spacing: -0.01em;
+  transition: background var(--shadow-ease), transform var(--shadow-ease), box-shadow var(--shadow-ease);
+}
+
+.shadow-btn:hover {
+  background: var(--shadow-accent-hover);
+}
+
+.shadow-btn:active {
+  transform: scale(0.98);
 }
 
 .shadow-btn-secondary {
-  background: #f5f5f5;
-  color: #111;
-  border: 1px solid #ddd;
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--shadow-text);
+  border: 1px solid var(--shadow-border);
+}
+
+.shadow-btn-secondary:hover {
+  background: rgba(0, 0, 0, 0.08);
 }
 
 .shadow-btn-small {
-  padding: 0.35rem 0.75rem;
-  font-size: 0.8rem;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.75rem;
 }
 
 .shadow-toolbar-link {
@@ -291,8 +382,8 @@ body.shadow-modal-drag-active {
 }
 
 .shadow-toolbar-link:hover {
-  background: #fff;
-  color: #111;
+  background: rgba(0, 0, 0, 0.08);
+  color: var(--shadow-text);
 }
 
 .shadow-form {
@@ -305,18 +396,29 @@ body.shadow-modal-drag-active {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
-  font-size: 0.85rem;
+  font-size: 0.8125rem;
   font-weight: 600;
+  color: var(--shadow-text);
 }
 
 .shadow-form textarea,
 .shadow-form select {
   font: inherit;
   font-weight: 400;
-  padding: 0.6rem 0.75rem;
-  border: 1px solid #ccc;
-  border-radius: 0.5rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 10px;
   resize: vertical;
+  background: #fff;
+  color: var(--shadow-text);
+  transition: border-color var(--shadow-ease), box-shadow var(--shadow-ease);
+}
+
+.shadow-form textarea:focus,
+.shadow-form select:focus {
+  outline: none;
+  border-color: rgba(232, 97, 46, 0.5);
+  box-shadow: 0 0 0 3px rgba(232, 97, 46, 0.12);
 }
 
 .shadow-ticket-list {
@@ -326,51 +428,58 @@ body.shadow-modal-drag-active {
 }
 
 .shadow-inbox-tabs {
-  display: flex;
-  gap: 0.5rem;
+  display: inline-flex;
+  gap: 0;
   margin: 0 0 1rem;
+  padding: 2px;
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 10px;
+  border: 1px solid var(--shadow-border);
 }
 
 .shadow-inbox-tab {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  border: 1px solid #ddd;
-  border-radius: 999px;
-  padding: 0.45rem 0.85rem;
-  background: #f5f5f5;
-  color: #111;
+  gap: 0.35rem;
+  border: none;
+  border-radius: 8px;
+  padding: 0.4rem 0.75rem;
+  background: transparent;
+  color: var(--shadow-text-secondary);
   font: inherit;
-  font-size: 0.85rem;
+  font-size: 0.8125rem;
   font-weight: 600;
   cursor: pointer;
+  transition: background var(--shadow-ease), color var(--shadow-ease), box-shadow var(--shadow-ease);
 }
 
 .shadow-inbox-tab:hover {
-  border-color: #e8612e;
+  color: var(--shadow-text);
 }
 
 .shadow-inbox-tab--active {
-  background: #e8612e;
-  border-color: #e8612e;
-  color: #fff;
+  background: #fff;
+  color: var(--shadow-text);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.04);
 }
 
 .shadow-inbox-tab-count {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 1.35rem;
-  height: 1.35rem;
-  padding: 0 0.35rem;
-  border-radius: 999px;
-  background: rgba(0, 0, 0, 0.12);
-  font-size: 0.75rem;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding: 0 0.3rem;
+  border-radius: var(--shadow-radius-pill);
+  background: rgba(0, 0, 0, 0.08);
+  font-size: 0.6875rem;
   font-weight: 700;
+  color: var(--shadow-text-secondary);
 }
 
 .shadow-inbox-tab--active .shadow-inbox-tab-count {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--shadow-text);
 }
 
 .shadow-page-badges {
@@ -385,21 +494,26 @@ body.shadow-modal-drag-active {
   z-index: 81;
   pointer-events: auto;
   border: none;
-  border-radius: 999px;
+  border-radius: var(--shadow-radius-pill);
   padding: 0.2rem 0.55rem;
-  background: #e8612e;
+  background: rgba(232, 97, 46, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   color: #fff;
-  font-family: Figtree, system-ui, sans-serif;
-  font-size: 0.72rem;
+  font-family: var(--shadow-font);
+  font-size: 0.6875rem;
   font-weight: 700;
   line-height: 1.2;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 2px 10px rgba(232, 97, 46, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.15);
   white-space: nowrap;
+  transition: background var(--shadow-ease), transform var(--shadow-ease), box-shadow var(--shadow-ease);
 }
 
 .shadow-page-badge:hover {
-  background: #c94f22;
+  background: rgba(212, 86, 40, 0.95);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(232, 97, 46, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.2);
 }
 
 .shadow-page-badge[hidden] {
@@ -412,12 +526,13 @@ body.shadow-modal-drag-active {
   grid-template-rows: auto auto auto;
   gap: 0.15rem 0.5rem;
   text-align: left;
-  padding: 0.75rem 0.85rem;
-  border: 1px solid #e5e5e5;
-  border-radius: 0.65rem;
-  background: #fafafa;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--shadow-border);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.6);
   cursor: pointer;
   font: inherit;
+  transition: border-color var(--shadow-ease), background var(--shadow-ease), box-shadow var(--shadow-ease);
 }
 
 .shadow-ticket-row .shadow-ticket-id,
@@ -430,39 +545,43 @@ body.shadow-modal-drag-active {
   grid-column: 2;
   grid-row: 1 / span 3;
   align-self: center;
-  border: 1px solid #ddd;
-  border-radius: 999px;
+  border: 1px solid var(--shadow-border);
+  border-radius: var(--shadow-radius-pill);
   padding: 0.35rem 0.65rem;
   background: #fff;
-  color: #e8612e;
+  color: var(--shadow-accent);
   font: inherit;
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   font-weight: 700;
   cursor: pointer;
   white-space: nowrap;
+  transition: background var(--shadow-ease), border-color var(--shadow-ease);
 }
 
 .shadow-locate-btn:hover {
-  border-color: #e8612e;
-  background: #fff8f4;
+  border-color: rgba(232, 97, 46, 0.35);
+  background: rgba(232, 97, 46, 0.06);
 }
 
 .shadow-ticket-row:hover {
-  border-color: #e8612e;
+  border-color: rgba(232, 97, 46, 0.25);
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .shadow-ticket-id {
   font-weight: 700;
-  color: #e8612e;
+  color: var(--shadow-accent);
 }
 
 .shadow-ticket-meta {
-  font-size: 0.8rem;
-  color: #666;
+  font-size: 0.75rem;
+  color: var(--shadow-text-secondary);
 }
 
 .shadow-ticket-summary {
-  font-size: 0.9rem;
+  font-size: 0.875rem;
+  color: var(--shadow-text);
 }
 
 .shadow-dl {
@@ -470,11 +589,11 @@ body.shadow-modal-drag-active {
   grid-template-columns: 7rem 1fr;
   gap: 0.35rem 0.75rem;
   margin: 0 0 1rem;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
 }
 
 .shadow-dl dt {
-  color: #666;
+  color: var(--shadow-text-secondary);
   font-weight: 600;
 }
 
@@ -484,7 +603,8 @@ body.shadow-modal-drag-active {
 
 .shadow-thread-title {
   margin: 0 0 0.5rem;
-  font-size: 1rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
 }
 
 .shadow-thread {
@@ -496,14 +616,14 @@ body.shadow-modal-drag-active {
 
 .shadow-comment {
   padding: 0.65rem 0.75rem;
-  background: #f5f5f5;
-  border-radius: 0.5rem;
-  font-size: 0.9rem;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 10px;
+  font-size: 0.875rem;
 }
 
 .shadow-comment time {
-  color: #777;
-  font-size: 0.8rem;
+  color: var(--shadow-text-secondary);
+  font-size: 0.75rem;
   font-weight: 400;
 }
 
@@ -517,13 +637,17 @@ body.shadow-modal-drag-active {
   bottom: 7rem;
   transform: translateX(-50%);
   z-index: 100000;
-  background: #111;
+  background: rgba(29, 29, 31, 0.88);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
   color: #fff;
-  padding: 0.75rem 1.1rem;
-  border-radius: 999px;
-  font-family: Figtree, system-ui, sans-serif;
-  font-size: 0.875rem;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  padding: 0.65rem 1rem;
+  border-radius: var(--shadow-radius-pill);
+  font-family: var(--shadow-font);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--shadow-border-light);
 }
 
 .shadow-toast[hidden] {
@@ -533,9 +657,9 @@ body.shadow-modal-drag-active {
 .shadow-storycard {
   padding: 0.85rem;
   margin-bottom: 0.5rem;
-  border: 1px dashed #e8612e;
-  border-radius: 0.65rem;
-  background: #fff8f4;
+  border: 1px dashed rgba(232, 97, 46, 0.45);
+  border-radius: 12px;
+  background: rgba(232, 97, 46, 0.04);
 }
 
 .shadow-storycard[hidden] {
@@ -544,9 +668,9 @@ body.shadow-modal-drag-active {
 
 .shadow-storycard-title {
   margin: 0 0 0.35rem;
-  font-size: 1rem;
-  font-family: "Cormorant Garamond", Georgia, serif;
-  color: #e8612e;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--shadow-accent);
 }
 
 .shadow-storycard-preview {
@@ -555,8 +679,8 @@ body.shadow-modal-drag-active {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f5f5f5;
-  border-radius: 0.5rem;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 10px;
   overflow: hidden;
 }
 
@@ -567,8 +691,8 @@ body.shadow-modal-drag-active {
 }
 
 .shadow-storycard-placeholder {
-  color: #666;
-  font-size: 0.85rem;
+  color: var(--shadow-text-secondary);
+  font-size: 0.8125rem;
   font-style: italic;
   padding: 1rem;
   text-align: center;
@@ -576,25 +700,25 @@ body.shadow-modal-drag-active {
 
 .shadow-storycard-hint {
   margin: 0.25rem 0 0;
-  font-size: 0.78rem;
-  color: #777;
+  font-size: 0.75rem;
+  color: var(--shadow-text-secondary);
   font-weight: 400;
 }
 
 .shadow-toolbar-version {
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   font-weight: 600;
-  padding: 0.2rem 0.5rem;
-  border-radius: 999px;
-  background: #222;
-  color: #ccc;
-  border: 1px solid #444;
+  padding: 0.15rem 0.45rem;
+  border-radius: var(--shadow-radius-pill);
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--shadow-text-secondary);
+  border: 1px solid var(--shadow-border);
 }
 
 .shadow-version-badge--new {
-  background: #e8612e;
+  background: var(--shadow-accent);
   color: #fff;
-  border-color: #e8612e;
+  border-color: transparent;
 }
 
 .shadow-whatsnew-body {
@@ -606,7 +730,7 @@ body.shadow-modal-drag-active {
 
 .shadow-whatsnew-release {
   padding: 0.85rem 0;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--shadow-border);
 }
 
 .shadow-whatsnew-release:last-child {
@@ -622,26 +746,28 @@ body.shadow-modal-drag-active {
 
 .shadow-whatsnew-version {
   font-weight: 700;
-  color: #e8612e;
-  font-size: 0.85rem;
+  color: var(--shadow-accent);
+  font-size: 0.8125rem;
 }
 
 .shadow-whatsnew-date {
-  font-size: 0.8rem;
-  color: #888;
+  font-size: 0.75rem;
+  color: var(--shadow-text-secondary);
 }
 
 .shadow-whatsnew-release-title {
   margin: 0 0 0.5rem;
-  font-size: 1.05rem;
-  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
 }
 
 .shadow-whatsnew-list {
   margin: 0;
   padding-left: 1.15rem;
-  font-size: 0.9rem;
-  color: #333;
+  font-size: 0.875rem;
+  color: var(--shadow-text);
+  line-height: 1.45;
 }
 
 .shadow-whatsnew-list li {
@@ -650,22 +776,22 @@ body.shadow-modal-drag-active {
 
 .shadow-whatsnew-dev-label {
   margin: 0.65rem 0 0.35rem;
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: #888;
+  color: var(--shadow-text-secondary);
 }
 
 .shadow-whatsnew-list-dev {
-  color: #555;
+  color: var(--shadow-text-secondary);
 }
 
 .shadow-whatsnew-foot {
   display: flex;
   justify-content: flex-end;
   padding-top: 0.5rem;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--shadow-border);
 }
 
 .shadow-ticket-actions {
@@ -676,8 +802,8 @@ body.shadow-modal-drag-active {
 }
 
 .shadow-action {
-  font-size: 0.82rem;
-  padding: 0.45rem 0.85rem;
+  font-size: 0.75rem;
+  padding: 0.4rem 0.75rem;
 }
 
 .shadow-form input[type="file"] {
