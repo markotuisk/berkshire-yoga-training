@@ -65,6 +65,12 @@
     new: 'shadow-new-modal'
   };
 
+  const DRAG_GRIP_SVG =
+    '<svg class="shadow-modal-drag-icon" width="10" height="16" viewBox="0 0 10 16" aria-hidden="true" focusable="false">' +
+    '<circle cx="2.5" cy="2.5" r="1.5"/><circle cx="7.5" cy="2.5" r="1.5"/>' +
+    '<circle cx="2.5" cy="8" r="1.5"/><circle cx="7.5" cy="8" r="1.5"/>' +
+    '<circle cx="2.5" cy="13.5" r="1.5"/><circle cx="7.5" cy="13.5" r="1.5"/></svg>';
+
   const MODAL_MIN_WIDTH = 280;
   const MODAL_MIN_HEIGHT = 220;
   const MODAL_MAX_WIDTH_VW = 0.95;
@@ -367,20 +373,27 @@
         key === 'detail' ? [qs('#shadow-comment-form', modal)].filter(Boolean) : [];
       setupModalScrollArea(card, head, keepOutside);
 
+      const dragGrip = document.createElement('button');
+      dragGrip.type = 'button';
+      dragGrip.className = 'shadow-modal-drag';
+      dragGrip.setAttribute('aria-label', 'Drag to move');
+      dragGrip.innerHTML = DRAG_GRIP_SVG;
+      head.insertBefore(dragGrip, head.firstChild);
+
       const grip = document.createElement('div');
       grip.className = 'shadow-modal-resize';
       grip.setAttribute('aria-hidden', 'true');
       card.appendChild(grip);
 
       head.addEventListener('dblclick', (e) => {
-        if (e.target.closest('.shadow-close')) return;
+        if (e.target.closest('.shadow-close, .shadow-modal-drag')) return;
         resetModalPosition(key, card);
       });
 
-      head.addEventListener('pointerdown', (e) => {
-        if (e.target.closest('.shadow-close')) return;
+      dragGrip.addEventListener('pointerdown', (e) => {
         if (e.button !== 0) return;
         e.preventDefault();
+        e.stopPropagation();
         const rect = card.getBoundingClientRect();
         const startX = e.clientX;
         const startY = e.clientY;
@@ -392,6 +405,9 @@
         card.style.left = startLeft + 'px';
         card.style.top = startTop + 'px';
         card.style.margin = '0';
+
+        dragGrip.setPointerCapture(e.pointerId);
+        document.body.classList.add('shadow-modal-drag-active');
 
         const onMove = (ev) => {
           const dx = ev.clientX - startX;
@@ -406,17 +422,19 @@
           card.style.top = pos.top + 'px';
         };
 
-        const onUp = () => {
-          head.removeEventListener('pointermove', onMove);
-          head.removeEventListener('pointerup', onUp);
-          head.removeEventListener('pointercancel', onUp);
+        const onUp = (ev) => {
+          dragGrip.releasePointerCapture(ev.pointerId);
+          document.removeEventListener('pointermove', onMove);
+          document.removeEventListener('pointerup', onUp);
+          document.removeEventListener('pointercancel', onUp);
           modal.classList.remove('shadow-modal--dragging');
+          document.body.classList.remove('shadow-modal-drag-active');
           if (dragged) saveModalState(key, card);
         };
 
-        head.addEventListener('pointermove', onMove);
-        head.addEventListener('pointerup', onUp);
-        head.addEventListener('pointercancel', onUp);
+        document.addEventListener('pointermove', onMove);
+        document.addEventListener('pointerup', onUp);
+        document.addEventListener('pointercancel', onUp);
       });
 
       grip.addEventListener('pointerdown', (e) => {

@@ -7,8 +7,18 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.4.1',
+    version: '1.4.2',
     releases: [
+      {
+        version: '1.4.2',
+        date: '2026-08-26',
+        title: 'Clearer drag handle',
+        user: [
+          'Six-dot grip on the left of ticket windows — drag there to move, not the whole header',
+          'Title and close button behave normally again'
+        ],
+        dev: []
+      },
       {
         version: '1.4.1',
         date: '2026-08-26',
