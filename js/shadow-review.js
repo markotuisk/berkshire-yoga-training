@@ -34,6 +34,10 @@
   const STORAGE_PERSON = 'twa_shadow_person';
   const AUDIT_SHEET_URL =
     'https://docs.google.com/spreadsheets/d/12syDpdZwS0ZtDPqKXLedHHfie0xyhGvJ3HFc_oEUDwY/edit';
+  const ASSETS_FOLDER_URL =
+    'https://drive.google.com/drive/folders/1TIhmFeB7LanKDhNCfiCm83ZZQTYjQKhF';
+  const MAX_ASSET_BYTES = 8 * 1024 * 1024;
+  const ASSET_MIME = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 
   let ticketsCache = [];
   let activeEl = null;
@@ -90,10 +94,87 @@
     return parts.join(' > ').slice(0, 300);
   }
 
+  function isPlaceholderImage(el) {
+    if (!el || el.tagName.toLowerCase() === 'img') return false;
+    return /placeholder-img/.test(String(el.className || ''));
+  }
+
+  function getImageElement(el) {
+    if (!el) return null;
+    if (el.tagName.toLowerCase() === 'img') return el;
+    return el.querySelector ? el.querySelector('img') : null;
+  }
+
+  function currentSrcFor(el) {
+    const img = getImageElement(el);
+    return img ? img.getAttribute('src') || '' : '';
+  }
+
+  function slugify(str) {
+    return String(str || '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '')
+      .slice(0, 48) || 'asset';
+  }
+
+  function pageSlug(path) {
+    let p = String(path || '/')
+      .replace(/\/index\.html$/i, '/')
+      .replace(/\.html$/i, '');
+    if (p === '/' || !p) return 'home';
+    return slugify(p.replace(/^\/+|\/+$/g, '').replace(/\//g, '-'));
+  }
+
+  function assetKey(el, meta) {
+    const img = getImageElement(el);
+    if (img && img.id) return slugify(img.id);
+    if (el.id) return slugify(el.id);
+    const cls = String(el.className || '')
+      .split(/\s+/)
+      .find((c) => c && !/^placeholder-img/.test(c));
+    if (cls) return slugify(cls);
+    if (img && img.alt) return slugify(img.alt.slice(0, 40));
+    return slugify(meta.selector.slice(-60));
+  }
+
+  function fileExtension(file) {
+    const name = file.name || '';
+    const dot = name.lastIndexOf('.');
+    if (dot > -1) return name.slice(dot + 1).toLowerCase();
+    if (file.type === 'image/png') return 'png';
+    if (file.type === 'image/webp') return 'webp';
+    if (file.type === 'image/gif') return 'gif';
+    return 'jpg';
+  }
+
+  function buildAssetFilename(ticketId, path, el, meta, file) {
+    const ext = fileExtension(file);
+    const loc = ticketId + '__' + pageSlug(path) + '__' + assetKey(el, meta);
+    return loc + '.' + ext;
+  }
+
+  function buildLocationId(ticketId, path, el, meta) {
+    return ticketId + '__' + pageSlug(path) + '__' + assetKey(el, meta);
+  }
+
+  function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = String(reader.result || '');
+        const comma = result.indexOf(',');
+        resolve(comma > -1 ? result.slice(comma + 1) : result);
+      };
+      reader.onerror = () => reject(reader.error || new Error('Could not read file'));
+      reader.readAsDataURL(file);
+    });
+  }
+
   function elementMeta(el) {
     const tag = el.tagName.toLowerCase();
     let type = 'section';
-    if (tag === 'img' || el.querySelector?.('img')) type = 'image';
+    if (tag === 'img' || isPlaceholderImage(el) || el.querySelector?.('img')) type = 'image';
     else if (tag === 'a' || tag === 'button' || el.classList?.contains('btn')) type = 'button';
     else if (/^h[1-6]$/.test(tag) || tag === 'p' || tag === 'span' || tag === 'li') type = 'text';
     else if (tag === 'a') type = 'link';
@@ -101,6 +182,31 @@
     const text = (el.innerText || el.alt || el.getAttribute?.('aria-label') || '').trim().replace(/\s+/g, ' ').slice(0, 120);
     const label = text || tag + (el.className ? '.' + String(el.className).split(' ')[0] : '');
     return { type, label, selector: cssPath(el), snippet: text };
+  }
+
+  function updateStorycard(el, meta) {
+    const card = qs('#shadow-storycard');
+    const preview = qs('#shadow-storycard-preview');
+    const fileInput = qs('#shadow-new-form input[name="asset"]');
+    if (!card) return;
+    if (meta.type !== 'image') {
+      card.hidden = true;
+      if (fileInput) fileInput.value = '';
+      if (preview) preview.innerHTML = '';
+      return;
+    }
+    card.hidden = false;
+    const src = currentSrcFor(el);
+    if (preview) {
+      if (src) {
+        preview.innerHTML =
+          '<img src="' + escapeAttr(src) + '" alt="" class="shadow-storycard-img">';
+      } else {
+        preview.innerHTML =
+          '<span class="shadow-storycard-placeholder">Placeholder — no image yet</span>';
+      }
+    }
+    if (fileInput) fileInput.value = '';
   }
 
   function ensureUI() {
@@ -154,6 +260,15 @@
           </div>
           <p id="shadow-new-target" class="shadow-hint"></p>
           <form id="shadow-new-form" class="shadow-form">
+            <div id="shadow-storycard" class="shadow-storycard" hidden>
+              <h3 class="shadow-storycard-title">Storycard</h3>
+              <p class="shadow-hint">Upload a replacement image for this location. Optional.</p>
+              <div id="shadow-storycard-preview" class="shadow-storycard-preview"></div>
+              <label>Replacement image
+                <input type="file" name="asset" accept="image/jpeg,image/png,image/webp,image/gif" />
+              </label>
+              <p class="shadow-storycard-hint">JPEG, PNG or WebP up to 8 MB</p>
+            </div>
             <label>Category
               <select name="category" required></select>
             </label>
@@ -327,7 +442,13 @@
         '</dd>' +
         '<dt>Summary</dt><dd>' +
         escapeHtml(t.summary) +
-        '</dd></dl>' +
+        '</dd>' +
+        (t.shadowFixUrl
+          ? '<dt>Uploaded asset</dt><dd><a href="' +
+            escapeAttr(t.shadowFixUrl) +
+            '" target="_blank" rel="noopener">Open in Drive</a></dd>'
+          : '') +
+        '</dl>' +
         '<h3 class="shadow-thread-title">Discussion</h3>' +
         '<div class="shadow-thread">' +
         (comments.length
@@ -356,6 +477,20 @@
     if (!person || !activeEl) return;
     const form = event.target;
     const meta = elementMeta(activeEl);
+    const fileInput = form.querySelector('input[name="asset"]');
+    const file = fileInput && fileInput.files && fileInput.files[0] ? fileInput.files[0] : null;
+
+    if (file) {
+      if (!ASSET_MIME.includes(file.type)) {
+        toast('Use JPEG, PNG, WebP or GIF');
+        return;
+      }
+      if (file.size > MAX_ASSET_BYTES) {
+        toast('Image must be 8 MB or smaller');
+        return;
+      }
+    }
+
     const payload = {
       createdBy: person.name,
       pageUrl: location.href,
@@ -370,10 +505,36 @@
     };
     try {
       const data = await api('/api/tickets', { method: 'POST', body: JSON.stringify(payload) });
+      const ticket = data.ticket;
+      let toastMsg = 'Ticket ' + ticket.id + ' created';
+
+      if (file) {
+        const filename = buildAssetFilename(ticket.id, location.pathname, activeEl, meta, file);
+        const dataBase64 = await fileToBase64(file);
+        const upload = await api('/api/assets', {
+          method: 'POST',
+          body: JSON.stringify({
+            ticketId: ticket.id,
+            uploadedBy: person.name,
+            pagePath: location.pathname,
+            pageUrl: location.href,
+            cssSelector: meta.selector,
+            currentSrc: currentSrcFor(activeEl),
+            elementLabel: meta.label,
+            locationId: buildLocationId(ticket.id, location.pathname, activeEl, meta),
+            filename,
+            mimeType: file.type,
+            dataBase64
+          })
+        });
+        toastMsg += upload.ok ? ' · image uploaded' : ' · image upload failed';
+      }
+
       hide('new');
       clearHighlight();
-      toast('Ticket ' + data.ticket.id + ' created');
+      toast(toastMsg);
       form.reset();
+      updateStorycard(null, { type: 'section' });
     } catch (err) {
       toast(err.message);
     }
@@ -424,7 +585,7 @@
     clearHighlight();
     activeEl =
       event.target.closest(
-        'img, a, button, h1, h2, h3, h4, p, li, section, article, .btn, [class*="card"], [class*="section"]'
+        'img, [class*="placeholder-img"], a, button, h1, h2, h3, h4, p, li, section, article, .btn, [class*="card"], [class*="section"]'
       ) || event.target;
     if (activeEl === document.body || activeEl === document.documentElement) return;
     highlightEl = activeEl;
@@ -432,6 +593,7 @@
 
     const meta = elementMeta(activeEl);
     qs('#shadow-new-target').textContent = meta.type + ': ' + (meta.label || meta.selector);
+    updateStorycard(activeEl, meta);
     document.body.classList.remove('shadow-pick-mode');
     const toggle = qs('#shadow-pick-toggle');
     if (toggle) toggle.textContent = 'Pick element';
@@ -466,6 +628,9 @@
       '<a href="' +
       AUDIT_SHEET_URL +
       '" class="shadow-btn shadow-btn-small shadow-btn-secondary shadow-toolbar-link" target="_blank" rel="noopener">Open audit sheet</a>' +
+      '<a href="' +
+      ASSETS_FOLDER_URL +
+      '" class="shadow-btn shadow-btn-small shadow-btn-secondary shadow-toolbar-link" target="_blank" rel="noopener">Open asset folder</a>' +
       '<span class="shadow-toolbar-hint">Or ⌘/Alt+click any element</span>';
     document.body.appendChild(bar);
     qs('#shadow-pick-toggle').addEventListener('click', () => {

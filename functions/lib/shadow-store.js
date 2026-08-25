@@ -229,3 +229,60 @@ export async function syncAllToSheets(env) {
   const data = await exportAudit(env);
   return pushToSheets(env, { action: 'sync', ...data });
 }
+
+/** Upload replacement image to Drive via Apps Script; link on ticket.shadowFixUrl. */
+export async function uploadAsset(env, payload) {
+  const sheetsResult = await pushToSheets(env, {
+    action: 'asset_upload',
+    asset: {
+      ticketId: payload.ticketId,
+      locationId: payload.locationId,
+      filename: payload.filename,
+      mimeType: payload.mimeType,
+      dataBase64: payload.dataBase64,
+      pagePath: payload.pagePath || '',
+      pageUrl: payload.pageUrl || '',
+      cssSelector: payload.cssSelector || '',
+      currentSrc: payload.currentSrc || '',
+      elementLabel: payload.elementLabel || '',
+      uploadedBy: payload.uploadedBy
+    }
+  });
+
+  if (sheetsResult.skipped) {
+    return { ok: false, error: 'SHEETS_WEBHOOK_URL is not set' };
+  }
+  if (!sheetsResult.ok) {
+    return {
+      ok: false,
+      error: sheetsResult.data?.error || sheetsResult.error || 'Sheets upload failed',
+      detail: sheetsResult
+    };
+  }
+
+  const scriptBody = sheetsResult.data || {};
+  if (!scriptBody.ok) {
+    return { ok: false, error: scriptBody.error || 'Drive upload failed' };
+  }
+
+  const driveUrl = scriptBody.driveUrl || '';
+  if (driveUrl && payload.ticketId) {
+    const state = await getState(env);
+    const ticket = state.tickets.find((t) => t.id === payload.ticketId);
+    if (ticket) {
+      ticket.shadowFixUrl = driveUrl;
+      ticket.lastUpdatedAt = nowIso();
+      ticket.lastUpdatedBy = payload.uploadedBy;
+      await persist(state);
+    }
+  }
+
+  return {
+    ok: true,
+    driveUrl,
+    fileId: scriptBody.fileId,
+    locationId: scriptBody.locationId || payload.locationId,
+    filename: scriptBody.filename || payload.filename,
+    assetId: scriptBody.assetId
+  };
+}

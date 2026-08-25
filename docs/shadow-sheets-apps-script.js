@@ -9,13 +9,18 @@
  *    Execute as: Me | Who has access: Anyone
  * 5. Copy script.google.com/macros/s/.../exec into SHEETS_WEBHOOK_URL
  *
- * Tabs: Tickets, Comments, Audit_Log, People (see SHADOW-SHEETS-TEMPLATE.md)
+ * Tabs: Tickets, Comments, Audit_Log, People, Assets (see SHADOW-SHEETS-TEMPLATE.md)
+ *
+ * Drive assets folder (override via Script property ASSETS_FOLDER_ID):
+ * https://drive.google.com/drive/folders/1TIhmFeB7LanKDhNCfiCm83ZZQTYjQKhF
  */
 
 var TICKETS = 'Tickets';
 var COMMENTS = 'Comments';
 var AUDIT = 'Audit_Log';
 var PEOPLE = 'People';
+var ASSETS = 'Assets';
+var ASSETS_FOLDER_ID_DEFAULT = '1TIhmFeB7LanKDhNCfiCm83ZZQTYjQKhF';
 
 function doPost(e) {
   try {
@@ -42,6 +47,9 @@ function doPost(e) {
       appendAudit_(ss, body.audit);
       return json_({ ok: true });
     }
+    if (action === 'asset_upload') {
+      return json_(uploadAsset_(ss, body.asset || {}));
+    }
     return json_({ ok: false, error: 'Unknown action' });
   } catch (err) {
     return json_({ ok: false, error: String(err) });
@@ -52,7 +60,7 @@ function doGet() {
   return json_({
     service: 'Meridian shadow review Sheets bridge',
     status: 'ok',
-    tabs: [TICKETS, COMMENTS, AUDIT, PEOPLE]
+    tabs: [TICKETS, COMMENTS, AUDIT, PEOPLE, ASSETS]
   });
 }
 
@@ -177,4 +185,98 @@ function writeTable_(sheet, headers, rows) {
 function json_(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+function assetsFolderId_() {
+  var id = PropertiesService.getScriptProperties().getProperty('ASSETS_FOLDER_ID');
+  return id || ASSETS_FOLDER_ID_DEFAULT;
+}
+
+function uploadAsset_(ss, a) {
+  if (!a.dataBase64 || !a.filename) {
+    return { ok: false, error: 'Missing file data' };
+  }
+  var folder = DriveApp.getFolderById(assetsFolderId_());
+  var bytes = Utilities.base64Decode(a.dataBase64);
+  var blob = Utilities.newBlob(bytes, a.mimeType || 'application/octet-stream', a.filename);
+  var file = folder.createFile(blob);
+  file.setName(a.filename);
+  var driveUrl = file.getUrl();
+  var assetId =
+    'A-' + Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyyMMddHHmmss');
+  var uploadedAt = new Date().toISOString();
+  var row = {
+    assetId: assetId,
+    ticketId: a.ticketId || '',
+    locationId: a.locationId || '',
+    filename: a.filename,
+    driveUrl: driveUrl,
+    pagePath: a.pagePath || '',
+    cssSelector: a.cssSelector || '',
+    currentSrc: a.currentSrc || '',
+    uploadedBy: a.uploadedBy || '',
+    uploadedAt: uploadedAt,
+    mimeType: a.mimeType || '',
+    sizeBytes: bytes.length
+  };
+  appendAsset_(ss, row);
+  appendAudit_(ss, {
+    eventId: assetId,
+    timestamp: uploadedAt,
+    actor: row.uploadedBy,
+    action: 'asset_uploaded',
+    ticketId: row.ticketId,
+    commentId: '',
+    fromStatus: '',
+    toStatus: '',
+    pageUrl: a.pageUrl || '',
+    details: row.filename,
+    source: 'Shadow UI'
+  });
+  if (a.ticketId) {
+    updateTicketShadowUrl_(ss, a.ticketId, driveUrl);
+  }
+  return {
+    ok: true,
+    driveUrl: driveUrl,
+    fileId: file.getId(),
+    locationId: row.locationId,
+    filename: row.filename,
+    assetId: assetId
+  };
+}
+
+function appendAsset_(ss, a) {
+  if (!a) return;
+  var sheet = ss.getSheetByName(ASSETS) || ss.insertSheet(ASSETS);
+  ensureHeaders_(sheet, assetHeaders_());
+  sheet.appendRow(assetRow_(a));
+}
+
+function updateTicketShadowUrl_(ss, ticketId, driveUrl) {
+  var sheet = ss.getSheetByName(TICKETS);
+  if (!sheet) return;
+  var data = sheet.getDataRange().getValues();
+  var shadowUrlCol = 14;
+  var i;
+  for (i = 1; i < data.length; i++) {
+    if (String(data[i][0]) === ticketId) {
+      sheet.getRange(i + 1, shadowUrlCol + 1).setValue(driveUrl);
+      return;
+    }
+  }
+}
+
+function assetHeaders_() {
+  return [
+    'Asset ID', 'Ticket ID', 'Location ID', 'Filename', 'Drive URL', 'Page path',
+    'CSS selector', 'Current src', 'Uploaded by', 'Uploaded at', 'Mime type', 'Size bytes'
+  ];
+}
+
+function assetRow_(a) {
+  return [
+    a.assetId, a.ticketId, a.locationId, a.filename, a.driveUrl, a.pagePath,
+    a.cssSelector, a.currentSrc, a.uploadedBy, a.uploadedAt, a.mimeType, a.sizeBytes
+  ];
 }
