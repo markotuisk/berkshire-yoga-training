@@ -34,6 +34,18 @@
     Blocked: 'Blocked'
   };
 
+  const ACTIVE_STATUSES = [
+    'Open',
+    'Discussing',
+    'Accepted',
+    'On shadow',
+    'In progress',
+    'Ready for review',
+    'Blocked'
+  ];
+
+  const ARCHIVE_STATUSES = ['Approved', 'Shipped to live', "Won't fix", 'Duplicate'];
+
   const STORAGE_PERSON = 'twa_shadow_person';
   const STORAGE_VERSION_SEEN = 'twa_shadow_version_seen';
   const STORAGE_LAST_ACTIVE = 'twa_shadow_last_active';
@@ -50,6 +62,9 @@
   let activeEl = null;
   let highlightEl = null;
   let whatsNewManual = false;
+  let inboxTab = 'active';
+  let pageBadgeNodes = [];
+  let badgePositionBound = false;
 
   function changelog() {
     return window.TWAShadowChangelog || { version: '0.0.0', releases: [] };
@@ -57,6 +72,31 @@
 
   function isDeveloper(person) {
     return person && person.id === 'marko';
+  }
+
+  function isActiveStatus(status) {
+    return ACTIVE_STATUSES.includes(status);
+  }
+
+  function isArchiveStatus(status) {
+    return ARCHIVE_STATUSES.includes(status);
+  }
+
+  function currentPagePath() {
+    return location.pathname || '/';
+  }
+
+  function ticketMatchesPage(ticket) {
+    const path = currentPagePath();
+    if (ticket.pagePath) return ticket.pagePath === path;
+    if (ticket.pageUrl) {
+      try {
+        return new URL(ticket.pageUrl).pathname === path;
+      } catch (e) {
+        return false;
+      }
+    }
+    return false;
   }
 
   function compareVersion(a, b) {
@@ -130,6 +170,7 @@
   function clearPerson() {
     localStorage.removeItem(STORAGE_PERSON);
     localStorage.removeItem(STORAGE_LAST_ACTIVE);
+    clearPageBadges();
     updateToolbarUser();
   }
 
@@ -412,10 +453,11 @@
       <div id="shadow-inbox-modal" class="shadow-modal" hidden>
         <div class="shadow-modal-card shadow-modal-wide">
           <div class="shadow-modal-head">
-            <h2>Your tickets</h2>
+            <h2>Ticket inbox</h2>
             <button type="button" class="shadow-close" data-close="inbox" aria-label="Close">&times;</button>
           </div>
-          <p class="shadow-hint">Shadow site only. Live site is unchanged. Meridian tracks tickets with Marko.</p>
+          <p class="shadow-hint">All reviewers see the same tickets. Orange markers on the page show open items for this page.</p>
+          <div id="shadow-inbox-tabs" class="shadow-inbox-tabs" role="tablist" aria-label="Ticket views"></div>
           <div id="shadow-ticket-list" class="shadow-ticket-list"></div>
         </div>
       </div>
@@ -532,9 +574,14 @@
     }
   }
 
-  function afterLogin() {
+  async function afterLogin() {
     updateVersionBadge();
     const person = getPerson();
+    try {
+      await refreshTickets();
+    } catch (err) {
+      toast('Could not load tickets: ' + err.message);
+    }
     if (shouldShowWhatsNew(person)) {
       showWhatsNew(false);
       return;
@@ -649,10 +696,198 @@
   }
 
   async function loadTickets() {
-    const person = getPerson();
-    const q = person ? '?author=' + encodeURIComponent(person.name) : '';
-    const data = await api('/api/tickets' + q);
+    const data = await api('/api/tickets');
     ticketsCache = data.tickets || [];
+    return ticketsCache;
+  }
+
+  function ticketsByTab(tab) {
+    return ticketsCache.filter((t) =>
+      tab === 'archive' ? isArchiveStatus(t.status) : isActiveStatus(t.status)
+    );
+  }
+
+  function inboxTabCounts() {
+    return {
+      active: ticketsByTab('active').length,
+      archive: ticketsByTab('archive').length
+    };
+  }
+
+  function renderInboxTabs() {
+    const tabsEl = qs('#shadow-inbox-tabs');
+    if (!tabsEl) return;
+    const counts = inboxTabCounts();
+    tabsEl.innerHTML = '';
+    [
+      { id: 'active', label: 'Active' },
+      { id: 'archive', label: 'Archive' }
+    ].forEach((tab) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className =
+        'shadow-inbox-tab' + (inboxTab === tab.id ? ' shadow-inbox-tab--active' : '');
+      btn.setAttribute('role', 'tab');
+      btn.setAttribute('aria-selected', inboxTab === tab.id ? 'true' : 'false');
+      btn.dataset.tab = tab.id;
+      btn.innerHTML =
+        escapeHtml(tab.label) +
+        '<span class="shadow-inbox-tab-count">' +
+        counts[tab.id] +
+        '</span>';
+      btn.addEventListener('click', () => {
+        if (inboxTab === tab.id) return;
+        inboxTab = tab.id;
+        renderInboxList();
+      });
+      tabsEl.appendChild(btn);
+    });
+  }
+
+  function renderInboxList() {
+    const list = qs('#shadow-ticket-list');
+    if (!list) return;
+    renderInboxTabs();
+    const visible = ticketsByTab(inboxTab)
+      .slice()
+      .sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+    if (!visible.length) {
+      list.innerHTML =
+        inboxTab === 'archive'
+          ? '<p class="shadow-hint">No archived tickets yet.</p>'
+          : '<p class="shadow-hint">No active tickets. Click any page element to create one.</p>';
+      return;
+    }
+    list.innerHTML = '';
+    visible.forEach((t) => {
+      const row = document.createElement('button');
+      row.type = 'button';
+      row.className = 'shadow-ticket-row';
+      row.innerHTML =
+        '<span class="shadow-ticket-id">' +
+        escapeHtml(t.id) +
+        '</span><span class="shadow-ticket-meta">' +
+        escapeHtml(formatDate(t.createdAt)) +
+        ' · ' +
+        escapeHtml(t.createdBy || 'Unknown') +
+        ' · ' +
+        escapeHtml(STATUS_LABELS[t.status] || t.status) +
+        '</span><span class="shadow-ticket-summary">' +
+        escapeHtml(t.summary || '') +
+        '</span>';
+      row.addEventListener('click', () => openDetail(t.id));
+      list.appendChild(row);
+    });
+  }
+
+  function ensureBadgeLayer() {
+    let layer = qs('#shadow-page-badges');
+    if (!layer) {
+      layer = document.createElement('div');
+      layer.id = 'shadow-page-badges';
+      layer.className = 'shadow-page-badges';
+      layer.setAttribute('aria-hidden', 'true');
+      document.body.appendChild(layer);
+    }
+    return layer;
+  }
+
+  function clearPageBadges() {
+    pageBadgeNodes.forEach((node) => node.remove());
+    pageBadgeNodes = [];
+    const layer = qs('#shadow-page-badges');
+    if (layer) layer.innerHTML = '';
+  }
+
+  function bindBadgePositioning() {
+    if (badgePositionBound) return;
+    badgePositionBound = true;
+    const reposition = throttle(positionPageBadges, 100);
+    window.addEventListener('scroll', reposition, { passive: true });
+    window.addEventListener('resize', reposition, { passive: true });
+  }
+
+  function positionPageBadges() {
+    pageBadgeNodes.forEach((badge) => {
+      const target = badge._shadowTarget;
+      if (!target || !target.isConnected) {
+        badge.hidden = true;
+        return;
+      }
+      const rect = target.getBoundingClientRect();
+      if (!rect.width && !rect.height) {
+        badge.hidden = true;
+        return;
+      }
+      badge.hidden = false;
+      const offset = badge._shadowOffset || 0;
+      badge.style.top = Math.max(4, rect.top + 4 + offset) + 'px';
+      badge.style.left = Math.max(4, rect.left + 4) + 'px';
+    });
+  }
+
+  function renderPageBadges() {
+    clearPageBadges();
+    if (!getPerson()) return;
+
+    const layer = ensureBadgeLayer();
+    const pageTickets = ticketsCache.filter(
+      (t) => isActiveStatus(t.status) && t.cssSelector && ticketMatchesPage(t)
+    );
+    if (!pageTickets.length) return;
+
+    const grouped = new Map();
+    pageTickets.forEach((ticket) => {
+      const key = ticket.cssSelector;
+      if (!grouped.has(key)) grouped.set(key, []);
+      grouped.get(key).push(ticket);
+    });
+
+    grouped.forEach((tickets, selector) => {
+      let target;
+      try {
+        target = document.querySelector(selector);
+      } catch (e) {
+        return;
+      }
+      if (!target || target.closest('#shadow-review-root, .shadow-toolbar, #shadow-page-badges')) {
+        return;
+      }
+
+      tickets
+        .slice()
+        .sort((a, b) => String(a.id).localeCompare(String(b.id)))
+        .forEach((ticket, index) => {
+          const badge = document.createElement('button');
+          badge.type = 'button';
+          badge.className = 'shadow-page-badge';
+          badge.textContent = ticket.id;
+          badge.title =
+            (STATUS_LABELS[ticket.status] || ticket.status) +
+            ': ' +
+            (ticket.summary || ticket.elementLabel || 'Open ticket');
+          badge._shadowTarget = target;
+          badge._shadowOffset = index * 26;
+          badge.addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            openDetail(ticket.id);
+          });
+          layer.appendChild(badge);
+          pageBadgeNodes.push(badge);
+        });
+    });
+
+    bindBadgePositioning();
+    positionPageBadges();
+  }
+
+  async function refreshTickets() {
+    if (!getPerson()) return ticketsCache;
+    await loadTickets();
+    renderPageBadges();
+    const inboxOpen = qs('#shadow-inbox-modal') && !qs('#shadow-inbox-modal').hidden;
+    if (inboxOpen) renderInboxList();
     return ticketsCache;
   }
 
@@ -735,6 +970,7 @@
     event.preventDefault();
     try {
       await updateTicketStatus(id, btn.getAttribute('data-action'), person);
+      await refreshTickets();
       openDetail(id);
     } catch (err) {
       toast(err.message);
@@ -746,32 +982,8 @@
     const list = qs('#shadow-ticket-list');
     list.innerHTML = '<p class="shadow-hint">Loading…</p>';
     try {
-      await loadTickets();
-      if (!ticketsCache.length) {
-        list.innerHTML = '<p class="shadow-hint">No tickets yet. Click any page element to create one.</p>';
-        return;
-      }
-      list.innerHTML = '';
-      ticketsCache
-        .slice()
-        .sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)))
-        .forEach((t) => {
-          const row = document.createElement('button');
-          row.type = 'button';
-          row.className = 'shadow-ticket-row';
-          row.innerHTML =
-            '<span class="shadow-ticket-id">' +
-            escapeHtml(t.id) +
-            '</span><span class="shadow-ticket-meta">' +
-            escapeHtml(formatDate(t.createdAt)) +
-            ' · ' +
-            escapeHtml(STATUS_LABELS[t.status] || t.status) +
-            '</span><span class="shadow-ticket-summary">' +
-            escapeHtml(t.summary || '') +
-            '</span>';
-          row.addEventListener('click', () => openDetail(t.id));
-          list.appendChild(row);
-        });
+      await refreshTickets();
+      renderInboxList();
     } catch (err) {
       list.innerHTML = '<p class="shadow-hint">Could not load tickets: ' + escapeHtml(err.message) + '</p>';
     }
@@ -907,6 +1119,7 @@
       toast(toastMsg);
       form.reset();
       updateStorycard(null, { type: 'section' });
+      await refreshTickets();
     } catch (err) {
       toast(err.message);
     }
@@ -942,6 +1155,7 @@
     if (event.defaultPrevented) return;
     if (event.target.closest('#shadow-review-root')) return;
     if (event.target.closest('.shadow-toolbar')) return;
+    if (event.target.closest('.shadow-page-badge, #shadow-page-badges')) return;
 
     const pickMod = isPickModifier(event);
     const interactive = event.target.closest('a, button, input, textarea, select, label');

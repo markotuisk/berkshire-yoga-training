@@ -26,10 +26,17 @@ Partners do **not** need Cloudflare accounts. Access only needs their emails on 
 1. Open the shadow site (Cloudflare Access login → one-time email code or Google).
 2. Choose your name (Katia / Raili / Marko).
 3. **What's new** on login when there are unread partner updates, then the ticket inbox.
-4. Click **Pick element** (or ⌘/Alt+click) on any text, image, or button.
-5. For images or placeholders, the **Storycard** section lets you upload a replacement file (optional).
-6. Add category + comment → ticket created (stored in KV and mirrored to Google Sheets).
-7. Open a ticket to read the thread and add further comments.
+4. The inbox shows **all reviewers' tickets** (not just your own) so partners can spot duplicates.
+5. **Active** tab (default) lists tickets still in play; **Archive** holds Approved, Shipped, Won't fix, and Duplicate.
+6. Orange **TWA-xxx** markers appear on page elements with active tickets — click to open the thread.
+7. Click **Pick element** (or ⌘/Alt+click) on any text, image, or button.
+8. For images or placeholders, the **Storycard** section lets you upload a replacement file (optional).
+9. Add category + comment → ticket created (stored in KV and mirrored to Google Sheets).
+10. Open a ticket to read the thread and add further comments.
+
+**Active statuses** (default inbox + on-page markers): Open, Discussing, Accepted, On shadow, In progress, Ready for review, Blocked.
+
+**Archive statuses**: Approved, Shipped to live, Won't fix, Duplicate.
 
 Statuses: Open → Discussing → Accepted → On shadow → Ready for review → Approved → Shipped to live.
 
@@ -198,7 +205,7 @@ Without the secret, tickets still work in KV; Sheets stays empty until the webho
 
 | Method | Path | Purpose |
 |--------|------|---------|
-| GET | `/api/tickets` | List tickets (`?author=Name`) |
+| GET | `/api/tickets` | List all tickets |
 | POST | `/api/tickets` | Create ticket (+ Sheets `ticket_created`) |
 | GET | `/api/tickets/:id` | Ticket + comments |
 | POST | `/api/tickets/:id/comments` | Add comment (+ Sheets `comment_added`) |

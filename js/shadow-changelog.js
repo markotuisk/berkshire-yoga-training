@@ -7,8 +7,23 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.2.0',
+    version: '1.3.0',
     releases: [
+      {
+        version: '1.3.0',
+        date: '2026-08-26',
+        title: 'Shared inbox and on-page markers',
+        user: [
+          'Ticket inbox shows everyone\'s tickets so you can avoid duplicate requests',
+          'Active and Archive tabs — default view is only tickets still in play',
+          'Orange TWA markers on page elements with open tickets — click to open the thread',
+          'Each ticket row shows who raised it'
+        ],
+        dev: [
+          'Page badges match tickets via stored cssSelector on the current page path',
+          'Badges hide when a ticket moves to Approved, Shipped, Won\'t fix, or Duplicate'
+        ]
+      },
       {
         version: '1.2.0',
         date: '2026-08-25',
