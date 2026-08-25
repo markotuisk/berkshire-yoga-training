@@ -108,12 +108,29 @@ npx wrangler pages deploy . --project-name=berkshire-yoga-training-shadow --bran
 
 ### Link preview (Open Graph)
 
-Middleware rewrites social meta on every HTML page:
+Two separate OG sets (middleware on the `shadow` branch):
+
+**1. Shadow Access** (link unfurls before login — WhatsApp, iMessage, Slack crawlers)
+
+- **Title:** Thames Wellness Academy · Shadow Access  
+- **Description:** Private partner login for the TWA Shadow review site. One-time email code. For Katia, Raili and Marko only — not the public Academy site.  
+- **Image:** `https://berkshireyogatraining.co.uk/assets/og-image.jpg`
+
+**2. Shadow review** (normal pages after you are logged in)
 
 - **Title:** Thames Wellness Academy · Shadow review  
-- **Description:** A calm private Shadow review room to refine the Academy site together. Flag copy, images and details before anything goes live. For Katia, Raili and Marko only.  
-- **Image:** `https://berkshireyogatraining.co.uk/assets/og-image.jpg`  
+- **Description:** A calm private Shadow review room…  
 - **theme-color:** `#E8612E`
+
+Access blocks crawlers by default, so they never reach our HTML. Add a **second policy** on the `shadow` Access app (order **above** Partners allowlist):
+
+1. Zero Trust → Access → Applications → **shadow** → Policies  
+2. **Create new policy** → name `Link preview crawlers` → Action **Bypass**  
+3. Include → **User Agent** (or equivalent) matching e.g.  
+   `.*facebookexternalhit.*|.*Twitterbot.*|.*LinkedInBot.*|.*Slackbot.*|.*WhatsApp.*|.*Discordbot.*|.*TelegramBot.*|.*Applebot.*`  
+4. Save — keep **Partners allowlist** as Allow for the three emails  
+
+Humans still hit Access login; only those bots see **Shadow Access** OG.
 
 ## Ticket storage
 

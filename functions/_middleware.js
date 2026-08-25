@@ -18,18 +18,45 @@ const SHADOW_STYLE_SCRIPT = `
 <script src="/js/shadow-review.js" defer></script>
 `;
 
-/** Shadow review link previews (WhatsApp, iMessage, Slack) */
-const SHADOW_OG = {
+const OG_IMAGE = 'https://berkshireyogatraining.co.uk/assets/og-image.jpg';
+
+/**
+ * Access gate link previews — shown to social crawlers (WhatsApp, iMessage, Slack)
+ * that hit the hostname before partners log in. Distinct from the in-site Shadow review OG.
+ * Requires an Access Bypass policy for those bots (see docs/SHADOW-REVIEW.md).
+ */
+const SHADOW_ACCESS_OG = {
+  title: 'Thames Wellness Academy · Shadow Access',
+  description:
+    'Private partner login for the TWA Shadow review site. One-time email code. For Katia, Raili and Marko only — not the public Academy site.',
+  siteName: 'Thames Wellness Academy · Shadow Access',
+  image: OG_IMAGE,
+  imageAlt: 'Thames Wellness Academy: Shadow Access',
+  twitterTitle: 'Thames Wellness Academy · Shadow Access',
+  twitterDescription:
+    'Secure Access login for the TWA Shadow review. Partners only.'
+};
+
+/** In-site Shadow review previews (after Access login / normal HTML pages) */
+const SHADOW_SITE_OG = {
   title: 'Thames Wellness Academy · Shadow review',
   description:
     'A calm private Shadow review room to refine the Academy site together. Flag copy, images and details before anything goes live. For Katia, Raili and Marko only.',
   siteName: 'Thames Wellness Academy',
-  image: 'https://berkshireyogatraining.co.uk/assets/og-image.jpg',
+  image: OG_IMAGE,
   imageAlt: 'Thames Wellness Academy: Shadow review',
   twitterTitle: 'Thames Wellness Academy · Shadow review',
   twitterDescription:
     'Shadow review for Thames Wellness Academy partners. Comment on any detail. The public site stays untouched.'
 };
+
+/** Social / messaging crawlers used for link unfurls (not search indexing). */
+function isLinkPreviewCrawler(userAgent) {
+  if (!userAgent) return false;
+  return /facebookexternalhit|Facebot|Twitterbot|LinkedInBot|Slackbot|Slack-ImgProxy|Discordbot|TelegramBot|WhatsApp|SkypeUriPreview|Viber|Pinterest|redditbot|Applebot|iMessage|Google-PageRenderer|Embedly|Quora Link Preview|BitlyBot|Tumblr/i.test(
+    userAgent
+  );
+}
 
 function prefersMarkdown(accept) {
   return !!accept && /\btext\/markdown\b/i.test(accept);
@@ -72,28 +99,25 @@ function upsertMeta(html, attr, key, content) {
   return html.replace(/<\/head>/i, `  ${tag}\n</head>`);
 }
 
-function applyShadowOpenGraph(html, pageUrl) {
+function applyShadowOpenGraph(html, pageUrl, og) {
   let out = html;
-  out = out.replace(
-    /<title>[^<]*<\/title>/i,
-    `<title>${SHADOW_OG.title}</title>`
-  );
+  out = out.replace(/<title>[^<]*<\/title>/i, `<title>${og.title}</title>`);
   const pairs = [
-    ['name', 'description', SHADOW_OG.description],
-    ['property', 'og:title', SHADOW_OG.title],
-    ['property', 'og:description', SHADOW_OG.description],
+    ['name', 'description', og.description],
+    ['property', 'og:title', og.title],
+    ['property', 'og:description', og.description],
     ['property', 'og:type', 'website'],
     ['property', 'og:locale', 'en_GB'],
-    ['property', 'og:site_name', SHADOW_OG.siteName],
+    ['property', 'og:site_name', og.siteName],
     ['property', 'og:url', pageUrl],
-    ['property', 'og:image', SHADOW_OG.image],
+    ['property', 'og:image', og.image],
     ['property', 'og:image:width', '1200'],
     ['property', 'og:image:height', '630'],
-    ['property', 'og:image:alt', SHADOW_OG.imageAlt],
+    ['property', 'og:image:alt', og.imageAlt],
     ['name', 'twitter:card', 'summary_large_image'],
-    ['name', 'twitter:title', SHADOW_OG.twitterTitle],
-    ['name', 'twitter:description', SHADOW_OG.twitterDescription],
-    ['name', 'twitter:image', SHADOW_OG.image]
+    ['name', 'twitter:title', og.twitterTitle],
+    ['name', 'twitter:description', og.twitterDescription],
+    ['name', 'twitter:image', og.image]
   ];
   for (const [attr, key, content] of pairs) {
     out = upsertMeta(out, attr, key, content.replace(/"/g, '&quot;'));
@@ -101,8 +125,11 @@ function applyShadowOpenGraph(html, pageUrl) {
   return out;
 }
 
-function injectShadowReview(html, pageUrl) {
-  let out = applyShadowOpenGraph(html, pageUrl);
+function injectShadowReview(html, pageUrl, { accessPreview = false } = {}) {
+  const og = accessPreview ? SHADOW_ACCESS_OG : SHADOW_SITE_OG;
+  let out = applyShadowOpenGraph(html, pageUrl, og);
+  // Crawlers only need meta for unfurls — skip the review overlay UI
+  if (accessPreview) return out;
   if (!out.includes('shadow-review.js')) {
     if (/<\/head>/i.test(out)) {
       out = out.replace(/<\/head>/i, SHADOW_STYLE_SCRIPT + '</head>');
@@ -129,9 +156,9 @@ function markdownResponse(body, sourceHeaders) {
   return new Response(body, { status: 200, headers });
 }
 
-async function htmlWithShadow(response, pageUrl) {
+async function htmlWithShadow(response, pageUrl, opts) {
   const html = await response.text();
-  const injected = injectShadowReview(html, pageUrl);
+  const injected = injectShadowReview(html, pageUrl, opts);
   const headers = new Headers(response.headers);
   applyAgentLinkHeaders(headers);
   headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
@@ -148,6 +175,7 @@ export async function onRequest(context) {
   const url = new URL(request.url);
   const { pathname } = url;
   const accept = request.headers.get('Accept') || '';
+  const accessPreview = isLinkPreviewCrawler(request.headers.get('User-Agent') || '');
 
   if (pathname.startsWith('/api/')) {
     return next();
@@ -157,7 +185,7 @@ export async function onRequest(context) {
     const response = await next();
     const contentType = response.headers.get('content-type') || '';
     if (response.ok && /text\/html/i.test(contentType) && isHtmlPagePath(pathname)) {
-      return htmlWithShadow(response, url.origin + pathname);
+      return htmlWithShadow(response, url.origin + pathname, { accessPreview });
     }
     return response;
   }
