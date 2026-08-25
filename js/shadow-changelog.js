@@ -7,8 +7,21 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.4.0',
+    version: '1.4.1',
     releases: [
+      {
+        version: '1.4.1',
+        date: '2026-08-26',
+        title: 'Resizable ticket windows',
+        user: [
+          'Drag the bottom-right corner of inbox, ticket detail, and new-ticket windows to resize them',
+          'Double-click the header to re-centre and restore the default size',
+          'Content scrolls inside the window if you make it smaller'
+        ],
+        dev: [
+          'Modal width and height persist in sessionStorage alongside drag position'
+        ]
+      },
       {
         version: '1.4.0',
         date: '2026-08-26',

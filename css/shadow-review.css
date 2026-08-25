@@ -105,7 +105,8 @@ body.shadow-pick-mode * {
   pointer-events: none;
 }
 
-.shadow-modal--floating.shadow-modal--dragging {
+.shadow-modal--floating.shadow-modal--dragging,
+.shadow-modal--floating.shadow-modal--resizing {
   background: rgba(0, 0, 0, 0.08);
 }
 
@@ -113,6 +114,45 @@ body.shadow-pick-mode * {
   position: fixed;
   margin: 0;
   pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 280px;
+  min-height: 220px;
+}
+
+.shadow-modal-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.shadow-modal-resize {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 18px;
+  height: 18px;
+  cursor: nwse-resize;
+  touch-action: none;
+  z-index: 2;
+}
+
+.shadow-modal-resize::after {
+  content: "";
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid #bbb;
+  border-bottom: 2px solid #bbb;
+  pointer-events: none;
+}
+
+.shadow-modal-resize:hover::after {
+  border-color: #e8612e;
 }
 
 .shadow-modal[hidden] {

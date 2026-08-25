@@ -65,6 +65,11 @@
     new: 'shadow-new-modal'
   };
 
+  const MODAL_MIN_WIDTH = 280;
+  const MODAL_MIN_HEIGHT = 220;
+  const MODAL_MAX_WIDTH_VW = 0.95;
+  const MODAL_MAX_HEIGHT_VH = 0.9;
+
   let ticketsCache = [];
   let activeEl = null;
   let highlightEl = null;
@@ -225,12 +230,54 @@
     return null;
   }
 
-  function saveModalPosition(key, top, left) {
+  function saveModalPosition(key, top, left, width, height) {
     try {
-      sessionStorage.setItem(STORAGE_MODAL_POS + key, JSON.stringify({ top, left }));
+      const data = { top, left };
+      if (typeof width === 'number' && width > 0) data.width = width;
+      if (typeof height === 'number' && height > 0) data.height = height;
+      sessionStorage.setItem(STORAGE_MODAL_POS + key, JSON.stringify(data));
     } catch (e) {
       /* ignore */
     }
+  }
+
+  function modalSizeLimits() {
+    return {
+      minW: MODAL_MIN_WIDTH,
+      minH: MODAL_MIN_HEIGHT,
+      maxW: Math.floor(window.innerWidth * MODAL_MAX_WIDTH_VW),
+      maxH: Math.floor(window.innerHeight * MODAL_MAX_HEIGHT_VH)
+    };
+  }
+
+  function clampModalSize(width, height) {
+    const limits = modalSizeLimits();
+    return {
+      width: Math.min(Math.max(limits.minW, width), limits.maxW),
+      height: Math.min(Math.max(limits.minH, height), limits.maxH)
+    };
+  }
+
+  function applyModalSize(card, width, height) {
+    const size = clampModalSize(width, height);
+    card.style.width = size.width + 'px';
+    card.style.height = size.height + 'px';
+    card.style.maxHeight = 'none';
+    return size;
+  }
+
+  function clearModalSize(card) {
+    card.style.width = '';
+    card.style.height = '';
+    card.style.maxHeight = '';
+  }
+
+  function saveModalState(key, card) {
+    const top = parseFloat(card.style.top);
+    const left = parseFloat(card.style.left);
+    const width = card.style.width ? parseFloat(card.style.width) : undefined;
+    const height = card.style.height ? parseFloat(card.style.height) : undefined;
+    saveModalPosition(key, top, left, width, height);
   }
 
   function clearModalPosition(key) {
@@ -271,6 +318,9 @@
     card.style.margin = '0';
     if (saved) {
       requestAnimationFrame(() => {
+        if (typeof saved.width === 'number' && typeof saved.height === 'number') {
+          applyModalSize(card, saved.width, saved.height);
+        }
         const pos = clampModalPosition(saved.left, saved.top, card);
         card.style.left = pos.left + 'px';
         card.style.top = pos.top + 'px';
@@ -282,8 +332,26 @@
 
   function resetModalPosition(key, card) {
     clearModalPosition(key);
+    clearModalSize(card);
     centerModalCard(card);
     toast('Modal re-centred');
+  }
+
+  function setupModalScrollArea(card, head, keepOutside) {
+    const scroll = document.createElement('div');
+    scroll.className = 'shadow-modal-scroll';
+    const toMove = [];
+    [...card.children].forEach((child) => {
+      if (child === head || child.classList.contains('shadow-modal-resize')) return;
+      if (keepOutside && keepOutside.includes(child)) return;
+      toMove.push(child);
+    });
+    if (!toMove.length) return null;
+    toMove.forEach((child) => scroll.appendChild(child));
+    const anchor = keepOutside && keepOutside.length ? keepOutside[0] : null;
+    if (anchor) card.insertBefore(scroll, anchor);
+    else card.appendChild(scroll);
+    return scroll;
   }
 
   function initDraggableModals() {
@@ -294,6 +362,15 @@
       const card = qs('.shadow-modal-card', modal);
       const head = qs('.shadow-modal-head', modal);
       if (!card || !head) return;
+
+      const keepOutside =
+        key === 'detail' ? [qs('#shadow-comment-form', modal)].filter(Boolean) : [];
+      setupModalScrollArea(card, head, keepOutside);
+
+      const grip = document.createElement('div');
+      grip.className = 'shadow-modal-resize';
+      grip.setAttribute('aria-hidden', 'true');
+      card.appendChild(grip);
 
       head.addEventListener('dblclick', (e) => {
         if (e.target.closest('.shadow-close')) return;
@@ -334,14 +411,55 @@
           head.removeEventListener('pointerup', onUp);
           head.removeEventListener('pointercancel', onUp);
           modal.classList.remove('shadow-modal--dragging');
-          if (dragged) {
-            saveModalPosition(key, parseFloat(card.style.left), parseFloat(card.style.top));
-          }
+          if (dragged) saveModalState(key, card);
         };
 
         head.addEventListener('pointermove', onMove);
         head.addEventListener('pointerup', onUp);
         head.addEventListener('pointercancel', onUp);
+      });
+
+      grip.addEventListener('pointerdown', (e) => {
+        if (e.button !== 0) return;
+        e.preventDefault();
+        e.stopPropagation();
+        const rect = card.getBoundingClientRect();
+        const startX = e.clientX;
+        const startY = e.clientY;
+        const startW = rect.width;
+        const startH = rect.height;
+        let resized = false;
+
+        card.style.position = 'fixed';
+        card.style.margin = '0';
+        if (!card.style.left) card.style.left = rect.left + 'px';
+        if (!card.style.top) card.style.top = rect.top + 'px';
+
+        const onMove = (ev) => {
+          const dx = ev.clientX - startX;
+          const dy = ev.clientY - startY;
+          if (!resized && (Math.abs(dx) > 3 || Math.abs(dy) > 3)) {
+            resized = true;
+            modal.classList.add('shadow-modal--resizing');
+          }
+          if (!resized) return;
+          const size = applyModalSize(card, startW + dx, startH + dy);
+          const pos = clampModalPosition(parseFloat(card.style.left), parseFloat(card.style.top), card);
+          card.style.left = pos.left + 'px';
+          card.style.top = pos.top + 'px';
+        };
+
+        const onUp = () => {
+          grip.removeEventListener('pointermove', onMove);
+          grip.removeEventListener('pointerup', onUp);
+          grip.removeEventListener('pointercancel', onUp);
+          modal.classList.remove('shadow-modal--resizing');
+          if (resized) saveModalState(key, card);
+        };
+
+        grip.addEventListener('pointermove', onMove);
+        grip.addEventListener('pointerup', onUp);
+        grip.addEventListener('pointercancel', onUp);
       });
     });
   }
