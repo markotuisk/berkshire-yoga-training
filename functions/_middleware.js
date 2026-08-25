@@ -28,7 +28,7 @@ const OG_IMAGE = 'https://berkshireyogatraining.co.uk/assets/og-image.jpg';
 const SHADOW_ACCESS_OG = {
   title: 'Thames Wellness Academy · Shadow Access',
   description:
-    'Private partner login for the TWA Shadow review site. One-time email code. For Katia, Raili and Marko only — not the public Academy site.',
+    'Private partner login for the TWA Shadow review site. One-time email code. For Katia, Raili and Marko only. Not the public Academy site.',
   siteName: 'Thames Wellness Academy · Shadow Access',
   image: OG_IMAGE,
   imageAlt: 'Thames Wellness Academy: Shadow Access',
