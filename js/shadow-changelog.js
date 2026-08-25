@@ -7,8 +7,20 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.5.1',
+    version: '1.5.2',
     releases: [
+      {
+        version: '1.5.2',
+        date: '2026-08-26',
+        title: 'Open and Closed tickets',
+        user: [
+          'Inbox tabs are now Open and Closed — finished tickets leave Open automatically',
+          'Accept agrees with the direction; Done closes a ticket when a shadow change looks right',
+          'Comment to keep discussing (no separate Request changes button)',
+          'Simpler status labels on each row: Open, In progress, Ready for review, Done'
+        ],
+        dev: []
+      },
       {
         version: '1.5.1',
         date: '2026-08-26',

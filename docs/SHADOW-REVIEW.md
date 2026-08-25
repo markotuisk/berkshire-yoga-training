@@ -27,21 +27,19 @@ Partners do **not** need Cloudflare accounts. Access only needs their emails on 
 2. Choose your name (Katia / Raili / Marko).
 3. **What's new** on login when there are unread partner updates, then the ticket inbox.
 4. The inbox shows **all reviewers' tickets** (not just your own) so partners can spot duplicates.
-5. **Active** tab (default) lists tickets still in play; **Archive** holds Approved, Shipped, Won't fix, and Duplicate.
-6. Orange **TWA-xxx** markers appear on page elements with active tickets — click to open the thread and jump to the element.
+5. **Open** tab (default) lists tickets that still need attention; **Closed** holds finished items (Approved, Shipped, Won't fix, Duplicate).
+6. Orange **TWA-xxx** markers appear on page elements with open tickets — click to open the thread and jump to the element.
 7. **Show on page** in a ticket (or **Locate** in the inbox) scrolls to the linked element and highlights it. Drag ticket windows by the six-dot grip; drag any corner to resize.
 8. Click **Pick element** (or ⌘/Alt+click) on any text, image, or button.
 9. For images or placeholders, the **Storycard** section lets you upload a replacement file (optional).
 10. Add category + comment → ticket created (stored in KV and mirrored to Google Sheets).
 11. Open a ticket to read the thread and add further comments.
 
-**Active statuses** (default inbox + on-page markers): Open, Discussing, Accepted, On shadow, In progress, Ready for review, Blocked.
+**Open tab** (default inbox + on-page markers): Open, Discussing, Accepted, On shadow, In progress, Ready for review, Blocked.
 
-**Archive statuses**: Approved, Shipped to live, Won't fix, Duplicate.
+**Closed tab**: Approved, Shipped to live, Won't fix, Duplicate.
 
-Statuses: Open → Discussing → Accepted → On shadow → Ready for review → Approved → Shipped to live.
-
-Partners use **Accept** to agree, **Comment** to keep discussing, and **Approve** when a shadow change looks right. Marko uses developer actions to move tickets through build and live deploy.
+Partners use **Comment** to discuss, **Accept** to agree with the proposed direction (ticket stays Open), and **Done** when a shadow change looks right (moves to Closed). Marko uses developer actions to mark work on shadow, send for review, and ship to live.
 
 ## Version and What's new
 
@@ -217,9 +215,9 @@ Without the secret, tickets still work in KV; Sheets stays empty until the webho
 
 ## Meridian workflow
 
-1. Partners comment only on shadow. Use **Accept**, **Comment**, or **Approve** on each ticket.
+1. Partners comment only on shadow. Use **Comment**, **Accept**, or **Done** on each ticket.
 2. Meridian implements on `shadow` branch, sets status **On shadow**, then **Ready for review**.
-3. Katia / Raili approve in the ticket thread or use **Approve**.
+3. Katia / Raili use **Done** in the ticket thread when a shadow change looks right.
 4. Marko ports the change to `main` and deploys live.
 5. Status → **Shipped to live**.
 

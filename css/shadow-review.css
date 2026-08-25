@@ -587,7 +587,7 @@ body.shadow-modal-drag-active {
 .shadow-ticket-row {
   display: grid;
   grid-template-columns: 1fr auto;
-  grid-template-rows: auto auto auto;
+  grid-template-rows: auto auto auto auto;
   gap: 0.15rem 0.5rem;
   text-align: left;
   padding: 0.7rem 0.8rem;
@@ -600,6 +600,7 @@ body.shadow-modal-drag-active {
 }
 
 .shadow-ticket-row .shadow-ticket-id,
+.shadow-ticket-row .shadow-status-pill,
 .shadow-ticket-row .shadow-ticket-meta,
 .shadow-ticket-row .shadow-ticket-summary {
   grid-column: 1;
@@ -607,7 +608,7 @@ body.shadow-modal-drag-active {
 
 .shadow-locate-btn {
   grid-column: 2;
-  grid-row: 1 / span 3;
+  grid-row: 1 / span 4;
   align-self: center;
   border: 1px solid var(--shadow-border);
   border-radius: var(--shadow-radius-pill);
@@ -646,6 +647,54 @@ body.shadow-modal-drag-active {
 .shadow-ticket-summary {
   font-size: 0.875rem;
   color: var(--shadow-text);
+}
+
+.shadow-status-pill {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--shadow-radius-pill);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.shadow-status-pill--open {
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--shadow-text-secondary);
+}
+
+.shadow-status-pill--progress {
+  background: rgba(10, 132, 255, 0.12);
+  color: #0a5dc2;
+}
+
+.shadow-status-pill--review {
+  background: rgba(232, 97, 46, 0.14);
+  color: var(--shadow-accent);
+}
+
+.shadow-status-pill--blocked {
+  background: rgba(255, 59, 48, 0.12);
+  color: #c41e12;
+}
+
+.shadow-status-pill--done {
+  background: rgba(52, 199, 89, 0.14);
+  color: #248a3d;
+}
+
+.shadow-status-pill--closed,
+.shadow-status-pill--muted {
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--shadow-text-secondary);
+}
+
+.shadow-action--done {
+  font-size: 0.8125rem;
+  padding: 0.5rem 1rem;
+  box-shadow: 0 2px 10px rgba(232, 97, 46, 0.25);
 }
 
 .shadow-dl {

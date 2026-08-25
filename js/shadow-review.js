@@ -32,9 +32,9 @@
     "Won't fix": "Won't fix",
     Duplicate: 'Duplicate',
     Blocked: 'Blocked'
-  };
+  }; // backend / audit labels; partner UI uses partnerStatusLabel()
 
-  const ACTIVE_STATUSES = [
+  const OPEN_STATUSES = [
     'Open',
     'Discussing',
     'Accepted',
@@ -44,7 +44,7 @@
     'Blocked'
   ];
 
-  const ARCHIVE_STATUSES = ['Approved', 'Shipped to live', "Won't fix", 'Duplicate'];
+  const CLOSED_STATUSES = ['Approved', 'Shipped to live', "Won't fix", 'Duplicate'];
 
   const STORAGE_PERSON = 'twa_shadow_person';
   const STORAGE_VERSION_SEEN = 'twa_shadow_version_seen';
@@ -80,7 +80,7 @@
   let activeEl = null;
   let highlightEl = null;
   let whatsNewManual = false;
-  let inboxTab = 'active';
+  let inboxTab = 'open';
   let pageBadgeNodes = [];
   let badgePositionBound = false;
 
@@ -92,12 +92,42 @@
     return person && person.id === 'marko';
   }
 
-  function isActiveStatus(status) {
-    return ACTIVE_STATUSES.includes(status);
+  function isOpenStatus(status) {
+    return OPEN_STATUSES.includes(status);
   }
 
-  function isArchiveStatus(status) {
-    return ARCHIVE_STATUSES.includes(status);
+  function isClosedStatus(status) {
+    return CLOSED_STATUSES.includes(status);
+  }
+
+  function partnerStatusLabel(status) {
+    if (isClosedStatus(status)) {
+      if (status === 'Approved') return 'Done';
+      if (status === 'Shipped to live') return 'Closed';
+      if (status === "Won't fix") return "Won't fix";
+      if (status === 'Duplicate') return 'Duplicate';
+      return 'Closed';
+    }
+    if (status === 'In progress' || status === 'On shadow' || status === 'Accepted') {
+      return 'In progress';
+    }
+    if (status === 'Ready for review') return 'Ready for review';
+    if (status === 'Blocked') return 'Blocked';
+    return 'Open';
+  }
+
+  function statusPillModifier(status) {
+    if (isClosedStatus(status)) {
+      if (status === 'Approved') return 'done';
+      if (status === "Won't fix" || status === 'Duplicate') return 'muted';
+      return 'closed';
+    }
+    if (status === 'In progress' || status === 'On shadow' || status === 'Accepted') {
+      return 'progress';
+    }
+    if (status === 'Ready for review') return 'review';
+    if (status === 'Blocked') return 'blocked';
+    return 'open';
   }
 
   function currentPagePath() {
@@ -907,7 +937,7 @@
             <button type="button" class="shadow-close" data-close="inbox" aria-label="Close">&times;</button>
           </div>
           <p class="shadow-hint">All reviewers see the same tickets. Orange markers on the page show open items for this page.</p>
-          <div id="shadow-inbox-tabs" class="shadow-inbox-tabs" role="tablist" aria-label="Ticket views"></div>
+          <div id="shadow-inbox-tabs" class="shadow-inbox-tabs" role="tablist" aria-label="Open and closed tickets"></div>
           <div id="shadow-ticket-list" class="shadow-ticket-list"></div>
         </div>
       </div>
@@ -923,7 +953,7 @@
             <label>Add comment
               <textarea name="message" rows="3" required placeholder="Follow-up note"></textarea>
             </label>
-            <button type="submit" class="shadow-btn">Post comment</button>
+            <button type="submit" class="shadow-btn shadow-btn-secondary">Comment</button>
           </form>
         </div>
       </div>
@@ -1166,14 +1196,14 @@
 
   function ticketsByTab(tab) {
     return ticketsCache.filter((t) =>
-      tab === 'archive' ? isArchiveStatus(t.status) : isActiveStatus(t.status)
+      tab === 'closed' ? isClosedStatus(t.status) : isOpenStatus(t.status)
     );
   }
 
   function inboxTabCounts() {
     return {
-      active: ticketsByTab('active').length,
-      archive: ticketsByTab('archive').length
+      open: ticketsByTab('open').length,
+      closed: ticketsByTab('closed').length
     };
   }
 
@@ -1183,8 +1213,8 @@
     const counts = inboxTabCounts();
     tabsEl.innerHTML = '';
     [
-      { id: 'active', label: 'Active' },
-      { id: 'archive', label: 'Archive' }
+      { id: 'open', label: 'Open' },
+      { id: 'closed', label: 'Closed' }
     ].forEach((tab) => {
       const btn = document.createElement('button');
       btn.type = 'button';
@@ -1220,12 +1250,14 @@
     row.innerHTML =
       '<span class="shadow-ticket-id">' +
       escapeHtml(t.id) +
+      '</span><span class="shadow-status-pill shadow-status-pill--' +
+      statusPillModifier(t.status) +
+      '">' +
+      escapeHtml(partnerStatusLabel(t.status)) +
       '</span><span class="shadow-ticket-meta">' +
       escapeHtml(formatDate(t.createdAt)) +
       ' · ' +
       escapeHtml(t.createdBy || 'Unknown') +
-      ' · ' +
-      escapeHtml(STATUS_LABELS[t.status] || t.status) +
       '</span><span class="shadow-ticket-summary">' +
       escapeHtml(t.summary || '') +
       '</span>' +
@@ -1274,9 +1306,9 @@
     const visible = ticketsByTab(inboxTab);
     if (!visible.length) {
       list.innerHTML =
-        inboxTab === 'archive'
-          ? '<p class="shadow-hint">No archived tickets yet.</p>'
-          : '<p class="shadow-hint">No active tickets. Click any page element to create one.</p>';
+        inboxTab === 'closed'
+          ? '<p class="shadow-hint">No closed tickets yet.</p>'
+          : '<p class="shadow-hint">No open tickets. Click any page element to create one.</p>';
       return;
     }
     list.innerHTML = '';
@@ -1353,7 +1385,7 @@
 
     const layer = ensureBadgeLayer();
     const pageTickets = ticketsCache.filter(
-      (t) => isActiveStatus(t.status) && t.cssSelector && ticketMatchesPage(t)
+      (t) => isOpenStatus(t.status) && t.cssSelector && ticketMatchesPage(t)
     );
     if (!pageTickets.length) return;
 
@@ -1384,7 +1416,7 @@
           badge.className = 'shadow-page-badge';
           badge.textContent = ticket.id;
           badge.title =
-            (STATUS_LABELS[ticket.status] || ticket.status) +
+            partnerStatusLabel(ticket.status) +
             ': ' +
             (ticket.summary || ticket.elementLabel || 'Open ticket');
           badge._shadowTarget = target;
@@ -1425,17 +1457,14 @@
       );
     }
 
-    if (['Open', 'Discussing', 'In progress'].includes(status)) {
+    if (['Open', 'Discussing'].includes(status)) {
       parts.push(
-        '<button type="button" class="shadow-btn shadow-action" data-action="accepted">Accept</button>'
+        '<button type="button" class="shadow-btn shadow-btn-secondary shadow-action" data-action="accepted">Accept</button>'
       );
     }
     if (status === 'Ready for review') {
       parts.push(
-        '<button type="button" class="shadow-btn shadow-action" data-action="approved">Approve</button>'
-      );
-      parts.push(
-        '<button type="button" class="shadow-btn shadow-btn-secondary shadow-action" data-action="discussing">Request changes</button>'
+        '<button type="button" class="shadow-btn shadow-action shadow-action--done" data-action="approved">Done</button>'
       );
     }
     if (dev) {
@@ -1485,7 +1514,7 @@
       method: 'PATCH',
       body: JSON.stringify({ status, actor: person.name })
     });
-    toast('Status: ' + (STATUS_LABELS[status] || status));
+    toast('Status: ' + partnerStatusLabel(status));
   }
 
   async function onDetailActionClick(event) {
@@ -1507,7 +1536,14 @@
     try {
       await updateTicketStatus(id, action, person);
       await refreshTickets();
-      openDetail(id);
+      const updated = ticketsCache.find((t) => t.id === id);
+      if (updated && isClosedStatus(updated.status)) {
+        hide('detail');
+        toast('Ticket moved to Closed');
+        renderInboxList();
+      } else {
+        openDetail(id);
+      }
     } catch (err) {
       toast(err.message);
     }
@@ -1539,7 +1575,7 @@
       const t = data.ticket;
       const comments = data.comments || [];
       const person = getPerson();
-      title.textContent = t.id + ' · ' + (STATUS_LABELS[t.status] || t.status);
+      title.textContent = t.id + ' · ' + partnerStatusLabel(t.status);
       form.dataset.ticketStatus = t.status;
       body.innerHTML =
         ticketActionButtons(t, person) +
@@ -1678,6 +1714,7 @@
       });
       form.reset();
       toast('Comment added');
+      await refreshTickets();
       openDetail(id);
     } catch (err) {
       toast(err.message);
