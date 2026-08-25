@@ -32,6 +32,8 @@
   };
 
   const STORAGE_PERSON = 'twa_shadow_person';
+  const AUDIT_SHEET_URL =
+    'https://docs.google.com/spreadsheets/d/12syDpdZwS0ZtDPqKXLedHHfie0xyhGvJ3HFc_oEUDwY/edit';
 
   let ticketsCache = [];
   let activeEl = null;
@@ -461,6 +463,9 @@
     bar.innerHTML =
       '<span class="shadow-toolbar-label">Shadow review</span>' +
       '<button type="button" id="shadow-pick-toggle" class="shadow-btn shadow-btn-small">Pick element</button>' +
+      '<a href="' +
+      AUDIT_SHEET_URL +
+      '" class="shadow-btn shadow-btn-small shadow-btn-secondary shadow-toolbar-link" target="_blank" rel="noopener">Open audit sheet</a>' +
       '<span class="shadow-toolbar-hint">Or ⌘/Alt+click any element</span>';
     document.body.appendChild(bar);
     qs('#shadow-pick-toggle').addEventListener('click', () => {
