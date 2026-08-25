@@ -50,6 +50,10 @@
   const STORAGE_VERSION_SEEN = 'twa_shadow_version_seen';
   const STORAGE_LAST_ACTIVE = 'twa_shadow_last_active';
   const STORAGE_MODAL_POS = 'twa_shadow_modal_pos_';
+  const STORAGE_INBOX_COLLAPSED = 'twa_shadow_inbox_collapsed';
+  const STORAGE_DETAIL_COLLAPSED = 'twa_shadow_detail_collapsed';
+  const MODAL_COLLAPSED_HEIGHT = 48;
+  const COLLAPSIBLE_MODALS = ['inbox', 'detail'];
   const IDLE_MS = 60 * 60 * 1000;
   const IDLE_CHECK_MS = 60 * 1000;
   const AUDIT_SHEET_URL =
@@ -70,6 +74,14 @@
     '<circle cx="2.5" cy="2.5" r="1.5"/><circle cx="7.5" cy="2.5" r="1.5"/>' +
     '<circle cx="2.5" cy="8" r="1.5"/><circle cx="7.5" cy="8" r="1.5"/>' +
     '<circle cx="2.5" cy="13.5" r="1.5"/><circle cx="7.5" cy="13.5" r="1.5"/></svg>';
+
+  const COLLAPSE_CHEVRON_DOWN =
+    '<svg class="shadow-modal-collapse-icon" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true" focusable="false">' +
+    '<path d="M2.5 4.5L6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  const COLLAPSE_CHEVRON_UP =
+    '<svg class="shadow-modal-collapse-icon" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true" focusable="false">' +
+    '<path d="M2.5 7.5L6 4l3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
   const MODAL_MIN_WIDTH = 280;
   const MODAL_MIN_HEIGHT = 220;
@@ -367,8 +379,12 @@
   function saveModalState(key, card) {
     const top = parseFloat(card.style.top);
     const left = parseFloat(card.style.left);
-    const width = card.style.width ? parseFloat(card.style.width) : undefined;
-    const height = card.style.height ? parseFloat(card.style.height) : undefined;
+    let width = card.style.width ? parseFloat(card.style.width) : undefined;
+    let height = card.style.height ? parseFloat(card.style.height) : undefined;
+    if (isModalCollapsed(key)) {
+      const existing = getModalPosition(key);
+      if (existing && typeof existing.height === 'number') height = existing.height;
+    }
     saveModalPosition(key, top, left, width, height);
   }
 
@@ -378,6 +394,94 @@
     } catch (e) {
       /* ignore */
     }
+  }
+
+  function collapseStorageKey(key) {
+    if (key === 'inbox') return STORAGE_INBOX_COLLAPSED;
+    if (key === 'detail') return STORAGE_DETAIL_COLLAPSED;
+    return 'twa_shadow_' + key + '_collapsed';
+  }
+
+  function isModalCollapsed(key) {
+    try {
+      return sessionStorage.getItem(collapseStorageKey(key)) === '1';
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function setModalCollapsed(key, collapsed) {
+    try {
+      if (collapsed) sessionStorage.setItem(collapseStorageKey(key), '1');
+      else sessionStorage.removeItem(collapseStorageKey(key));
+    } catch (e) {
+      /* ignore */
+    }
+  }
+
+  function collapseButtonLabel(key, collapsed) {
+    if (key === 'inbox') return collapsed ? 'Expand inbox' : 'Collapse inbox';
+    return collapsed ? 'Expand ticket' : 'Collapse ticket';
+  }
+
+  function applyModalCollapseState(key, modal, card, collapsed) {
+    const btn = qs('.shadow-modal-collapse', modal);
+    if (collapsed) {
+      modal.classList.add('shadow-modal--collapsed');
+      card.classList.add('shadow-modal-card--collapsed');
+      card.style.height = MODAL_COLLAPSED_HEIGHT + 'px';
+      card.style.minHeight = MODAL_COLLAPSED_HEIGHT + 'px';
+      if (btn) {
+        btn.setAttribute('aria-expanded', 'false');
+        btn.setAttribute('aria-label', collapseButtonLabel(key, true));
+        btn.innerHTML = COLLAPSE_CHEVRON_UP;
+      }
+    } else {
+      modal.classList.remove('shadow-modal--collapsed');
+      card.classList.remove('shadow-modal-card--collapsed');
+      card.style.minHeight = '';
+      const saved = getModalPosition(key);
+      if (saved && typeof saved.height === 'number' && typeof saved.width === 'number') {
+        applyModalSize(card, saved.width, saved.height);
+      } else {
+        card.style.height = '';
+      }
+      if (btn) {
+        btn.setAttribute('aria-expanded', 'true');
+        btn.setAttribute('aria-label', collapseButtonLabel(key, false));
+        btn.innerHTML = COLLAPSE_CHEVRON_DOWN;
+      }
+    }
+  }
+
+  function toggleModalCollapse(key) {
+    const id = DRAGGABLE_MODALS[key];
+    const modal = qs('#' + id);
+    if (!modal) return;
+    const card = qs('.shadow-modal-card', modal);
+    if (!card) return;
+    const willCollapse = !isModalCollapsed(key);
+    if (willCollapse) saveModalState(key, card);
+    setModalCollapsed(key, willCollapse);
+    applyModalCollapseState(key, modal, card, willCollapse);
+  }
+
+  function initModalCollapse(key, modal, card, head) {
+    const closeBtn = qs('.shadow-close', head);
+    const collapseBtn = document.createElement('button');
+    collapseBtn.type = 'button';
+    collapseBtn.className = 'shadow-modal-collapse';
+    collapseBtn.setAttribute('data-collapse', key);
+    collapseBtn.setAttribute('aria-label', collapseButtonLabel(key, false));
+    collapseBtn.setAttribute('aria-expanded', 'true');
+    collapseBtn.innerHTML = COLLAPSE_CHEVRON_DOWN;
+    if (closeBtn) head.insertBefore(collapseBtn, closeBtn);
+    else head.appendChild(collapseBtn);
+    collapseBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleModalCollapse(key);
+    });
+    if (isModalCollapsed(key)) applyModalCollapseState(key, modal, card, true);
   }
 
   function clampModalPosition(left, top, card) {
@@ -406,25 +510,38 @@
 
   function applyModalPosition(key, card) {
     const saved = getModalPosition(key);
+    const modal = card.closest('.shadow-modal');
+    const collapsed = isModalCollapsed(key);
     card.style.position = 'fixed';
     card.style.margin = '0';
     if (saved) {
       requestAnimationFrame(() => {
-        if (typeof saved.width === 'number' && typeof saved.height === 'number') {
+        if (
+          !collapsed &&
+          typeof saved.width === 'number' &&
+          typeof saved.height === 'number'
+        ) {
           applyModalSize(card, saved.width, saved.height);
         }
         const pos = clampModalPosition(saved.left, saved.top, card);
         card.style.left = pos.left + 'px';
         card.style.top = pos.top + 'px';
+        if (modal) applyModalCollapseState(key, modal, card, collapsed);
       });
       return;
     }
+    if (modal && collapsed) applyModalCollapseState(key, modal, card, true);
     centerModalCard(card);
   }
 
   function resetModalPosition(key, card) {
     clearModalPosition(key);
     clearModalSize(card);
+    if (COLLAPSIBLE_MODALS.includes(key)) {
+      const modal = card.closest('.shadow-modal');
+      setModalCollapsed(key, false);
+      if (modal) applyModalCollapseState(key, modal, card, false);
+    }
     centerModalCard(card);
     toast('Modal re-centred');
   }
@@ -508,6 +625,10 @@
   function bindModalResize(grip, mode, modal, key, card) {
     grip.addEventListener('pointerdown', (e) => {
       if (e.button !== 0) return;
+      if (isModalCollapsed(key)) {
+        if (mode.type === 'corner') return;
+        if (mode.type === 'edge' && mode.id !== 'left' && mode.id !== 'right') return;
+      }
       e.preventDefault();
       e.stopPropagation();
       const rect = card.getBoundingClientRect();
@@ -627,8 +748,10 @@
 
       addModalResizeHandles(card, modal, key);
 
+      if (COLLAPSIBLE_MODALS.includes(key)) initModalCollapse(key, modal, card, head);
+
       head.addEventListener('dblclick', (e) => {
-        if (e.target.closest('.shadow-close, .shadow-modal-drag')) return;
+        if (e.target.closest('.shadow-close, .shadow-modal-drag, .shadow-modal-collapse')) return;
         resetModalPosition(key, card);
       });
 

@@ -7,8 +7,19 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.5.5',
+    version: '1.5.6',
     releases: [
+      {
+        version: '1.5.6',
+        date: '2026-08-26',
+        title: 'Collapse ticket windows',
+        user: [
+          'Chevron next to Ticket inbox collapses the window to a slim header bar so you can see more of the page',
+          'Same collapse on ticket detail windows — click the chevron again to restore size',
+          'Drag still works when collapsed; your collapsed preference is remembered for the session'
+        ],
+        dev: []
+      },
       {
         version: '1.5.5',
         date: '2026-08-26',

@@ -202,6 +202,42 @@ body.shadow-pick-mode::before {
   overflow: hidden;
   min-width: 280px;
   min-height: 220px;
+  transition: height 200ms ease;
+}
+
+.shadow-modal--floating.shadow-modal--dragging .shadow-modal-card,
+.shadow-modal--floating.shadow-modal--resizing .shadow-modal-card {
+  transition: none;
+}
+
+.shadow-modal-card--collapsed {
+  min-height: 48px;
+  padding-bottom: 0.55rem;
+}
+
+.shadow-modal-card--collapsed .shadow-modal-head {
+  margin-bottom: 0;
+}
+
+.shadow-modal-card--collapsed .shadow-modal-scroll,
+.shadow-modal-card--collapsed > .shadow-form {
+  opacity: 0;
+  visibility: hidden;
+  overflow: hidden;
+  flex: 0 0 0;
+  min-height: 0;
+  max-height: 0;
+  pointer-events: none;
+}
+
+.shadow-modal--collapsed .shadow-modal-resize--top,
+.shadow-modal--collapsed .shadow-modal-resize--bottom,
+.shadow-modal--collapsed .shadow-modal-resize--nw,
+.shadow-modal--collapsed .shadow-modal-resize--ne,
+.shadow-modal--collapsed .shadow-modal-resize--sw,
+.shadow-modal--collapsed .shadow-modal-resize--se {
+  pointer-events: none;
+  opacity: 0;
 }
 
 .shadow-modal-scroll {
@@ -415,9 +451,35 @@ body.shadow-modal-drag-active {
   cursor: grabbing;
 }
 
-.shadow-modal-head .shadow-close {
+.shadow-modal-head .shadow-close,
+.shadow-modal-head .shadow-modal-collapse {
   flex-shrink: 0;
   cursor: pointer;
+}
+
+.shadow-modal-collapse {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  margin: -0.15rem 0 0 0;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--shadow-text-secondary);
+  transition: background var(--shadow-ease), color var(--shadow-ease);
+}
+
+.shadow-modal-collapse:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--shadow-text);
+}
+
+.shadow-modal-collapse-icon {
+  display: block;
+  pointer-events: none;
 }
 
 .shadow-modal-card h2 {
