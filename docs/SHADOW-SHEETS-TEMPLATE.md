@@ -26,6 +26,9 @@ Asset ID	Ticket ID	Location ID	Filename	Drive URL	Page path	CSS selector	Current
 
 ## Status values
 Open
+Discussing
+Accepted
+On shadow
 In progress
 Ready for review
 Approved

@@ -25,13 +25,35 @@ Partners do **not** need Cloudflare accounts. Access only needs their emails on 
 
 1. Open the shadow site (Cloudflare Access login → one-time email code or Google).
 2. Choose your name (Katia / Raili / Marko).
-3. Ticket inbox opens with your tickets (ID, date, status).
+3. **What's new** on login when there are unread partner updates, then the ticket inbox.
 4. Click **Pick element** (or ⌘/Alt+click) on any text, image, or button.
 5. For images or placeholders, the **Storycard** section lets you upload a replacement file (optional).
 6. Add category + comment → ticket created (stored in KV and mirrored to Google Sheets).
 7. Open a ticket to read the thread and add further comments.
 
-Statuses: Open → In progress → Ready for review → Approved → Shipped to live.
+Statuses: Open → Discussing → Accepted → On shadow → Ready for review → Approved → Shipped to live.
+
+Partners use **Accept** to agree, **Comment** to keep discussing, and **Approve** when a shadow change looks right. Marko uses developer actions to move tickets through build and live deploy.
+
+## Version and What's new
+
+Shadow review tools are versioned in `js/shadow-changelog.js` (currently loaded before `js/shadow-review.js`).
+
+When shipping partner-facing changes:
+
+1. Bump `version` in `js/shadow-changelog.js`
+2. Add a release entry with `user` bullets (Katia and Raili) and optional `dev` bullets (Marko only)
+3. Deploy shadow branch
+
+On next login, partners see a **What's new** popup for any release newer than their last seen version (stored in browser localStorage). Marko also sees `dev` items. Toolbar shows **vX.Y.Z** with an orange badge when updates are unread. **What's new** in the toolbar reopens the changelog any time.
+
+**Log out** in the toolbar ends the Cloudflare Access session (sign-in required again). **Switch user** clears the reviewer name only. Sessions end automatically after **1 hour** with no mouse, keyboard, scroll, or touch activity.
+
+```text
+js/shadow-changelog.js   version + release notes
+js/shadow-review.js        overlay UI
+css/shadow-review.css      overlay styles
+```
 
 ---
 
@@ -187,11 +209,11 @@ Without the secret, tickets still work in KV; Sheets stays empty until the webho
 
 ## Meridian workflow
 
-1. Partners comment only on shadow.  
-2. Meridian implements on `shadow` branch, sets status Ready for review.  
-3. Katia / Raili approve in the ticket thread.  
-4. Marko + Meridian port the change to `main` and deploy live.  
-5. Status → Shipped to live.
+1. Partners comment only on shadow. Use **Accept**, **Comment**, or **Approve** on each ticket.
+2. Meridian implements on `shadow` branch, sets status **On shadow**, then **Ready for review**.
+3. Katia / Raili approve in the ticket thread or use **Approve**.
+4. Marko ports the change to `main` and deploys live.
+5. Status → **Shipped to live**.
 
 Never merge shadow-review overlay files onto live `main` without stripping them.
 

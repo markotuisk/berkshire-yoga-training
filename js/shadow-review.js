@@ -22,6 +22,9 @@
 
   const STATUS_LABELS = {
     Open: 'Open',
+    Discussing: 'Discussing',
+    Accepted: 'Accepted',
+    'On shadow': 'On shadow',
     'In progress': 'In progress',
     'Ready for review': 'Ready for review',
     Approved: 'Approved',
@@ -32,6 +35,10 @@
   };
 
   const STORAGE_PERSON = 'twa_shadow_person';
+  const STORAGE_VERSION_SEEN = 'twa_shadow_version_seen';
+  const STORAGE_LAST_ACTIVE = 'twa_shadow_last_active';
+  const IDLE_MS = 60 * 60 * 1000;
+  const IDLE_CHECK_MS = 60 * 1000;
   const AUDIT_SHEET_URL =
     'https://docs.google.com/spreadsheets/d/12syDpdZwS0ZtDPqKXLedHHfie0xyhGvJ3HFc_oEUDwY/edit';
   const ASSETS_FOLDER_URL =
@@ -42,6 +49,57 @@
   let ticketsCache = [];
   let activeEl = null;
   let highlightEl = null;
+  let whatsNewManual = false;
+
+  function changelog() {
+    return window.TWAShadowChangelog || { version: '0.0.0', releases: [] };
+  }
+
+  function isDeveloper(person) {
+    return person && person.id === 'marko';
+  }
+
+  function compareVersion(a, b) {
+    const pa = String(a || '0').split('.').map((n) => parseInt(n, 10) || 0);
+    const pb = String(b || '0').split('.').map((n) => parseInt(n, 10) || 0);
+    for (let i = 0; i < 3; i++) {
+      if ((pa[i] || 0) > (pb[i] || 0)) return 1;
+      if ((pa[i] || 0) < (pb[i] || 0)) return -1;
+    }
+    return 0;
+  }
+
+  function migrateVersionSeen() {
+    if (!localStorage.getItem(STORAGE_VERSION_SEEN)) {
+      localStorage.setItem(STORAGE_VERSION_SEEN, '1.0.0');
+    }
+  }
+
+  function getLastSeenVersion() {
+    return localStorage.getItem(STORAGE_VERSION_SEEN) || '1.0.0';
+  }
+
+  function markVersionSeen() {
+    localStorage.setItem(STORAGE_VERSION_SEEN, changelog().version);
+  }
+
+  function releasesForPerson(person, onlyUnseen) {
+    const seen = getLastSeenVersion();
+    const dev = isDeveloper(person);
+    return changelog()
+      .releases.filter((r) => {
+        if (onlyUnseen && compareVersion(r.version, seen) <= 0) return false;
+        const userItems = r.user && r.user.length;
+        const devItems = dev && r.dev && r.dev.length;
+        return userItems || devItems;
+      })
+      .sort((a, b) => compareVersion(b.version, a.version));
+  }
+
+  function shouldShowWhatsNew(person) {
+    if (!person) return false;
+    return releasesForPerson(person, true).length > 0;
+  }
 
   function qs(sel, root) {
     return (root || document).querySelector(sel);
@@ -65,6 +123,133 @@
 
   function setPerson(id) {
     localStorage.setItem(STORAGE_PERSON, id);
+    touchActivity();
+    updateToolbarUser();
+  }
+
+  function clearPerson() {
+    localStorage.removeItem(STORAGE_PERSON);
+    localStorage.removeItem(STORAGE_LAST_ACTIVE);
+    updateToolbarUser();
+  }
+
+  function touchActivity() {
+    if (!getPerson()) return;
+    localStorage.setItem(STORAGE_LAST_ACTIVE, String(Date.now()));
+  }
+
+  function isIdleExpired() {
+    const person = getPerson();
+    if (!person) return false;
+    const last = parseInt(localStorage.getItem(STORAGE_LAST_ACTIVE) || '0', 10);
+    if (!last) return false;
+    return Date.now() - last >= IDLE_MS;
+  }
+
+  function checkIdleLogout() {
+    if (!getPerson()) return;
+    if (isIdleExpired()) {
+      performLogout('Logged out after 1 hour of inactivity.');
+    }
+  }
+
+  function closeAllModals() {
+    ['person', 'inbox', 'detail', 'new', 'whatsnew'].forEach((key) => hide(key));
+    clearHighlight();
+    document.body.classList.remove('shadow-pick-mode');
+    const toggle = qs('#shadow-pick-toggle');
+    if (toggle) toggle.textContent = 'Pick element';
+  }
+
+  function performLogout(message) {
+    clearPerson();
+    closeAllModals();
+    if (message) {
+      try {
+        sessionStorage.setItem('twa_shadow_logout_msg', message);
+      } catch (e) {
+        /* ignore */
+      }
+    }
+    window.location.assign('/cdn-cgi/access/logout');
+  }
+
+  function logout() {
+    const person = getPerson();
+    if (!person) {
+      show('person');
+      return;
+    }
+    if (
+      !window.confirm(
+        'Log out of shadow review? You will need to sign in again with your email code.'
+      )
+    ) {
+      return;
+    }
+    performLogout('');
+  }
+
+  function switchUser() {
+    clearPerson();
+    closeAllModals();
+    show('person');
+    toast('Choose who is reviewing');
+  }
+
+  function throttle(fn, wait) {
+    let last = 0;
+    return function throttled() {
+      const now = Date.now();
+      if (now - last >= wait) {
+        last = now;
+        fn();
+      }
+    };
+  }
+
+  function bindActivityTracking() {
+    const onActivity = throttle(touchActivity, 15000);
+    ['click', 'keydown', 'scroll', 'touchstart', 'mousemove'].forEach((evt) => {
+      document.addEventListener(evt, onActivity, { passive: true });
+    });
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') checkIdleLogout();
+      else touchActivity();
+    });
+  }
+
+  function startIdleWatch() {
+    setInterval(checkIdleLogout, IDLE_CHECK_MS);
+  }
+
+  function updateToolbarUser() {
+    const userEl = qs('#shadow-toolbar-user');
+    const logoutBtn = qs('#shadow-logout-btn');
+    const switchBtn = qs('#shadow-switch-user-btn');
+    const person = getPerson();
+    if (!userEl || !logoutBtn || !switchBtn) return;
+    if (person) {
+      userEl.textContent = person.name;
+      userEl.hidden = false;
+      logoutBtn.hidden = false;
+      switchBtn.hidden = false;
+    } else {
+      userEl.hidden = true;
+      logoutBtn.hidden = true;
+      switchBtn.hidden = true;
+    }
+  }
+
+  function showLogoutMessageIfAny() {
+    let msg = '';
+    try {
+      msg = sessionStorage.getItem('twa_shadow_logout_msg') || '';
+      sessionStorage.removeItem('twa_shadow_logout_msg');
+    } catch (e) {
+      /* ignore */
+    }
+    if (msg) toast(msg);
   }
 
   function cssPath(el) {
@@ -280,6 +465,20 @@
         </div>
       </div>
 
+      <div id="shadow-whatsnew-modal" class="shadow-modal" hidden>
+        <div class="shadow-modal-card shadow-modal-wide shadow-whatsnew-card">
+          <div class="shadow-modal-head">
+            <h2>What's new</h2>
+            <button type="button" class="shadow-close" data-close="whatsnew" aria-label="Close">&times;</button>
+          </div>
+          <p class="shadow-hint">Updates to shadow review tools. Live site is unchanged until Marko ships approved work.</p>
+          <div id="shadow-whatsnew-body" class="shadow-whatsnew-body"></div>
+          <div class="shadow-whatsnew-foot">
+            <button type="button" id="shadow-whatsnew-dismiss" class="shadow-btn">Got it</button>
+          </div>
+        </div>
+      </div>
+
       <div id="shadow-toast" class="shadow-toast" hidden></div>
     `;
     document.body.appendChild(root);
@@ -301,7 +500,7 @@
       btn.addEventListener('click', () => {
         setPerson(p.id);
         hide('person');
-        openInbox();
+        afterLogin();
       });
       list.appendChild(btn);
     });
@@ -317,6 +516,90 @@
 
     qs('#shadow-new-form').addEventListener('submit', onCreateTicket);
     qs('#shadow-comment-form').addEventListener('submit', onAddComment);
+    qs('#shadow-whatsnew-dismiss').addEventListener('click', onWhatsNewDismiss);
+    qs('#shadow-detail-body').addEventListener('click', onDetailActionClick);
+  }
+
+  function updateVersionBadge() {
+    const badge = qs('#shadow-version-badge');
+    if (!badge) return;
+    const person = getPerson();
+    if (person && shouldShowWhatsNew(person)) {
+      badge.classList.add('shadow-version-badge--new');
+      badge.setAttribute('title', 'New updates available');
+    } else {
+      badge.classList.remove('shadow-version-badge--new');
+      badge.setAttribute('title', 'Shadow review version');
+    }
+  }
+
+  function afterLogin() {
+    updateVersionBadge();
+    const person = getPerson();
+    if (shouldShowWhatsNew(person)) {
+      showWhatsNew(false);
+      return;
+    }
+    openInbox();
+  }
+
+  function renderWhatsNewContent(person) {
+    const body = qs('#shadow-whatsnew-body');
+    if (!body) return;
+    const dev = isDeveloper(person);
+    const releases = releasesForPerson(person, whatsNewManual ? false : true);
+    if (!releases.length) {
+      body.innerHTML = '<p class="shadow-hint">You are on the latest version (' + escapeHtml(changelog().version) + ').</p>';
+      return;
+    }
+    body.innerHTML = releases
+      .map((r) => {
+        const userList =
+          r.user && r.user.length
+            ? '<ul class="shadow-whatsnew-list">' +
+              r.user.map((item) => '<li>' + escapeHtml(item) + '</li>').join('') +
+              '</ul>'
+            : '';
+        const devList =
+          dev && r.dev && r.dev.length
+            ? '<p class="shadow-whatsnew-dev-label">Developer</p><ul class="shadow-whatsnew-list shadow-whatsnew-list-dev">' +
+              r.dev.map((item) => '<li>' + escapeHtml(item) + '</li>').join('') +
+              '</ul>'
+            : '';
+        return (
+          '<article class="shadow-whatsnew-release">' +
+          '<header class="shadow-whatsnew-release-head">' +
+          '<span class="shadow-whatsnew-version">v' +
+          escapeHtml(r.version) +
+          '</span>' +
+          '<span class="shadow-whatsnew-date">' +
+          escapeHtml(r.date) +
+          '</span>' +
+          '</header>' +
+          '<h3 class="shadow-whatsnew-release-title">' +
+          escapeHtml(r.title) +
+          '</h3>' +
+          userList +
+          devList +
+          '</article>'
+        );
+      })
+      .join('');
+  }
+
+  function showWhatsNew(manual) {
+    whatsNewManual = !!manual;
+    const person = getPerson();
+    renderWhatsNewContent(person);
+    show('whatsnew');
+  }
+
+  function onWhatsNewDismiss() {
+    markVersionSeen();
+    updateVersionBadge();
+    hide('whatsnew');
+    if (!whatsNewManual) openInbox();
+    whatsNewManual = false;
   }
 
   function show(which) {
@@ -324,7 +607,8 @@
       person: 'shadow-person-modal',
       inbox: 'shadow-inbox-modal',
       detail: 'shadow-detail-modal',
-      new: 'shadow-new-modal'
+      new: 'shadow-new-modal',
+      whatsnew: 'shadow-whatsnew-modal'
     };
     Object.values(map).forEach((id) => {
       const el = qs('#' + id);
@@ -339,7 +623,8 @@
       person: 'shadow-person-modal',
       inbox: 'shadow-inbox-modal',
       detail: 'shadow-detail-modal',
-      new: 'shadow-new-modal'
+      new: 'shadow-new-modal',
+      whatsnew: 'shadow-whatsnew-modal'
     };
     const el = qs('#' + map[which]);
     if (el) el.hidden = true;
@@ -370,6 +655,91 @@
     const data = await api('/api/tickets' + q);
     ticketsCache = data.tickets || [];
     return ticketsCache;
+  }
+
+  function ticketActionButtons(t, person) {
+    if (!person) return '';
+    const dev = isDeveloper(person);
+    const status = t.status;
+    const parts = [];
+
+    if (['Open', 'Discussing', 'In progress'].includes(status)) {
+      parts.push(
+        '<button type="button" class="shadow-btn shadow-action" data-action="accepted">Accept</button>'
+      );
+    }
+    if (status === 'Ready for review') {
+      parts.push(
+        '<button type="button" class="shadow-btn shadow-action" data-action="approved">Approve</button>'
+      );
+      parts.push(
+        '<button type="button" class="shadow-btn shadow-btn-secondary shadow-action" data-action="discussing">Request changes</button>'
+      );
+    }
+    if (dev) {
+      if (!['On shadow', 'Ready for review', 'Approved', 'Shipped to live', "Won't fix", 'Duplicate'].includes(status)) {
+        parts.push(
+          '<button type="button" class="shadow-btn shadow-btn-secondary shadow-action" data-action="on-shadow">Mark on shadow</button>'
+        );
+      }
+      if (['Accepted', 'On shadow', 'In progress'].includes(status)) {
+        parts.push(
+          '<button type="button" class="shadow-btn shadow-btn-secondary shadow-action" data-action="ready">Send for review</button>'
+        );
+      }
+      if (status === 'Approved') {
+        parts.push(
+          '<button type="button" class="shadow-btn shadow-action" data-action="shipped">Ship to live</button>'
+        );
+      }
+      if (!['Shipped to live', "Won't fix", 'Duplicate'].includes(status)) {
+        parts.push(
+          '<button type="button" class="shadow-btn shadow-btn-secondary shadow-action" data-action="duplicate">Duplicate</button>'
+        );
+        parts.push(
+          '<button type="button" class="shadow-btn shadow-btn-secondary shadow-action" data-action="wontfix">Won\'t fix</button>'
+        );
+      }
+    }
+
+    if (!parts.length) return '';
+    return '<div class="shadow-ticket-actions">' + parts.join('') + '</div>';
+  }
+
+  async function updateTicketStatus(ticketId, action, person) {
+    const map = {
+      accepted: 'Accepted',
+      approved: 'Approved',
+      discussing: 'Discussing',
+      'on-shadow': 'On shadow',
+      ready: 'Ready for review',
+      shipped: 'Shipped to live',
+      duplicate: 'Duplicate',
+      wontfix: "Won't fix"
+    };
+    const status = map[action];
+    if (!status) return;
+    await api('/api/tickets/' + encodeURIComponent(ticketId), {
+      method: 'PATCH',
+      body: JSON.stringify({ status, actor: person.name })
+    });
+    toast('Status: ' + (STATUS_LABELS[status] || status));
+  }
+
+  async function onDetailActionClick(event) {
+    const btn = event.target.closest('[data-action]');
+    if (!btn || !btn.closest('#shadow-detail-body')) return;
+    const person = getPerson();
+    const form = qs('#shadow-comment-form');
+    const id = form && form.dataset.ticketId;
+    if (!person || !id) return;
+    event.preventDefault();
+    try {
+      await updateTicketStatus(id, btn.getAttribute('data-action'), person);
+      openDetail(id);
+    } catch (err) {
+      toast(err.message);
+    }
   }
 
   async function openInbox() {
@@ -420,8 +790,11 @@
       const data = await api('/api/tickets/' + encodeURIComponent(id));
       const t = data.ticket;
       const comments = data.comments || [];
-      title.textContent = t.id + ' — ' + (STATUS_LABELS[t.status] || t.status);
+      const person = getPerson();
+      title.textContent = t.id + ' · ' + (STATUS_LABELS[t.status] || t.status);
+      form.dataset.ticketStatus = t.status;
       body.innerHTML =
+        ticketActionButtons(t, person) +
         '<dl class="shadow-dl">' +
         '<dt>Raised by</dt><dd>' +
         escapeHtml(t.createdBy) +
@@ -547,6 +920,9 @@
     const id = form.dataset.ticketId;
     if (!person || !id) return;
     try {
+      if (form.dataset.ticketStatus === 'Open') {
+        await updateTicketStatus(id, 'discussing', person);
+      }
       await api('/api/tickets/' + encodeURIComponent(id) + '/comments', {
         method: 'POST',
         body: JSON.stringify({ author: person.name, message: form.message.value.trim() })
@@ -624,6 +1000,10 @@
     bar.className = 'shadow-toolbar';
     bar.innerHTML =
       '<span class="shadow-toolbar-label">Shadow review</span>' +
+      '<span class="shadow-toolbar-version" id="shadow-version-badge" title="Shadow review version">v' +
+      escapeHtml(changelog().version) +
+      '</span>' +
+      '<button type="button" id="shadow-whatsnew-btn" class="shadow-btn shadow-btn-small shadow-btn-secondary">What\'s new</button>' +
       '<button type="button" id="shadow-pick-toggle" class="shadow-btn shadow-btn-small">Pick element</button>' +
       '<a href="' +
       AUDIT_SHEET_URL +
@@ -631,23 +1011,50 @@
       '<a href="' +
       ASSETS_FOLDER_URL +
       '" class="shadow-btn shadow-btn-small shadow-btn-secondary shadow-toolbar-link" target="_blank" rel="noopener">Open asset folder</a>' +
-      '<span class="shadow-toolbar-hint">Or ⌘/Alt+click any element</span>';
+      '<span class="shadow-toolbar-hint">Or ⌘/Alt+click any element</span>' +
+      '<span class="shadow-toolbar-spacer"></span>' +
+      '<span class="shadow-toolbar-user" id="shadow-toolbar-user" hidden></span>' +
+      '<button type="button" id="shadow-switch-user-btn" class="shadow-btn shadow-btn-small shadow-btn-secondary" hidden>Switch user</button>' +
+      '<button type="button" id="shadow-logout-btn" class="shadow-btn shadow-btn-small shadow-btn-secondary" hidden>Log out</button>';
     document.body.appendChild(bar);
+    qs('#shadow-whatsnew-btn').addEventListener('click', () => {
+      if (!getPerson()) {
+        show('person');
+        return;
+      }
+      showWhatsNew(true);
+    });
     qs('#shadow-pick-toggle').addEventListener('click', () => {
       document.body.classList.toggle('shadow-pick-mode');
       const on = document.body.classList.contains('shadow-pick-mode');
       qs('#shadow-pick-toggle').textContent = on ? 'Cancel pick' : 'Pick element';
       toast(on ? 'Click an element to file a ticket' : 'Pick mode off');
     });
+    qs('#shadow-logout-btn').addEventListener('click', logout);
+    qs('#shadow-switch-user-btn').addEventListener('click', switchUser);
   }
 
   function init() {
+    migrateVersionSeen();
     ensureUI();
     addToolbar();
+    bindActivityTracking();
+    startIdleWatch();
+    updateVersionBadge();
+    updateToolbarUser();
+    showLogoutMessageIfAny();
     document.addEventListener('click', onPageClick, true);
 
-    if (!getPerson()) show('person');
-    else openInbox();
+    if (getPerson()) {
+      if (isIdleExpired()) {
+        performLogout('Logged out after 1 hour of inactivity.');
+        return;
+      }
+      touchActivity();
+      afterLogin();
+      return;
+    }
+    show('person');
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
