@@ -27,8 +27,9 @@ Partners do **not** need Cloudflare accounts. Access only needs their emails on 
 2. Choose your name (Katia / Raili / Marko).
 3. Ticket inbox opens with your tickets (ID, date, status).
 4. Click **Pick element** (or ⌘/Alt+click) on any text, image, or button.
-5. Add category + comment → ticket created (stored in KV and mirrored to Google Sheets).
-6. Open a ticket to read the thread and add further comments.
+5. For images or placeholders, the **Storycard** section lets you upload a replacement file (optional).
+6. Add category + comment → ticket created (stored in KV and mirrored to Google Sheets).
+7. Open a ticket to read the thread and add further comments.
 
 Statuses: Open → In progress → Ready for review → Approved → Shipped to live.
 
@@ -80,7 +81,7 @@ ID: `12syDpdZwS0ZtDPqKXLedHHfie0xyhGvJ3HFc_oEUDwY`
 Do **not** put the spreadsheet edit URL into `SHEETS_WEBHOOK_URL`. That secret must be the Apps Script **web app** URL (`https://script.google.com/macros/s/.../exec`).
 
 1. Open **this** Sheet (link above).  
-2. Ensure four tabs exist with headers from `docs/SHADOW-SHEETS-TEMPLATE.md`: `Tickets`, `Comments`, `Audit_Log`, `People` (seed People rows from the template).  
+2. Ensure five tabs exist with headers from `docs/SHADOW-SHEETS-TEMPLATE.md`: `Tickets`, `Comments`, `Audit_Log`, `People`, `Assets` (seed People rows from the template).  
 3. In **this** Sheet: **Extensions → Apps Script** → delete any stub code → paste the full contents of `docs/shadow-sheets-apps-script.js` → **Save** (disk icon).  
 4. **Deploy → New deployment** → type **Web app**  
    - Execute as: **Me**  
@@ -104,6 +105,30 @@ Pages → `berkshire-yoga-training-shadow` → Settings → Functions → KV bin
 | Variable name | Namespace |
 |---------------|-----------|
 | `SHADOW_TICKETS` | id `7b1eff8921fc46cdaed5e5fffd57ab38` (also in `wrangler.toml`) |
+
+### E. Storycard uploads (Google Drive)
+
+When a partner picks an **image** or **placeholder** on the shadow site, the New ticket modal shows a **Storycard** section with an optional file upload. After the ticket is created, the image is sent to Google Drive via Apps Script.
+
+**Drive folder (upload destination):**  
+https://drive.google.com/drive/folders/1TIhmFeB7LanKDhNCfiCm83ZZQTYjQKhF  
+Folder ID: `1TIhmFeB7LanKDhNCfiCm83ZZQTYjQKhF`
+
+**Filename pattern:** `TWA-xxx__pageSlug__assetKey.ext` (e.g. `TWA-0042__about__hero-banner.jpg`)
+
+**Marko must redeploy Apps Script** after pulling the latest `shadow` branch:
+
+1. Open the Sheet → **Extensions → Apps Script**
+2. Replace all code with the full contents of `docs/shadow-sheets-apps-script.js` (not just a snippet)
+3. **Save** → **Deploy → Manage deployments** → edit existing web app → **New version** → Deploy
+4. Ensure the script owner account has **Editor** access to the Drive folder above
+5. Add an **Assets** tab to the Sheet if missing (headers in `docs/SHADOW-SHEETS-TEMPLATE.md`)
+
+No new Pages secret is required. Uploads use the existing `SHEETS_WEBHOOK_URL` with action `asset_upload`.
+
+**Limits:** JPEG, PNG, WebP or GIF only; maximum 8 MB per file.
+
+Uploaded assets appear in the Sheet **Assets** tab and on the ticket detail view as **Open in Drive** (stored in KV as `shadowFixUrl`).
 
 ---
 
@@ -156,6 +181,7 @@ Without the secret, tickets still work in KV; Sheets stays empty until the webho
 | GET | `/api/tickets/:id` | Ticket + comments |
 | POST | `/api/tickets/:id/comments` | Add comment (+ Sheets `comment_added`) |
 | PATCH | `/api/tickets/:id` | Update status (+ Sheets `status_changed`) |
+| POST | `/api/assets` | Upload replacement image to Drive (+ Sheets `asset_upload`) |
 | GET | `/api/audit` | Full JSON export |
 | POST | `/api/audit` | Full replace sync to Sheets |
 

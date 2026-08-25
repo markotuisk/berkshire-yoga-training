@@ -1,7 +1,7 @@
 # Google Sheets template for Meridian shadow review
 # Spreadsheet: https://docs.google.com/spreadsheets/d/12syDpdZwS0ZtDPqKXLedHHfie0xyhGvJ3HFc_oEUDwY/edit
 # ID: 12syDpdZwS0ZtDPqKXLedHHfie0xyhGvJ3HFc_oEUDwY
-# Create four tabs and paste these header rows.
+# Create five tabs and paste these header rows.
 # Webhook: deploy docs/shadow-sheets-apps-script.js as a Web app from THIS sheet;
 # SHEETS_WEBHOOK_URL = script.google.com/.../exec (never the spreadsheet edit URL).
 
@@ -20,6 +20,9 @@ Katia Major	Katia.major@thameswellness.com	Owner	Yes
 Raili Maripuu	raili.maripuu@thameswellness.com	Owner	Yes
 Marko Tuisk	markotuisk@gmail.com	SEO & Dev	Yes
 Meridian	system	Agent	Yes
+
+## Assets
+Asset ID	Ticket ID	Location ID	Filename	Drive URL	Page path	CSS selector	Current src	Uploaded by	Uploaded at	Mime type	Size bytes
 
 ## Status values
 Open
@@ -44,3 +47,4 @@ rejected
 shipped_to_live
 wont_fix
 login
+asset_uploaded
