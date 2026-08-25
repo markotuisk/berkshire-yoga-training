@@ -216,8 +216,8 @@ export async function exportAudit(env) {
     comments: state.comments,
     audit: state.audit,
     people: [
-      { name: 'Katia Major', email: '', role: 'Owner', active: true },
-      { name: 'Raili Maripuu', email: '', role: 'Owner', active: true },
+      { name: 'Katia Major', email: 'Katia.major@thameswellness.com', role: 'Owner', active: true },
+      { name: 'Raili Maripuu', email: 'raili.maripuu@thameswellness.com', role: 'Owner', active: true },
       { name: 'Marko Tuisk', email: 'markotuisk@gmail.com', role: 'SEO & Dev', active: true },
       { name: 'Meridian', email: 'system', role: 'Agent', active: true }
     ]

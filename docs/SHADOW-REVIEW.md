@@ -11,8 +11,8 @@ Private review copy of Thames Wellness Academy.
 
 | Name | Role | Access email |
 |------|------|----------------|
-| Katia Major | Business owner | *(ask — needed for Cloudflare Access)* |
-| Raili Maripuu | Business owner | *(ask — needed for Cloudflare Access)* |
+| Katia Major | Business owner | Katia.major@thameswellness.com |
+| Raili Maripuu | Business owner | raili.maripuu@thameswellness.com |
 | Marko Tuisk | SEO and development | markotuisk@gmail.com |
 | Meridian | Implementation agent | — |
 
@@ -48,7 +48,7 @@ Wrangler OAuth cannot create DNS (`zone:read` only). Use the dashboard or an API
 2. Application name: `TWA Shadow review`  
 3. Domain: `shadow.berkshireyogatraining.co.uk` (also add `berkshire-yoga-training-shadow.pages.dev` so the preview URL is gated)  
 4. Identity: **One-time PIN** (simplest) and/or Google  
-5. Policy **Allow**: emails for Marko + Katia + Raili  
+5. Policy **Allow**: emails for Marko (`markotuisk@gmail.com`), Katia (`Katia.major@thameswellness.com`), and Raili (`raili.maripuu@thameswellness.com`)  
 6. Save → test in a private window  
 
 #### Access login branding
@@ -77,7 +77,7 @@ npx wrangler pages secret put SHEETS_WEBHOOK_URL --project-name=berkshire-yoga-t
 7. Optional full resync after deploy: `POST https://berkshire-yoga-training-shadow.pages.dev/api/audit`  
    (or the custom domain once Access allows you through)
 
-Fill Katia / Raili emails in the **People** tab when known.
+People tab emails: Katia `Katia.major@thameswellness.com`, Raili `raili.maripuu@thameswellness.com`, Marko `markotuisk@gmail.com`.
 
 ### D. KV binding (tickets must persist)
 

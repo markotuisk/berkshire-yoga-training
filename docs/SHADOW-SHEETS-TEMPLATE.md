@@ -12,9 +12,9 @@ Event ID	Timestamp	Actor	Action	Ticket ID	Comment ID	From status	To status	Page 
 
 ## People
 Name	Email	Role	Active
-Katia Major		Owner	Yes
-Raili Maripuu		Owner	Yes
-Marko Tuisk		SEO & Dev	Yes
+Katia Major	Katia.major@thameswellness.com	Owner	Yes
+Raili Maripuu	raili.maripuu@thameswellness.com	Owner	Yes
+Marko Tuisk	markotuisk@gmail.com	SEO & Dev	Yes
 Meridian	system	Agent	Yes
 
 ## Status values
