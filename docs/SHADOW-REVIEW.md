@@ -113,7 +113,7 @@ Two separate OG sets (middleware on the `shadow` branch):
 **1. Shadow Access** (link unfurls before login — WhatsApp, iMessage, Slack crawlers)
 
 - **Title:** Thames Wellness Academy · Shadow Access  
-- **Description:** Private partner login for the TWA Shadow review site. One-time email code. For Katia, Raili and Marko only — not the public Academy site.  
+- **Description:** Private partner login for the TWA Shadow review site. One-time email code. For Katia, Raili and Marko only. Not the public Academy site.  
 - **Image:** `https://berkshireyogatraining.co.uk/assets/og-image.jpg`
 
 **2. Shadow review** (normal pages after you are logged in)
@@ -128,7 +128,7 @@ Access blocks crawlers by default, so they never reach our HTML. Add a **second 
 2. **Create new policy** → name `Link preview crawlers` → Action **Bypass**  
 3. Include → **User Agent** (or equivalent) matching e.g.  
    `.*facebookexternalhit.*|.*Twitterbot.*|.*LinkedInBot.*|.*Slackbot.*|.*WhatsApp.*|.*Discordbot.*|.*TelegramBot.*|.*Applebot.*`  
-4. Save — keep **Partners allowlist** as Allow for the three emails  
+4. Save. Keep **Partners allowlist** as Allow for the three emails. 
 
 Humans still hit Access login; only those bots see **Shadow Access** OG.
 
