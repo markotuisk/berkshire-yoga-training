@@ -564,7 +564,7 @@
     }
     if (
       !window.confirm(
-        'Log out of shadow review? You will need to sign in again with your email code.'
+        'Log out of Shadow mode? You will need to sign in again with your email code.'
       )
     ) {
       return;
@@ -853,7 +853,7 @@
             <h2>What's new</h2>
             <button type="button" class="shadow-close" data-close="whatsnew" aria-label="Close">&times;</button>
           </div>
-          <p class="shadow-hint">Updates to shadow review tools. Live site is unchanged until Marko ships approved work.</p>
+          <p class="shadow-hint">Updates to Shadow mode tools. Live site is unchanged until Marko ships approved work.</p>
           <div id="shadow-whatsnew-body" class="shadow-whatsnew-body"></div>
           <div class="shadow-whatsnew-foot">
             <button type="button" id="shadow-whatsnew-dismiss" class="shadow-btn">Got it</button>
@@ -913,7 +913,7 @@
       badge.setAttribute('title', 'New updates available');
     } else {
       badge.classList.remove('shadow-version-badge--new');
-      badge.setAttribute('title', 'Shadow review version');
+      badge.setAttribute('title', 'Shadow mode version');
     }
   }
 
@@ -1608,8 +1608,8 @@
     const bar = document.createElement('div');
     bar.className = 'shadow-toolbar';
     bar.innerHTML =
-      '<span class="shadow-toolbar-label">Shadow review</span>' +
-      '<span class="shadow-toolbar-version" id="shadow-version-badge" title="Shadow review version">v' +
+      '<span class="shadow-toolbar-label">Shadow mode</span>' +
+      '<span class="shadow-toolbar-version" id="shadow-version-badge" title="Shadow mode version">v' +
       escapeHtml(changelog().version) +
       '</span>' +
       '<button type="button" id="shadow-whatsnew-btn" class="shadow-btn shadow-btn-small shadow-btn-secondary">What\'s new</button>' +

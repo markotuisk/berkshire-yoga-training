@@ -1,5 +1,5 @@
 /**
- * Shadow review release notes. Bump version when shipping partner-facing changes.
+ * Shadow mode release notes. Bump version when shipping partner-facing changes.
  * user: shown to Katia and Raili in What's new
  * dev: shown only when Marko is logged in
  */
@@ -7,8 +7,17 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.4.2',
+    version: '1.4.3',
     releases: [
+      {
+        version: '1.4.3',
+        date: '2026-08-26',
+        title: 'Shadow mode naming',
+        user: [
+          'Toolbar and menus now say Shadow mode instead of Shadow review'
+        ],
+        dev: []
+      },
       {
         version: '1.4.2',
         date: '2026-08-26',

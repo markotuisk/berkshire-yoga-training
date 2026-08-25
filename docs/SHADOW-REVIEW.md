@@ -1,4 +1,4 @@
-# Shadow review site setup
+# Shadow mode site setup
 
 Private review copy of Thames Wellness Academy.
 
@@ -45,7 +45,7 @@ Partners use **Accept** to agree, **Comment** to keep discussing, and **Approve*
 
 ## Version and What's new
 
-Shadow review tools are versioned in `js/shadow-changelog.js` (currently loaded before `js/shadow-review.js`).
+Shadow mode tools are versioned in `js/shadow-changelog.js` (currently loaded before `js/shadow-review.js`).
 
 When shipping partner-facing changes:
 
@@ -89,7 +89,7 @@ Allowlist in that script: Marko, Katia (`Katia.major@thameswellness.com`), Raili
 ### B. Cloudflare Access (login)
 
 1. **Zero Trust** → **Access** → **Applications** → **Add** → Self-hosted  
-2. Application name: `TWA Shadow review`  
+2. Application name: `TWA Shadow mode`  
 3. Domain: `shadow.berkshireyogatraining.co.uk` (also add `berkshire-yoga-training-shadow.pages.dev` so the preview URL is gated)  
 4. Identity: **One-time PIN** (simplest) and/or Google  
 5. Policy **Allow**: emails for Marko (`markotuisk@gmail.com`), Katia (`Katia.major@thameswellness.com`), and Raili (`raili.maripuu@thameswellness.com`)  
@@ -99,7 +99,7 @@ Allowlist in that script: Marko, Katia (`Katia.major@thameswellness.com`), Raili
 
 1. Zero Trust → **Reusable components** → **Custom pages** → Access login page → **Manage**  
 2. Organisation name: **Thames Wellness Academy**  
-3. Logo + header **Shadow review** · footer **Partners only · not the public site**  
+3. Logo + header **Shadow mode** · footer **Partners only · not the public site**  
 4. Brand orange `#E8612E` where colour fields allow  
 
 ### C. Google Sheet + Apps Script
@@ -179,10 +179,10 @@ Two separate OG sets (middleware on the `shadow` branch):
 - **Description:** Private partner login for the TWA Shadow review site. One-time email code. For Katia, Raili and Marko only. Not the public Academy site.  
 - **Image:** `https://berkshireyogatraining.co.uk/assets/og-image.jpg`
 
-**2. Shadow review** (normal pages after you are logged in)
+**2. Shadow mode** (normal pages after you are logged in)
 
-- **Title:** Thames Wellness Academy · Shadow review  
-- **Description:** A calm private Shadow review room…  
+- **Title:** Thames Wellness Academy · Shadow mode  
+- **Description:** A calm private Shadow mode room…  
 - **theme-color:** `#E8612E`
 
 Access blocks crawlers by default, so they never reach our HTML. Add a **second policy** on the `shadow` Access app (order **above** Partners allowlist):

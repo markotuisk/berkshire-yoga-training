@@ -23,7 +23,7 @@ const OG_IMAGE = 'https://berkshireyogatraining.co.uk/assets/og-image.jpg';
 
 /**
  * Access gate link previews — shown to social crawlers (WhatsApp, iMessage, Slack)
- * that hit the hostname before partners log in. Distinct from the in-site Shadow review OG.
+ * that hit the hostname before partners log in. Distinct from the in-site Shadow mode OG.
  * Requires an Access Bypass policy for those bots (see docs/SHADOW-REVIEW.md).
  */
 const SHADOW_ACCESS_OG = {
@@ -38,17 +38,17 @@ const SHADOW_ACCESS_OG = {
     'Secure Access login for the TWA Shadow review. Partners only.'
 };
 
-/** In-site Shadow review previews (after Access login / normal HTML pages) */
+/** In-site Shadow mode previews (after Access login / normal HTML pages) */
 const SHADOW_SITE_OG = {
-  title: 'Thames Wellness Academy · Shadow review',
+  title: 'Thames Wellness Academy · Shadow mode',
   description:
-    'A calm private Shadow review room to refine the Academy site together. Flag copy, images and details before anything goes live. For Katia, Raili and Marko only.',
+    'A calm private Shadow mode room to refine the Academy site together. Flag copy, images and details before anything goes live. For Katia, Raili and Marko only.',
   siteName: 'Thames Wellness Academy',
   image: OG_IMAGE,
-  imageAlt: 'Thames Wellness Academy: Shadow review',
-  twitterTitle: 'Thames Wellness Academy · Shadow review',
+  imageAlt: 'Thames Wellness Academy: Shadow mode',
+  twitterTitle: 'Thames Wellness Academy · Shadow mode',
   twitterDescription:
-    'Shadow review for Thames Wellness Academy partners. Comment on any detail. The public site stays untouched.'
+    'Shadow mode for Thames Wellness Academy partners. Comment on any detail. The public site stays untouched.'
 };
 
 /** Social / messaging crawlers used for link unfurls (not search indexing). */
