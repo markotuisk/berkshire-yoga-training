@@ -215,7 +215,6 @@
     });
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') checkIdleLogout();
-      else touchActivity();
     });
   }
 
