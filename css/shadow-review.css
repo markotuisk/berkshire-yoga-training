@@ -424,6 +424,70 @@ body.shadow-modal-drag-active {
 .shadow-ticket-list {
   display: flex;
   flex-direction: column;
+  gap: 0.75rem;
+}
+
+.shadow-inbox-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.shadow-inbox-section + .shadow-inbox-section {
+  margin-top: 0.25rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--shadow-border);
+}
+
+.shadow-inbox-section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.5rem;
+  padding: 0.4rem 0.55rem;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--shadow-text);
+  letter-spacing: -0.01em;
+}
+
+.shadow-inbox-section-head--current {
+  background: rgba(232, 97, 46, 0.08);
+}
+
+.shadow-inbox-section-label {
+  color: var(--shadow-text);
+}
+
+.shadow-inbox-section-head--current .shadow-inbox-section-label {
+  color: var(--shadow-accent);
+}
+
+.shadow-inbox-section-path {
+  font-weight: 500;
+  color: var(--shadow-text-secondary);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.6875rem;
+}
+
+.shadow-inbox-section-count {
+  margin-left: auto;
+  font-weight: 600;
+  color: var(--shadow-text-secondary);
+  font-size: 0.6875rem;
+}
+
+.shadow-inbox-section-count::before {
+  content: "·";
+  margin-right: 0.35rem;
+  color: rgba(0, 0, 0, 0.2);
+}
+
+.shadow-inbox-section-rows {
+  display: flex;
+  flex-direction: column;
   gap: 0.5rem;
 }
 

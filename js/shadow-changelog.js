@@ -7,8 +7,18 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.5.0',
+    version: '1.5.1',
     releases: [
+      {
+        version: '1.5.1',
+        date: '2026-08-26',
+        title: 'Page-grouped ticket inbox',
+        user: [
+          'Ticket inbox groups items by page so you see what belongs on each URL first',
+          'Tickets for the page you are viewing appear at the top under This page'
+        ],
+        dev: []
+      },
       {
         version: '1.5.0',
         date: '2026-08-26',

@@ -104,6 +104,23 @@
     return location.pathname || '/';
   }
 
+  function normalizePagePath(path) {
+    let p = String(path || '/').trim();
+    if (!p.startsWith('/')) {
+      try {
+        p = new URL(p, location.origin).pathname;
+      } catch (e) {
+        p = '/';
+      }
+    }
+    p = p.replace(/\/index\.html$/i, '/');
+    if (p !== '/') {
+      p = p.replace(/\.html$/i, '');
+      p = p.replace(/\/+$/, '') || '/';
+    }
+    return p || '/';
+  }
+
   function ticketPagePath(ticket) {
     if (ticket.pagePath) return ticket.pagePath;
     if (ticket.pageUrl) {
@@ -116,17 +133,49 @@
     return '/';
   }
 
+  function pageLabel(path) {
+    const norm = normalizePagePath(path);
+    if (norm === '/') return 'Homepage';
+    const segments = norm.split('/').filter(Boolean);
+    const last = segments[segments.length - 1] || 'Page';
+    return last.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+  }
+
+  function isCurrentPage(ticket) {
+    return normalizePagePath(ticketPagePath(ticket)) === normalizePagePath(currentPagePath());
+  }
+
   function ticketMatchesPage(ticket) {
-    const path = currentPagePath();
-    if (ticket.pagePath) return ticket.pagePath === path;
-    if (ticket.pageUrl) {
-      try {
-        return new URL(ticket.pageUrl).pathname === path;
-      } catch (e) {
-        return false;
-      }
-    }
-    return false;
+    return isCurrentPage(ticket);
+  }
+
+  function ticketCountLabel(count) {
+    return count === 1 ? '1 ticket' : count + ' tickets';
+  }
+
+  function groupInboxTickets(tickets) {
+    const groups = new Map();
+    tickets.forEach((t) => {
+      const path = normalizePagePath(ticketPagePath(t));
+      if (!groups.has(path)) groups.set(path, []);
+      groups.get(path).push(t);
+    });
+
+    const currentPath = normalizePagePath(currentPagePath());
+    const sortedPaths = [...groups.keys()].sort((a, b) => {
+      if (a === currentPath) return -1;
+      if (b === currentPath) return 1;
+      return a.localeCompare(b);
+    });
+
+    return sortedPaths.map((path) => ({
+      path,
+      isCurrent: path === currentPath,
+      tickets: groups
+        .get(path)
+        .slice()
+        .sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)))
+    }));
   }
 
   function compareVersion(a, b) {
@@ -1158,13 +1207,71 @@
     });
   }
 
+  function createTicketRow(t) {
+    const row = document.createElement('div');
+    row.className = 'shadow-ticket-row';
+    row.setAttribute('role', 'button');
+    row.tabIndex = 0;
+    const locateBtn = t.cssSelector
+      ? '<button type="button" class="shadow-locate-btn" data-ticket-id="' +
+        escapeAttr(t.id) +
+        '" title="Show on page">Locate</button>'
+      : '';
+    row.innerHTML =
+      '<span class="shadow-ticket-id">' +
+      escapeHtml(t.id) +
+      '</span><span class="shadow-ticket-meta">' +
+      escapeHtml(formatDate(t.createdAt)) +
+      ' · ' +
+      escapeHtml(t.createdBy || 'Unknown') +
+      ' · ' +
+      escapeHtml(STATUS_LABELS[t.status] || t.status) +
+      '</span><span class="shadow-ticket-summary">' +
+      escapeHtml(t.summary || '') +
+      '</span>' +
+      locateBtn;
+    row.addEventListener('click', (e) => {
+      if (e.target.closest('.shadow-locate-btn')) return;
+      openDetail(t.id);
+    });
+    row.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        if (e.target.closest('.shadow-locate-btn')) return;
+        e.preventDefault();
+        openDetail(t.id);
+      }
+    });
+    return row;
+  }
+
+  function renderInboxSectionHead(group) {
+    const head = document.createElement('header');
+    head.className =
+      'shadow-inbox-section-head' + (group.isCurrent ? ' shadow-inbox-section-head--current' : '');
+
+    const label = document.createElement('span');
+    label.className = 'shadow-inbox-section-label';
+    label.textContent = group.isCurrent ? 'This page' : pageLabel(group.path);
+
+    const pathEl = document.createElement('span');
+    pathEl.className = 'shadow-inbox-section-path';
+    pathEl.textContent = group.path;
+
+    const count = document.createElement('span');
+    count.className = 'shadow-inbox-section-count';
+    count.textContent = ticketCountLabel(group.tickets.length);
+
+    head.appendChild(label);
+    head.appendChild(pathEl);
+    head.appendChild(count);
+    return head;
+  }
+
   function renderInboxList() {
     const list = qs('#shadow-ticket-list');
     if (!list) return;
     renderInboxTabs();
-    const visible = ticketsByTab(inboxTab)
-      .slice()
-      .sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+    const visible = ticketsByTab(inboxTab);
     if (!visible.length) {
       list.innerHTML =
         inboxTab === 'archive'
@@ -1173,41 +1280,15 @@
       return;
     }
     list.innerHTML = '';
-    visible.forEach((t) => {
-      const row = document.createElement('div');
-      row.className = 'shadow-ticket-row';
-      row.setAttribute('role', 'button');
-      row.tabIndex = 0;
-      const locateBtn = t.cssSelector
-        ? '<button type="button" class="shadow-locate-btn" data-ticket-id="' +
-          escapeAttr(t.id) +
-          '" title="Show on page">Locate</button>'
-        : '';
-      row.innerHTML =
-        '<span class="shadow-ticket-id">' +
-        escapeHtml(t.id) +
-        '</span><span class="shadow-ticket-meta">' +
-        escapeHtml(formatDate(t.createdAt)) +
-        ' · ' +
-        escapeHtml(t.createdBy || 'Unknown') +
-        ' · ' +
-        escapeHtml(STATUS_LABELS[t.status] || t.status) +
-        '</span><span class="shadow-ticket-summary">' +
-        escapeHtml(t.summary || '') +
-        '</span>' +
-        locateBtn;
-      row.addEventListener('click', (e) => {
-        if (e.target.closest('.shadow-locate-btn')) return;
-        openDetail(t.id);
-      });
-      row.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          if (e.target.closest('.shadow-locate-btn')) return;
-          e.preventDefault();
-          openDetail(t.id);
-        }
-      });
-      list.appendChild(row);
+    groupInboxTickets(visible).forEach((group) => {
+      const section = document.createElement('section');
+      section.className = 'shadow-inbox-section';
+      section.appendChild(renderInboxSectionHead(group));
+      const rows = document.createElement('div');
+      rows.className = 'shadow-inbox-section-rows';
+      group.tickets.forEach((t) => rows.appendChild(createTicketRow(t)));
+      section.appendChild(rows);
+      list.appendChild(section);
     });
   }
 
