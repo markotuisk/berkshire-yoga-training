@@ -7,8 +7,24 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.3.0',
+    version: '1.4.0',
     releases: [
+      {
+        version: '1.4.0',
+        date: '2026-08-26',
+        title: 'Draggable tickets and Show on page',
+        user: [
+          'Drag ticket windows by the header so you can see the page behind while discussing',
+          'Double-click the header to re-centre a window',
+          'Show on page jumps to the element a ticket refers to and highlights it in orange',
+          'Locate button on inbox rows for a quick jump without opening the full thread',
+          'Opening a ticket from an on-page TWA marker scrolls to that element automatically'
+        ],
+        dev: [
+          'Cross-page tickets open via ?ticket=TWA-xxx query param then scroll and highlight',
+          'Modal positions persist in sessionStorage per modal type during the browser session'
+        ]
+      },
       {
         version: '1.3.0',
         date: '2026-08-26',

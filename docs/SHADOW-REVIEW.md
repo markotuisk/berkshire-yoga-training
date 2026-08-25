@@ -28,11 +28,12 @@ Partners do **not** need Cloudflare accounts. Access only needs their emails on 
 3. **What's new** on login when there are unread partner updates, then the ticket inbox.
 4. The inbox shows **all reviewers' tickets** (not just your own) so partners can spot duplicates.
 5. **Active** tab (default) lists tickets still in play; **Archive** holds Approved, Shipped, Won't fix, and Duplicate.
-6. Orange **TWA-xxx** markers appear on page elements with active tickets — click to open the thread.
-7. Click **Pick element** (or ⌘/Alt+click) on any text, image, or button.
-8. For images or placeholders, the **Storycard** section lets you upload a replacement file (optional).
-9. Add category + comment → ticket created (stored in KV and mirrored to Google Sheets).
-10. Open a ticket to read the thread and add further comments.
+6. Orange **TWA-xxx** markers appear on page elements with active tickets — click to open the thread and jump to the element.
+7. **Show on page** in a ticket (or **Locate** in the inbox) scrolls to the linked element and highlights it. Drag ticket windows by the header to see the page behind.
+8. Click **Pick element** (or ⌘/Alt+click) on any text, image, or button.
+9. For images or placeholders, the **Storycard** section lets you upload a replacement file (optional).
+10. Add category + comment → ticket created (stored in KV and mirrored to Google Sheets).
+11. Open a ticket to read the thread and add further comments.
 
 **Active statuses** (default inbox + on-page markers): Open, Discussing, Accepted, On shadow, In progress, Ready for review, Blocked.
 

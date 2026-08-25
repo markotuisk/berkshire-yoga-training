@@ -55,6 +55,19 @@ body.shadow-pick-mode * {
 .shadow-highlight {
   outline: 3px solid #e8612e !important;
   outline-offset: 2px;
+  animation: shadow-highlight-pulse 1.5s ease-in-out 2;
+}
+
+@keyframes shadow-highlight-pulse {
+  0%,
+  100% {
+    outline-color: #e8612e;
+    outline-width: 3px;
+  }
+  50% {
+    outline-color: #f5bf03;
+    outline-width: 5px;
+  }
 }
 
 .shadow-fab {
@@ -85,6 +98,23 @@ body.shadow-pick-mode * {
   background: rgba(0, 0, 0, 0.45);
 }
 
+.shadow-modal--floating {
+  display: block;
+  padding: 0;
+  background: rgba(0, 0, 0, 0.12);
+  pointer-events: none;
+}
+
+.shadow-modal--floating.shadow-modal--dragging {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.shadow-modal--floating .shadow-modal-card {
+  position: fixed;
+  margin: 0;
+  pointer-events: auto;
+}
+
 .shadow-modal[hidden] {
   display: none !important;
 }
@@ -111,6 +141,13 @@ body.shadow-pick-mode * {
   justify-content: space-between;
   gap: 1rem;
   margin-bottom: 0.75rem;
+  cursor: move;
+  user-select: none;
+  touch-action: none;
+}
+
+.shadow-modal-head .shadow-close {
+  cursor: pointer;
 }
 
 .shadow-modal-card h2 {
@@ -288,7 +325,9 @@ body.shadow-pick-mode * {
 
 .shadow-ticket-row {
   display: grid;
-  gap: 0.15rem;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto auto;
+  gap: 0.15rem 0.5rem;
   text-align: left;
   padding: 0.75rem 0.85rem;
   border: 1px solid #e5e5e5;
@@ -296,6 +335,33 @@ body.shadow-pick-mode * {
   background: #fafafa;
   cursor: pointer;
   font: inherit;
+}
+
+.shadow-ticket-row .shadow-ticket-id,
+.shadow-ticket-row .shadow-ticket-meta,
+.shadow-ticket-row .shadow-ticket-summary {
+  grid-column: 1;
+}
+
+.shadow-locate-btn {
+  grid-column: 2;
+  grid-row: 1 / span 3;
+  align-self: center;
+  border: 1px solid #ddd;
+  border-radius: 999px;
+  padding: 0.35rem 0.65rem;
+  background: #fff;
+  color: #e8612e;
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.shadow-locate-btn:hover {
+  border-color: #e8612e;
+  background: #fff8f4;
 }
 
 .shadow-ticket-row:hover {

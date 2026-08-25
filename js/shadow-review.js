@@ -49,6 +49,7 @@
   const STORAGE_PERSON = 'twa_shadow_person';
   const STORAGE_VERSION_SEEN = 'twa_shadow_version_seen';
   const STORAGE_LAST_ACTIVE = 'twa_shadow_last_active';
+  const STORAGE_MODAL_POS = 'twa_shadow_modal_pos_';
   const IDLE_MS = 60 * 60 * 1000;
   const IDLE_CHECK_MS = 60 * 1000;
   const AUDIT_SHEET_URL =
@@ -57,6 +58,12 @@
     'https://drive.google.com/drive/folders/1TIhmFeB7LanKDhNCfiCm83ZZQTYjQKhF';
   const MAX_ASSET_BYTES = 8 * 1024 * 1024;
   const ASSET_MIME = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+
+  const DRAGGABLE_MODALS = {
+    inbox: 'shadow-inbox-modal',
+    detail: 'shadow-detail-modal',
+    new: 'shadow-new-modal'
+  };
 
   let ticketsCache = [];
   let activeEl = null;
@@ -84,6 +91,18 @@
 
   function currentPagePath() {
     return location.pathname || '/';
+  }
+
+  function ticketPagePath(ticket) {
+    if (ticket.pagePath) return ticket.pagePath;
+    if (ticket.pageUrl) {
+      try {
+        return new URL(ticket.pageUrl).pathname;
+      } catch (e) {
+        return '/';
+      }
+    }
+    return '/';
   }
 
   function ticketMatchesPage(ticket) {
@@ -191,6 +210,192 @@
     if (!getPerson()) return;
     if (isIdleExpired()) {
       performLogout('Logged out after 1 hour of inactivity.');
+    }
+  }
+
+  function getModalPosition(key) {
+    try {
+      const raw = sessionStorage.getItem(STORAGE_MODAL_POS + key);
+      if (!raw) return null;
+      const pos = JSON.parse(raw);
+      if (typeof pos.top === 'number' && typeof pos.left === 'number') return pos;
+    } catch (e) {
+      /* ignore */
+    }
+    return null;
+  }
+
+  function saveModalPosition(key, top, left) {
+    try {
+      sessionStorage.setItem(STORAGE_MODAL_POS + key, JSON.stringify({ top, left }));
+    } catch (e) {
+      /* ignore */
+    }
+  }
+
+  function clearModalPosition(key) {
+    try {
+      sessionStorage.removeItem(STORAGE_MODAL_POS + key);
+    } catch (e) {
+      /* ignore */
+    }
+  }
+
+  function clampModalPosition(left, top, card) {
+    const margin = 8;
+    const w = card.offsetWidth || 320;
+    const h = card.offsetHeight || 400;
+    const maxLeft = Math.max(margin, window.innerWidth - w - margin);
+    const maxTop = Math.max(margin, window.innerHeight - h - margin);
+    return {
+      left: Math.min(Math.max(margin, left), maxLeft),
+      top: Math.min(Math.max(margin, top), maxTop)
+    };
+  }
+
+  function centerModalCard(card) {
+    card.style.position = 'fixed';
+    card.style.margin = '0';
+    requestAnimationFrame(() => {
+      const w = card.offsetWidth;
+      const h = card.offsetHeight;
+      const pos = clampModalPosition((window.innerWidth - w) / 2, (window.innerHeight - h) / 2, card);
+      card.style.left = pos.left + 'px';
+      card.style.top = pos.top + 'px';
+    });
+  }
+
+  function applyModalPosition(key, card) {
+    const saved = getModalPosition(key);
+    card.style.position = 'fixed';
+    card.style.margin = '0';
+    if (saved) {
+      requestAnimationFrame(() => {
+        const pos = clampModalPosition(saved.left, saved.top, card);
+        card.style.left = pos.left + 'px';
+        card.style.top = pos.top + 'px';
+      });
+      return;
+    }
+    centerModalCard(card);
+  }
+
+  function resetModalPosition(key, card) {
+    clearModalPosition(key);
+    centerModalCard(card);
+    toast('Modal re-centred');
+  }
+
+  function initDraggableModals() {
+    Object.entries(DRAGGABLE_MODALS).forEach(([key, id]) => {
+      const modal = qs('#' + id);
+      if (!modal) return;
+      modal.classList.add('shadow-modal--floating');
+      const card = qs('.shadow-modal-card', modal);
+      const head = qs('.shadow-modal-head', modal);
+      if (!card || !head) return;
+
+      head.addEventListener('dblclick', (e) => {
+        if (e.target.closest('.shadow-close')) return;
+        resetModalPosition(key, card);
+      });
+
+      head.addEventListener('pointerdown', (e) => {
+        if (e.target.closest('.shadow-close')) return;
+        if (e.button !== 0) return;
+        e.preventDefault();
+        const rect = card.getBoundingClientRect();
+        const startX = e.clientX;
+        const startY = e.clientY;
+        const startLeft = rect.left;
+        const startTop = rect.top;
+        let dragged = false;
+
+        card.style.position = 'fixed';
+        card.style.left = startLeft + 'px';
+        card.style.top = startTop + 'px';
+        card.style.margin = '0';
+
+        const onMove = (ev) => {
+          const dx = ev.clientX - startX;
+          const dy = ev.clientY - startY;
+          if (!dragged && (Math.abs(dx) > 3 || Math.abs(dy) > 3)) {
+            dragged = true;
+            modal.classList.add('shadow-modal--dragging');
+          }
+          if (!dragged) return;
+          const pos = clampModalPosition(startLeft + dx, startTop + dy, card);
+          card.style.left = pos.left + 'px';
+          card.style.top = pos.top + 'px';
+        };
+
+        const onUp = () => {
+          head.removeEventListener('pointermove', onMove);
+          head.removeEventListener('pointerup', onUp);
+          head.removeEventListener('pointercancel', onUp);
+          modal.classList.remove('shadow-modal--dragging');
+          if (dragged) {
+            saveModalPosition(key, parseFloat(card.style.left), parseFloat(card.style.top));
+          }
+        };
+
+        head.addEventListener('pointermove', onMove);
+        head.addEventListener('pointerup', onUp);
+        head.addEventListener('pointercancel', onUp);
+      });
+    });
+  }
+
+  function highlightElement(el) {
+    clearHighlight();
+    highlightEl = el;
+    highlightEl.classList.add('shadow-highlight');
+  }
+
+  function showTicketOnPage(ticket) {
+    if (!ticket || !ticket.cssSelector) {
+      toast('No element linked to this ticket');
+      return false;
+    }
+    if (!ticketMatchesPage(ticket)) {
+      const path = ticketPagePath(ticket);
+      window.location.assign(path + '?ticket=' + encodeURIComponent(ticket.id));
+      return true;
+    }
+    let el;
+    try {
+      el = document.querySelector(ticket.cssSelector);
+    } catch (e) {
+      el = null;
+    }
+    if (!el || el.closest('#shadow-review-root, .shadow-toolbar, #shadow-page-badges')) {
+      toast('Could not find element on this page');
+      return false;
+    }
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    highlightElement(el);
+    return true;
+  }
+
+  async function handleTicketDeepLink() {
+    const params = new URLSearchParams(location.search);
+    const ticketId = params.get('ticket');
+    if (!ticketId || !getPerson()) return;
+    try {
+      await refreshTickets();
+      const ticket = ticketsCache.find((t) => t.id === ticketId);
+      if (!ticket) {
+        toast('Ticket ' + ticketId + ' not found');
+        return;
+      }
+      await openDetail(ticketId);
+      showTicketOnPage(ticket);
+      const url = new URL(location.href);
+      url.searchParams.delete('ticket');
+      const clean = url.pathname + (url.search || '') + url.hash;
+      history.replaceState(null, '', clean);
+    } catch (err) {
+      toast(err.message);
     }
   }
 
@@ -559,6 +764,8 @@
     qs('#shadow-comment-form').addEventListener('submit', onAddComment);
     qs('#shadow-whatsnew-dismiss').addEventListener('click', onWhatsNewDismiss);
     qs('#shadow-detail-body').addEventListener('click', onDetailActionClick);
+    qs('#shadow-ticket-list').addEventListener('click', onInboxListClick);
+    initDraggableModals();
   }
 
   function updateVersionBadge() {
@@ -584,6 +791,11 @@
     }
     if (shouldShowWhatsNew(person)) {
       showWhatsNew(false);
+      return;
+    }
+    const params = new URLSearchParams(location.search);
+    if (params.get('ticket')) {
+      await handleTicketDeepLink();
       return;
     }
     openInbox();
@@ -661,7 +873,13 @@
       if (el) el.hidden = true;
     });
     const el = qs('#' + map[which]);
-    if (el) el.hidden = false;
+    if (el) {
+      el.hidden = false;
+      if (DRAGGABLE_MODALS[which]) {
+        const card = qs('.shadow-modal-card', el);
+        if (card) applyModalPosition(which, card);
+      }
+    }
   }
 
   function hide(which) {
@@ -674,7 +892,7 @@
     };
     const el = qs('#' + map[which]);
     if (el) el.hidden = true;
-    clearHighlight();
+    if (which === 'detail') clearHighlight();
   }
 
   function toast(msg) {
@@ -760,9 +978,15 @@
     }
     list.innerHTML = '';
     visible.forEach((t) => {
-      const row = document.createElement('button');
-      row.type = 'button';
+      const row = document.createElement('div');
       row.className = 'shadow-ticket-row';
+      row.setAttribute('role', 'button');
+      row.tabIndex = 0;
+      const locateBtn = t.cssSelector
+        ? '<button type="button" class="shadow-locate-btn" data-ticket-id="' +
+          escapeAttr(t.id) +
+          '" title="Show on page">Locate</button>'
+        : '';
       row.innerHTML =
         '<span class="shadow-ticket-id">' +
         escapeHtml(t.id) +
@@ -774,10 +998,30 @@
         escapeHtml(STATUS_LABELS[t.status] || t.status) +
         '</span><span class="shadow-ticket-summary">' +
         escapeHtml(t.summary || '') +
-        '</span>';
-      row.addEventListener('click', () => openDetail(t.id));
+        '</span>' +
+        locateBtn;
+      row.addEventListener('click', (e) => {
+        if (e.target.closest('.shadow-locate-btn')) return;
+        openDetail(t.id);
+      });
+      row.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          if (e.target.closest('.shadow-locate-btn')) return;
+          e.preventDefault();
+          openDetail(t.id);
+        }
+      });
       list.appendChild(row);
     });
+  }
+
+  function onInboxListClick(event) {
+    const btn = event.target.closest('.shadow-locate-btn');
+    if (!btn) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const ticket = ticketsCache.find((t) => t.id === btn.dataset.ticketId);
+    if (ticket) showTicketOnPage(ticket);
   }
 
   function ensureBadgeLayer() {
@@ -872,6 +1116,7 @@
             event.preventDefault();
             event.stopPropagation();
             openDetail(ticket.id);
+            showTicketOnPage(ticket);
           });
           layer.appendChild(badge);
           pageBadgeNodes.push(badge);
@@ -896,6 +1141,12 @@
     const dev = isDeveloper(person);
     const status = t.status;
     const parts = [];
+
+    if (t.cssSelector) {
+      parts.push(
+        '<button type="button" class="shadow-btn shadow-btn-secondary shadow-action" data-action="show-location">Show on page</button>'
+      );
+    }
 
     if (['Open', 'Discussing', 'In progress'].includes(status)) {
       parts.push(
@@ -963,13 +1214,21 @@
   async function onDetailActionClick(event) {
     const btn = event.target.closest('[data-action]');
     if (!btn || !btn.closest('#shadow-detail-body')) return;
+    const action = btn.getAttribute('data-action');
     const person = getPerson();
     const form = qs('#shadow-comment-form');
     const id = form && form.dataset.ticketId;
     if (!person || !id) return;
     event.preventDefault();
+
+    if (action === 'show-location') {
+      const ticket = ticketsCache.find((t) => t.id === id);
+      if (ticket) showTicketOnPage(ticket);
+      return;
+    }
+
     try {
-      await updateTicketStatus(id, btn.getAttribute('data-action'), person);
+      await updateTicketStatus(id, action, person);
       await refreshTickets();
       openDetail(id);
     } catch (err) {
@@ -990,6 +1249,7 @@
   }
 
   async function openDetail(id) {
+    clearHighlight();
     show('detail');
     const title = qs('#shadow-detail-title');
     const body = qs('#shadow-detail-body');
