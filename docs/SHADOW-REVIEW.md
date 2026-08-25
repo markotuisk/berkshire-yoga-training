@@ -51,12 +51,16 @@ npx wrangler pages deploy . --project-name=berkshire-yoga-training-shadow --bran
 
 Cloudflare hosts the Access login page itself, so logo and colours are set in Zero Trust, not in site HTML:
 
-1. Zero Trust → Settings → **Custom Pages** (or **Customization** / **Account branding**, depending on plan)  
-2. Upload the Academy logo (prefer a clear PNG on transparent or white)  
-3. Set primary / accent colour to **`#E8612E`** where the UI allows  
-4. Optional: custom login message such as “Thames Wellness Academy · private review”
+1. Zero Trust → **Reusable components** → **Custom pages** → Access login page → **Manage**  
+   (docs: https://developers.cloudflare.com/cloudflare-one/reusable-components/custom-pages/access-login-page/)  
+2. Organisation name: **Thames Wellness Academy**  
+3. Upload the Academy logo (clear PNG)  
+4. Header text e.g. **Private review** · footer e.g. **Partners only · not the public site**  
+5. Background / text colours: use a calm light ground and accent where possible; brand orange is **`#E8612E`** (Access only exposes background + text colour, not a separate accent)
 
-Link previews (WhatsApp, iMessage, Slack) use the **page OG tags** below once Access has let the crawler through, or when the URL is shared after login. Those tags are rewritten by shadow middleware on every HTML page.
+These settings apply to **all** Access apps on the Zero Trust org.
+
+Link previews (WhatsApp, iMessage, Slack) use the **page OG tags** below once the HTML of the shadow site is reachable. Those tags are rewritten by shadow middleware on every HTML page.
 
 ### Link preview (Open Graph)
 
