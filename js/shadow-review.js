@@ -396,15 +396,20 @@
     }
   }
 
+  function isPickModifier(event) {
+    return event.altKey || event.metaKey;
+  }
+
   function onPageClick(event) {
     if (event.defaultPrevented) return;
     if (event.target.closest('#shadow-review-root')) return;
     if (event.target.closest('.shadow-toolbar')) return;
 
+    const pickMod = isPickModifier(event);
     const interactive = event.target.closest('a, button, input, textarea, select, label');
-    if (interactive && !event.altKey && !document.body.classList.contains('shadow-pick-mode')) return;
+    if (interactive && !pickMod && !document.body.classList.contains('shadow-pick-mode')) return;
 
-    if (!event.altKey && !document.body.classList.contains('shadow-pick-mode')) return;
+    if (!pickMod && !document.body.classList.contains('shadow-pick-mode')) return;
 
     event.preventDefault();
     event.stopPropagation();
@@ -456,7 +461,7 @@
     bar.innerHTML =
       '<span class="shadow-toolbar-label">Shadow review</span>' +
       '<button type="button" id="shadow-pick-toggle" class="shadow-btn shadow-btn-small">Pick element</button>' +
-      '<span class="shadow-toolbar-hint">Or Alt+click any element</span>';
+      '<span class="shadow-toolbar-hint">Or ⌘/Alt+click any element</span>';
     document.body.appendChild(bar);
     qs('#shadow-pick-toggle').addEventListener('click', () => {
       document.body.classList.toggle('shadow-pick-mode');

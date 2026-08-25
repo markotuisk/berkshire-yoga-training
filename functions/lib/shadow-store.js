@@ -1,7 +1,10 @@
 /**
  * Shadow ticket store — KV when bound, otherwise in-memory (dev / first boot).
  * Schema mirrors Google Sheets Tabs: Tickets, Comments, Audit_Log.
+ * Optionally dual-writes to Google Sheets when SHEETS_WEBHOOK_URL is set.
  */
+
+import { pushToSheets } from './sheets-sync.js';
 
 const META_KEY = 'shadow:meta';
 const TICKETS_KEY = 'shadow:tickets';
@@ -81,12 +84,14 @@ function pad(n, width) {
 
 async function appendAudit(state, entry) {
   const id = 'E-' + pad(state.meta.nextEvent++, 4);
-  state.audit.push({
+  const row = {
     eventId: id,
     timestamp: nowIso(),
     source: 'Shadow UI',
     ...entry
-  });
+  };
+  state.audit.push(row);
+  return row;
 }
 
 export async function listTickets(env, { author } = {}) {
@@ -133,7 +138,7 @@ export async function createTicket(env, payload) {
     lastUpdatedBy: payload.createdBy
   };
   state.tickets.push(ticket);
-  await appendAudit(state, {
+  const audit = await appendAudit(state, {
     actor: payload.createdBy,
     action: 'ticket_created',
     ticketId: id,
@@ -143,6 +148,7 @@ export async function createTicket(env, payload) {
     details: ticket.summary
   });
   await persist(state);
+  await pushToSheets(env, { action: 'ticket_created', ticket, audit });
   return ticket;
 }
 
@@ -164,7 +170,7 @@ export async function addComment(env, ticketId, { author, message }) {
   state.comments.push(comment);
   ticket.lastUpdatedAt = createdAt;
   ticket.lastUpdatedBy = author;
-  await appendAudit(state, {
+  const audit = await appendAudit(state, {
     actor: author,
     action: 'comment_added',
     ticketId,
@@ -173,6 +179,7 @@ export async function addComment(env, ticketId, { author, message }) {
     details: message.slice(0, 200)
   });
   await persist(state);
+  await pushToSheets(env, { action: 'comment_added', ticket, comment, audit });
   return { ticket, comment };
 }
 
@@ -188,7 +195,7 @@ export async function updateTicketStatus(env, ticketId, { status, actor }) {
     ticket.closedAt = ticket.lastUpdatedAt;
     ticket.closedBy = actor;
   }
-  await appendAudit(state, {
+  const audit = await appendAudit(state, {
     actor,
     action: 'status_changed',
     ticketId,
@@ -198,6 +205,7 @@ export async function updateTicketStatus(env, ticketId, { status, actor }) {
     details: from + ' → ' + status
   });
   await persist(state);
+  await pushToSheets(env, { action: 'status_changed', ticket, audit });
   return ticket;
 }
 
@@ -208,10 +216,16 @@ export async function exportAudit(env) {
     comments: state.comments,
     audit: state.audit,
     people: [
-      { name: 'Katia Major', role: 'Owner', active: true },
-      { name: 'Raili Maripuu', role: 'Owner', active: true },
-      { name: 'Marko Tuisk', role: 'SEO & Dev', active: true },
-      { name: 'Meridian', role: 'Agent', active: true }
+      { name: 'Katia Major', email: '', role: 'Owner', active: true },
+      { name: 'Raili Maripuu', email: '', role: 'Owner', active: true },
+      { name: 'Marko Tuisk', email: 'markotuisk@gmail.com', role: 'SEO & Dev', active: true },
+      { name: 'Meridian', email: 'system', role: 'Agent', active: true }
     ]
   };
+}
+
+/** Full replace sync of all tabs to Sheets (manual / recovery). */
+export async function syncAllToSheets(env) {
+  const data = await exportAudit(env);
+  return pushToSheets(env, { action: 'sync', ...data });
 }
