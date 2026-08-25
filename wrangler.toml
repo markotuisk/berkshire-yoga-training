@@ -1,0 +1,8 @@
+# Shadow Pages project only — do not use for live berkshire-yoga-training
+name = "berkshire-yoga-training-shadow"
+compatibility_date = "2024-11-01"
+pages_build_output_dir = "."
+
+[[kv_namespaces]]
+binding = "SHADOW_TICKETS"
+id = "7b1eff8921fc46cdaed5e5fffd57ab38"
