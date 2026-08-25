@@ -76,9 +76,16 @@
   const MODAL_MAX_WIDTH_VW = 0.95;
   const MODAL_MAX_HEIGHT_VH = 0.9;
 
+  const PICK_TARGET_SELECTOR =
+    'img, [class*="placeholder-img"], a, button, h1, h2, h3, h4, p, li, section, article, .btn, [class*="card"], [class*="section"]';
+  const PICK_EXCLUDE_SELECTOR =
+    '#shadow-review-root, .shadow-toolbar, .shadow-modal, #shadow-page-badges';
+
   let ticketsCache = [];
   let activeEl = null;
   let highlightEl = null;
+  let pickHoverEl = null;
+  let pickHoverBound = false;
   let whatsNewManual = false;
   let inboxTab = 'open';
   let pageBadgeNodes = [];
@@ -677,6 +684,7 @@
   function closeAllModals() {
     ['person', 'inbox', 'detail', 'new', 'whatsnew'].forEach((key) => hide(key));
     clearHighlight();
+    clearPickHover();
     document.body.classList.remove('shadow-pick-mode');
     const toggle = qs('#shadow-pick-toggle');
     if (toggle) toggle.textContent = 'Pick element';
@@ -1186,6 +1194,52 @@
       highlightEl = null;
     }
     activeEl = null;
+  }
+
+  function isPickExcluded(el) {
+    return !!(el && el.closest && el.closest(PICK_EXCLUDE_SELECTOR));
+  }
+
+  function resolvePickTarget(fromEl) {
+    if (!fromEl || fromEl === document.body || fromEl === document.documentElement) return null;
+    if (isPickExcluded(fromEl)) return null;
+    const el = fromEl.closest(PICK_TARGET_SELECTOR) || fromEl;
+    if (el === document.body || el === document.documentElement) return null;
+    return el;
+  }
+
+  function clearPickHover() {
+    if (pickHoverEl) {
+      pickHoverEl.classList.remove('shadow-pick-hover');
+      pickHoverEl = null;
+    }
+  }
+
+  function setPickHover(el) {
+    if (!el || el === pickHoverEl) return;
+    clearPickHover();
+    pickHoverEl = el;
+    pickHoverEl.classList.add('shadow-pick-hover');
+  }
+
+  function onPickPointerMove(event) {
+    if (!document.body.classList.contains('shadow-pick-mode')) return;
+    const el = resolvePickTarget(event.target);
+    if (!el) {
+      clearPickHover();
+      return;
+    }
+    setPickHover(el);
+  }
+
+  function bindPickHover() {
+    if (pickHoverBound) return;
+    pickHoverBound = true;
+    const onMove = throttle(onPickPointerMove, 32);
+    document.addEventListener('mousemove', onMove, { passive: true });
+    document.addEventListener('mouseleave', () => {
+      if (document.body.classList.contains('shadow-pick-mode')) clearPickHover();
+    });
   }
 
   async function loadTickets() {
@@ -1745,12 +1799,10 @@
       return;
     }
 
+    clearPickHover();
     clearHighlight();
-    activeEl =
-      event.target.closest(
-        'img, [class*="placeholder-img"], a, button, h1, h2, h3, h4, p, li, section, article, .btn, [class*="card"], [class*="section"]'
-      ) || event.target;
-    if (activeEl === document.body || activeEl === document.documentElement) return;
+    activeEl = resolvePickTarget(event.target);
+    if (!activeEl) return;
     highlightEl = activeEl;
     highlightEl.classList.add('shadow-highlight');
 
@@ -1815,6 +1867,7 @@
       document.body.classList.toggle('shadow-pick-mode');
       const on = document.body.classList.contains('shadow-pick-mode');
       qs('#shadow-pick-toggle').textContent = on ? 'Cancel pick' : 'Pick element';
+      if (!on) clearPickHover();
       toast(on ? 'Click an element to file a ticket' : 'Pick mode off');
     });
     qs('#shadow-logout-btn').addEventListener('click', logout);
@@ -1831,6 +1884,7 @@
     updateToolbarUser();
     showLogoutMessageIfAny();
     document.addEventListener('click', onPageClick, true);
+    bindPickHover();
 
     if (getPerson()) {
       if (isIdleExpired()) {

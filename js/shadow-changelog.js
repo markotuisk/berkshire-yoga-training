@@ -7,8 +7,17 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.5.2',
+    version: '1.5.3',
     releases: [
+      {
+        version: '1.5.3',
+        date: '2026-08-26',
+        title: 'Pick mode hover preview',
+        user: [
+          'Pick element mode highlights whatever is under your cursor before you click'
+        ],
+        dev: []
+      },
       {
         version: '1.5.2',
         date: '2026-08-26',
