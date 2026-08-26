@@ -7,8 +7,19 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.6.3',
+    version: '1.6.4',
     releases: [
+      {
+        version: '1.6.4',
+        date: '2026-08-26',
+        title: 'Locate SEO fields on page',
+        user: [
+          'View SEO rows now include a locate button to jump to the matching element on the page',
+          'Headings, images, and links scroll into view with an orange highlight pulse',
+          'Meta and social tags highlight the tag or the nearest visible match (e.g. title → H1, og:image → image)'
+        ],
+        dev: []
+      },
       {
         version: '1.6.3',
         date: '2026-08-26',

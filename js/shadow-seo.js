@@ -56,6 +56,36 @@
   let highlightOn = false;
   let overlayLayer = null;
   let overlayNodes = [];
+  let lastAuditData = null;
+  let locateHighlightEl = null;
+  let locateHighlightTimer = null;
+
+  const META_LOCATE_KEYS = {
+    title: 'meta-title',
+    description: 'meta-description',
+    canonical: 'meta-canonical',
+    robots: 'meta-robots',
+    keywords: 'meta-keywords',
+    author: 'meta-author',
+    publisher: 'meta-publisher',
+    lang: 'meta-lang'
+  };
+
+  const OG_LOCATE_KEYS = {
+    'og:title': 'og-title',
+    'og:description': 'og-description',
+    'og:image': 'og-image',
+    'og:type': 'og-type',
+    'og:locale': 'og-locale',
+    'og:site_name': 'og-site_name'
+  };
+
+  const TWITTER_LOCATE_KEYS = {
+    'twitter:card': 'twitter-card',
+    'twitter:title': 'twitter-title',
+    'twitter:description': 'twitter-description',
+    'twitter:image': 'twitter-image'
+  };
 
   function qs(sel, root) {
     return (root || document).querySelector(sel);
@@ -176,7 +206,11 @@
       } catch (e) {
         return;
       }
-      const entry = { href: url.href, text: truncate((el.innerText || '').trim(), 60) };
+      const entry = {
+        href: url.href,
+        text: truncate((el.innerText || '').trim(), 60),
+        el
+      };
       if (url.origin === origin) internal.push(entry);
       else external.push(entry);
     });
@@ -481,6 +515,29 @@
     );
   }
 
+  function locateBtnHtml(locateKey) {
+    if (!locateKey) return '';
+    return (
+      '<button type="button" class="shadow-seo-locate-btn" data-locate="' +
+      escapeHtml(locateKey) +
+      '" aria-label="Locate on page" title="Locate on page">' +
+      '<svg class="shadow-seo-locate-icon" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true" focusable="false">' +
+      '<circle cx="6" cy="6" r="2.25" fill="none" stroke="currentColor" stroke-width="1.1"/>' +
+      '<path d="M6 1.25v1.5M6 9.25v1.5M1.25 6h1.5M9.25 6h1.5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>' +
+      '</button>'
+    );
+  }
+
+  function renderValueCell(val, opts) {
+    opts = opts || {};
+    const locateKey = opts.locate;
+    const valueHtml = renderCellValue(val, opts);
+    if (!locateKey) return valueHtml;
+    return (
+      '<span class="shadow-seo-value-cell">' + valueHtml + locateBtnHtml(locateKey) + '</span>'
+    );
+  }
+
   function renderFieldTable(rows, tableClass) {
     return (
       '<table class="shadow-seo-table' +
@@ -494,7 +551,7 @@
             '"><th scope="row">' +
             escapeHtml(r[0]) +
             '</th><td>' +
-            renderCellValue(r[1], r[2] || {}) +
+            renderValueCell(r[1], r[2] || {}) +
             '</td></tr>'
         )
         .join('') +
@@ -506,26 +563,28 @@
     const rows = META_FIELDS.map(([label, key, opts]) => {
       let value = data[key];
       if (key === 'wordCount') value = String(data.technical.wordCount);
-      return [label, value, opts];
+      const rowOpts = Object.assign({}, opts);
+      if (META_LOCATE_KEYS[key]) rowOpts.locate = META_LOCATE_KEYS[key];
+      return [label, value, rowOpts];
     });
     return renderFieldTable(rows, 'shadow-seo-table--meta');
   }
 
   function renderOgTable(data) {
-    const rows = OG_FIELDS.map((key) => [
-      key,
-      data.og[key] || '',
-      { mono: true, truncate: 64, emptyLabel: 'Not set' }
-    ]);
+    const rows = OG_FIELDS.map((key) => {
+      const rowOpts = { mono: true, truncate: 64, emptyLabel: 'Not set' };
+      if (OG_LOCATE_KEYS[key]) rowOpts.locate = OG_LOCATE_KEYS[key];
+      return [key, data.og[key] || '', rowOpts];
+    });
     return renderFieldTable(rows, 'shadow-seo-table--og');
   }
 
   function renderTwitterTable(data) {
-    const rows = TWITTER_FIELDS.map((key) => [
-      key,
-      data.twitter[key] || '',
-      { mono: true, truncate: 64, emptyLabel: 'Not set' }
-    ]);
+    const rows = TWITTER_FIELDS.map((key) => {
+      const rowOpts = { mono: true, truncate: 64, emptyLabel: 'Not set' };
+      if (TWITTER_LOCATE_KEYS[key]) rowOpts.locate = TWITTER_LOCATE_KEYS[key];
+      return [key, data.twitter[key] || '', rowOpts];
+    });
     return renderFieldTable(rows, 'shadow-seo-table--twitter');
   }
 
@@ -533,7 +592,11 @@
     const t = data.technical;
     const rows = [
       ['HTTPS', t.https ? 'Yes' : 'No', {}],
-      ['Viewport', data.viewport, { mono: true, truncate: 72, emptyLabel: 'Not set' }]
+      [
+        'Viewport',
+        data.viewport,
+        { mono: true, truncate: 72, emptyLabel: 'Not set', locate: 'meta-viewport' }
+      ]
     ];
     return renderFieldTable(rows, 'shadow-seo-table--security');
   }
@@ -568,7 +631,7 @@
                 '">' +
                 escapeHtml(h.tag.toUpperCase()) +
                 '</span></td><td>' +
-                renderCellValue(h.text, { emptyLabel: 'Empty' }) +
+                renderValueCell(h.text, { emptyLabel: 'Empty', locate: 'heading-' + i }) +
                 '</td></tr>'
             )
             .join('') +
@@ -592,7 +655,7 @@
     }
     html +=
       '<table class="shadow-seo-table shadow-seo-table--images">' +
-      '<thead><tr><th>Src</th><th>Alt</th><th>Dims</th></tr></thead><tbody>' +
+      '<thead><tr><th>Src</th><th>Alt</th><th>Dims</th><th class="shadow-seo-cell-actions" aria-hidden="true"></th></tr></thead><tbody>' +
       data.images
         .map(
           (img, i) =>
@@ -607,6 +670,8 @@
               : renderCellValue(img.alt, { truncate: 40 })) +
             '</td><td>' +
             renderCellValue(img.dims, { emptyLabel: 'Not set' }) +
+            '</td><td class="shadow-seo-cell-actions">' +
+            locateBtnHtml('image-' + i) +
             '</td></tr>'
         )
         .join('') +
@@ -628,20 +693,25 @@
     html += '<p class="shadow-seo-subhead">Internal' + (slice.length ? ' (first ' + slice.length + ')' : '') + '</p>';
     if (slice.length) {
       html +=
-        '<ul class="shadow-seo-link-list">' +
+        '<table class="shadow-seo-table shadow-seo-table--links"><tbody>' +
         slice
           .map(
-            (l) =>
-              '<li><a href="' +
+            (l, i) =>
+              '<tr class="shadow-seo-row' +
+              (i % 2 ? ' shadow-seo-row--zebra' : '') +
+              '"><td class="shadow-seo-cell-link">' +
+              '<a href="' +
               escapeHtml(l.href) +
               '" target="_blank" rel="noopener">' +
               escapeHtml(truncate(l.href, 56)) +
               '</a>' +
               (l.text ? ' <span class="shadow-seo-link-text">' + escapeHtml(l.text) + '</span>' : '') +
-              '</li>'
+              '</td><td class="shadow-seo-cell-actions">' +
+              locateBtnHtml('link-int-' + i) +
+              '</td></tr>'
           )
           .join('') +
-        '</ul>';
+        '</tbody></table>';
     } else {
       html += '<p class="shadow-seo-empty-state">' + emptyPill('None') + '</p>';
     }
@@ -649,18 +719,23 @@
     html += '<p class="shadow-seo-subhead">External' + (extSlice.length ? ' (first ' + extSlice.length + ')' : '') + '</p>';
     if (extSlice.length) {
       html +=
-        '<ul class="shadow-seo-link-list">' +
+        '<table class="shadow-seo-table shadow-seo-table--links"><tbody>' +
         extSlice
           .map(
-            (l) =>
-              '<li><a href="' +
+            (l, i) =>
+              '<tr class="shadow-seo-row' +
+              (i % 2 ? ' shadow-seo-row--zebra' : '') +
+              '"><td class="shadow-seo-cell-link">' +
+              '<a href="' +
               escapeHtml(l.href) +
               '" target="_blank" rel="noopener">' +
               escapeHtml(truncate(l.href, 56)) +
-              '</a></li>'
+              '</a></td><td class="shadow-seo-cell-actions">' +
+              locateBtnHtml('link-ext-' + i) +
+              '</td></tr>'
           )
           .join('') +
-        '</ul>';
+        '</tbody></table>';
     } else {
       html += '<p class="shadow-seo-empty-state">' + emptyPill('None') + '</p>';
     }
@@ -672,16 +747,21 @@
       return '<p class="shadow-seo-empty-state">' + emptyPill('None found') + '</p>';
     }
     return data.jsonLd
-      .map(
-        (block) =>
-          '<details class="shadow-seo-jsonld"><summary>Block ' +
+      .map((block, i) => {
+        const locateKey = findJsonLdLocateKey(block) ? 'jsonld-' + i : '';
+        return (
+          '<details class="shadow-seo-jsonld"><summary class="shadow-seo-jsonld-summary">' +
+          '<span>Block ' +
           block.index +
           ' <span class="shadow-seo-jsonld-meta">(' +
           block.raw.length +
-          ' chars)</span></summary><pre class="shadow-seo-pre shadow-seo-pre--json">' +
+          ' chars)</span></span>' +
+          (locateKey ? locateBtnHtml(locateKey) : '') +
+          '</summary><pre class="shadow-seo-pre shadow-seo-pre--json">' +
           highlightJson(block.pretty) +
           '</pre></details>'
-      )
+        );
+      })
       .join('');
   }
 
@@ -779,10 +859,205 @@
     });
   }
 
+  function normalizeUrlForMatch(url) {
+    if (!url) return '';
+    try {
+      const u = new URL(url, location.href);
+      return u.pathname.split('/').pop() || u.href;
+    } catch (e) {
+      return String(url).split('/').pop() || String(url);
+    }
+  }
+
+  function findImageByUrl(url) {
+    if (!url) return null;
+    const target = normalizeUrlForMatch(url);
+    let match = null;
+    document.querySelectorAll('img').forEach((img) => {
+      if (isExcluded(img) || match) return;
+      const src = img.currentSrc || img.src || '';
+      if (!src) return;
+      if (src === url || normalizeUrlForMatch(src) === target || src.includes(target)) {
+        match = img;
+      }
+    });
+    return match;
+  }
+
+  function findHeadingByText(text) {
+    if (!text) return null;
+    const needle = String(text).trim().toLowerCase();
+    if (!needle) return null;
+    let match = null;
+    document.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach((el) => {
+      if (isExcluded(el) || match) return;
+      const hay = (el.innerText || '').trim().toLowerCase();
+      if (hay === needle || hay.includes(needle) || needle.includes(hay)) match = el;
+    });
+    return match;
+  }
+
+  function firstVisibleH1() {
+    const h1 = document.querySelector('h1');
+    return h1 && !isExcluded(h1) ? h1 : null;
+  }
+
+  function metaElement(attr, key) {
+    return document.querySelector('meta[' + attr + '="' + key + '"]');
+  }
+
+  function findJsonLdVisibleTarget(block) {
+    let parsed;
+    try {
+      parsed = JSON.parse(block.raw);
+    } catch (e) {
+      return null;
+    }
+    const items = Array.isArray(parsed) ? parsed : [parsed];
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      if (!item || typeof item !== 'object') continue;
+      const image = item.image;
+      let imageUrl = '';
+      if (typeof image === 'string') imageUrl = image;
+      else if (image && typeof image === 'object') imageUrl = image.url || image['@id'] || '';
+      else if (Array.isArray(image) && image.length) {
+        const first = image[0];
+        imageUrl = typeof first === 'string' ? first : first && first.url ? first.url : '';
+      }
+      if (imageUrl) {
+        const imgEl = findImageByUrl(imageUrl);
+        if (imgEl) return imgEl;
+      }
+      const name = item.name || item.headline;
+      if (name) {
+        const heading = findHeadingByText(name);
+        if (heading) return heading;
+      }
+    }
+    return null;
+  }
+
+  function findJsonLdLocateKey(block) {
+    return findJsonLdVisibleTarget(block) ? 'pending' : '';
+  }
+
+  function resolveLocateTarget(key) {
+    const data = lastAuditData;
+    if (!data || !key) return null;
+
+    if (key === 'meta-title') return firstVisibleH1();
+    if (key === 'meta-description') return metaElement('name', 'description');
+    if (key === 'meta-canonical') return document.querySelector('link[rel="canonical"]');
+    if (key === 'meta-robots') return metaElement('name', 'robots');
+    if (key === 'meta-keywords') return metaElement('name', 'keywords');
+    if (key === 'meta-author') return metaElement('name', 'author');
+    if (key === 'meta-publisher') {
+      return metaElement('name', 'publisher') || metaElement('property', 'article:publisher');
+    }
+    if (key === 'meta-lang') return document.documentElement;
+    if (key === 'meta-viewport') return metaElement('name', 'viewport');
+
+    if (key === 'og-title' || key === 'twitter-title') {
+      return firstVisibleH1() || metaElement('property', 'og:title') || metaElement('name', 'twitter:title');
+    }
+    if (key === 'og-description' || key === 'twitter-description') {
+      return (
+        metaElement('property', 'og:description') || metaElement('name', 'twitter:description')
+      );
+    }
+    if (key === 'og-image') return findImageByUrl(data.og['og:image']) || metaElement('property', 'og:image');
+    if (key === 'twitter-image') {
+      return findImageByUrl(data.twitter['twitter:image']) || metaElement('name', 'twitter:image');
+    }
+    if (key === 'og-type') return metaElement('property', 'og:type');
+    if (key === 'og-locale') return metaElement('property', 'og:locale');
+    if (key === 'og-site_name') return metaElement('property', 'og:site_name');
+    if (key === 'twitter-card') return metaElement('name', 'twitter:card');
+
+    const headingMatch = key.match(/^heading-(\d+)$/);
+    if (headingMatch) {
+      const h = data.headings[parseInt(headingMatch[1], 10)];
+      return h ? h.el : null;
+    }
+
+    const imageMatch = key.match(/^image-(\d+)$/);
+    if (imageMatch) {
+      const img = data.images[parseInt(imageMatch[1], 10)];
+      return img ? img.el : null;
+    }
+
+    const linkIntMatch = key.match(/^link-int-(\d+)$/);
+    if (linkIntMatch) {
+      const link = data.links.internal[parseInt(linkIntMatch[1], 10)];
+      return link ? link.el : null;
+    }
+
+    const linkExtMatch = key.match(/^link-ext-(\d+)$/);
+    if (linkExtMatch) {
+      const link = data.links.external[parseInt(linkExtMatch[1], 10)];
+      return link ? link.el : null;
+    }
+
+    const jsonLdMatch = key.match(/^jsonld-(\d+)$/);
+    if (jsonLdMatch) {
+      const block = data.jsonLd[parseInt(jsonLdMatch[1], 10)];
+      return block ? findJsonLdVisibleTarget(block) : null;
+    }
+
+    return null;
+  }
+
+  function clearLocateHighlight() {
+    if (locateHighlightTimer) {
+      clearTimeout(locateHighlightTimer);
+      locateHighlightTimer = null;
+    }
+    if (locateHighlightEl) {
+      locateHighlightEl.classList.remove('shadow-highlight');
+      locateHighlightEl = null;
+    }
+  }
+
+  function locateOnPage(key) {
+    const el = resolveLocateTarget(key);
+    if (!el || isExcluded(el)) {
+      if (helpers && helpers.toast) helpers.toast('Could not locate this on the page');
+      return false;
+    }
+    clearLocateHighlight();
+    try {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } catch (e) {
+      el.scrollIntoView();
+    }
+    locateHighlightEl = el;
+    locateHighlightEl.classList.add('shadow-highlight');
+    locateHighlightTimer = setTimeout(clearLocateHighlight, 3500);
+    return true;
+  }
+
+  function onLocateClick(event) {
+    const btn = event.target.closest('.shadow-seo-locate-btn');
+    if (!btn) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const key = btn.dataset.locate;
+    if (key) locateOnPage(key);
+  }
+
+  function bindLocateHandlers() {
+    const section = qs('#shadow-seo-section');
+    if (!section || section._locateBound) return;
+    section._locateBound = true;
+    section.addEventListener('click', onLocateClick);
+  }
+
   function renderAudit() {
     const body = qs('#shadow-seo-section');
     if (!body) return;
     const data = auditPage();
+    lastAuditData = data;
     renderTabs();
     body.innerHTML = renderSection(data, activeSection);
     if (highlightOn) applyHighlights(data);
@@ -882,6 +1157,7 @@
   }
 
   function bindSeoControls() {
+    bindLocateHandlers();
     const toggle = qs('#shadow-seo-highlight-toggle');
     if (toggle && !toggle._bound) {
       toggle._bound = true;
@@ -906,6 +1182,7 @@
 
   function shutdown() {
     setHighlight(false);
+    clearLocateHighlight();
     closePanel();
   }
 

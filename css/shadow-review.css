@@ -1536,6 +1536,82 @@ body.shadow-modal-drag-active {
   font-size: 0.75rem;
 }
 
+.shadow-seo-jsonld-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.35rem;
+}
+
+.shadow-seo-value-cell {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 0.35rem;
+  max-width: 100%;
+}
+
+.shadow-seo-value-cell .shadow-seo-value,
+.shadow-seo-value-cell .shadow-seo-value--empty {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.shadow-seo-locate-btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--shadow-text-secondary);
+  cursor: pointer;
+  transition: background var(--shadow-ease), color var(--shadow-ease), transform var(--shadow-ease);
+}
+
+.shadow-seo-locate-btn:hover {
+  background: rgba(232, 97, 46, 0.1);
+  color: var(--shadow-accent);
+}
+
+.shadow-seo-locate-btn:active {
+  transform: scale(0.92);
+}
+
+.shadow-seo-locate-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(232, 97, 46, 0.25);
+}
+
+.shadow-seo-locate-icon {
+  display: block;
+  pointer-events: none;
+}
+
+.shadow-seo-cell-actions {
+  width: 1.75rem;
+  padding-left: 0.15rem !important;
+  padding-right: 0.15rem !important;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.shadow-seo-cell-link {
+  word-break: break-word;
+}
+
+.shadow-seo-table--links .shadow-seo-cell-actions {
+  width: 2rem;
+}
+
+.shadow-seo-jsonld .shadow-seo-locate-btn {
+  flex-shrink: 0;
+}
+
 .shadow-seo-jsonld-meta {
   font-weight: 500;
   color: var(--shadow-text-secondary);

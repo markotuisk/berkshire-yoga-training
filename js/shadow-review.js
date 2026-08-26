@@ -1351,7 +1351,8 @@
         getPerson,
         showExclusive: show,
         showFloating,
-        hideFloating
+        hideFloating,
+        toast
       });
     }
   }
