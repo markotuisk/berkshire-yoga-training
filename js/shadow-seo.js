@@ -18,6 +18,7 @@
     { id: 'headings', label: 'Headings' },
     { id: 'images', label: 'Images' },
     { id: 'links', label: 'Links' },
+    { id: 'linkgraph', label: 'Link graph' },
     { id: 'structured', label: 'Structured data' },
     { id: 'technical', label: 'Technical' }
   ];
@@ -1893,6 +1894,21 @@
     ];
   }
 
+  function renderLinkGraph() {
+    return (
+      '<div class="shadow-seo-groups">' +
+      '<p class="shadow-seo-subhead">Internal link relationships across sitemap pages. Click a node to open that page on shadow. Graph is cached for this session.</p>' +
+      '<div id="shadow-seo-link-graph" class="shadow-graph-panel"></div>' +
+      '</div>'
+    );
+  }
+
+  function mountLinkGraph() {
+    const container = qs('#shadow-seo-link-graph');
+    if (!container || !window.TWAShadowGraph) return;
+    window.TWAShadowGraph.renderGraphPanel(container, location.pathname || '/');
+  }
+
   function renderLinks(data) {
     const links = data.links;
     let html = renderLinkScopeCallout(links) +
@@ -2414,6 +2430,8 @@
         return renderImages(data);
       case 'links':
         return renderLinks(data);
+      case 'linkgraph':
+        return renderLinkGraph();
       case 'keywords':
         return renderKeywords(data);
       case 'structured':
@@ -3315,6 +3333,9 @@
         prefetchSitemapPageCount();
         bindLinkCheckControls();
       }
+      if (activeSection === 'linkgraph') {
+        mountLinkGraph();
+      }
     } catch (err) {
       console.error('[TWAShadowSEO] renderAudit failed', err);
       renderTabs();
@@ -3448,6 +3469,12 @@
     );
   }
 
+  function activateSection(sectionId) {
+    if (!SECTIONS.some((s) => s.id === sectionId)) return;
+    activeSection = sectionId;
+    renderAudit();
+  }
+
   function onTabActive() {
     activeSection = activeSection || 'overview';
     renderAudit();
@@ -3519,6 +3546,7 @@
     close: closePanel,
     refresh: renderAudit,
     onTabActive,
+    activateSection,
     onReviewClosed,
     onToolsClosed,
     onTicketClosed,

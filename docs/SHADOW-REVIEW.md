@@ -27,7 +27,7 @@ Partners do **not** need Cloudflare accounts. Access only needs their emails on 
 2. Choose your name (Katia / Raili / Marko).
 3. **What's new** on login when there are unread partner updates (ticket inbox does not auto-open).
 4. **Review** toolbox FAB (bottom right) opens the unified page review panel with **Summary**, **SEO**, **Design**, and **Pick** tabs.
-5. **Summary** shows page health (SEO score, key counts, links to other tabs). **SEO** and **Design** keep their sidebar audits inside the same panel. **Pick** toggles element selection (or use ⌘/Alt+click).
+5. **Summary** shows page health (SEO score, Search Console and Analytics when configured, link graph preview, key counts, links to other tabs). **SEO** and **Design** keep their sidebar audits inside the same panel. **Pick** toggles element selection (or use ⌘/Alt+click).
 6. **Tickets** in the toolbar opens the ticket inbox.
 7. **Open** tab (default) lists tickets that still need attention; **Closed** holds finished items (Approved, Shipped to live, Won't fix, Duplicate).
 8. Orange **TWA-xxx** markers appear on page elements with open tickets — click to open the thread and jump to the element.
@@ -35,7 +35,7 @@ Partners do **not** need Cloudflare accounts. Access only needs their emails on 
 10. For images or placeholders, the **Storycard** section lets you upload a replacement file (optional).
 11. Add category + comment → ticket created (stored in KV and mirrored to Google Sheets).
 12. Open a ticket to read the thread and add further comments.
-13. **SEO** panel shows overview score, meta, headings, images, links, JSON-LD, and technical checks from the current page DOM. **Links** tab can check broken links on the page or crawl the site from `sitemap.xml`. **Technical** tab reports canonical mismatch, mixed content, DOM size, and load timing. **Structured data** tab validates required schema fields. **Highlight on page** labels headings and marks images missing alt.
+13. **SEO** panel shows overview score, meta, headings, images, links, **Link graph**, JSON-LD, and technical checks from the current page DOM. **Links** tab can check broken links on the page or crawl the site from `sitemap.xml`. **Link graph** maps inbound and outbound internal links across sitemap pages. **Summary** tab shows the same graph as a mini preview plus Search Console and GA4 metrics when configured. **Technical** tab reports canonical mismatch, mixed content, DOM size, and load timing. **Structured data** tab validates required schema fields. **Highlight on page** labels headings and marks images missing alt.
 
 **Open tab** (default inbox + on-page markers): Open, Discussing, Accepted, On shadow, In progress, Ready for review, Blocked.
 
@@ -61,10 +61,12 @@ On next login, partners see a **What's new** popup for any release newer than th
 ```text
 js/shadow-changelog.js   version + release notes
 js/shadow-links.js         link checker (page + sitemap crawl)
+js/shadow-graph.js         site link graph (sitemap crawl + radial SVG)
 js/shadow-seo.js           client-side SEO audit panel
 js/shadow-design.js        fonts, colours, accessibility and design mismatch audit
 js/shadow-review.js        overlay UI
 css/shadow-review.css      overlay styles
+functions/api/insights.js  GSC + GA4 page insights (Workers)
 ```
 
 **Design audit:** Review panel → **Design** tab scans the page for font families, sizes, weights, line heights, colours and accessibility (images, headings, contrast, links, buttons, form fields, landmarks). **Issues** merges design mismatches with accessibility findings. **⋯** row menus offer **Locate on page** and **Request change**, matching the SEO panel.
@@ -220,6 +222,55 @@ Without the secret, tickets still work in KV; Sheets stays empty until the webho
 | POST | `/api/assets` | Upload replacement image to Drive (+ Sheets `asset_upload`) |
 | GET | `/api/audit` | Full JSON export |
 | POST | `/api/audit` | Full replace sync to Sheets |
+| GET | `/api/insights?path=/services/` | Page insights — GSC + GA4 (28 days); link graph stays client-side |
+
+## Google Search Console and GA4 (Page insights)
+
+Page insights on the **Summary** tab call `/api/insights?path=…` via Cloudflare Workers. The **link graph** works without any Google credentials (client-side sitemap crawl only).
+
+### 1. Create a Google Cloud service account
+
+1. Google Cloud Console → **IAM & Admin** → **Service accounts** → **Create**
+2. Grant no project roles required for read-only APIs (API access is via Search Console / GA4 property sharing)
+3. **Keys** → **Add key** → JSON — download the key file (keep private)
+
+### 2. Enable APIs
+
+In the same GCP project, enable:
+
+- **Google Search Console API**
+- **Google Analytics Data API**
+
+### 3. Share properties with the service account email
+
+- **Search Console:** Property → **Settings** → **Users and permissions** → Add the service account email (e.g. `…@….iam.gserviceaccount.com`) as **Full** or **Restricted** with read access
+- **GA4:** Admin → **Property access management** → Add the service account email as **Viewer**
+
+Note the **GSC property URL** format:
+
+- Domain property: `sc-domain:berkshireyogatraining.co.uk`
+- URL-prefix property: `https://berkshireyogatraining.co.uk/`
+
+Note the **GA4 numeric Property ID** (Admin → Property settings).
+
+### 4. Wrangler secrets (berkshire-yoga-training-shadow)
+
+Paste the **entire** JSON key file contents for the service account secret (single-line JSON string):
+
+```bash
+npx wrangler pages secret put GOOGLE_SERVICE_ACCOUNT_JSON --project-name=berkshire-yoga-training-shadow
+# paste full JSON when prompted
+
+npx wrangler pages secret put GSC_SITE_URL --project-name=berkshire-yoga-training-shadow
+# e.g. sc-domain:berkshireyogatraining.co.uk
+
+npx wrangler pages secret put GA4_PROPERTY_ID --project-name=berkshire-yoga-training-shadow
+# e.g. 123456789
+```
+
+Redeploy the `shadow` branch after setting secrets. Without secrets, Summary shows **Not configured** cards and setup hints — no errors.
+
+Response shape when configured: GSC clicks, impressions, CTR, position, top queries, page rank by clicks; GA4 sessions, users, engagement rate, avg engagement time, rank by sessions, vs site averages.
 
 ## Meridian workflow
 

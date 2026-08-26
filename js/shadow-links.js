@@ -423,6 +423,7 @@
     cancelCrawl,
     summariseResults,
     getSitemapPageCount,
+    parseSitemapUrls,
     isCloudflareInfraUrl,
     LINK_TIMEOUT_MS,
     CRAWL_CONCURRENCY

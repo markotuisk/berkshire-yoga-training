@@ -116,6 +116,9 @@
   let pageBadgeNodes = [];
   let badgePositionBound = false;
   let activeReviewTab = 'summary';
+  let insightsCache = null;
+  let insightsFetchPath = '';
+  let insightsLoading = false;
 
   function changelog() {
     return window.TWAShadowChangelog || { version: '0.0.0', releases: [] };
@@ -968,6 +971,282 @@
     return false;
   }
 
+  function formatNumber(n, decimals) {
+    const num = Number(n) || 0;
+    if (decimals != null) return num.toFixed(decimals);
+    return num >= 1000 ? num.toLocaleString('en-GB') : String(Math.round(num));
+  }
+
+  function formatPercent(ratio) {
+    return (Number(ratio) * 100).toFixed(1) + '%';
+  }
+
+  function formatDuration(seconds) {
+    const s = Math.round(Number(seconds) || 0);
+    if (s < 60) return s + 's';
+    const m = Math.floor(s / 60);
+    const rem = s % 60;
+    return m + 'm ' + rem + 's';
+  }
+
+  function comparisonBar(label, pageVal, siteVal, formatter) {
+    const fmt = formatter || formatNumber;
+    const pageNum = Number(pageVal) || 0;
+    const siteNum = Number(siteVal) || 0;
+    const max = Math.max(pageNum, siteNum, 0.0001);
+    const pagePct = Math.round((pageNum / max) * 100);
+    const sitePct = Math.round((siteNum / max) * 100);
+    return (
+      '<div class="shadow-insights-compare-row">' +
+      '<span class="shadow-insights-compare-label">' +
+      escapeHtml(label) +
+      '</span>' +
+      '<div class="shadow-insights-bars">' +
+      '<div class="shadow-insights-bar shadow-insights-bar--page" style="width:' +
+      pagePct +
+      '%" title="This page: ' +
+      escapeHtml(fmt(pageVal)) +
+      '"></div>' +
+      '<div class="shadow-insights-bar shadow-insights-bar--site" style="width:' +
+      sitePct +
+      '%" title="Site average: ' +
+      escapeHtml(fmt(siteVal)) +
+      '"></div>' +
+      '</div>' +
+      '<span class="shadow-insights-compare-values">' +
+      escapeHtml(fmt(pageVal)) +
+      ' vs ' +
+      escapeHtml(fmt(siteVal)) +
+      '</span>' +
+      '</div>'
+    );
+  }
+
+  function renderInsightsCard(title, body, tone) {
+    return (
+      '<section class="shadow-insights-card' +
+      (tone ? ' shadow-insights-card--' + tone : '') +
+      '">' +
+      '<h3 class="shadow-insights-card-title">' +
+      escapeHtml(title) +
+      '</h3>' +
+      body +
+      '</section>'
+    );
+  }
+
+  function renderInsightsConfiguredBlock(data) {
+    const gsc = data.gsc;
+    const ga4 = data.ga4;
+    let html = '<div class="shadow-insights-grid">';
+
+    if (data.configured.gsc && gsc && !gsc.error) {
+      const rankText =
+        gsc.pageRank != null
+          ? 'Page #' + gsc.pageRank + ' of ' + (gsc.totalPagesWithData || gsc.sitePages.length)
+          : 'No ranking data';
+      let siteCtr = gsc.page.ctr;
+      if (gsc.sitePages && gsc.sitePages.length) {
+        let clicks = 0;
+        let impressions = 0;
+        gsc.sitePages.forEach((p) => {
+          clicks += p.clicks || 0;
+          impressions += p.impressions || 0;
+        });
+        siteCtr = impressions ? clicks / impressions : 0;
+      }
+      html += renderInsightsCard(
+        'Search (GSC · 28 days)',
+        '<div class="shadow-seo-stat-grid">' +
+          '<div class="shadow-seo-stat-card"><span class="shadow-seo-stat-value">' +
+          formatNumber(gsc.page.clicks) +
+          '</span><span class="shadow-seo-stat-label">Clicks</span></div>' +
+          '<div class="shadow-seo-stat-card"><span class="shadow-seo-stat-value">' +
+          formatNumber(gsc.page.impressions) +
+          '</span><span class="shadow-seo-stat-label">Impressions</span></div>' +
+          '<div class="shadow-seo-stat-card"><span class="shadow-seo-stat-value">' +
+          formatPercent(gsc.page.ctr) +
+          '</span><span class="shadow-seo-stat-label">CTR</span></div>' +
+          '<div class="shadow-seo-stat-card"><span class="shadow-seo-stat-value">' +
+          formatNumber(gsc.page.position, 1) +
+          '</span><span class="shadow-seo-stat-label">Avg position</span></div>' +
+          '</div>' +
+          comparisonBar('CTR vs site', gsc.page.ctr, siteCtr, formatPercent) +
+          '<p class="shadow-insights-rank">' +
+          escapeHtml(rankText) +
+          ' by clicks</p>',
+        'gsc'
+      );
+    } else if (data.configured.gsc) {
+      html += renderInsightsCard(
+        'Search (GSC)',
+        '<p class="shadow-hint">Could not load Search Console data.</p>',
+        'muted'
+      );
+    } else {
+      html += renderInsightsCard(
+        'Search (GSC)',
+        '<p class="shadow-hint">Not configured. Add Google service account secrets to enable Search Console insights.</p>',
+        'muted'
+      );
+    }
+
+    if (data.configured.ga4 && ga4 && !ga4.error) {
+      const rankText =
+        ga4.pageRank != null
+          ? 'Page #' + ga4.pageRank + ' of ' + ga4.pagesWithData
+          : 'No ranking data';
+      html += renderInsightsCard(
+        'Traffic (GA4 · 28 days)',
+        '<div class="shadow-seo-stat-grid">' +
+          '<div class="shadow-seo-stat-card"><span class="shadow-seo-stat-value">' +
+          formatNumber(ga4.page.sessions) +
+          '</span><span class="shadow-seo-stat-label">Sessions</span></div>' +
+          '<div class="shadow-seo-stat-card"><span class="shadow-seo-stat-value">' +
+          formatNumber(ga4.page.users) +
+          '</span><span class="shadow-seo-stat-label">Users</span></div>' +
+          '<div class="shadow-seo-stat-card"><span class="shadow-seo-stat-value">' +
+          formatPercent(ga4.page.engagementRate) +
+          '</span><span class="shadow-seo-stat-label">Engagement rate</span></div>' +
+          '<div class="shadow-seo-stat-card"><span class="shadow-seo-stat-value">' +
+          formatDuration(ga4.page.avgEngagementTime) +
+          '</span><span class="shadow-seo-stat-label">Avg engagement</span></div>' +
+          '</div>' +
+          comparisonBar('Sessions vs site', ga4.page.sessions, ga4.siteAverage.sessions) +
+          '<p class="shadow-insights-rank">' +
+          escapeHtml(rankText) +
+          ' by sessions</p>',
+        'ga4'
+      );
+    } else if (data.configured.ga4) {
+      html += renderInsightsCard(
+        'Traffic (GA4)',
+        '<p class="shadow-hint">Could not load Analytics data.</p>',
+        'muted'
+      );
+    } else {
+      html += renderInsightsCard(
+        'Traffic (GA4)',
+        '<p class="shadow-hint">Not configured. Add GA4_PROPERTY_ID to enable traffic insights.</p>',
+        'muted'
+      );
+    }
+
+    html += '</div>';
+
+    if (data.configured.gsc && gsc && gsc.queries && gsc.queries.length) {
+      html +=
+        '<section class="shadow-insights-card shadow-insights-card--queries">' +
+        '<h3 class="shadow-insights-card-title">Top queries (GSC)</h3>' +
+        '<div class="shadow-seo-kw-table-wrap"><table class="shadow-seo-kw-table">' +
+        '<thead><tr><th>Query</th><th>Clicks</th><th>Impr.</th><th>Pos.</th></tr></thead><tbody>';
+      gsc.queries.forEach((row) => {
+        html +=
+          '<tr><td>' +
+          escapeHtml(row.query) +
+          '</td><td>' +
+          formatNumber(row.clicks) +
+          '</td><td>' +
+          formatNumber(row.impressions) +
+          '</td><td>' +
+          formatNumber(row.position, 1) +
+          '</td></tr>';
+      });
+      html += '</tbody></table></div></section>';
+    }
+
+    if (data.hints && data.hints.length && (!data.configured.gsc || !data.configured.ga4)) {
+      html +=
+        '<details class="shadow-insights-hints"><summary class="shadow-insights-hints-summary">Setup hints (Marko)</summary><ul class="shadow-insights-hints-list">';
+      data.hints.forEach((hint) => {
+        html += '<li>' + escapeHtml(hint) + '</li>';
+      });
+      html += '</ul></details>';
+    }
+
+    return html;
+  }
+
+  function renderInsightsLoading() {
+    return (
+      '<div class="shadow-insights-loading">' +
+      '<p class="shadow-hint">Loading page insights…</p>' +
+      '<div class="shadow-seo-link-progress-bar" role="progressbar"><span class="shadow-seo-link-progress-fill shadow-seo-link-progress-fill--indeterminate"></span></div>' +
+      '</div>'
+    );
+  }
+
+  function renderLinkGraphSummary() {
+    const graph = window.TWAShadowGraph ? window.TWAShadowGraph.getPageGraph(currentPagePath()) : null;
+    let statsHtml = '';
+    if (graph && graph.ready) {
+      statsHtml = window.TWAShadowGraph.renderGraphStats(graph);
+    }
+    return (
+      renderInsightsCard(
+        'Link graph',
+        statsHtml +
+          '<div id="shadow-review-graph-mini" class="shadow-graph-mini"></div>' +
+          '<button type="button" class="shadow-btn shadow-btn-secondary shadow-insights-graph-open">Open link graph</button>',
+        'graph'
+      )
+    );
+  }
+
+  function mountSummaryGraphMini() {
+    const container = qs('#shadow-review-graph-mini');
+    if (!container || !window.TWAShadowGraph) return;
+    window.TWAShadowGraph.renderMiniPreview(container, currentPagePath());
+  }
+
+  function bindSummaryInsightsControls() {
+    const openGraph = qs('.shadow-insights-graph-open');
+    if (openGraph && !openGraph._bound) {
+      openGraph._bound = true;
+      openGraph.addEventListener('click', () => {
+        switchReviewTab('seo');
+        if (window.TWAShadowSEO && window.TWAShadowSEO.activateSection) {
+          window.TWAShadowSEO.activateSection('linkgraph');
+        }
+      });
+    }
+  }
+
+  async function loadPageInsights(force) {
+    const path = currentPagePath();
+    if (!force && insightsCache && insightsFetchPath === path) {
+      return insightsCache;
+    }
+    if (insightsLoading) return insightsCache;
+    insightsLoading = true;
+    try {
+      const res = await fetch('/api/insights?path=' + encodeURIComponent(path), {
+        credentials: 'same-origin'
+      });
+      const data = await res.json();
+      insightsCache = data;
+      insightsFetchPath = path;
+      return data;
+    } catch (e) {
+      return { ok: false, error: 'Could not reach insights API' };
+    } finally {
+      insightsLoading = false;
+    }
+  }
+
+  function updateInsightsPanel(data) {
+    const panel = qs('#shadow-review-insights');
+    if (!panel) return;
+    if (!data || data.error) {
+      panel.innerHTML =
+        '<p class="shadow-hint">Page insights unavailable. Link graph still works without Google credentials.</p>';
+    } else {
+      panel.innerHTML = renderInsightsConfiguredBlock(data);
+    }
+    mountSummaryGraphMini();
+    bindSummaryInsightsControls();
+  }
+
   function renderReviewSummary() {
     const panel = qs('#shadow-review-panel-summary');
     if (!panel) return;
@@ -986,6 +1265,10 @@
       escapeHtml(path) +
       '</code></p>' +
       seoBlock +
+      '<div id="shadow-review-insights" class="shadow-review-insights">' +
+      renderInsightsLoading() +
+      '</div>' +
+      renderLinkGraphSummary() +
       '<dl class="shadow-review-summary-stats shadow-review-summary-stats--extra">' +
       '<div><dt>Design issues</dt><dd>' +
       escapeHtml(designCount) +
@@ -998,6 +1281,10 @@
       '</div>' +
       '<p class="shadow-hint shadow-review-summary-note">Tickets stay in the bottom toolbar for conversation threads.</p>' +
       '</div>';
+
+    mountSummaryGraphMini();
+    bindSummaryInsightsControls();
+    loadPageInsights(false).then(updateInsightsPanel);
   }
 
   function switchReviewTab(tab) {

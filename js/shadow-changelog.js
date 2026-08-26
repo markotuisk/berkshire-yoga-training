@@ -7,8 +7,22 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.14.0',
+    version: '1.15.0',
     releases: [
+      {
+        version: '1.15.0',
+        date: '2026-08-26',
+        title: 'Page insights — link graph, Search Console and Analytics',
+        user: [
+          'Summary tab now shows Search (GSC) and Traffic (GA4) cards for this page when Google credentials are configured',
+          'Compare this page vs site average with simple bars; top search queries listed when available',
+          'Link graph maps internal links across the site — mini preview on Summary, full radial graph in SEO → Link graph',
+          'Click a graph node to open that page on shadow; orphan pages (no inbound links) are flagged'
+        ],
+        dev: [
+          'js/shadow-graph.js buildSiteGraph + getPageGraph; functions/api/insights.js + google-auth/gsc/ga4 clients; Summary fetch /api/insights; cache-bust via ?v=1.15.0'
+        ]
+      },
       {
         version: '1.14.0',
         date: '2026-08-26',
