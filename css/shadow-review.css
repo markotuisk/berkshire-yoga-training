@@ -23,9 +23,8 @@
   right: 0;
   z-index: 90;
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
   gap: 0.5rem;
   padding: 0.45rem 1rem;
   background: rgba(248, 248, 248, 0.78);
@@ -38,45 +37,6 @@
   box-shadow: var(--shadow-shadow-toolbar);
   border-top: 1px solid var(--shadow-border);
   transition: background var(--shadow-ease);
-}
-
-.shadow-toolbar-start,
-.shadow-toolbar-end {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem;
-  min-width: 0;
-}
-
-.shadow-toolbar-start {
-  flex: 1 1 0;
-  justify-content: flex-start;
-}
-
-.shadow-toolbar-end {
-  flex: 1 1 0;
-  justify-content: flex-end;
-}
-
-.shadow-toolbar-centre {
-  flex: 0 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.shadow-toolbar-tools-btn {
-  min-width: 4.5rem;
-  font-weight: 600;
-  background: var(--shadow-accent);
-  color: #fff;
-  border-color: transparent;
-}
-
-.shadow-toolbar-tools-btn:hover {
-  background: var(--shadow-accent-hover);
-  color: #fff;
 }
 
 .shadow-toolbar-label {

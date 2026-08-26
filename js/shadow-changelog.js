@@ -7,8 +7,17 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.13.0',
+    version: '1.13.1',
     releases: [
+      {
+        version: '1.13.1',
+        date: '2026-08-26',
+        title: 'Tools FAB only',
+        user: ['Remove duplicate Tools button from toolbar'],
+        dev: [
+          'shadow-review.js restore flat toolbar layout; remove centre Tools btn and click handler; cache-bust via ?v=1.13.1'
+        ]
+      },
       {
         version: '1.13.0',
         date: '2026-08-26',

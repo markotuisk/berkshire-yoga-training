@@ -1,6 +1,6 @@
 /**
  * Meridian shadow review overlay — shadow branch only.
- * Tools FAB and toolbar button open the tools hub (Pick, SEO, Design); Tickets toolbar button opens inbox.
+ * Tools FAB opens the tools hub (Pick, SEO, Design); Tickets toolbar button opens inbox.
  */
 (function () {
   'use strict';
@@ -2550,7 +2550,6 @@
     const bar = document.createElement('div');
     bar.className = 'shadow-toolbar';
     bar.innerHTML =
-      '<div class="shadow-toolbar-start">' +
       '<span class="shadow-toolbar-label">Shadow mode</span>' +
       '<span class="shadow-toolbar-version" id="shadow-version-badge" title="Shadow mode version">v' +
       escapeHtml(changelog().version) +
@@ -2563,15 +2562,11 @@
       '<a href="' +
       ASSETS_FOLDER_URL +
       '" class="shadow-btn shadow-btn-small shadow-btn-secondary shadow-toolbar-link" target="_blank" rel="noopener">Open asset folder</a>' +
-      '</div>' +
-      '<div class="shadow-toolbar-centre">' +
-      '<button type="button" id="shadow-toolbar-tools-btn" class="shadow-btn shadow-btn-small shadow-toolbar-tools-btn">Tools</button>' +
-      '</div>' +
-      '<div class="shadow-toolbar-end">' +
+      '<span class="shadow-toolbar-hint">Tools FAB · Tickets in toolbar</span>' +
+      '<span class="shadow-toolbar-spacer"></span>' +
       '<span class="shadow-toolbar-user" id="shadow-toolbar-user" hidden></span>' +
       '<button type="button" id="shadow-switch-user-btn" class="shadow-btn shadow-btn-small shadow-btn-secondary" hidden>Switch user</button>' +
-      '<button type="button" id="shadow-logout-btn" class="shadow-btn shadow-btn-small shadow-btn-secondary" hidden>Log out</button>' +
-      '</div>';
+      '<button type="button" id="shadow-logout-btn" class="shadow-btn shadow-btn-small shadow-btn-secondary" hidden>Log out</button>';
     document.body.appendChild(bar);
     qs('#shadow-whatsnew-btn').addEventListener('click', () => {
       if (!getPerson()) {
@@ -2586,13 +2581,6 @@
         return;
       }
       openInbox();
-    });
-    qs('#shadow-toolbar-tools-btn').addEventListener('click', () => {
-      if (!getPerson()) {
-        show('person');
-        return;
-      }
-      toggleTools();
     });
     qs('#shadow-logout-btn').addEventListener('click', logout);
     qs('#shadow-switch-user-btn').addEventListener('click', switchUser);
