@@ -38,6 +38,7 @@
   box-shadow: var(--shadow-shadow-toolbar);
   border-top: 1px solid var(--shadow-border);
   transition: background var(--shadow-ease);
+  overflow: visible;
 }
 
 .shadow-toolbar-label {
@@ -158,6 +159,10 @@ body.shadow-pick-mode::before {
   }
 }
 
+#shadow-review-root {
+  overflow: visible;
+}
+
 .shadow-tools-wrap {
   position: fixed;
   right: 1.25rem;
@@ -165,6 +170,7 @@ body.shadow-pick-mode::before {
   z-index: 99990;
   width: 3rem;
   height: 3rem;
+  overflow: visible;
 }
 
 .shadow-fab,
@@ -3493,20 +3499,28 @@ body.shadow-seo-image-preview-open {
   width: 100%;
 }
 
-/* Exploding toolbox FAB (v1.16.0) */
-.shadow-tools-categories {
+/* Exploding toolbox FAB — linear column above FAB (v1.18.1) */
+.shadow-tools-stack {
   position: absolute;
-  right: 50%;
-  bottom: 50%;
-  width: 0;
-  height: 0;
+  right: 0;
+  bottom: 100%;
+  margin-bottom: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
   pointer-events: none;
+  overflow: visible;
+}
+
+.shadow-tools-categories {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
 }
 
 .shadow-tools-cat-btn {
-  position: absolute;
-  left: 0;
-  top: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -3524,7 +3538,7 @@ body.shadow-seo-image-preview-open {
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
   pointer-events: none;
   opacity: 0;
-  transform: translate(-50%, -50%) scale(0.4);
+  transform: scale(0.4);
   transition:
     transform 220ms cubic-bezier(0.34, 1.4, 0.64, 1),
     opacity 180ms ease,
@@ -3533,14 +3547,14 @@ body.shadow-seo-image-preview-open {
   transition-delay: 0ms;
 }
 
-.shadow-tools-exploded .shadow-tools-categories {
+.shadow-tools-exploded .shadow-tools-stack {
   pointer-events: auto;
 }
 
 .shadow-tools-exploded .shadow-tools-cat-btn {
   pointer-events: auto;
   opacity: 1;
-  transform: translate(calc(-50% + var(--tools-x, 0)), calc(-50% + var(--tools-y, 0))) scale(1);
+  transform: scale(1);
   transition-delay: var(--tools-delay, 0ms);
 }
 
@@ -3559,6 +3573,7 @@ body.shadow-seo-image-preview-open {
   position: absolute;
   right: 0;
   bottom: calc(100% + 0.75rem);
+  transform: translateX(0);
   width: min(14rem, calc(100vw - 2.5rem));
   max-height: min(18rem, 50vh);
   overflow: hidden;
@@ -4012,26 +4027,6 @@ body.shadow-seo-image-preview-open {
 }
 
 @media (max-width: 767px) {
-  .shadow-tools-cat-btn[data-category="insights"] {
-    --tools-x: 0;
-    --tools-y: -108px;
-  }
-
-  .shadow-tools-cat-btn[data-category="seo"] {
-    --tools-x: 0;
-    --tools-y: -80px;
-  }
-
-  .shadow-tools-cat-btn[data-category="design"] {
-    --tools-x: 0;
-    --tools-y: -52px;
-  }
-
-  .shadow-tools-cat-btn[data-category="pick"] {
-    --tools-x: 0;
-    --tools-y: -24px;
-  }
-
   .shadow-tools-submenu {
     position: fixed;
     left: 0.5rem;
@@ -4053,4 +4048,129 @@ body.shadow-seo-image-preview-open {
     max-width: none;
     bottom: 3.5rem;
   }
+}
+
+/* Environment settings — v1.18.0 */
+.shadow-toolbar-settings {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.shadow-toolbar-settings-icon {
+  flex-shrink: 0;
+}
+
+.shadow-toolbar-settings-label {
+  font-size: 0.6875rem;
+}
+
+.shadow-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.65rem 0.75rem 0.85rem;
+}
+
+.shadow-settings-toolbar {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.shadow-settings-card {
+  border: 1px solid rgba(232, 97, 46, 0.18);
+  border-radius: 12px;
+  padding: 0.75rem 0.85rem;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.shadow-settings-card--muted {
+  border-color: rgba(0, 0, 0, 0.06);
+  background: rgba(248, 248, 250, 0.9);
+}
+
+.shadow-settings-card-title {
+  margin: 0 0 0.55rem;
+  font-family: var(--shadow-font, 'Figtree', system-ui, sans-serif);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--shadow-accent, #e8612e);
+  letter-spacing: 0.01em;
+}
+
+.shadow-settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.35rem;
+}
+
+.shadow-settings-row-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #3a3a3c;
+}
+
+.shadow-settings-meta {
+  margin: 0.35rem 0 0;
+  font-size: 0.6875rem;
+  color: #636366;
+  line-height: 1.45;
+}
+
+.shadow-settings-meta-label {
+  font-weight: 600;
+  color: #48484a;
+  margin-right: 0.35rem;
+}
+
+.shadow-settings-actions {
+  margin-top: 0.65rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.shadow-settings-status-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.14rem 0.5rem;
+  border-radius: var(--shadow-radius-pill, 999px);
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.shadow-settings-status-pill--good {
+  color: #1b7f3a;
+  background: rgba(52, 199, 89, 0.14);
+}
+
+.shadow-settings-status-pill--warn {
+  color: #9a6700;
+  background: rgba(255, 149, 0, 0.14);
+}
+
+.shadow-settings-status-pill--muted {
+  color: #636366;
+  background: rgba(142, 142, 147, 0.16);
+}
+
+.shadow-settings-advanced {
+  margin-top: 0.65rem;
+}
+
+.shadow-settings-advanced-summary {
+  cursor: pointer;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: #636366;
+}
+
+.shadow-activity-card[data-category='settings'] {
+  width: 420px;
+  height: 520px;
 }

@@ -7,8 +7,35 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.17.0',
+    version: '1.18.1',
     releases: [
+      {
+        version: '1.18.1',
+        date: '2026-08-26',
+        title: 'Toolbox fan opens toward page centre',
+        user: [
+          'Category buttons (Insights, SEO, Design, Pick) now fan up and left from the orange toolbox — fully visible inside the page',
+          'Sub-menu panel stays anchored above the toolbox without clipping at the screen edge'
+        ],
+        dev: [
+          'TOOL_CATEGORIES angles 200–305° → 105–165° (quadrant II); TOOLS_MENU_RADIUS 72 → 88',
+          'overflow: visible on #shadow-review-root, .shadow-tools-wrap, .shadow-toolbar; cache-bust via ?v=1.18.1'
+        ]
+      },
+      {
+        version: '1.18.0',
+        date: '2026-08-26',
+        title: 'Environment settings and Google connect',
+        user: [
+          'New Settings button in the toolbar opens environment and connection options',
+          'Connect your Google account for Search Console and Analytics insights — no wrangler secrets needed on your side',
+          'See connection status for Search Console and GA4, plus Shadow version and insights readiness',
+          'Disconnect Google any time from Settings'
+        ],
+        dev: [
+          'OAuth Pages Functions /api/auth/google/*; KV token store; insights prefers OAuth then service account; shadow-settings.js; cache-bust via ?v=1.18.0'
+        ]
+      },
       {
         version: '1.17.0',
         date: '2026-08-26',

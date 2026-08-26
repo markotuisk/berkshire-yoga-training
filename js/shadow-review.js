@@ -63,10 +63,10 @@
   ];
   const INSIGHTS_GROUPS = [{ label: 'Page insights', ids: ['summary', 'gsc', 'ga4', 'linkgraph'] }];
   const TOOL_CATEGORIES = [
-    { id: 'insights', label: 'Insights', angle: 200, icon: 'insights' },
-    { id: 'seo', label: 'SEO', angle: 235, icon: 'seo' },
-    { id: 'design', label: 'Design', angle: 270, icon: 'design' },
-    { id: 'pick', label: 'Pick', angle: 305, icon: 'pick' }
+    { id: 'insights', label: 'Insights', angle: 105, icon: 'insights' },
+    { id: 'seo', label: 'SEO', angle: 125, icon: 'seo' },
+    { id: 'design', label: 'Design', angle: 145, icon: 'design' },
+    { id: 'pick', label: 'Pick', angle: 165, icon: 'pick' }
   ];
   const CATEGORY_ICON_SVG = {
     insights:
@@ -90,7 +90,7 @@
   };
   const ACTIVITY_DEFAULT_SIZE = { width: 400, height: 480 };
   const ACTIVITY_STACK_OFFSET = 24;
-  const TOOLS_MENU_RADIUS = 72;
+  const TOOLS_MENU_RADIUS = 88;
   const DOCK_MAX_PILLS = 5;
   const IDLE_MS = 60 * 60 * 1000;
   const IDLE_CHECK_MS = 60 * 1000;
@@ -1127,7 +1127,7 @@
     } else {
       html += renderInsightsCard(
         'Search (GSC)',
-        '<p class="shadow-hint">Not configured. Add Google service account secrets to enable Search Console insights.</p>',
+        '<p class="shadow-hint">Not configured. Open <strong>Settings</strong> in the toolbar to connect Google, or ask Marko to add service account secrets.</p>',
         'muted'
       );
     }
@@ -1168,7 +1168,7 @@
     } else {
       html += renderInsightsCard(
         'Traffic (GA4)',
-        '<p class="shadow-hint">Not configured. Add GA4_PROPERTY_ID to enable traffic insights.</p>',
+        '<p class="shadow-hint">Not configured. Open <strong>Settings</strong> to connect Google, or ask Marko to set <code>GA4_PROPERTY_ID</code>.</p>',
         'muted'
       );
     }
@@ -1249,6 +1249,22 @@
         openActivityPopup('insights', 'linkgraph');
       });
     }
+  }
+
+  function invalidateInsightsCache() {
+    insightsCache = null;
+    insightsFetchPath = '';
+    if (window.TWAShadowSettings && window.TWAShadowSettings.invalidateCache) {
+      window.TWAShadowSettings.invalidateCache();
+    }
+  }
+
+  function openSettingsPopup() {
+    if (!getPerson()) {
+      show('person');
+      return;
+    }
+    openActivityPopup('settings', 'environment');
   }
 
   async function loadPageInsights(force) {
@@ -1702,6 +1718,9 @@
       return window.TWAShadowDesign.getSections();
     }
     if (category === 'insights') return INSIGHTS_SECTIONS.slice();
+    if (category === 'settings') {
+      return [{ id: 'environment', label: 'Environment' }];
+    }
     if (category === 'pick') {
       return [{ id: 'pick', label: 'Pick element' }];
     }
@@ -1734,6 +1753,7 @@
     if (category === 'seo') return 'SEO · ' + label;
     if (category === 'design') return 'Design · ' + label;
     if (category === 'insights') return 'Insights · ' + label;
+    if (category === 'settings') return 'Settings';
     if (category === 'pick') return 'Pick element';
     return label;
   }
@@ -1916,6 +1936,10 @@
       renderInsightsSectionHtml(sectionId, bodyEl);
       return;
     }
+    if (category === 'settings' && window.TWAShadowSettings && window.TWAShadowSettings.renderActivity) {
+      window.TWAShadowSettings.renderActivity(sectionId, bodyEl);
+      return;
+    }
     if (category === 'pick') {
       renderPickActivityHtml(bodyEl);
     }
@@ -2035,19 +2059,13 @@
     const categoriesEl = qs('#shadow-tools-categories');
     if (!categoriesEl) return;
     categoriesEl.innerHTML = TOOL_CATEGORIES.map((cat, index) => {
-      const rad = (cat.angle * Math.PI) / 180;
-      const x = Math.round(Math.cos(rad) * TOOLS_MENU_RADIUS);
-      const y = Math.round(Math.sin(rad) * -TOOLS_MENU_RADIUS);
+      const delay = (TOOL_CATEGORIES.length - 1 - index) * 45;
       const icon = CATEGORY_ICON_SVG[cat.icon] || '';
       return (
         '<button type="button" class="shadow-tools-cat-btn" data-category="' +
         escapeHtml(cat.id) +
-        '" style="--tools-x:' +
-        x +
-        'px;--tools-y:' +
-        y +
-        'px;--tools-delay:' +
-        index * 45 +
+        '" style="--tools-delay:' +
+        delay +
         'ms" aria-label="' +
         escapeHtml(cat.label) +
         '">' +
@@ -2212,8 +2230,10 @@
     root.id = 'shadow-review-root';
     root.innerHTML = `
       <div id="shadow-tools-wrap" class="shadow-tools-wrap">
-        <div id="shadow-tools-submenu" class="shadow-tools-submenu" hidden></div>
-        <div id="shadow-tools-categories" class="shadow-tools-categories" aria-hidden="true"></div>
+        <div class="shadow-tools-stack">
+          <div id="shadow-tools-submenu" class="shadow-tools-submenu" hidden></div>
+          <div id="shadow-tools-categories" class="shadow-tools-categories" aria-hidden="true"></div>
+        </div>
         <button type="button" id="shadow-fab" class="shadow-fab shadow-tools-fab" title="Review tools" aria-label="Open review tools menu" aria-expanded="false" aria-haspopup="true">${TOOLS_FAB_ICON}</button>
       </div>
       <div id="shadow-activity-layer" class="shadow-activity-layer" aria-live="polite"></div>
@@ -2371,6 +2391,15 @@
         openChangeTicket
       });
     }
+
+    if (window.TWAShadowSettings) {
+      window.TWAShadowSettings.init({
+        escapeHtml,
+        toast,
+        changelog,
+        onInsightsRefresh: invalidateInsightsCache
+      });
+    }
   }
 
   function updateVersionBadge() {
@@ -2399,6 +2428,9 @@
       return;
     }
     const params = new URLSearchParams(location.search);
+    if (window.TWAShadowSettings && window.TWAShadowSettings.consumeOAuthSuccess()) {
+      openSettingsPopup();
+    }
     if (params.get('ticket')) {
       await handleTicketDeepLink();
     }
@@ -3420,6 +3452,9 @@
       '" class="shadow-btn shadow-btn-small shadow-btn-secondary shadow-toolbar-link" target="_blank" rel="noopener">Open asset folder</a>' +
       '<span class="shadow-toolbar-hint">Review button · Tickets in toolbar</span>' +
       '<span class="shadow-toolbar-spacer"></span>' +
+      '<button type="button" id="shadow-settings-btn" class="shadow-btn shadow-btn-small shadow-btn-secondary shadow-toolbar-settings" title="Environment settings" aria-label="Settings">' +
+      '<svg class="shadow-toolbar-settings-icon" width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 10.2a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4z" fill="none" stroke="currentColor" stroke-width="1.25"/><path d="M12.9 9.1l.9.7a.6.6 0 0 1 .1.8l-.8 1.4a.6.6 0 0 1-.7.3l-1-.2a3.4 3.4 0 0 1-.8.5l-.2 1a.6.6 0 0 1-.6.5H7.3a.6.6 0 0 1-.6-.5l-.2-1a3.4 3.4 0 0 1-.8-.5l-1 .2a.6.6 0 0 1-.7-.3l-.8-1.4a.6.6 0 0 1 .1-.8l.9-.7a3.3 3.3 0 0 1 0-1l-.9-.7a.6.6 0 0 1-.1-.8l.8-1.4a.6.6 0 0 1 .7-.3l1 .2c.25-.2.52-.38.8-.5l.2-1a.6.6 0 0 1 .6-.5h1.6a.6.6 0 0 1 .6.5l.2 1c.28.12.55.3.8.5l1-.2a.6.6 0 0 1 .7.3l.8 1.4a.6.6 0 0 1-.1.8l-.9.7c.04.33.04.67 0 1z" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg>' +
+      '<span class="shadow-toolbar-settings-label">Settings</span></button>' +
       '<span class="shadow-toolbar-user" id="shadow-toolbar-user" hidden></span>' +
       '<button type="button" id="shadow-switch-user-btn" class="shadow-btn shadow-btn-small shadow-btn-secondary" hidden>Switch user</button>' +
       '<button type="button" id="shadow-logout-btn" class="shadow-btn shadow-btn-small shadow-btn-secondary" hidden>Log out</button>';
@@ -3438,6 +3473,7 @@
       }
       openInbox();
     });
+    qs('#shadow-settings-btn').addEventListener('click', openSettingsPopup);
     qs('#shadow-logout-btn').addEventListener('click', logout);
     qs('#shadow-switch-user-btn').addEventListener('click', switchUser);
   }
