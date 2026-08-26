@@ -12,12 +12,14 @@
       {
         version: '1.9.1',
         date: '2026-08-26',
-        title: 'Social tab for sharing previews',
+        title: 'Social tab and View SEO fix',
         user: [
+          'View SEO in the Tools modal opens the Page SEO panel again',
           'Open Graph and Twitter are now one Social tab with grouped Open Graph, Twitter / X, and Other social sections',
           'All og:* and twitter:* fields always show with Not set pills when missing; Overview warns on thin social previews'
         ],
         dev: [
+          'Fix shadow-seo.js renderLinks syntax (v1.8.0) and shadow-changelog.js release list syntax (v1.9.0) that blocked TWAShadowSEO',
           'Social tab replaces separate og/twitter sidebar items (12 → 11 nav items); pin:media + LinkedIn guidance row',
           'Overview warns on missing og:title/og:image and twitter:card when Open Graph is thin; cache-bust via ?v=1.9.1'
         ]
