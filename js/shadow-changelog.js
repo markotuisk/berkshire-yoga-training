@@ -7,8 +7,19 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.6.4',
+    version: '1.6.5',
     releases: [
+      {
+        version: '1.6.5',
+        date: '2026-08-26',
+        title: 'SEO row actions menu',
+        user: [
+          'Each SEO field row now has a ⋯ menu with Locate on page and Request change',
+          'Locate keeps the scroll and orange highlight from v1.6.4 when a page element exists',
+          'Request change opens the ticket form pre-filled with the field name, current value, and page URL'
+        ],
+        dev: []
+      },
       {
         version: '1.6.4',
         date: '2026-08-26',

@@ -59,6 +59,7 @@
   let lastAuditData = null;
   let locateHighlightEl = null;
   let locateHighlightTimer = null;
+  let openRowMenu = null;
 
   const META_LOCATE_KEYS = {
     title: 'meta-title',
@@ -515,26 +516,120 @@
     );
   }
 
-  function locateBtnHtml(locateKey) {
-    if (!locateKey) return '';
+  function resolveFieldValue(fieldName, locateKey) {
+    const data = lastAuditData;
+    if (!data) return '';
+
+    if (locateKey) {
+      if (locateKey === 'meta-title') return data.title;
+      if (locateKey === 'meta-description') return data.description;
+      if (locateKey === 'meta-canonical') return data.canonical;
+      if (locateKey === 'meta-robots') return data.robots;
+      if (locateKey === 'meta-keywords') return data.keywords;
+      if (locateKey === 'meta-author') return data.author;
+      if (locateKey === 'meta-publisher') return data.publisher;
+      if (locateKey === 'meta-lang') return data.lang;
+      if (locateKey === 'meta-viewport') return data.viewport;
+      if (locateKey === 'og-title') return data.og['og:title'] || '';
+      if (locateKey === 'og-description') return data.og['og:description'] || '';
+      if (locateKey === 'og-image') return data.og['og:image'] || '';
+      if (locateKey === 'og-type') return data.og['og:type'] || '';
+      if (locateKey === 'og-locale') return data.og['og:locale'] || '';
+      if (locateKey === 'og-site_name') return data.og['og:site_name'] || '';
+      if (locateKey === 'twitter-card') return data.twitter['twitter:card'] || '';
+      if (locateKey === 'twitter-title') return data.twitter['twitter:title'] || '';
+      if (locateKey === 'twitter-description') return data.twitter['twitter:description'] || '';
+      if (locateKey === 'twitter-image') return data.twitter['twitter:image'] || '';
+
+      const headingMatch = locateKey.match(/^heading-(\d+)$/);
+      if (headingMatch) {
+        const h = data.headings[parseInt(headingMatch[1], 10)];
+        return h ? h.text : '';
+      }
+
+      const imageMatch = locateKey.match(/^image-(\d+)$/);
+      if (imageMatch) {
+        const img = data.images[parseInt(imageMatch[1], 10)];
+        return img ? (img.missingAlt ? 'Missing alt' : img.alt || img.src) : '';
+      }
+
+      const linkIntMatch = locateKey.match(/^link-int-(\d+)$/);
+      if (linkIntMatch) {
+        const link = data.links.internal[parseInt(linkIntMatch[1], 10)];
+        return link ? link.href : '';
+      }
+
+      const linkExtMatch = locateKey.match(/^link-ext-(\d+)$/);
+      if (linkExtMatch) {
+        const link = data.links.external[parseInt(linkExtMatch[1], 10)];
+        return link ? link.href : '';
+      }
+
+      const jsonLdMatch = locateKey.match(/^jsonld-(\d+)$/);
+      if (jsonLdMatch) {
+        const block = data.jsonLd[parseInt(jsonLdMatch[1], 10)];
+        return block ? truncate(block.raw, 120) : '';
+      }
+    }
+
+    const staticMap = {
+      Title: data.title,
+      'Meta description': data.description,
+      URL: data.url,
+      Canonical: data.canonical,
+      Robots: data.robots,
+      Keywords: data.keywords,
+      Author: data.author,
+      Publisher: data.publisher,
+      Language: data.lang,
+      'Word count': String(data.technical.wordCount),
+      HTTPS: data.technical.https ? 'Yes' : 'No',
+      Viewport: data.viewport
+    };
+    if (staticMap[fieldName] != null) return staticMap[fieldName];
+    if (fieldName.indexOf('og:') === 0) return data.og[fieldName] || '';
+    if (fieldName.indexOf('twitter:') === 0) return data.twitter[fieldName] || '';
+    return '';
+  }
+
+  function canLocateField(locateKey) {
+    if (!locateKey) return false;
+    return !!resolveLocateTarget(locateKey);
+  }
+
+  function rowMenuHtml(fieldName, locateKey) {
+    const canLocate = canLocateField(locateKey);
     return (
-      '<button type="button" class="shadow-seo-locate-btn" data-locate="' +
-      escapeHtml(locateKey) +
-      '" aria-label="Locate on page" title="Locate on page">' +
-      '<svg class="shadow-seo-locate-icon" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true" focusable="false">' +
-      '<circle cx="6" cy="6" r="2.25" fill="none" stroke="currentColor" stroke-width="1.1"/>' +
-      '<path d="M6 1.25v1.5M6 9.25v1.5M1.25 6h1.5M9.25 6h1.5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>' +
-      '</button>'
+      '<span class="shadow-seo-row-menu">' +
+      '<button type="button" class="shadow-seo-row-menu-btn" aria-haspopup="menu" aria-expanded="false" ' +
+      'aria-label="Actions for ' +
+      escapeHtml(fieldName) +
+      '" data-field-name="' +
+      escapeHtml(fieldName) +
+      '" data-locate="' +
+      escapeHtml(locateKey || '') +
+      '">' +
+      '<span class="shadow-seo-row-menu-dots" aria-hidden="true">⋯</span>' +
+      '</button>' +
+      '<div class="shadow-seo-row-menu-popover" role="menu" hidden>' +
+      (canLocate
+        ? '<button type="button" class="shadow-seo-row-menu-item" role="menuitem" data-action="locate">Locate on page</button>'
+        : '') +
+      '<button type="button" class="shadow-seo-row-menu-item" role="menuitem" data-action="change">Request change</button>' +
+      '</div></span>'
     );
   }
 
   function renderValueCell(val, opts) {
     opts = opts || {};
-    const locateKey = opts.locate;
+    const fieldName = opts.fieldName || '';
+    const locateKey = opts.locate || '';
     const valueHtml = renderCellValue(val, opts);
-    if (!locateKey) return valueHtml;
     return (
-      '<span class="shadow-seo-value-cell">' + valueHtml + locateBtnHtml(locateKey) + '</span>'
+      '<span class="shadow-seo-value-cell">' +
+      valueHtml +
+      rowMenuHtml(fieldName, locateKey) +
+      '</span>'
     );
   }
 
@@ -551,7 +646,7 @@
             '"><th scope="row">' +
             escapeHtml(r[0]) +
             '</th><td>' +
-            renderValueCell(r[1], r[2] || {}) +
+            renderValueCell(r[1], Object.assign({}, r[2] || {}, { fieldName: r[0] })) +
             '</td></tr>'
         )
         .join('') +
@@ -631,7 +726,11 @@
                 '">' +
                 escapeHtml(h.tag.toUpperCase()) +
                 '</span></td><td>' +
-                renderValueCell(h.text, { emptyLabel: 'Empty', locate: 'heading-' + i }) +
+                renderValueCell(h.text, {
+                  emptyLabel: 'Empty',
+                  locate: 'heading-' + i,
+                  fieldName: h.tag.toUpperCase() + ' heading'
+                }) +
                 '</td></tr>'
             )
             .join('') +
@@ -671,7 +770,7 @@
             '</td><td>' +
             renderCellValue(img.dims, { emptyLabel: 'Not set' }) +
             '</td><td class="shadow-seo-cell-actions">' +
-            locateBtnHtml('image-' + i) +
+            rowMenuHtml(img.missingAlt ? 'Image alt' : 'Image', 'image-' + i) +
             '</td></tr>'
         )
         .join('') +
@@ -707,7 +806,7 @@
               '</a>' +
               (l.text ? ' <span class="shadow-seo-link-text">' + escapeHtml(l.text) + '</span>' : '') +
               '</td><td class="shadow-seo-cell-actions">' +
-              locateBtnHtml('link-int-' + i) +
+              rowMenuHtml('Internal link', 'link-int-' + i) +
               '</td></tr>'
           )
           .join('') +
@@ -731,7 +830,7 @@
               '" target="_blank" rel="noopener">' +
               escapeHtml(truncate(l.href, 56)) +
               '</a></td><td class="shadow-seo-cell-actions">' +
-              locateBtnHtml('link-ext-' + i) +
+              rowMenuHtml('External link', 'link-ext-' + i) +
               '</td></tr>'
           )
           .join('') +
@@ -756,7 +855,7 @@
           ' <span class="shadow-seo-jsonld-meta">(' +
           block.raw.length +
           ' chars)</span></span>' +
-          (locateKey ? locateBtnHtml(locateKey) : '') +
+          rowMenuHtml('Structured data block ' + block.index, locateKey) +
           '</summary><pre class="shadow-seo-pre shadow-seo-pre--json">' +
           highlightJson(block.pretty) +
           '</pre></details>'
@@ -1037,20 +1136,116 @@
     return true;
   }
 
-  function onLocateClick(event) {
-    const btn = event.target.closest('.shadow-seo-locate-btn');
-    if (!btn) return;
-    event.preventDefault();
-    event.stopPropagation();
-    const key = btn.dataset.locate;
-    if (key) locateOnPage(key);
+  function closeRowMenu(menu) {
+    if (!menu) return;
+    const btn = menu.querySelector('.shadow-seo-row-menu-btn');
+    const popover = menu.querySelector('.shadow-seo-row-menu-popover');
+    if (btn) btn.setAttribute('aria-expanded', 'false');
+    if (popover) popover.hidden = true;
+    if (openRowMenu === menu) openRowMenu = null;
   }
 
-  function bindLocateHandlers() {
+  function closeAllRowMenus() {
+    document.querySelectorAll('.shadow-seo-row-menu').forEach((menu) => closeRowMenu(menu));
+  }
+
+  function openRowMenuPopover(menu) {
+    if (!menu) return;
+    closeAllRowMenus();
+    const btn = menu.querySelector('.shadow-seo-row-menu-btn');
+    const popover = menu.querySelector('.shadow-seo-row-menu-popover');
+    if (!btn || !popover) return;
+    btn.setAttribute('aria-expanded', 'true');
+    popover.hidden = false;
+    openRowMenu = menu;
+    const firstItem = popover.querySelector('.shadow-seo-row-menu-item');
+    if (firstItem) firstItem.focus();
+  }
+
+  function requestSeoChange(fieldName, locateKey) {
+    if (!helpers || !helpers.getPerson || !helpers.getPerson()) {
+      if (helpers && helpers.showExclusive) helpers.showExclusive('person');
+      return;
+    }
+    if (!helpers.openChangeTicket) {
+      if (helpers && helpers.toast) helpers.toast('Ticket form unavailable');
+      return;
+    }
+    const fieldValue = resolveFieldValue(fieldName, locateKey);
+    const element = locateKey ? resolveLocateTarget(locateKey) : null;
+    helpers.openChangeTicket({
+      fieldName,
+      fieldValue,
+      element,
+      locateKey
+    });
+  }
+
+  function onRowMenuClick(event) {
+    const menuBtn = event.target.closest('.shadow-seo-row-menu-btn');
+    if (menuBtn) {
+      event.preventDefault();
+      event.stopPropagation();
+      const menu = menuBtn.closest('.shadow-seo-row-menu');
+      const popover = menu && menu.querySelector('.shadow-seo-row-menu-popover');
+      if (popover && popover.hidden) openRowMenuPopover(menu);
+      else closeRowMenu(menu);
+      return;
+    }
+
+    const item = event.target.closest('.shadow-seo-row-menu-item');
+    if (!item) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const menu = item.closest('.shadow-seo-row-menu');
+    const menuBtnEl = menu && menu.querySelector('.shadow-seo-row-menu-btn');
+    const fieldName = menuBtnEl ? menuBtnEl.dataset.fieldName : '';
+    const locateKey = menuBtnEl ? menuBtnEl.dataset.locate : '';
+    const action = item.dataset.action;
+    closeRowMenu(menu);
+
+    if (action === 'locate' && locateKey) locateOnPage(locateKey);
+    else if (action === 'change') requestSeoChange(fieldName, locateKey);
+  }
+
+  function onRowMenuKeydown(event) {
+    const menu = event.target.closest('.shadow-seo-row-menu');
+    if (!menu) return;
+
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      closeRowMenu(menu);
+      const btn = menu.querySelector('.shadow-seo-row-menu-btn');
+      if (btn) btn.focus();
+      return;
+    }
+
+    const item = event.target.closest('.shadow-seo-row-menu-item');
+    if (!item || (event.key !== 'ArrowDown' && event.key !== 'ArrowUp')) return;
+    event.preventDefault();
+    const items = [...menu.querySelectorAll('.shadow-seo-row-menu-item')];
+    const idx = items.indexOf(item);
+    if (idx < 0) return;
+    const next = event.key === 'ArrowDown' ? items[idx + 1] : items[idx - 1];
+    if (next) next.focus();
+  }
+
+  function onDocumentPointerDown(event) {
+    if (!openRowMenu) return;
+    if (event.target.closest('.shadow-seo-row-menu') === openRowMenu) return;
+    closeAllRowMenus();
+  }
+
+  function bindRowMenuHandlers() {
     const section = qs('#shadow-seo-section');
-    if (!section || section._locateBound) return;
-    section._locateBound = true;
-    section.addEventListener('click', onLocateClick);
+    if (!section || section._rowMenuBound) return;
+    section._rowMenuBound = true;
+    section.addEventListener('click', onRowMenuClick);
+    section.addEventListener('keydown', onRowMenuKeydown);
+    if (!bindRowMenuHandlers._docBound) {
+      bindRowMenuHandlers._docBound = true;
+      document.addEventListener('pointerdown', onDocumentPointerDown, true);
+    }
   }
 
   function renderAudit() {
@@ -1061,6 +1256,7 @@
     renderTabs();
     body.innerHTML = renderSection(data, activeSection);
     if (highlightOn) applyHighlights(data);
+    closeAllRowMenus();
   }
 
   function ensureOverlayLayer() {
@@ -1157,7 +1353,7 @@
   }
 
   function bindSeoControls() {
-    bindLocateHandlers();
+    bindRowMenuHandlers();
     const toggle = qs('#shadow-seo-highlight-toggle');
     if (toggle && !toggle._bound) {
       toggle._bound = true;
@@ -1183,6 +1379,7 @@
   function shutdown() {
     setHighlight(false);
     clearLocateHighlight();
+    closeAllRowMenus();
     closePanel();
   }
 

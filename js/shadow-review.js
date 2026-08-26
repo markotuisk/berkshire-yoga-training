@@ -102,6 +102,7 @@
 
   let ticketsCache = [];
   let activeEl = null;
+  let seoTicketDraft = null;
   let highlightEl = null;
   let pickHoverEl = null;
   let pickHoverBound = false;
@@ -1352,7 +1353,8 @@
         showExclusive: show,
         showFloating,
         hideFloating,
-        toast
+        toast,
+        openChangeTicket
       });
     }
   }
@@ -1507,6 +1509,10 @@
     }
     const el = qs('#' + MODAL_MAP[which]);
     if (el) el.hidden = true;
+    if (which === 'new') {
+      seoTicketDraft = null;
+      clearHighlight();
+    }
     if (which === 'detail') clearHighlight();
   }
 
@@ -2084,12 +2090,110 @@
     }
   }
 
+  function seoChangeTitle(fieldName, fieldValue) {
+    const empty =
+      fieldValue == null ||
+      !String(fieldValue).trim() ||
+      fieldValue === 'Missing' ||
+      fieldValue === 'Not set';
+    const lower = String(fieldName || 'SEO field').toLowerCase();
+    if (empty) {
+      if (lower.includes('alt')) return 'Fix missing alt on image';
+      if (lower.includes('description')) return 'Add ' + lower;
+      if (lower.includes('canonical')) return 'Set canonical URL';
+      return 'Add ' + lower;
+    }
+    return 'Update ' + lower;
+  }
+
+  function seoChangeSummaryBody(fieldName, fieldValue, pagePath, pageUrl) {
+    const displayValue =
+      fieldValue == null || !String(fieldValue).trim() ? '(not set)' : String(fieldValue);
+    return (
+      'Field: ' +
+      fieldName +
+      '\nCurrent value: ' +
+      displayValue +
+      '\n\nPage: ' +
+      pagePath +
+      '\nURL: ' +
+      pageUrl +
+      '\n\nDescribe the change needed:'
+    );
+  }
+
+  function openChangeTicket(opts) {
+    opts = opts || {};
+    const person = getPerson();
+    if (!person) {
+      show('person');
+      return;
+    }
+
+    clearPickHover();
+    document.body.classList.remove('shadow-pick-mode');
+    updatePickToggleLabel(false);
+    if (highlightEl) {
+      highlightEl.classList.remove('shadow-highlight');
+      highlightEl = null;
+    }
+
+    const fieldName = opts.fieldName || 'SEO field';
+    const fieldValue = opts.fieldValue != null ? String(opts.fieldValue) : '';
+    activeEl = opts.element || null;
+
+    let meta;
+    if (activeEl) {
+      meta = elementMeta(activeEl);
+      meta = {
+        type: meta.type,
+        label: fieldName + ' · ' + (meta.label || meta.selector),
+        selector: meta.selector,
+        snippet: fieldValue.trim() || meta.snippet
+      };
+    } else {
+      meta = {
+        type: 'text',
+        label: fieldName + ' (SEO)',
+        selector: '',
+        snippet: fieldValue.trim().slice(0, 120)
+      };
+    }
+    seoTicketDraft = { meta };
+
+    const form = qs('#shadow-new-form');
+    if (form) {
+      form.reset();
+      const category = form.querySelector('select[name="category"]');
+      if (category) category.value = 'Change';
+      const summary = form.querySelector('textarea[name="summary"]');
+      if (summary) {
+        summary.value =
+          seoChangeTitle(fieldName, fieldValue) +
+          '\n\n' +
+          seoChangeSummaryBody(fieldName, fieldValue, location.pathname, location.href);
+      }
+    }
+
+    const target = qs('#shadow-new-target');
+    if (target) target.textContent = 'SEO: ' + fieldName;
+    updateStorycard(activeEl, meta);
+    show('new');
+  }
+
   async function onCreateTicket(event) {
     event.preventDefault();
     const person = getPerson();
-    if (!person || !activeEl) return;
+    if (!person) return;
     const form = event.target;
-    const meta = elementMeta(activeEl);
+    let meta;
+    if (seoTicketDraft && seoTicketDraft.meta) {
+      meta = seoTicketDraft.meta;
+    } else if (activeEl) {
+      meta = elementMeta(activeEl);
+    } else {
+      return;
+    }
     const fileInput = form.querySelector('input[name="asset"]');
     const file = fileInput && fileInput.files && fileInput.files[0] ? fileInput.files[0] : null;
 
@@ -2144,6 +2248,7 @@
       }
 
       hide('new');
+      seoTicketDraft = null;
       clearHighlight();
       toast(toastMsg);
       form.reset();
