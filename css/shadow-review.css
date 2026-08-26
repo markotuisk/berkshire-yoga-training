@@ -1372,6 +1372,64 @@ body.shadow-modal-drag-active {
   background: rgba(255, 59, 48, 0.05);
 }
 
+.shadow-seo-field-row--info {
+  grid-template-columns: 34% minmax(0, 1fr);
+}
+
+.shadow-seo-info-text {
+  font-size: 0.8125rem;
+  color: #8e8e93;
+  font-style: italic;
+}
+
+.shadow-seo-field-row--google {
+  align-items: start;
+}
+
+.shadow-seo-field-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.shadow-seo-google-hint {
+  margin: 0;
+  font-size: 0.6875rem;
+  line-height: 1.35;
+  color: #8e8e93;
+}
+
+.shadow-seo-status-pill {
+  display: inline-block;
+  padding: 0.1rem 0.4rem;
+  border-radius: var(--shadow-radius-pill);
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.3;
+}
+
+.shadow-seo-status-pill--found {
+  color: #248a3d;
+  background: rgba(52, 199, 89, 0.12);
+}
+
+.shadow-seo-status-pill--might-relevant {
+  color: #b25000;
+  background: rgba(255, 149, 0, 0.12);
+}
+
+.shadow-seo-status-pill--might-add,
+.shadow-seo-status-pill--not-set {
+  color: #8e8e93;
+  background: rgba(142, 142, 147, 0.12);
+}
+
+.shadow-seo-value--found {
+  color: #248a3d;
+  font-weight: 600;
+}
+
 .shadow-seo-field-label {
   font-size: 0.9375rem;
   font-weight: 500;
@@ -1434,6 +1492,74 @@ body.shadow-modal-drag-active {
 
 .shadow-seo-field-row--badge {
   grid-template-columns: minmax(0, 1fr) 32px;
+}
+
+.shadow-seo-field-row--google {
+  align-items: flex-start;
+}
+
+.shadow-seo-field-row--google .shadow-seo-field-actions {
+  padding-top: 0.15rem;
+}
+
+.shadow-seo-field-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.shadow-seo-field-primary {
+  min-width: 0;
+}
+
+.shadow-seo-field-primary .shadow-seo-value,
+.shadow-seo-field-primary .shadow-seo-value--empty {
+  white-space: normal;
+}
+
+.shadow-seo-google-hint {
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  color: #86868b;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.shadow-seo-status-pill {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  padding: 0.12rem 0.45rem;
+  border-radius: var(--shadow-radius-pill);
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+}
+
+.shadow-seo-status-pill--found {
+  color: #1b7f3a;
+  background: rgba(52, 199, 89, 0.14);
+}
+
+.shadow-seo-status-pill--might-relevant {
+  color: #9a6700;
+  background: rgba(255, 149, 0, 0.14);
+}
+
+.shadow-seo-status-pill--might-add {
+  color: #4a5568;
+  background: rgba(142, 142, 147, 0.16);
+}
+
+.shadow-seo-status-pill--not-set {
+  color: #9a6700;
+  background: transparent;
+  border: 1px dashed rgba(255, 149, 0, 0.55);
 }
 
 .shadow-seo-kw-badge {

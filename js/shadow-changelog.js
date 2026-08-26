@@ -7,8 +7,36 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.9.0',
+    version: '1.9.2',
     releases: [
+      {
+        version: '1.9.2',
+        date: '2026-08-26',
+        title: 'Google guidance on SEO fields',
+        user: [
+          'View SEO fields now include a short note on what Google looks for and why it matters',
+          'Status pills show Found, Might be relevant, Might be added, or Not set — based on this page URL depth',
+          'Structured data tab splits breadcrumbs into JSON-LD and visible navigation rows with Google guidance',
+          'Meta, International, Headings, and Images tabs highlight key Google fields (title, description, canonical, hreflang, H1, alt text)'
+        ],
+        dev: [
+          'GOOGLE_FIELD_HINTS metadata with page-depth relevance logic; Social sidebar tab; cache-bust via ?v=1.9.2'
+        ]
+      },
+      {
+        version: '1.9.1',
+        date: '2026-08-26',
+        title: 'Social tab and View SEO fix',
+        user: [
+          'Open Graph and Twitter are now one Social tab with grouped Open Graph, Twitter / X, and Other social sections',
+          'View SEO in the Tools modal opens the Page SEO panel again'
+        ],
+        dev: [
+          'Social tab replaces separate og/twitter sidebar items (11 nav items); pin:media + LinkedIn guidance row',
+          'Overview warns on missing og:title/og:image and thin OG without twitter:card',
+          'Fix syntax error in shadow-seo.js renderLinks; cache-bust via ?v=1.9.1'
+        ]
+      },
       {
         version: '1.9.0',
         date: '2026-08-26',
@@ -26,6 +54,8 @@
           'Structured data @type mapping with SearchAction check for WebSite; cache-bust via ?v=1.9.0'
         ]
       },
+      {
+        version: '1.8.0',
         date: '2026-08-26',
         title: 'Page SEO visual redesign',
         user: [

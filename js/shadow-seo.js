@@ -1229,6 +1229,8 @@
       if (key === 'wordCount') value = String(data.technical.wordCount);
       const rowOpts = Object.assign({}, opts);
       if (META_LOCATE_KEYS[key]) rowOpts.locate = META_LOCATE_KEYS[key];
+      const hintId = META_GOOGLE_HINT_IDS[key];
+      if (hintId) return applyGoogleGuidance(label, value, hintId, rowOpts);
       return [label, value, rowOpts];
     });
     return renderFieldTable(rows, 'Document meta');
@@ -1276,7 +1278,22 @@
           { mono: true, truncate: 56, locate: 'hreflang-' + i, fieldName: 'hreflang: ' + h.hreflang }
         ])
       : [];
+    const hreflangSummary = data.hreflang.length
+      ? data.hreflang.length + ' alternate(s)'
+      : '';
     const rows = [
+      applyGoogleGuidance(
+        'hreflang alternates',
+        hreflangSummary,
+        'hreflang',
+        { emptyLabel: 'Not set' },
+        data.hreflang.length > 0
+      ),
+      [
+        'HTML lang',
+        data.lang,
+        { emptyLabel: 'Not set', locate: 'meta-lang' }
+      ],
       [
         'x-default hreflang',
         data.xDefault ? data.xDefault.href : '',
@@ -1292,13 +1309,6 @@
     html += renderFieldGroup('Locale signals', renderFieldRows(rows));
     if (hreflangRows.length) {
       html += renderFieldGroup('hreflang alternates', renderFieldRows(hreflangRows));
-    } else {
-      html +=
-        renderFieldGroup(
-          'hreflang alternates',
-          '<p class="shadow-seo-empty-state">' + emptyPill('None') + '</p>',
-          { plain: true }
-        );
     }
     html += '</div>';
     return html;
@@ -1380,7 +1390,20 @@
     const total = data.images.length;
     const missingAltCount = data.images.filter((img) => img.missingAlt).length;
     const decorativeCount = data.images.filter((img) => img.decorative).length;
+    const altSummary =
+      total === 0
+        ? 'No images on page'
+        : missingAltCount === 0
+          ? total + ' image(s) — all have alt attributes'
+          : missingAltCount + ' of ' + total + ' missing alt attribute';
     let html =
+      '<div class="shadow-seo-groups">' +
+      renderFieldGroup(
+        'Google guidance',
+        renderFieldRows([
+          applyGoogleGuidance('Image alt text', altSummary, 'image-alt', {}, total > 0 && missingAltCount === 0)
+        ])
+      ) +
       '<p class="shadow-seo-counts">Total: ' +
       total +
       ' · Missing alt: ' +
@@ -1388,7 +1411,7 @@
       (decorativeCount ? ' · Decorative (empty alt): ' + decorativeCount : '') +
       '</p>';
     if (!total) {
-      html += '<p class="shadow-seo-empty-state">' + emptyPill('No images') + '</p>';
+      html += '<p class="shadow-seo-empty-state">' + emptyPill('No images') + '</p></div>';
       return html;
     }
     const rows = data.images.map((img, i) => {
@@ -1491,10 +1514,44 @@
     return html;
   }
 
-  function renderStructuredTypeRow(entry) {
-    if (!entry.found) {
-      return renderFieldRow(entry.label, '', { emptyLabel: 'Not set', fieldName: entry.label });
+  function renderStructuredTypeRow(entry, data) {
+    const hintId = entry.id === 'breadcrumb' ? 'breadcrumb-list' : entry.id;
+
+    if (entry.id === 'breadcrumb') {
+      const jsonFound = entry.found;
+      const visible = data.visibleBreadcrumbs;
+      const jsonRow = applyGoogleGuidance(
+        GOOGLE_FIELD_HINTS['breadcrumb-list'].label,
+        jsonFound ? 'Found' : '',
+        'breadcrumb-list',
+        { emptyLabel: 'Not set', fieldName: 'BreadcrumbList (JSON-LD)' },
+        jsonFound
+      );
+      const visRow = applyGoogleGuidance(
+        GOOGLE_FIELD_HINTS['visible-breadcrumbs'].label,
+        visible.summary || '',
+        'visible-breadcrumbs',
+        {
+          emptyLabel: 'Not set',
+          fieldName: 'Visible breadcrumbs',
+          locate: visible.el ? 'visible-breadcrumbs' : ''
+        },
+        visible.found
+      );
+      return renderFieldRow(jsonRow[0], jsonRow[1], jsonRow[2]) + renderFieldRow(visRow[0], visRow[1], visRow[2]);
     }
+
+    if (!entry.found) {
+      const row = applyGoogleGuidance(
+        entry.label,
+        '',
+        hintId,
+        { emptyLabel: 'Not set', fieldName: entry.label, locate: 'structured-' + entry.id },
+        false
+      );
+      return renderFieldRow(row[0], row[1], row[2]);
+    }
+
     const firstMatch = entry.matches[0];
     let pretty = '';
     try {
@@ -1509,15 +1566,21 @@
       '<pre class="shadow-seo-pre shadow-seo-pre--json">' +
       highlightJson(pretty) +
       '</pre></details>';
-    return renderFieldRow(entry.label, value, {
-      fieldName: entry.label,
-      raw: true,
-      locate: 'structured-' + entry.id
-    });
+    const row = applyGoogleGuidance(
+      entry.label,
+      'Found',
+      hintId,
+      { fieldName: entry.label, raw: true, locate: 'structured-' + entry.id },
+      true
+    );
+    row[1] = value;
+    return renderFieldRow(row[0], row[1], row[2]);
   }
 
   function renderStructured(data) {
-    const templateRows = data.structured.template.map((entry) => renderStructuredTypeRow(entry)).join('');
+    const templateRows = data.structured.template
+      .map((entry) => renderStructuredTypeRow(entry, data))
+      .join('');
     let html =
       '<div class="shadow-seo-groups">' +
       renderFieldGroup('Google rich result types', templateRows);
@@ -2073,6 +2136,33 @@
     if (jsonLdMatch) {
       const block = data.jsonLd[parseInt(jsonLdMatch[1], 10)];
       return block ? findJsonLdVisibleTarget(block) : null;
+    }
+
+    if (key === 'visible-breadcrumbs' && data.visibleBreadcrumbs && data.visibleBreadcrumbs.el) {
+      return data.visibleBreadcrumbs.el;
+    }
+
+    const structuredMatch = key.match(/^structured-([a-z-]+)$/);
+    if (structuredMatch) {
+      const typeId = structuredMatch[1];
+      if (typeId === 'breadcrumb') {
+        const block = data.jsonLd.find((b) => {
+          try {
+            const parsed = JSON.parse(b.raw);
+            return flattenJsonLdItems(parsed).some((item) =>
+              itemTypes(item).includes('BreadcrumbList')
+            );
+          } catch (e) {
+            return false;
+          }
+        });
+        if (block) {
+          const scripts = [...document.querySelectorAll('script[type="application/ld+json"]')];
+          const idx = data.jsonLd.indexOf(block);
+          return scripts[idx] && !isExcluded(scripts[idx]) ? scripts[idx] : null;
+        }
+      }
+      if (data.visibleBreadcrumbs && data.visibleBreadcrumbs.el) return data.visibleBreadcrumbs.el;
     }
 
     return null;
