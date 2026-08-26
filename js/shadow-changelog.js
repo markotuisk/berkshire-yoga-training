@@ -7,8 +7,20 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.9.5',
+    version: '1.9.6',
     releases: [
+      {
+        version: '1.9.6',
+        date: '2026-08-26',
+        title: 'SEO image Preview opens reliably',
+        user: [
+          'Preview under ⋯ on image rows now opens the popup every time',
+          'Preview appears above the SEO panel so it is not hidden behind it'
+        ],
+        dev: [
+          'Portal menu click delegation; block document pointerdown dismiss on portaled menu items; preview z-index 100020; previewAttrFrom + try/catch in openImagePreview; cache-bust via ?v=1.9.6'
+        ]
+      },
       {
         version: '1.9.5',
         date: '2026-08-26',

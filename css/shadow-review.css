@@ -2106,7 +2106,7 @@ body.shadow-modal-drag-active {
 .shadow-seo-image-preview {
   position: fixed;
   inset: 0;
-  z-index: 100010;
+  z-index: 100020;
   display: flex;
   align-items: center;
   justify-content: center;
