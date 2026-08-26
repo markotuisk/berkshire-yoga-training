@@ -1151,7 +1151,13 @@
       '</button>' +
       '<div class="shadow-seo-row-menu-popover" role="menu" hidden>' +
       (showPreview
-        ? '<button type="button" class="shadow-seo-row-menu-item" role="menuitem" data-action="preview">Preview</button>'
+        ? '<button type="button" class="shadow-seo-row-menu-item" role="menuitem" data-action="preview" data-preview-src="' +
+          escapeHtml(menuOpts.previewSrc) +
+          '" data-preview-alt="' +
+          escapeHtml(menuOpts.previewAlt || '') +
+          '" data-preview-dims="' +
+          escapeHtml(menuOpts.previewDims || '') +
+          '">Preview</button>'
         : '') +
       (canLocate
         ? '<button type="button" class="shadow-seo-row-menu-item" role="menuitem" data-action="locate">Locate on page</button>'
@@ -2520,13 +2526,19 @@
     const locateKey = menuBtnEl ? menuBtnEl.dataset.locate : '';
     const action = item.dataset.action;
     if (action === 'preview') {
-      const previewSrc = menuBtnEl ? menuBtnEl.dataset.previewSrc : '';
+      const previewSrc =
+        item.dataset.previewSrc || (menuBtnEl && menuBtnEl.dataset.previewSrc) || '';
+      const previewAlt =
+        item.dataset.previewAlt || (menuBtnEl && menuBtnEl.dataset.previewAlt) || '';
+      const previewDims =
+        item.dataset.previewDims || (menuBtnEl && menuBtnEl.dataset.previewDims) || '';
       if (previewSrc) {
         setActiveRow(locateKey);
         closeRowMenu(menu, { keepActiveRow: true });
-        openImagePreview(previewSrc, menuBtnEl.dataset.previewAlt || '', menuBtnEl.dataset.previewDims || '');
+        openImagePreview(previewSrc, previewAlt, previewDims);
       } else {
         closeRowMenu(menu);
+        if (helpers && helpers.toast) helpers.toast('No image URL to preview');
       }
     } else if (action === 'locate' && locateKey) {
       setActiveRow(locateKey);
@@ -2572,15 +2584,11 @@
   }
 
   function bindRowMenuHandlers() {
-    const section = qs('#shadow-seo-section');
-    if (!section || section._rowMenuBound) return;
-    section._rowMenuBound = true;
-    section.addEventListener('click', onRowMenuClick);
-    section.addEventListener('keydown', onRowMenuKeydown);
-    if (!bindRowMenuHandlers._docBound) {
-      bindRowMenuHandlers._docBound = true;
-      document.addEventListener('pointerdown', onDocumentPointerDown, true);
-    }
+    if (bindRowMenuHandlers._bound) return;
+    bindRowMenuHandlers._bound = true;
+    document.addEventListener('click', onRowMenuClick);
+    document.addEventListener('keydown', onRowMenuKeydown);
+    document.addEventListener('pointerdown', onDocumentPointerDown, true);
   }
 
   function renderAudit() {

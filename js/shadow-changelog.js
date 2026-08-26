@@ -7,8 +7,20 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.9.4',
+    version: '1.9.5',
     releases: [
+      {
+        version: '1.9.5',
+        date: '2026-08-26',
+        title: 'Fix SEO image Preview click',
+        user: [
+          'Preview under ⋯ on image rows now opens correctly',
+          'Locate and Request change in the row menu also work reliably after the menu portal fix'
+        ],
+        dev: [
+          'Row menu click/keydown handlers bound on document so portaled popover items receive clicks; preview URL on menu item; cache-bust via ?v=1.9.5'
+        ]
+      },
       {
         version: '1.9.4',
         date: '2026-08-26',
