@@ -7,8 +7,21 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.9.8',
+    version: '1.9.9',
     releases: [
+      {
+        version: '1.9.9',
+        date: '2026-08-26',
+        title: 'All page elements pickable',
+        user: [
+          'All page elements are pickable in Pick element mode — including badges, labels, spans and category tags',
+          'Hover outline wraps small badges and labels so you can see exactly what you will select',
+          'Image swap upload is only offered when you pick an actual image — text elements open a copy or change ticket'
+        ],
+        dev: [
+          'elementsFromPoint deepest-target resolution; image-only storycard via elementMeta fix; extended hover ring for small inline elements; cache-bust via ?v=1.9.9'
+        ]
+      },
       {
         version: '1.9.8',
         date: '2026-08-26',

@@ -96,7 +96,7 @@
   const MODAL_MAX_HEIGHT_VH = 0.9;
 
   const PICK_TARGET_SELECTOR =
-    'img, [class*="placeholder-img"], a, button, h1, h2, h3, h4, h5, h6, p, li, span, time, small, strong, em, mark, label, figcaption, blockquote, dt, dd, td, th, section, article, .btn, [class*="card"], [class*="section"], [class*="badge"], [class*="tag"], [class*="category"]';
+    'img, [class*="placeholder-img"], a, button, h1, h2, h3, h4, h5, h6, p, li, span, time, small, strong, em, mark, label, figcaption, blockquote, dt, dd, td, th, div, ul, ol, nav, header, footer, main, aside, dl, section, article, .btn, [class*="card"], [class*="section"], [class*="badge"], [class*="tag"], [class*="category"]';
   const PICK_EXCLUDE_SELECTOR =
     '#shadow-review-root, .shadow-toolbar, .shadow-modal, #shadow-page-badges, #shadow-seo-overlay, .shadow-seo-badge';
 
@@ -1148,10 +1148,23 @@
   function elementMeta(el) {
     const tag = el.tagName.toLowerCase();
     let type = 'section';
-    if (tag === 'img' || isPlaceholderImage(el) || el.querySelector?.('img')) type = 'image';
+    if (tag === 'img' || isPlaceholderImage(el)) type = 'image';
     else if (tag === 'a' || tag === 'button' || el.classList?.contains('btn')) type = 'button';
-    else if (/^h[1-6]$/.test(tag) || tag === 'p' || tag === 'span' || tag === 'li') type = 'text';
-    else if (tag === 'a') type = 'link';
+    else if (
+      /^h[1-6]$/.test(tag) ||
+      tag === 'p' ||
+      tag === 'span' ||
+      tag === 'li' ||
+      tag === 'label' ||
+      tag === 'time' ||
+      tag === 'small' ||
+      tag === 'strong' ||
+      tag === 'em' ||
+      tag === 'mark' ||
+      tag === 'figcaption'
+    ) {
+      type = 'text';
+    }
 
     const text = (el.innerText || el.alt || el.getAttribute?.('aria-label') || '').trim().replace(/\s+/g, ' ').slice(0, 120);
     const label = text || tag + (el.className ? '.' + String(el.className).split(' ')[0] : '');
@@ -1552,24 +1565,50 @@
     return !!(el && el.closest && el.closest(PICK_EXCLUDE_SELECTOR));
   }
 
+  function isBroadPickRoot(el) {
+    return el === document.body || el === document.documentElement;
+  }
+
   function isVisiblePickTarget(el) {
     if (!el || !el.getBoundingClientRect) return false;
     const rect = el.getBoundingClientRect();
     return rect.width > 0 || rect.height > 0;
   }
 
-  function resolvePickTarget(fromEl) {
-    if (!fromEl || fromEl === document.body || fromEl === document.documentElement) return null;
-    if (isPickExcluded(fromEl)) return null;
+  function isPickableNode(el) {
+    if (!el || el.nodeType !== 1) return false;
+    if (isBroadPickRoot(el)) return false;
+    if (isPickExcluded(el)) return false;
+    return isVisiblePickTarget(el);
+  }
 
-    let node = fromEl;
-    while (node && node !== document.body && node !== document.documentElement) {
-      if (isPickExcluded(node)) return null;
+  function resolvePickTarget(fromEl) {
+    if (!isPickableNode(fromEl)) return null;
+    if (fromEl.matches(PICK_TARGET_SELECTOR)) return fromEl;
+
+    let node = fromEl.parentElement;
+    while (node && !isBroadPickRoot(node)) {
+      if (isPickExcluded(node)) break;
       if (node.matches(PICK_TARGET_SELECTOR) && isVisiblePickTarget(node)) return node;
       node = node.parentElement;
     }
 
-    if (isVisiblePickTarget(fromEl)) return fromEl;
+    return fromEl;
+  }
+
+  function elementFromPoint(clientX, clientY) {
+    const stack = document.elementsFromPoint
+      ? document.elementsFromPoint(clientX, clientY)
+      : [document.elementFromPoint(clientX, clientY)].filter(Boolean);
+
+    for (let i = 0; i < stack.length; i++) {
+      const el = stack[i];
+      if (!el || el.nodeType !== 1) continue;
+      if (isBroadPickRoot(el)) continue;
+      if (isPickExcluded(el)) continue;
+      const target = resolvePickTarget(el);
+      if (target) return target;
+    }
     return null;
   }
 
@@ -1641,12 +1680,43 @@
 
   function onPickPointerMove(event) {
     if (!document.body.classList.contains('shadow-pick-mode')) return;
-    const el = resolvePickTarget(event.target);
+    const el = elementFromPoint(event.clientX, event.clientY);
     if (!el) {
       clearPickHover();
       return;
     }
     setPickHover(el, event.clientX, event.clientY);
+  }
+
+  function openElementTicket(el) {
+    if (!el) return;
+    clearPickHover();
+    clearHighlight();
+    activeEl = el;
+    highlightEl = activeEl;
+    highlightEl.classList.add('shadow-highlight');
+
+    const meta = elementMeta(activeEl);
+    qs('#shadow-new-target').textContent = meta.type + ': ' + (meta.label || meta.selector);
+
+    const form = qs('#shadow-new-form');
+    if (form) {
+      form.reset();
+      const category = form.querySelector('select[name="category"]');
+      const summary = form.querySelector('textarea[name="summary"]');
+      if (category) category.value = meta.type === 'image' ? 'Missing image' : 'Change';
+      if (summary) {
+        summary.placeholder =
+          meta.type === 'image'
+            ? 'Image replacement — describe the change or upload below'
+            : 'What needs to change?';
+      }
+    }
+
+    updateStorycard(activeEl, meta);
+    document.body.classList.remove('shadow-pick-mode');
+    updatePickToggleLabel(false);
+    show('new');
   }
 
   function bindPickHover() {
@@ -2333,19 +2403,9 @@
       return;
     }
 
-    clearPickHover();
-    clearHighlight();
-    activeEl = resolvePickTarget(event.target);
-    if (!activeEl) return;
-    highlightEl = activeEl;
-    highlightEl.classList.add('shadow-highlight');
-
-    const meta = elementMeta(activeEl);
-    qs('#shadow-new-target').textContent = meta.type + ': ' + (meta.label || meta.selector);
-    updateStorycard(activeEl, meta);
-    document.body.classList.remove('shadow-pick-mode');
-    updatePickToggleLabel(false);
-    show('new');
+    const picked = elementFromPoint(event.clientX, event.clientY);
+    if (!picked) return;
+    openElementTicket(picked);
   }
 
   function escapeHtml(str) {
