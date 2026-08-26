@@ -96,7 +96,7 @@
   const MODAL_MAX_HEIGHT_VH = 0.9;
 
   const PICK_TARGET_SELECTOR =
-    'img, [class*="placeholder-img"], a, button, h1, h2, h3, h4, p, li, section, article, .btn, [class*="card"], [class*="section"]';
+    'img, [class*="placeholder-img"], a, button, h1, h2, h3, h4, h5, h6, p, li, span, time, small, strong, em, mark, label, figcaption, blockquote, dt, dd, td, th, section, article, .btn, [class*="card"], [class*="section"], [class*="badge"], [class*="tag"], [class*="category"]';
   const PICK_EXCLUDE_SELECTOR =
     '#shadow-review-root, .shadow-toolbar, .shadow-modal, #shadow-page-badges, #shadow-seo-overlay, .shadow-seo-badge';
 
@@ -1552,12 +1552,25 @@
     return !!(el && el.closest && el.closest(PICK_EXCLUDE_SELECTOR));
   }
 
+  function isVisiblePickTarget(el) {
+    if (!el || !el.getBoundingClientRect) return false;
+    const rect = el.getBoundingClientRect();
+    return rect.width > 0 || rect.height > 0;
+  }
+
   function resolvePickTarget(fromEl) {
     if (!fromEl || fromEl === document.body || fromEl === document.documentElement) return null;
     if (isPickExcluded(fromEl)) return null;
-    const el = fromEl.closest(PICK_TARGET_SELECTOR) || fromEl;
-    if (el === document.body || el === document.documentElement) return null;
-    return el;
+
+    let node = fromEl;
+    while (node && node !== document.body && node !== document.documentElement) {
+      if (isPickExcluded(node)) return null;
+      if (node.matches(PICK_TARGET_SELECTOR) && isVisiblePickTarget(node)) return node;
+      node = node.parentElement;
+    }
+
+    if (isVisiblePickTarget(fromEl)) return fromEl;
+    return null;
   }
 
   function pickTypeLabel(type) {

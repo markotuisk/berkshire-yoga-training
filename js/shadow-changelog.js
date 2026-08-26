@@ -7,8 +7,20 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.9.7',
+    version: '1.9.8',
     releases: [
+      {
+        version: '1.9.8',
+        date: '2026-08-26',
+        title: 'Pick spans, badges and category labels',
+        user: [
+          'Pick element now selects small inline elements like category badges and tags — not just the whole card or article around them',
+          'Hover outline shows on spans and labels before you click'
+        ],
+        dev: [
+          'PICK_TARGET_SELECTOR adds span, time, badge/tag/category patterns; resolvePickTarget walks up from pointer for nearest visible match; pick-hover z-index for small inline elements; cache-bust via ?v=1.9.8'
+        ]
+      },
       {
         version: '1.9.7',
         date: '2026-08-26',

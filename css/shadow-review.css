@@ -96,6 +96,8 @@ body.shadow-pick-mode::before {
     inset 0 0 0 9999px rgba(232, 97, 46, 0.12) !important;
   transition: box-shadow 80ms ease;
   isolation: isolate;
+  position: relative;
+  z-index: 51;
 }
 
 #shadow-pick-tooltip {
