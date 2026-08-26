@@ -7,8 +7,20 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.9.3',
+    version: '1.9.4',
     releases: [
+      {
+        version: '1.9.4',
+        date: '2026-08-26',
+        title: 'Image preview in Page SEO',
+        user: [
+          'Images in the SEO panel have a Preview option under ⋯ — opens a popup with the full image, alt text, and URL',
+          'Preview works alongside Locate on page and Request change for each image row'
+        ],
+        dev: [
+          'shadow-seo-image-preview overlay with backdrop blur; Preview menu item on image rows only; cache-bust via ?v=1.9.4'
+        ]
+      },
       {
         version: '1.9.3',
         date: '2026-08-26',

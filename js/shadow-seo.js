@@ -1463,6 +1463,9 @@
           warn: img.missingAlt,
           locate: 'image-' + i,
           fieldName: img.missingAlt ? 'Image alt' : 'Image',
+          previewSrc: img.src,
+          previewAlt: img.alt || '',
+          previewDims: img.dims || '',
           raw: true
         }
       ];
@@ -2420,6 +2423,80 @@
     });
   }
 
+  function ensureImagePreview() {
+    let overlay = qs('#shadow-seo-image-preview');
+    if (overlay) return overlay;
+    overlay = document.createElement('div');
+    overlay.id = 'shadow-seo-image-preview';
+    overlay.className = 'shadow-seo-image-preview';
+    overlay.hidden = true;
+    overlay.innerHTML =
+      '<div class="shadow-seo-image-preview-backdrop" data-close="preview" aria-hidden="true"></div>' +
+      '<div class="shadow-seo-image-preview-card" role="dialog" aria-modal="true" aria-labelledby="shadow-seo-image-preview-title">' +
+      '<header class="shadow-seo-image-preview-head">' +
+      '<h3 id="shadow-seo-image-preview-title">Image preview</h3>' +
+      '<button type="button" class="shadow-close shadow-seo-image-preview-close" aria-label="Close">&times;</button>' +
+      '</header>' +
+      '<div class="shadow-seo-image-preview-body">' +
+      '<img class="shadow-seo-image-preview-img" alt="" />' +
+      '</div>' +
+      '<footer class="shadow-seo-image-preview-meta">' +
+      '<p class="shadow-seo-image-preview-alt"></p>' +
+      '<p class="shadow-seo-image-preview-dims"></p>' +
+      '<p class="shadow-seo-image-preview-src"></p>' +
+      '</footer>' +
+      '</div>';
+    document.body.appendChild(overlay);
+    overlay.querySelector('[data-close="preview"]').addEventListener('click', closeImagePreview);
+    overlay.querySelector('.shadow-seo-image-preview-close').addEventListener('click', closeImagePreview);
+    if (!ensureImagePreview._keyBound) {
+      ensureImagePreview._keyBound = true;
+      document.addEventListener('keydown', (e) => {
+        const panel = qs('#shadow-seo-image-preview');
+        if (e.key === 'Escape' && panel && !panel.hidden) closeImagePreview();
+      });
+    }
+    return overlay;
+  }
+
+  function openImagePreview(src, alt, dims) {
+    const overlay = ensureImagePreview();
+    const img = overlay.querySelector('.shadow-seo-image-preview-img');
+    const altEl = overlay.querySelector('.shadow-seo-image-preview-alt');
+    const dimsEl = overlay.querySelector('.shadow-seo-image-preview-dims');
+    const srcEl = overlay.querySelector('.shadow-seo-image-preview-src');
+    if (img) {
+      img.src = src;
+      img.alt = alt || 'Preview';
+    }
+    if (altEl) {
+      altEl.textContent = alt ? 'Alt: ' + alt : 'Alt: (not set)';
+      altEl.hidden = false;
+    }
+    if (dimsEl) {
+      if (dims) {
+        dimsEl.textContent = 'Dimensions: ' + dims;
+        dimsEl.hidden = false;
+      } else {
+        dimsEl.hidden = true;
+      }
+    }
+    if (srcEl) srcEl.textContent = src;
+    overlay.hidden = false;
+    document.body.classList.add('shadow-seo-image-preview-open');
+    const closeBtn = overlay.querySelector('.shadow-seo-image-preview-close');
+    if (closeBtn) closeBtn.focus();
+  }
+
+  function closeImagePreview() {
+    const overlay = qs('#shadow-seo-image-preview');
+    if (!overlay) return;
+    overlay.hidden = true;
+    document.body.classList.remove('shadow-seo-image-preview-open');
+    const img = overlay.querySelector('.shadow-seo-image-preview-img');
+    if (img) img.removeAttribute('src');
+  }
+
   function onRowMenuClick(event) {
     const menuBtn = event.target.closest('.shadow-seo-row-menu-btn');
     if (menuBtn) {
@@ -2442,7 +2519,16 @@
     const fieldName = menuBtnEl ? menuBtnEl.dataset.fieldName : '';
     const locateKey = menuBtnEl ? menuBtnEl.dataset.locate : '';
     const action = item.dataset.action;
-    if (action === 'locate' && locateKey) {
+    if (action === 'preview') {
+      const previewSrc = menuBtnEl ? menuBtnEl.dataset.previewSrc : '';
+      if (previewSrc) {
+        setActiveRow(locateKey);
+        closeRowMenu(menu, { keepActiveRow: true });
+        openImagePreview(previewSrc, menuBtnEl.dataset.previewAlt || '', menuBtnEl.dataset.previewDims || '');
+      } else {
+        closeRowMenu(menu);
+      }
+    } else if (action === 'locate' && locateKey) {
       setActiveRow(locateKey);
       closeRowMenu(menu, { keepActiveRow: true });
       locateOnPage(locateKey);
@@ -2644,6 +2730,7 @@
     activeRowForTicket = null;
     clearActiveRow();
     closeAllRowMenus();
+    closeImagePreview();
     closePanel();
   }
 

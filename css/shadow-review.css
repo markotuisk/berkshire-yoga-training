@@ -2103,3 +2103,105 @@ body.shadow-modal-drag-active {
   outline-offset: 2px;
 }
 
+.shadow-seo-image-preview {
+  position: fixed;
+  inset: 0;
+  z-index: 100010;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.shadow-seo-image-preview[hidden] {
+  display: none !important;
+}
+
+.shadow-seo-image-preview-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.shadow-seo-image-preview-card {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  width: min(560px, calc(100vw - 2rem));
+  max-height: min(82vh, 720px);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.22);
+  overflow: hidden;
+}
+
+.shadow-seo-image-preview-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem 0.75rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.shadow-seo-image-preview-head h3 {
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  color: var(--shadow-text);
+}
+
+.shadow-seo-image-preview-body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: #f5f5f7;
+  overflow: auto;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.shadow-seo-image-preview-img {
+  display: block;
+  max-width: 100%;
+  max-height: min(52vh, 480px);
+  width: auto;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+  object-fit: contain;
+}
+
+.shadow-seo-image-preview-meta {
+  padding: 0.75rem 1rem 1rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.shadow-seo-image-preview-meta p {
+  margin: 0 0 0.35rem;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: #636366;
+}
+
+.shadow-seo-image-preview-meta p:last-child {
+  margin-bottom: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.75rem;
+  word-break: break-all;
+  color: #8e8e93;
+}
+
+.shadow-seo-image-preview-meta p[hidden] {
+  display: none;
+}
+
+body.shadow-seo-image-preview-open {
+  overflow: hidden;
+}
+
