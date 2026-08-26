@@ -7,8 +7,20 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.9.6',
+    version: '1.9.7',
     releases: [
+      {
+        version: '1.9.7',
+        date: '2026-08-26',
+        title: 'SEO row menu closes after action',
+        user: [
+          '⋯ row menu now closes when you choose Preview, Locate on page, or Request change',
+          'No more menu left floating on screen after you pick an action'
+        ],
+        dev: [
+          'findPopoverForMenu resolves portaled popover for closeRowMenu; clearMenuPortalPopovers on closeAllRowMenus; cache-bust via ?v=1.9.7'
+        ]
+      },
       {
         version: '1.9.6',
         date: '2026-08-26',

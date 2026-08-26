@@ -2301,6 +2301,41 @@
     delete popover.dataset.menuOwner;
   }
 
+  function findPopoverForMenu(menu) {
+    if (!menu) return null;
+    const inMenu = menu.querySelector('.shadow-seo-row-menu-popover');
+    if (inMenu) return inMenu;
+    const menuId = menu.dataset.menuId;
+    if (!menuId) return null;
+    const portal = document.getElementById('shadow-seo-menu-portal');
+    if (!portal) return null;
+    if (typeof CSS !== 'undefined' && CSS.escape) {
+      return portal.querySelector(
+        '.shadow-seo-row-menu-popover[data-menu-owner="' + CSS.escape(menuId) + '"]'
+      );
+    }
+    return (
+      [...portal.querySelectorAll('.shadow-seo-row-menu-popover')].find(
+        (popover) => popover.dataset.menuOwner === menuId
+      ) || null
+    );
+  }
+
+  function clearMenuPortalPopovers() {
+    const portal = document.getElementById('shadow-seo-menu-portal');
+    if (!portal) return;
+    portal.querySelectorAll('.shadow-seo-row-menu-popover').forEach((popover) => {
+      const menu = menuForPopover(popover);
+      popover.hidden = true;
+      popover.style.visibility = '';
+      popover.style.display = '';
+      popover.style.top = '';
+      popover.style.left = '';
+      if (menu) returnPopoverToMenu(menu, popover);
+      else popover.remove();
+    });
+  }
+
   function ensureMenuId(menu) {
     if (!menu.dataset.menuId) {
       menu.dataset.menuId = 'seo-menu-' + Math.random().toString(36).slice(2, 9);
@@ -2356,11 +2391,12 @@
     opts = opts || {};
     if (!menu) return;
     const btn = menu.querySelector('.shadow-seo-row-menu-btn');
-    const popover = menu.querySelector('.shadow-seo-row-menu-popover');
+    const popover = findPopoverForMenu(menu);
     if (btn) btn.setAttribute('aria-expanded', 'false');
     if (popover) {
       popover.hidden = true;
       popover.style.visibility = '';
+      popover.style.display = '';
       popover.style.top = '';
       popover.style.left = '';
       returnPopoverToMenu(menu, popover);
@@ -2371,7 +2407,7 @@
 
   function positionRowMenuPopover(menu) {
     const btn = menu.querySelector('.shadow-seo-row-menu-btn');
-    const popover = menu.querySelector('.shadow-seo-row-menu-popover');
+    const popover = findPopoverForMenu(menu);
     if (!btn || !popover) return;
     ensureMenuId(menu);
     attachPopoverToPortal(menu, popover);
@@ -2399,6 +2435,7 @@
 
   function closeAllRowMenus(opts) {
     document.querySelectorAll('.shadow-seo-row-menu').forEach((menu) => closeRowMenu(menu, opts));
+    clearMenuPortalPopovers();
   }
 
   function bindMenuReposition() {
@@ -2414,7 +2451,7 @@
   function openRowMenuPopover(menu) {
     if (!menu) return;
     const btn = menu.querySelector('.shadow-seo-row-menu-btn');
-    const popover = menu.querySelector('.shadow-seo-row-menu-popover');
+    const popover = findPopoverForMenu(menu);
     if (!btn || !popover) return;
     const locateKey = btn.dataset.locate || '';
     closeAllRowMenus({ keepActiveRow: true });
@@ -2551,7 +2588,7 @@
       event.preventDefault();
       event.stopPropagation();
       const menu = menuBtn.closest('.shadow-seo-row-menu');
-      const popover = menu && menu.querySelector('.shadow-seo-row-menu-popover');
+      const popover = menu && findPopoverForMenu(menu);
       if (popover && popover.hidden) openRowMenuPopover(menu);
       else closeRowMenu(menu);
       return;
@@ -2618,7 +2655,8 @@
     const item = event.target.closest('.shadow-seo-row-menu-item');
     if (!item || (event.key !== 'ArrowDown' && event.key !== 'ArrowUp')) return;
     event.preventDefault();
-    const items = [...menu.querySelectorAll('.shadow-seo-row-menu-item')];
+    const popover = findPopoverForMenu(menu);
+    const items = popover ? [...popover.querySelectorAll('.shadow-seo-row-menu-item')] : [];
     const idx = items.indexOf(item);
     if (idx < 0) return;
     const next = event.key === 'ArrowDown' ? items[idx + 1] : items[idx - 1];
