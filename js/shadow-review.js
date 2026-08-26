@@ -522,13 +522,24 @@
     };
   }
 
-  function centerModalCard(card) {
+  const DEFAULT_MODAL_EDGE_MARGIN = 28;
+
+  function defaultModalPlacement(key, card) {
     card.style.position = 'fixed';
     card.style.margin = '0';
     requestAnimationFrame(() => {
       const w = card.offsetWidth;
       const h = card.offsetHeight;
-      const pos = clampModalPosition((window.innerWidth - w) / 2, (window.innerHeight - h) / 2, card);
+      let left;
+      let top;
+      if (key === 'tools' || key === 'seo') {
+        left = window.innerWidth - w - DEFAULT_MODAL_EDGE_MARGIN;
+        top = (window.innerHeight - h) * 0.42;
+      } else {
+        left = (window.innerWidth - w) / 2;
+        top = (window.innerHeight - h) / 2;
+      }
+      const pos = clampModalPosition(left, top, card);
       card.style.left = pos.left + 'px';
       card.style.top = pos.top + 'px';
     });
@@ -561,7 +572,7 @@
       const def = DEFAULT_MODAL_SIZES[key];
       applyModalSize(card, def.width, def.height);
     }
-    centerModalCard(card);
+    defaultModalPlacement(key, card);
   }
 
   function resetModalPosition(key, card) {
@@ -572,8 +583,8 @@
       setModalCollapsed(key, false);
       if (modal) applyModalCollapseState(key, modal, card, false);
     }
-    centerModalCard(card);
-    toast('Modal re-centred');
+    defaultModalPlacement(key, card);
+    toast(key === 'tools' || key === 'seo' ? 'Modal reset to default position' : 'Modal re-centred');
   }
 
   function isResizeHandle(el) {

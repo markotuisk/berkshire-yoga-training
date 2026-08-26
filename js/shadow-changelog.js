@@ -7,8 +7,18 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.6.1',
+    version: '1.6.2',
     releases: [
+      {
+        version: '1.6.2',
+        date: '2026-08-26',
+        title: 'Tools position and SEO polish',
+        user: [
+          'Tools panel opens centre-right by default — easier reach from the bottom-right button',
+          'View SEO refreshed: score ring, clearer missing fields, segmented tabs, and stat cards'
+        ],
+        dev: []
+      },
       {
         version: '1.6.1',
         date: '2026-08-26',

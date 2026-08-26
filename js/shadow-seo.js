@@ -295,28 +295,118 @@
     };
   }
 
+  function isEmptyValue(val) {
+    if (val == null) return true;
+    const s = String(val).trim();
+    return !s || s === '—' || s === 'Not set' || s === 'Missing';
+  }
+
+  function emptyPill(label) {
+    return '<span class="shadow-seo-empty-pill">' + escapeHtml(label || 'Not set') + '</span>';
+  }
+
+  function renderCellValue(val, opts) {
+    opts = opts || {};
+    if (isEmptyValue(val)) {
+      return (
+        '<span class="shadow-seo-value shadow-seo-value--empty">' +
+        emptyPill(opts.emptyLabel || 'Not set') +
+        '</span>'
+      );
+    }
+    const text = opts.truncate ? truncate(val, opts.truncate) : String(val);
+    const classes = ['shadow-seo-value'];
+    if (opts.mono) classes.push('shadow-seo-value--mono');
+    const title = opts.mono && String(val).length > (opts.truncate || 0) ? ' title="' + escapeHtml(val) + '"' : '';
+    return '<span class="' + classes.join(' ') + '"' + title + '>' + escapeHtml(text) + '</span>';
+  }
+
   function scoreClass(score) {
     if (score >= 80) return 'shadow-seo-score--good';
     if (score >= 60) return 'shadow-seo-score--ok';
     return 'shadow-seo-score--poor';
   }
 
+  function scoreRingSvg(score) {
+    const r = 15.5;
+    const circ = 2 * Math.PI * r;
+    const offset = circ * (1 - score / 100);
+    return (
+      '<svg class="shadow-seo-score-svg" viewBox="0 0 36 36" aria-hidden="true">' +
+      '<circle class="shadow-seo-score-track" cx="18" cy="18" r="' +
+      r +
+      '" fill="none" stroke-width="3"/>' +
+      '<circle class="shadow-seo-score-fill" cx="18" cy="18" r="' +
+      r +
+      '" fill="none" stroke-width="3" stroke-linecap="round" ' +
+      'stroke-dasharray="' +
+      circ.toFixed(2) +
+      '" stroke-dashoffset="' +
+      offset.toFixed(2) +
+      '" transform="rotate(-90 18 18)"/>' +
+      '</svg>'
+    );
+  }
+
   function warningIcon(level) {
-    if (level === 'error') return '●';
-    if (level === 'warn') return '●';
-    return '○';
+    if (level === 'error') {
+      return (
+        '<svg class="shadow-seo-warning-svg" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">' +
+        '<circle cx="7" cy="7" r="6.25" fill="none" stroke="currentColor" stroke-width="1.25"/>' +
+        '<path d="M7 4.25v3.25M7 9.25h.01" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>'
+      );
+    }
+    if (level === 'warn') {
+      return (
+        '<svg class="shadow-seo-warning-svg" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">' +
+        '<path d="M7 1.5L12.5 11.5H1.5L7 1.5z" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linejoin="round"/>' +
+        '<path d="M7 5.5v2.75M7 10h.01" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>'
+      );
+    }
+    if (level === 'good') {
+      return (
+        '<svg class="shadow-seo-warning-svg" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">' +
+        '<circle cx="7" cy="7" r="6.25" fill="none" stroke="currentColor" stroke-width="1.25"/>' +
+        '<path d="M4.5 7.25l1.75 1.75 3.25-3.5" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+      );
+    }
+    return (
+      '<svg class="shadow-seo-warning-svg" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">' +
+      '<circle cx="7" cy="7" r="6.25" fill="none" stroke="currentColor" stroke-width="1.25"/>' +
+      '<path d="M7 6.25v3.25M7 4.25h.01" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>'
+    );
+  }
+
+  function headingBadgeClass(level) {
+    if (level === 1) return 'shadow-seo-heading-badge shadow-seo-heading-badge--h1';
+    if (level === 2) return 'shadow-seo-heading-badge shadow-seo-heading-badge--h2';
+    return 'shadow-seo-heading-badge shadow-seo-heading-badge--hn';
+  }
+
+  function highlightJson(str) {
+    const escaped = escapeHtml(str);
+    return escaped
+      .replace(/(&quot;)([^&]+)(&quot;)(\s*:)/g, '<span class="shadow-seo-json-key">$1$2$3</span>$4')
+      .replace(/:\s*(&quot;)([^&]*)(&quot;)/g, ': <span class="shadow-seo-json-str">$1$2$3</span>')
+      .replace(/:\s*(-?\d+\.?\d*)/g, ': <span class="shadow-seo-json-num">$1</span>')
+      .replace(/:\s*(true|false|null)/g, ': <span class="shadow-seo-json-bool">$1</span>');
   }
 
   function renderOverview(data) {
     return (
       '<div class="shadow-seo-overview">' +
-      '<div class="shadow-seo-score ' +
+      '<div class="shadow-seo-score-ring ' +
       scoreClass(data.score) +
-      '" aria-label="SEO score">' +
+      '" aria-label="SEO score ' +
+      data.score +
+      ' out of 100">' +
+      scoreRingSvg(data.score) +
+      '<div class="shadow-seo-score-inner">' +
       '<span class="shadow-seo-score-num">' +
       data.score +
       '</span>' +
       '<span class="shadow-seo-score-label">Score</span>' +
+      '</div>' +
       '</div>' +
       '<ul class="shadow-seo-warnings">' +
       (data.warnings.length
@@ -327,12 +417,14 @@
                 w.level +
                 '"><span class="shadow-seo-warning-icon">' +
                 warningIcon(w.level) +
-                '</span>' +
+                '</span><span class="shadow-seo-warning-text">' +
                 escapeHtml(w.text) +
-                '</li>'
+                '</span></li>'
             )
             .join('')
-        : '<li class="shadow-seo-warning shadow-seo-warning--good">No major issues detected</li>') +
+        : '<li class="shadow-seo-warning shadow-seo-warning--good"><span class="shadow-seo-warning-icon">' +
+          warningIcon('good') +
+          '</span><span class="shadow-seo-warning-text">No major issues detected</span></li>') +
       '</ul>' +
       '</div>'
     );
@@ -340,53 +432,73 @@
 
   function renderMetaTable(data) {
     const rows = [
-      ['Title', data.title || '—'],
-      ['Description', data.description || '—'],
-      ['Canonical', data.canonical || '—'],
-      ['Robots', data.robots || '—'],
-      ['Language', data.lang || '—'],
-      ['URL', data.url]
+      ['Title', data.title, {}],
+      ['Description', data.description, { emptyLabel: 'Missing' }],
+      ['Canonical', data.canonical, { mono: true, truncate: 72, emptyLabel: 'Not set' }],
+      ['Robots', data.robots, { emptyLabel: 'Not set' }],
+      ['Language', data.lang, { emptyLabel: 'Not set' }],
+      ['URL', data.url, { mono: true, truncate: 72 }]
     ];
-    Object.keys(data.og).forEach((k) => rows.push([k, data.og[k]]));
-    Object.keys(data.twitter).forEach((k) => rows.push([k, data.twitter[k]]));
+    Object.keys(data.og).forEach((k) =>
+      rows.push([k, data.og[k], { mono: true, truncate: 64, emptyLabel: 'Not set' }])
+    );
+    Object.keys(data.twitter).forEach((k) =>
+      rows.push([k, data.twitter[k], { mono: true, truncate: 64, emptyLabel: 'Not set' }])
+    );
     return (
-      '<dl class="shadow-seo-dl">' +
+      '<table class="shadow-seo-table shadow-seo-table--meta">' +
+      '<tbody>' +
       rows
         .map(
-          (r) =>
-            '<dt>' +
+          (r, i) =>
+            '<tr class="shadow-seo-row' +
+            (i % 2 ? ' shadow-seo-row--zebra' : '') +
+            '"><th scope="row">' +
             escapeHtml(r[0]) +
-            '</dt><dd>' +
-            escapeHtml(r[1]) +
-            '</dd>'
+            '</th><td>' +
+            renderCellValue(r[1], r[2]) +
+            '</td></tr>'
         )
         .join('') +
-      '</dl>'
+      '</tbody></table>'
     );
   }
 
   function renderHeadings(data) {
     const counts = data.headingCounts;
     const summary =
-      '<p class="shadow-seo-counts">' +
+      '<div class="shadow-seo-heading-counts">' +
       ['h1', 'h2', 'h3', 'h4', 'h5', 'h6']
-        .map((k) => k.toUpperCase() + ': ' + counts[k])
-        .join(' · ') +
-      '</p>';
+        .map(
+          (k) =>
+            '<span class="' +
+            headingBadgeClass(parseInt(k.charAt(1), 10)) +
+            '">' +
+            k.toUpperCase() +
+            ' ' +
+            counts[k] +
+            '</span>'
+        )
+        .join('') +
+      '</div>';
     const list =
       data.headings.length
-        ? '<ul class="shadow-seo-heading-list">' +
+        ? '<table class="shadow-seo-table shadow-seo-table--headings"><tbody>' +
           data.headings
             .map(
-              (h) =>
-                '<li><span class="shadow-seo-heading-tag">' +
-                escapeHtml(h.tag) +
-                '</span> ' +
-                escapeHtml(h.text || '(empty)') +
-                '</li>'
+              (h, i) =>
+                '<tr class="shadow-seo-row' +
+                (i % 2 ? ' shadow-seo-row--zebra' : '') +
+                '"><td class="shadow-seo-cell-badge"><span class="' +
+                headingBadgeClass(h.level) +
+                '">' +
+                escapeHtml(h.tag.toUpperCase()) +
+                '</span></td><td>' +
+                renderCellValue(h.text, { emptyLabel: 'Empty' }) +
+                '</td></tr>'
             )
             .join('') +
-          '</ul>'
+          '</tbody></table>'
         : '<p class="shadow-hint">No headings found</p>';
     return summary + list;
   }
@@ -394,21 +506,22 @@
   function renderImages(data) {
     if (!data.images.length) return '<p class="shadow-hint">No images on this page</p>';
     return (
-      '<table class="shadow-seo-table">' +
+      '<table class="shadow-seo-table shadow-seo-table--images">' +
       '<thead><tr><th>Src</th><th>Alt</th><th>Dims</th></tr></thead><tbody>' +
       data.images
         .map(
-          (img) =>
-            '<tr class="' +
-            (img.missingAlt ? 'shadow-seo-row--warn' : '') +
+          (img, i) =>
+            '<tr class="shadow-seo-row' +
+            (img.missingAlt ? ' shadow-seo-row--warn' : '') +
+            (i % 2 && !img.missingAlt ? ' shadow-seo-row--zebra' : '') +
             '"><td class="shadow-seo-cell-src">' +
-            escapeHtml(truncate(img.src, 48)) +
+            renderCellValue(img.src, { mono: true, truncate: 48, emptyLabel: 'Not set' }) +
             '</td><td>' +
             (img.missingAlt
-              ? '<span class="shadow-seo-missing">Missing</span>'
-              : escapeHtml(truncate(img.alt, 40))) +
+              ? '<span class="shadow-seo-badge-missing-alt">Missing alt</span>'
+              : renderCellValue(img.alt, { truncate: 40 })) +
             '</td><td>' +
-            escapeHtml(img.dims || '—') +
+            renderCellValue(img.dims, { emptyLabel: 'Not set' }) +
             '</td></tr>'
         )
         .join('') +
@@ -474,10 +587,10 @@
         (block) =>
           '<details class="shadow-seo-jsonld"><summary>Block ' +
           block.index +
-          ' (' +
+          ' <span class="shadow-seo-jsonld-meta">(' +
           block.raw.length +
-          ' chars)</summary><pre class="shadow-seo-pre">' +
-          escapeHtml(block.pretty) +
+          ' chars)</span></summary><pre class="shadow-seo-pre shadow-seo-pre--json">' +
+          highlightJson(block.pretty) +
           '</pre></details>'
       )
       .join('');
@@ -485,32 +598,44 @@
 
   function renderTechnical(data) {
     const t = data.technical;
-    return (
-      '<dl class="shadow-seo-dl">' +
-      '<dt>HTTPS</dt><dd>' +
-      (t.https ? 'Yes' : 'No') +
-      '</dd>' +
-      '<dt>Word count (main)</dt><dd>' +
-      t.wordCount +
-      '</dd>' +
-      '<dt>Scripts</dt><dd>' +
-      t.scriptCount +
-      '</dd>' +
-      '<dt>Stylesheets</dt><dd>' +
-      t.stylesheetCount +
-      '</dd>' +
-      '<dt>Blocking scripts in head</dt><dd>' +
-      t.blockingHeadScripts +
-      (t.blockingHeadScripts
-        ? '<ul class="shadow-seo-script-list">' +
-          t.blockingHeadScriptSrcs
-            .map((s) => '<li>' + escapeHtml(truncate(s, 64)) + '</li>')
-            .join('') +
-          '</ul>'
-        : '') +
-      '</dd>' +
-      '</dl>'
-    );
+    const stats = [
+      { label: 'HTTPS', value: t.https ? 'Yes' : 'No', tone: t.https ? 'good' : 'bad' },
+      { label: 'Word count', value: String(t.wordCount) },
+      { label: 'Scripts', value: String(t.scriptCount) },
+      { label: 'Stylesheets', value: String(t.stylesheetCount) },
+      {
+        label: 'Blocking in head',
+        value: String(t.blockingHeadScripts),
+        tone: t.blockingHeadScripts ? 'warn' : 'good'
+      }
+    ];
+    let html =
+      '<div class="shadow-seo-stat-grid">' +
+      stats
+        .map(
+          (s) =>
+            '<div class="shadow-seo-stat-card' +
+            (s.tone ? ' shadow-seo-stat-card--' + s.tone : '') +
+            '"><span class="shadow-seo-stat-value">' +
+            escapeHtml(s.value) +
+            '</span><span class="shadow-seo-stat-label">' +
+            escapeHtml(s.label) +
+            '</span></div>'
+        )
+        .join('') +
+      '</div>';
+    if (t.blockingHeadScripts) {
+      html +=
+        '<p class="shadow-seo-subhead">Blocking script sources</p><ul class="shadow-seo-script-list">' +
+        t.blockingHeadScriptSrcs
+          .map(
+            (s) =>
+              '<li>' + renderCellValue(s, { mono: true, truncate: 64, emptyLabel: 'Not set' }) + '</li>'
+          )
+          .join('') +
+        '</ul>';
+    }
+    return html;
   }
 
   function renderSection(data, sectionId) {
@@ -538,6 +663,8 @@
     const tabsEl = qs('#shadow-seo-tabs');
     if (!tabsEl) return;
     tabsEl.innerHTML = '';
+    tabsEl.setAttribute('role', 'tablist');
+    tabsEl.setAttribute('aria-label', 'SEO audit sections');
     SECTIONS.forEach((section) => {
       const btn = document.createElement('button');
       btn.type = 'button';
@@ -545,6 +672,8 @@
         'shadow-seo-tab' + (activeSection === section.id ? ' shadow-seo-tab--active' : '');
       btn.textContent = section.label;
       btn.dataset.section = section.id;
+      btn.setAttribute('role', 'tab');
+      btn.setAttribute('aria-selected', activeSection === section.id ? 'true' : 'false');
       btn.addEventListener('click', () => {
         if (activeSection === section.id) return;
         activeSection = section.id;
