@@ -12,7 +12,7 @@ const AGENT_LINK_HEADER =
   '</.well-known/api-catalog>; rel="api-catalog", </.well-known/agent-card.json>; rel="service-desc"; type="application/json", </llms.txt>; rel="describedby"; type="text/plain", </auth.md>; rel="service-doc"; type="text/markdown", </sitemap.xml>; rel="sitemap"; type="application/xml"';
 
 /** Keep in sync with js/shadow-changelog.js — busts browser cache on deploy */
-const SHADOW_ASSET_VERSION = '1.9.9';
+const SHADOW_ASSET_VERSION = '1.10.0';
 
 const SHADOW_STYLE_SCRIPT = `
 <link rel="stylesheet" href="/css/shadow-review.css?v=${SHADOW_ASSET_VERSION}">
@@ -20,6 +20,7 @@ const SHADOW_STYLE_SCRIPT = `
 <meta name="theme-color" content="#E8612E">
 <script src="/js/shadow-changelog.js?v=${SHADOW_ASSET_VERSION}" defer></script>
 <script src="/js/shadow-seo.js?v=${SHADOW_ASSET_VERSION}" defer></script>
+<script src="/js/shadow-design.js?v=${SHADOW_ASSET_VERSION}" defer></script>
 <script src="/js/shadow-review.js?v=${SHADOW_ASSET_VERSION}" defer></script>
 `;
 

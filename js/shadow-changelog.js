@@ -7,8 +7,21 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.9.9',
+    version: '1.10.0',
     releases: [
+      {
+        version: '1.10.0',
+        date: '2026-08-26',
+        title: 'Design audit tool',
+        user: [
+          'Tools → View design opens a panel listing font families, sizes, weights, line heights and font colours on the page',
+          'Issues tab flags unexpected fonts, non-token font colours and inline styles',
+          'Locate highlights matching elements on the page so you can spot design mismatches quickly'
+        ],
+        dev: [
+          'js/shadow-design.js design audit panel; wired in shadow-review tools modal; cache-bust via ?v=1.10.0'
+        ]
+      },
       {
         version: '1.9.9',
         date: '2026-08-26',

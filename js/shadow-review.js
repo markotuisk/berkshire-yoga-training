@@ -53,7 +53,7 @@
   const STORAGE_INBOX_COLLAPSED = 'twa_shadow_inbox_collapsed';
   const STORAGE_DETAIL_COLLAPSED = 'twa_shadow_detail_collapsed';
   const MODAL_COLLAPSED_HEIGHT = 48;
-  const COLLAPSIBLE_MODALS = ['inbox', 'detail', 'tools', 'seo'];
+  const COLLAPSIBLE_MODALS = ['inbox', 'detail', 'tools', 'seo', 'design'];
   const IDLE_MS = 60 * 60 * 1000;
   const IDLE_CHECK_MS = 60 * 1000;
   const AUDIT_SHEET_URL =
@@ -68,12 +68,14 @@
     detail: 'shadow-detail-modal',
     new: 'shadow-new-modal',
     tools: 'shadow-tools-modal',
-    seo: 'shadow-seo-modal'
+    seo: 'shadow-seo-modal',
+    design: 'shadow-design-modal'
   };
 
   const DEFAULT_MODAL_SIZES = {
-    tools: { width: 300, height: 210 },
-    seo: { width: 480, height: 580 }
+    tools: { width: 300, height: 260 },
+    seo: { width: 480, height: 580 },
+    design: { width: 480, height: 580 }
   };
 
   const DRAG_GRIP_SVG =
@@ -98,7 +100,7 @@
   const PICK_TARGET_SELECTOR =
     'img, [class*="placeholder-img"], a, button, h1, h2, h3, h4, h5, h6, p, li, span, time, small, strong, em, mark, label, figcaption, blockquote, dt, dd, td, th, div, ul, ol, nav, header, footer, main, aside, dl, section, article, .btn, [class*="card"], [class*="section"], [class*="badge"], [class*="tag"], [class*="category"]';
   const PICK_EXCLUDE_SELECTOR =
-    '#shadow-review-root, .shadow-toolbar, .shadow-modal, #shadow-page-badges, #shadow-seo-overlay, .shadow-seo-badge';
+    '#shadow-review-root, .shadow-toolbar, .shadow-modal, #shadow-page-badges, #shadow-seo-overlay, .shadow-seo-badge, #shadow-design-overlay, .shadow-design-badge';
 
   let ticketsCache = [];
   let activeEl = null;
@@ -446,6 +448,7 @@
     if (key === 'inbox') return collapsed ? 'Expand inbox' : 'Collapse inbox';
     if (key === 'tools') return collapsed ? 'Expand tools' : 'Collapse tools';
     if (key === 'seo') return collapsed ? 'Expand SEO panel' : 'Collapse SEO panel';
+    if (key === 'design') return collapsed ? 'Expand design panel' : 'Collapse design panel';
     return collapsed ? 'Expand ticket' : 'Collapse ticket';
   }
 
@@ -533,7 +536,7 @@
       const h = card.offsetHeight;
       let left;
       let top;
-      if (key === 'tools' || key === 'seo') {
+      if (key === 'tools' || key === 'seo' || key === 'design') {
         left = window.innerWidth - w - DEFAULT_MODAL_EDGE_MARGIN;
         top = (window.innerHeight - h) * 0.42;
       } else {
@@ -585,7 +588,11 @@
       if (modal) applyModalCollapseState(key, modal, card, false);
     }
     defaultModalPlacement(key, card);
-    toast(key === 'tools' || key === 'seo' ? 'Modal reset to default position' : 'Modal re-centred');
+    toast(
+      key === 'tools' || key === 'seo' || key === 'design'
+        ? 'Modal reset to default position'
+        : 'Modal re-centred'
+    );
   }
 
   function isResizeHandle(el) {
@@ -814,7 +821,9 @@
           ? [qs('#shadow-comment-form', modal)].filter(Boolean)
           : key === 'seo'
             ? [qs('.shadow-seo-footer', modal)].filter(Boolean)
-            : [];
+            : key === 'design'
+              ? [qs('.shadow-design-footer', modal)].filter(Boolean)
+              : [];
       setupModalScrollArea(card, head, keepOutside);
 
       setupModalHeadActions(head);
@@ -943,8 +952,9 @@
   }
 
   function closeAllModals() {
-    ['person', 'inbox', 'detail', 'new', 'whatsnew', 'tools', 'seo'].forEach((key) => hide(key));
+    ['person', 'inbox', 'detail', 'new', 'whatsnew', 'tools', 'seo', 'design'].forEach((key) => hide(key));
     if (window.TWAShadowSEO) window.TWAShadowSEO.shutdown();
+    if (window.TWAShadowDesign) window.TWAShadowDesign.shutdown();
     clearHighlight();
     clearPickHover();
     document.body.classList.remove('shadow-pick-mode');
@@ -1291,6 +1301,7 @@
           <div class="shadow-tools-actions">
             <button type="button" id="shadow-tools-pick-toggle" class="shadow-btn shadow-tools-action">Pick element</button>
             <button type="button" id="shadow-tools-seo-btn" class="shadow-btn shadow-tools-action shadow-btn-secondary">View SEO</button>
+            <button type="button" id="shadow-tools-design-btn" class="shadow-btn shadow-tools-action shadow-btn-secondary">View design</button>
           </div>
           <p class="shadow-hint shadow-tools-hint">Or ⌘/Alt+click any element to file a ticket</p>
         </div>
@@ -1314,6 +1325,27 @@
           <footer class="shadow-seo-footer">
             <button type="button" id="shadow-seo-highlight-toggle" class="shadow-seo-footer-btn" aria-pressed="false">Highlight on page</button>
             <button type="button" id="shadow-seo-refresh" class="shadow-seo-footer-btn">Refresh audit</button>
+          </footer>
+        </div>
+      </div>
+
+      <div id="shadow-design-modal" class="shadow-modal" hidden>
+        <div class="shadow-modal-card shadow-modal-design">
+          <div class="shadow-modal-head shadow-design-head">
+            <div class="shadow-design-head-text">
+              <h2>Page design</h2>
+              <p class="shadow-design-subtitle">Fonts, colours and mismatches</p>
+            </div>
+            <button type="button" class="shadow-close" data-close="design" aria-label="Close">&times;</button>
+          </div>
+          <div class="shadow-design-body">
+            <nav id="shadow-design-nav" class="shadow-design-nav" role="tablist" aria-label="Design audit sections"></nav>
+            <div class="shadow-design-content">
+              <div id="shadow-design-section" class="shadow-design-section" role="tabpanel"></div>
+            </div>
+          </div>
+          <footer class="shadow-design-footer">
+            <button type="button" id="shadow-design-refresh" class="shadow-design-footer-btn">Refresh audit</button>
           </footer>
         </div>
       </div>
@@ -1379,6 +1411,15 @@
         hideFloating,
         toast,
         openChangeTicket
+      });
+    }
+
+    if (window.TWAShadowDesign) {
+      window.TWAShadowDesign.init({
+        getPerson,
+        showExclusive: show,
+        showFloating,
+        toast
       });
     }
   }
@@ -1479,7 +1520,8 @@
     new: 'shadow-new-modal',
     whatsnew: 'shadow-whatsnew-modal',
     tools: 'shadow-tools-modal',
-    seo: 'shadow-seo-modal'
+    seo: 'shadow-seo-modal',
+    design: 'shadow-design-modal'
   };
 
   function showFloating(which) {
@@ -1496,8 +1538,12 @@
     const el = qs('#' + MODAL_MAP[which]);
     if (!el) return;
     el.hidden = true;
-    if (which === 'tools' && window.TWAShadowSEO) window.TWAShadowSEO.onToolsClosed();
+    if (which === 'tools') {
+      if (window.TWAShadowSEO) window.TWAShadowSEO.onToolsClosed();
+      if (window.TWAShadowDesign) window.TWAShadowDesign.onToolsClosed();
+    }
     if (which === 'seo' && window.TWAShadowSEO) window.TWAShadowSEO.close();
+    if (which === 'design' && window.TWAShadowDesign) window.TWAShadowDesign.close();
   }
 
   function openTools() {
@@ -1508,11 +1554,15 @@
     Object.entries(MODAL_MAP).forEach(([key, id]) => {
       const el = qs('#' + id);
       if (!el || el.hidden) return;
-      if (key === 'tools' && which !== 'tools' && window.TWAShadowSEO) {
-        window.TWAShadowSEO.onToolsClosed();
+      if (key === 'tools' && which !== 'tools') {
+        if (window.TWAShadowSEO) window.TWAShadowSEO.onToolsClosed();
+        if (window.TWAShadowDesign) window.TWAShadowDesign.onToolsClosed();
       }
       if (key === 'seo' && which !== 'seo' && window.TWAShadowSEO) {
         window.TWAShadowSEO.close();
+      }
+      if (key === 'design' && which !== 'design' && window.TWAShadowDesign) {
+        window.TWAShadowDesign.close();
       }
       el.hidden = true;
     });
@@ -1527,7 +1577,7 @@
   }
 
   function hide(which) {
-    if (which === 'tools' || which === 'seo') {
+    if (which === 'tools' || which === 'seo' || which === 'design') {
       hideFloating(which);
       return;
     }
