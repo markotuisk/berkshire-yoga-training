@@ -1,3 +1,9 @@
+/js/shadow-*.js
+  Cache-Control: public, max-age=0, must-revalidate
+
+/css/shadow-review.css
+  Cache-Control: public, max-age=0, must-revalidate
+
 /*
   Vary: Accept
   Link: </.well-known/api-catalog>; rel="api-catalog", </.well-known/agent-card.json>; rel="service-desc"; type="application/json", </llms.txt>; rel="describedby"; type="text/plain", </auth.md>; rel="service-doc"; type="text/markdown", </sitemap.xml>; rel="sitemap"; type="application/xml"

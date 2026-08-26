@@ -50,8 +50,9 @@ Shadow mode tools are versioned in `js/shadow-changelog.js` (loaded before `js/s
 When shipping partner-facing changes:
 
 1. Bump `version` in `js/shadow-changelog.js`
-2. Add a release entry with `user` bullets (Katia and Raili) and optional `dev` bullets (Marko only)
-3. Deploy shadow branch
+2. Bump `SHADOW_ASSET_VERSION` in `functions/_middleware.js` to the same value (cache-busts injected CSS/JS)
+3. Add a release entry with `user` bullets (Katia and Raili) and optional `dev` bullets (Marko only)
+4. Deploy shadow branch
 
 On next login, partners see a **What's new** popup for any release newer than their last seen version (stored in browser localStorage). Marko also sees `dev` items. Toolbar shows **vX.Y.Z** with an orange badge when updates are unread. **What's new** in the toolbar reopens the changelog any time.
 

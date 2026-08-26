@@ -7,8 +7,19 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.7.0',
+    version: '1.7.1',
     releases: [
+      {
+        version: '1.7.1',
+        date: '2026-08-26',
+        title: 'Shadow asset cache fix',
+        user: [
+          'View SEO and other shadow tools now load the latest version after each release — no stale panel from browser cache'
+        ],
+        dev: [
+          'Middleware injects ?v= on shadow CSS/JS; bump SHADOW_ASSET_VERSION in functions/_middleware.js with changelog version'
+        ]
+      },
       {
         version: '1.7.0',
         date: '2026-08-26',
