@@ -7,8 +7,19 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.6.2',
+    version: '1.6.3',
     releases: [
+      {
+        version: '1.6.3',
+        date: '2026-08-26',
+        title: 'Complete SEO field template',
+        user: [
+          'View SEO now always shows every field — Meta, Open Graph, Twitter, Security, and more',
+          'Empty or missing values appear as clear Not set / Missing pills instead of hiding rows',
+          'Images, links, and structured data sections always show counts and empty states'
+        ],
+        dev: []
+      },
       {
         version: '1.6.2',
         date: '2026-08-26',

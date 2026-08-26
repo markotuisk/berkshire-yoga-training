@@ -11,11 +11,44 @@
   const SECTIONS = [
     { id: 'overview', label: 'Overview' },
     { id: 'meta', label: 'Meta' },
+    { id: 'og', label: 'Open Graph' },
+    { id: 'twitter', label: 'Twitter' },
+    { id: 'security', label: 'Security' },
     { id: 'headings', label: 'Headings' },
     { id: 'images', label: 'Images' },
     { id: 'links', label: 'Links' },
     { id: 'structured', label: 'Structured data' },
     { id: 'technical', label: 'Technical' }
+  ];
+
+  const META_FIELDS = [
+    ['Title', 'title', {}],
+    ['Meta description', 'description', { emptyLabel: 'Missing' }],
+    ['URL', 'url', { mono: true, truncate: 72 }],
+    ['Canonical', 'canonical', { mono: true, truncate: 72, emptyLabel: 'Not set' }],
+    ['Robots', 'robots', { emptyLabel: 'Not set' }],
+    ['Keywords', 'keywords', { emptyLabel: 'Not set' }],
+    ['Author', 'author', { emptyLabel: 'Not set' }],
+    ['Publisher', 'publisher', { emptyLabel: 'Not set' }],
+    ['Language', 'lang', { emptyLabel: 'Not set' }],
+    ['Word count', 'wordCount', {}]
+  ];
+
+  const OG_FIELDS = [
+    'og:title',
+    'og:description',
+    'og:url',
+    'og:image',
+    'og:type',
+    'og:locale',
+    'og:site_name'
+  ];
+
+  const TWITTER_FIELDS = [
+    'twitter:card',
+    'twitter:title',
+    'twitter:description',
+    'twitter:image'
   ];
 
   let helpers = null;
@@ -173,6 +206,10 @@
     const canonicalEl = document.querySelector('link[rel="canonical"]');
     const canonical = canonicalEl ? (canonicalEl.getAttribute('href') || '').trim() : '';
     const robots = metaContent('name', 'robots');
+    const keywords = metaContent('name', 'keywords');
+    const author = metaContent('name', 'author');
+    const publisher = metaContent('name', 'publisher') || metaContent('property', 'article:publisher');
+    const viewport = metaContent('name', 'viewport');
     const og = allMetaByPrefix('property', 'og:');
     const twitter = allMetaByPrefix('name', 'twitter:');
     const lang = (document.documentElement.getAttribute('lang') || '').trim();
@@ -251,6 +288,16 @@
       score -= 5;
     }
 
+    if (!viewport) {
+      warnings.push({ level: 'warn', text: 'Viewport meta tag is missing' });
+      score -= 5;
+    }
+
+    if (location.protocol !== 'https:') {
+      warnings.push({ level: 'error', text: 'Page is not served over HTTPS' });
+      score -= 10;
+    }
+
     const missingAltCount = images.filter((img) => img.missingAlt).length;
     if (missingAltCount) {
       warnings.push({
@@ -272,6 +319,10 @@
       description,
       canonical,
       robots,
+      keywords,
+      author,
+      publisher,
+      viewport,
       og,
       twitter,
       lang,
@@ -430,24 +481,11 @@
     );
   }
 
-  function renderMetaTable(data) {
-    const rows = [
-      ['Title', data.title, {}],
-      ['Description', data.description, { emptyLabel: 'Missing' }],
-      ['Canonical', data.canonical, { mono: true, truncate: 72, emptyLabel: 'Not set' }],
-      ['Robots', data.robots, { emptyLabel: 'Not set' }],
-      ['Language', data.lang, { emptyLabel: 'Not set' }],
-      ['URL', data.url, { mono: true, truncate: 72 }]
-    ];
-    Object.keys(data.og).forEach((k) =>
-      rows.push([k, data.og[k], { mono: true, truncate: 64, emptyLabel: 'Not set' }])
-    );
-    Object.keys(data.twitter).forEach((k) =>
-      rows.push([k, data.twitter[k], { mono: true, truncate: 64, emptyLabel: 'Not set' }])
-    );
+  function renderFieldTable(rows, tableClass) {
     return (
-      '<table class="shadow-seo-table shadow-seo-table--meta">' +
-      '<tbody>' +
+      '<table class="shadow-seo-table' +
+      (tableClass ? ' ' + tableClass : '') +
+      '"><tbody>' +
       rows
         .map(
           (r, i) =>
@@ -456,12 +494,48 @@
             '"><th scope="row">' +
             escapeHtml(r[0]) +
             '</th><td>' +
-            renderCellValue(r[1], r[2]) +
+            renderCellValue(r[1], r[2] || {}) +
             '</td></tr>'
         )
         .join('') +
       '</tbody></table>'
     );
+  }
+
+  function renderMetaTable(data) {
+    const rows = META_FIELDS.map(([label, key, opts]) => {
+      let value = data[key];
+      if (key === 'wordCount') value = String(data.technical.wordCount);
+      return [label, value, opts];
+    });
+    return renderFieldTable(rows, 'shadow-seo-table--meta');
+  }
+
+  function renderOgTable(data) {
+    const rows = OG_FIELDS.map((key) => [
+      key,
+      data.og[key] || '',
+      { mono: true, truncate: 64, emptyLabel: 'Not set' }
+    ]);
+    return renderFieldTable(rows, 'shadow-seo-table--og');
+  }
+
+  function renderTwitterTable(data) {
+    const rows = TWITTER_FIELDS.map((key) => [
+      key,
+      data.twitter[key] || '',
+      { mono: true, truncate: 64, emptyLabel: 'Not set' }
+    ]);
+    return renderFieldTable(rows, 'shadow-seo-table--twitter');
+  }
+
+  function renderSecurity(data) {
+    const t = data.technical;
+    const rows = [
+      ['HTTPS', t.https ? 'Yes' : 'No', {}],
+      ['Viewport', data.viewport, { mono: true, truncate: 72, emptyLabel: 'Not set' }]
+    ];
+    return renderFieldTable(rows, 'shadow-seo-table--security');
   }
 
   function renderHeadings(data) {
@@ -499,13 +573,24 @@
             )
             .join('') +
           '</tbody></table>'
-        : '<p class="shadow-hint">No headings found</p>';
+        : '<p class="shadow-seo-empty-state">' + emptyPill('No headings') + '</p>';
     return summary + list;
   }
 
   function renderImages(data) {
-    if (!data.images.length) return '<p class="shadow-hint">No images on this page</p>';
-    return (
+    const total = data.images.length;
+    const missingAltCount = data.images.filter((img) => img.missingAlt).length;
+    let html =
+      '<p class="shadow-seo-counts">Total: ' +
+      total +
+      ' · Missing alt: ' +
+      missingAltCount +
+      '</p>';
+    if (!total) {
+      html += '<p class="shadow-seo-empty-state">' + emptyPill('No images') + '</p>';
+      return html;
+    }
+    html +=
       '<table class="shadow-seo-table shadow-seo-table--images">' +
       '<thead><tr><th>Src</th><th>Alt</th><th>Dims</th></tr></thead><tbody>' +
       data.images
@@ -525,8 +610,8 @@
             '</td></tr>'
         )
         .join('') +
-      '</tbody></table>'
-    );
+      '</tbody></table>';
+    return html;
   }
 
   function renderLinks(data) {
@@ -540,11 +625,10 @@
       links.external.length +
       '</p>';
     const slice = links.internal.slice(0, 15);
+    html += '<p class="shadow-seo-subhead">Internal' + (slice.length ? ' (first ' + slice.length + ')' : '') + '</p>';
     if (slice.length) {
       html +=
-        '<p class="shadow-seo-subhead">Internal (first ' +
-        slice.length +
-        ')</p><ul class="shadow-seo-link-list">' +
+        '<ul class="shadow-seo-link-list">' +
         slice
           .map(
             (l) =>
@@ -558,13 +642,14 @@
           )
           .join('') +
         '</ul>';
+    } else {
+      html += '<p class="shadow-seo-empty-state">' + emptyPill('None') + '</p>';
     }
-  const extSlice = links.external.slice(0, 10);
+    const extSlice = links.external.slice(0, 10);
+    html += '<p class="shadow-seo-subhead">External' + (extSlice.length ? ' (first ' + extSlice.length + ')' : '') + '</p>';
     if (extSlice.length) {
       html +=
-        '<p class="shadow-seo-subhead">External (first ' +
-        extSlice.length +
-        ')</p><ul class="shadow-seo-link-list">' +
+        '<ul class="shadow-seo-link-list">' +
         extSlice
           .map(
             (l) =>
@@ -576,12 +661,16 @@
           )
           .join('') +
         '</ul>';
+    } else {
+      html += '<p class="shadow-seo-empty-state">' + emptyPill('None') + '</p>';
     }
     return html;
   }
 
   function renderStructured(data) {
-    if (!data.jsonLd.length) return '<p class="shadow-hint">No JSON-LD blocks found</p>';
+    if (!data.jsonLd.length) {
+      return '<p class="shadow-seo-empty-state">' + emptyPill('None found') + '</p>';
+    }
     return data.jsonLd
       .map(
         (block) =>
@@ -599,10 +688,8 @@
   function renderTechnical(data) {
     const t = data.technical;
     const stats = [
-      { label: 'HTTPS', value: t.https ? 'Yes' : 'No', tone: t.https ? 'good' : 'bad' },
-      { label: 'Word count', value: String(t.wordCount) },
-      { label: 'Scripts', value: String(t.scriptCount) },
       { label: 'Stylesheets', value: String(t.stylesheetCount) },
+      { label: 'Scripts', value: String(t.scriptCount) },
       {
         label: 'Blocking in head',
         value: String(t.blockingHeadScripts),
@@ -624,9 +711,10 @@
         )
         .join('') +
       '</div>';
+    html += '<p class="shadow-seo-subhead">Blocking script sources</p>';
     if (t.blockingHeadScripts) {
       html +=
-        '<p class="shadow-seo-subhead">Blocking script sources</p><ul class="shadow-seo-script-list">' +
+        '<ul class="shadow-seo-script-list">' +
         t.blockingHeadScriptSrcs
           .map(
             (s) =>
@@ -634,6 +722,8 @@
           )
           .join('') +
         '</ul>';
+    } else {
+      html += '<p class="shadow-seo-empty-state">' + emptyPill('None') + '</p>';
     }
     return html;
   }
@@ -644,6 +734,12 @@
         return renderOverview(data);
       case 'meta':
         return renderMetaTable(data);
+      case 'og':
+        return renderOgTable(data);
+      case 'twitter':
+        return renderTwitterTable(data);
+      case 'security':
+        return renderSecurity(data);
       case 'headings':
         return renderHeadings(data);
       case 'images':
