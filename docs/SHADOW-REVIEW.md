@@ -29,13 +29,14 @@ Partners do **not** need Cloudflare accounts. Access only needs their emails on 
 4. **Review** toolbox FAB (bottom right) opens the **Curator's desk**: categories explode into Insights, SEO, Design and Pick. SEO and Design show **grouped catalogues** (Foundation, Content, Links, Technical). Each activity opens as its own draggable popup. **Open activities** appear as pills above the toolbar (click to focus, × to close). **Link graph** is in Insights only. **Pick** toggles element selection immediately (or use ⌘/Alt+click).
 5. **Insights** covers page summary, Search Console, GA4 traffic, and link graph. **SEO** and **Design** sections open from grouped toolbox menus. **Pick** toggles element selection (or use ⌘/Alt+click).
 6. **Tickets** in the toolbar opens the ticket inbox.
-7. **Open** tab (default) lists tickets that still need attention; **Closed** holds finished items (Approved, Shipped to live, Won't fix, Duplicate).
-8. Orange **TWA-xxx** markers appear on page elements with open tickets — click to open the thread and jump to the element.
-9. **Show on page** in a ticket (or **Locate** in the inbox) scrolls to the linked element and highlights it. Drag ticket windows by the six-dot grip; drag any corner to resize.
-10. For images or placeholders, the **Storycard** section lets you upload a replacement file (optional).
-11. Add category + comment → ticket created (stored in KV and mirrored to Google Sheets).
-12. Open a ticket to read the thread and add further comments.
-13. **SEO** panel shows overview score, meta, headings, images, links, JSON-LD, and technical checks from the current page DOM. **Links** tab can check broken links on the page or crawl the site from `sitemap.xml`. **Link graph** (Insights only) maps inbound and outbound internal links across sitemap pages. **Summary** tab shows the graph as a mini preview plus Search Console and GA4 metrics when configured. **Technical** tab reports canonical mismatch, mixed content, DOM size, and load timing. **Structured data** tab validates required schema fields. **Highlight on page** labels headings and marks images missing alt.
+7. **Settings** (gear icon, before your name) opens environment options — connect Google for Search Console and Analytics insights, see connection status, and view Shadow version.
+8. **Open** tab (default) lists tickets that still need attention; **Closed** holds finished items (Approved, Shipped to live, Won't fix, Duplicate).
+9. Orange **TWA-xxx** markers appear on page elements with open tickets — click to open the thread and jump to the element.
+10. **Show on page** in a ticket (or **Locate** in the inbox) scrolls to the linked element and highlights it. Drag ticket windows by the six-dot grip; drag any corner to resize.
+11. For images or placeholders, the **Storycard** section lets you upload a replacement file (optional).
+12. Add category + comment → ticket created (stored in KV and mirrored to Google Sheets).
+13. Open a ticket to read the thread and add further comments.
+14. **SEO** panel shows overview score, meta, headings, images, links, JSON-LD, and technical checks from the current page DOM. **Links** tab can check broken links on the page or crawl the site from `sitemap.xml`. **Link graph** (Insights only) maps inbound and outbound internal links across sitemap pages. **Summary** tab shows the graph as a mini preview plus Search Console and GA4 metrics when configured. **Technical** tab reports canonical mismatch, mixed content, DOM size, and load timing. **Structured data** tab validates required schema fields. **Highlight on page** labels headings and marks images missing alt.
 
 **Open tab** (default inbox + on-page markers): Open, Discussing, Accepted, On shadow, In progress, Ready for review, Blocked.
 
@@ -76,9 +77,12 @@ js/shadow-links.js         link checker (page + sitemap crawl)
 js/shadow-graph.js         site link graph (sitemap crawl + radial SVG)
 js/shadow-seo.js           client-side SEO audit panel
 js/shadow-design.js        fonts, colours, accessibility and design mismatch audit
+js/shadow-settings.js      environment settings and Google OAuth connect UI
 js/shadow-review.js        overlay UI
 css/shadow-review.css      overlay styles
 functions/api/insights.js  GSC + GA4 page insights (Workers)
+functions/api/auth/google/ OAuth start, callback, status, disconnect
+functions/lib/google-oauth.js  OAuth helpers and token refresh
 ```
 
 **Design audit:** Toolbox → **Design** → choose a section (Summary, Typography, Colours, Accessibility, Issues). Each opens as its own popup scanning the page for font families, sizes, weights, line heights, colours and accessibility (images, headings, contrast, links, buttons, form fields, landmarks). **Issues** merges design mismatches with accessibility findings. **⋯** row menus offer **Locate on page** and **Request change**, matching the SEO panel.
@@ -235,6 +239,58 @@ Without the secret, tickets still work in KV; Sheets stays empty until the webho
 | GET | `/api/audit` | Full JSON export |
 | POST | `/api/audit` | Full replace sync to Sheets |
 | GET | `/api/insights?path=/services/` | Page insights — GSC + GA4 (28 days); link graph stays client-side |
+| GET | `/api/auth/google/start` | Start Google OAuth (redirect to consent) |
+| GET | `/api/auth/google/callback` | OAuth callback (stores tokens in KV) |
+| GET | `/api/auth/google/status` | Connection status (Google account, GSC, GA4) |
+| POST | `/api/auth/google/disconnect` | Clear stored OAuth tokens |
+
+## Google OAuth (partner connect — v1.18.2)
+
+Partners connect their own Google account from **Settings** in the toolbar. Tokens are stored in Cloudflare KV (`SHADOW_TICKETS`, keys prefixed `oauth:tokens:`). The insights API tries the partner OAuth token first, then falls back to the service account if configured.
+
+### 1. Create an OAuth client (Google Cloud Console)
+
+1. **APIs & Services** → **Credentials** → **Create credentials** → **OAuth client ID**
+2. Application type: **Web application**
+3. **Authorised redirect URIs** (both required):
+
+   - `https://shadow.berkshireyogatraining.co.uk/api/auth/google/callback`
+   - `https://berkshire-yoga-training-shadow.pages.dev/api/auth/google/callback`
+
+4. Copy **Client ID** and **Client secret** (secret never goes to the browser)
+
+### 2. OAuth consent screen
+
+- User type: **External** (or Internal if all partners are in the same Workspace)
+- Scopes used by Shadow:
+
+  - `https://www.googleapis.com/auth/webmasters.readonly`
+  - `https://www.googleapis.com/auth/analytics.readonly`
+  - `openid`, `email`
+
+Partners must have Search Console and GA4 access on the Berkshire Yoga Training properties.
+
+### 3. Wrangler secrets
+
+```bash
+npx wrangler pages secret put GOOGLE_OAUTH_CLIENT_ID --project-name=berkshire-yoga-training-shadow
+npx wrangler pages secret put GOOGLE_OAUTH_CLIENT_SECRET --project-name=berkshire-yoga-training-shadow
+```
+
+Redeploy after setting secrets. Without them, Settings shows *Connect unavailable — ask Marko to configure OAuth client*.
+
+### 4. Session identity
+
+- Cookie `shadow_oauth_sid` (random UUID) when Cloudflare Access email header is absent
+- When `Cf-Access-Authenticated-User-Email` is present, tokens are keyed by partner email (persists across devices)
+
+### 5. Insights auth order
+
+1. Valid OAuth token for the current session / Access email  
+2. Else `GOOGLE_SERVICE_ACCOUNT_JSON` (service account JWT)  
+3. Else not configured — hints in Insights and Settings
+
+`GA4_PROPERTY_ID` and `GSC_SITE_URL` remain environment variables (Marko). OAuth grants API access; property ID and preferred GSC site URL are still read from env, or the first verified Search Console site from the partner account when `GSC_SITE_URL` is unset.
 
 ## Google Search Console and GA4 (Page insights)
 

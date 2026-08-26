@@ -104,8 +104,11 @@ export function isGscConfigured(env) {
   return !!(env.GSC_SITE_URL && env.GSC_SITE_URL.trim());
 }
 
-export async function fetchGscInsights(accessToken, env, pagePath) {
-  const siteUrl = env.GSC_SITE_URL.trim();
+export async function fetchGscInsights(accessToken, env, pagePath, siteUrlOverride) {
+  const siteUrl = String(siteUrlOverride || env.GSC_SITE_URL || '').trim();
+  if (!siteUrl) {
+    return { ok: false, error: 'GSC site URL not configured' };
+  }
   const pageUrl = pathToLivePageUrl(pagePath, siteUrl);
   const dateRange = last28DaysRange();
 

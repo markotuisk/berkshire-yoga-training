@@ -7,8 +7,22 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.18.1',
+    version: '1.18.2',
     releases: [
+      {
+        version: '1.18.2',
+        date: '2026-08-26',
+        title: 'Environment settings and Google connect',
+        user: [
+          'New Settings button in the toolbar opens environment and connection options',
+          'Connect your Google account for Search Console and Analytics insights — no wrangler secrets needed on your side',
+          'See connection status for Search Console and GA4, plus Shadow version and insights readiness',
+          'Disconnect Google any time from Settings'
+        ],
+        dev: [
+          'OAuth Pages Functions /api/auth/google/*; KV token store; insights prefers OAuth then service account; shadow-settings.js; cache-bust via ?v=1.18.2'
+        ]
+      },
       {
         version: '1.18.1',
         date: '2026-08-26',
@@ -19,20 +33,6 @@
         ],
         dev: [
           'Replace radial fan (--tools-x/y angles) with flex column stack above FAB; shadow-tools-stack wrapper; cache-bust via ?v=1.18.1'
-        ]
-      },
-      {
-        version: '1.18.0',
-        date: '2026-08-26',
-        title: 'Environment settings and Google connect',
-        user: [
-          'New Settings button in the toolbar opens environment and connection options',
-          'Connect your Google account for Search Console and Analytics insights — no wrangler secrets needed on your side',
-          'See connection status for Search Console and GA4, plus Shadow version and insights readiness',
-          'Disconnect Google any time from Settings'
-        ],
-        dev: [
-          'OAuth Pages Functions /api/auth/google/*; KV token store; insights prefers OAuth then service account; shadow-settings.js; cache-bust via ?v=1.18.0'
         ]
       },
       {
