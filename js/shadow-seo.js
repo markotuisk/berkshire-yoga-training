@@ -219,6 +219,7 @@
 
   let helpers = null;
   let activeSection = 'overview';
+  const openContainers = new Map();
   let highlightOn = false;
   let overlayLayer = null;
   let overlayNodes = [];
@@ -1894,19 +1895,22 @@
     ];
   }
 
-  function renderLinkGraph() {
+  function renderLinkGraph(graphId) {
+    const id = graphId || 'shadow-seo-link-graph';
     return (
       '<div class="shadow-seo-groups">' +
       '<p class="shadow-seo-subhead">Internal link relationships across sitemap pages. Click a node to open that page on shadow. Graph is cached for this session.</p>' +
-      '<div id="shadow-seo-link-graph" class="shadow-graph-panel"></div>' +
+      '<div id="' +
+      escapeHtml(id) +
+      '" class="shadow-graph-panel"></div>' +
       '</div>'
     );
   }
 
-  function mountLinkGraph() {
-    const container = qs('#shadow-seo-link-graph');
-    if (!container || !window.TWAShadowGraph) return;
-    window.TWAShadowGraph.renderGraphPanel(container, location.pathname || '/');
+  function mountLinkGraph(container) {
+    const el = container || qs('#shadow-seo-link-graph');
+    if (!el || !window.TWAShadowGraph) return;
+    window.TWAShadowGraph.renderGraphPanel(el, location.pathname || '/');
   }
 
   function renderLinks(data) {
@@ -2431,7 +2435,7 @@
       case 'links':
         return renderLinks(data);
       case 'linkgraph':
-        return renderLinkGraph();
+        return renderLinkGraph(null);
       case 'keywords':
         return renderKeywords(data);
       case 'structured':
@@ -2853,8 +2857,10 @@
   }
 
   function seoPanelBounds() {
-    const card = qs('#shadow-review-modal .shadow-modal-card');
+    const card = document.querySelector('.shadow-activity-card[data-category="seo"]');
     if (card) return card.getBoundingClientRect();
+    const legacyCard = qs('#shadow-review-modal .shadow-modal-card');
+    if (legacyCard) return legacyCard.getBoundingClientRect();
     const modal = qs('#shadow-review-modal');
     if (modal && !modal.hidden) return modal.getBoundingClientRect();
     return {
@@ -2867,6 +2873,18 @@
 
   function findRowByLocateKey(key) {
     if (!key) return null;
+    for (const { container } of openContainers.values()) {
+      if (!container) continue;
+      if (typeof CSS !== 'undefined' && CSS.escape) {
+        const row = container.querySelector('[data-locate="' + CSS.escape(key) + '"]');
+        if (row) return row;
+      } else {
+        const row = [...container.querySelectorAll('[data-locate]')].find(
+          (el) => el.dataset.locate === key
+        );
+        if (row) return row;
+      }
+    }
     const section = qs('#shadow-seo-section');
     if (!section) return null;
     if (typeof CSS !== 'undefined' && CSS.escape) {
@@ -2876,11 +2894,18 @@
   }
 
   function syncActiveRowHighlight() {
-    const section = qs('#shadow-seo-section');
-    if (!section) return;
-    section.querySelectorAll('.shadow-seo-row--active').forEach((row) => {
-      row.classList.remove('shadow-seo-row--active');
+    openContainers.forEach(({ container }) => {
+      if (!container) return;
+      container.querySelectorAll('.shadow-seo-row--active').forEach((row) => {
+        row.classList.remove('shadow-seo-row--active');
+      });
     });
+    const section = qs('#shadow-seo-section');
+    if (section) {
+      section.querySelectorAll('.shadow-seo-row--active').forEach((row) => {
+        row.classList.remove('shadow-seo-row--active');
+      });
+    }
     if (!activeRowLocateKey) return;
     const row = findRowByLocateKey(activeRowLocateKey);
     if (row) row.classList.add('shadow-seo-row--active');
@@ -3197,12 +3222,16 @@
   }
 
   function updateLinkCheckUi() {
+    openContainers.forEach(({ container, sectionId }) => {
+      if (sectionId !== 'links' || !container || !lastAuditData) return;
+      container.innerHTML = renderSection(lastAuditData, 'links');
+      bindLinkCheckControls(container);
+    });
     if (activeSection !== 'links') return;
-    prefetchSitemapPageCount();
     const body = qs('#shadow-seo-section');
     if (!body || !lastAuditData) return;
     body.innerHTML = renderSection(lastAuditData, 'links');
-    bindLinkCheckControls();
+    bindLinkCheckControls(body);
   }
 
   async function runPageLinkCheck() {
@@ -3295,11 +3324,11 @@
     updateLinkCheckUi();
   }
 
-  function bindLinkCheckControls() {
-    const section = qs('#shadow-seo-section');
-    if (!section || section._linkCheckBound) return;
-    section._linkCheckBound = true;
-    section.addEventListener('click', (event) => {
+  function bindLinkCheckControls(section) {
+    const root = section || qs('#shadow-seo-section');
+    if (!root || root._linkCheckBound) return;
+    root._linkCheckBound = true;
+    root.addEventListener('click', (event) => {
       if (event.target.closest('#shadow-seo-check-page-links')) {
         event.preventDefault();
         runPageLinkCheck();
@@ -3311,6 +3340,94 @@
         cancelLinkCheck();
       }
     });
+  }
+
+  function seoFooterHtml(popupKey, sectionId) {
+    const showHighlight = sectionId === 'headings' || sectionId === 'images' || sectionId === 'overview';
+    let html = '<footer class="shadow-seo-footer" data-popup-key="' + escapeHtml(popupKey) + '">';
+    if (showHighlight) {
+      html +=
+        '<button type="button" class="shadow-seo-footer-btn shadow-seo-highlight-toggle" data-popup-key="' +
+        escapeHtml(popupKey) +
+        '" aria-pressed="' +
+        (highlightOn ? 'true' : 'false') +
+        '">' +
+        (highlightOn ? 'Hide highlights' : 'Highlight on page') +
+        '</button>';
+    }
+    html +=
+      '<button type="button" class="shadow-seo-footer-btn shadow-seo-refresh" data-popup-key="' +
+      escapeHtml(popupKey) +
+      '">Refresh audit</button></footer>';
+    return html;
+  }
+
+  function bindSeoPopupControls(modal, popupKey, sectionId) {
+    const toggle = qs('.shadow-seo-highlight-toggle[data-popup-key="' + popupKey + '"]', modal);
+    if (toggle && !toggle._bound) {
+      toggle._bound = true;
+      toggle.addEventListener('click', () => setHighlight(!highlightOn));
+    }
+    const refresh = qs('.shadow-seo-refresh[data-popup-key="' + popupKey + '"]', modal);
+    if (refresh && !refresh._bound) {
+      refresh._bound = true;
+      refresh.addEventListener('click', () => {
+        const entry = openContainers.get(popupKey);
+        if (entry) renderActivity(entry.sectionId, entry.container, popupKey, modal);
+      });
+    }
+  }
+
+  function renderActivity(sectionId, container, popupKey, modal) {
+    if (!container || !SECTIONS.some((s) => s.id === sectionId)) return;
+    activeSection = sectionId;
+    openContainers.set(popupKey, { container, sectionId, modal: modal || null });
+    try {
+      const data = auditPage();
+      lastAuditData = data;
+      container.classList.remove('shadow-seo-section--visible');
+      let html = renderSection(data, sectionId);
+      if (sectionId === 'linkgraph') {
+        const graphId = 'shadow-seo-link-graph-' + popupKey.replace(/[^a-z0-9-]/gi, '-');
+        html = renderLinkGraph(graphId);
+      }
+      container.innerHTML = html;
+      requestAnimationFrame(() => container.classList.add('shadow-seo-section--visible'));
+      if (highlightOn) applyHighlights(data);
+      closeAllRowMenus();
+      activeRowForTicket = null;
+      clearActiveRow();
+      if (sectionId === 'links') {
+        prefetchSitemapPageCount();
+        bindLinkCheckControls(container);
+      }
+      if (sectionId === 'linkgraph') {
+        const graphEl = container.querySelector('.shadow-graph-panel');
+        mountLinkGraph(graphEl);
+      }
+      if (modal) {
+        const existingFooter = qs('.shadow-seo-footer', modal);
+        if (existingFooter) existingFooter.remove();
+        const card = qs('.shadow-modal-card', modal);
+        if (card) {
+          card.insertAdjacentHTML('beforeend', seoFooterHtml(popupKey, sectionId));
+          bindSeoPopupControls(modal, popupKey, sectionId);
+        }
+      }
+    } catch (err) {
+      console.error('[TWAShadowSEO] renderActivity failed', err);
+      container.innerHTML =
+        '<p class="shadow-seo-empty-state">Could not run SEO audit. Try refreshing the page.</p>';
+      container.classList.add('shadow-seo-section--visible');
+    }
+  }
+
+  function closeActivity(popupKey) {
+    openContainers.delete(popupKey);
+  }
+
+  function getSections() {
+    return SECTIONS.slice();
   }
 
   function renderAudit() {
@@ -3414,6 +3531,11 @@
 
   function setHighlight(on) {
     highlightOn = !!on;
+    document.querySelectorAll('.shadow-seo-highlight-toggle').forEach((toggle) => {
+      toggle.setAttribute('aria-pressed', highlightOn ? 'true' : 'false');
+      toggle.classList.toggle('shadow-seo-footer-btn--active', highlightOn);
+      toggle.textContent = highlightOn ? 'Hide highlights' : 'Highlight on page';
+    });
     const toggle = qs('#shadow-seo-highlight-toggle');
     if (toggle) {
       toggle.setAttribute('aria-pressed', highlightOn ? 'true' : 'false');
@@ -3471,8 +3593,22 @@
 
   function activateSection(sectionId) {
     if (!SECTIONS.some((s) => s.id === sectionId)) return;
+    if (helpers && helpers.openActivityPopup) {
+      helpers.openActivityPopup('seo', sectionId);
+      return;
+    }
     activeSection = sectionId;
     renderAudit();
+  }
+
+  function openActivity(sectionId) {
+    if (helpers && helpers.openActivityPopup) {
+      helpers.openActivityPopup('seo', sectionId || 'overview');
+      return;
+    }
+    activeSection = sectionId || 'overview';
+    renderAudit();
+    bindSeoControls();
   }
 
   function onTabActive() {
@@ -3482,13 +3618,7 @@
   }
 
   function openPanel() {
-    if (helpers && helpers.openReviewTab) {
-      helpers.openReviewTab('seo');
-      return;
-    }
-    activeSection = 'overview';
-    renderAudit();
-    bindSeoControls();
+    openActivity('overview');
   }
 
   function bindSeoControls() {
@@ -3533,6 +3663,7 @@
     closeAllRowMenus();
     closeImagePreview();
     cancelLinkCheck();
+    openContainers.clear();
     closePanel();
   }
 
@@ -3547,6 +3678,10 @@
     refresh: renderAudit,
     onTabActive,
     activateSection,
+    openActivity,
+    renderActivity,
+    closeActivity,
+    getSections,
     onReviewClosed,
     onToolsClosed,
     onTicketClosed,

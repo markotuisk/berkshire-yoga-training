@@ -41,6 +41,7 @@
   let helpers = null;
   let activeSection = 'summary';
   let auditCache = null;
+  const openContainers = new Map();
   let locateEls = [];
   let locateTimer = null;
   let locateIndex = {};
@@ -941,9 +942,10 @@
     return index;
   }
 
-  function renderSection(a) {
-    if (activeSection === 'summary') return renderSummary(a);
-    if (activeSection === 'typography') {
+  function renderSection(a, sectionId) {
+    const sid = sectionId || activeSection;
+    if (sid === 'summary') return renderSummary(a);
+    if (sid === 'typography') {
       return (
         '<h3 class="shadow-design-h3">Font families</h3>' +
         renderTableRows(a.fontFamilies, 'family', 'Font family') +
@@ -958,7 +960,7 @@
         renderTableRows(a.typography, 'typo', 'Typography')
       );
     }
-    if (activeSection === 'colors') {
+    if (sid === 'colors') {
       return (
         '<h3 class="shadow-design-h3">Font colours</h3>' +
         '<p class="shadow-design-meta">Computed text colour on visible elements</p>' +
@@ -969,7 +971,7 @@
         renderColorRows(a.borderColors, 'border', 'Border colour')
       );
     }
-    if (activeSection === 'accessibility') {
+    if (sid === 'accessibility') {
       const langNote = a.a11y.pageBasics.lang
         ? 'lang="' + escapeHtml(a.a11y.pageBasics.lang) + '"'
         : 'lang not set';
@@ -1012,7 +1014,7 @@
         renderA11yRows(a.a11y.inputs, 'a11y-input', 'Form field', 'Field')
       );
     }
-    if (activeSection === 'issues') {
+    if (sid === 'issues') {
       const focused = a.issues.filter((i) => isDesignIssue(i) || isA11yIssue(i));
       if (!focused.length) {
         return '<p class="shadow-design-empty">No design or accessibility issues flagged on this page.</p>';
@@ -1082,8 +1084,10 @@
   }
 
   function designPanelBounds() {
-    const card = qs('#shadow-review-modal .shadow-modal-card');
+    const card = document.querySelector('.shadow-activity-card[data-category="design"]');
     if (card) return card.getBoundingClientRect();
+    const legacyCard = qs('#shadow-review-modal .shadow-modal-card');
+    if (legacyCard) return legacyCard.getBoundingClientRect();
     const modal = qs('#shadow-review-modal');
     if (modal && !modal.hidden) return modal.getBoundingClientRect();
     return {
@@ -1424,6 +1428,59 @@
     document.addEventListener('pointerdown', onDocumentPointerDown, true);
   }
 
+  function renderActivity(sectionId, container, popupKey, modal) {
+    if (!container || !SECTIONS.some((s) => s.id === sectionId)) return;
+    activeSection = sectionId;
+    openContainers.set(popupKey, { container, sectionId, modal: modal || null });
+    try {
+      auditCache = auditPage();
+      locateIndex = buildLocateIndex(auditCache);
+      container.classList.remove('shadow-design-section--visible');
+      container.innerHTML = renderSection(auditCache, sectionId);
+      requestAnimationFrame(() => container.classList.add('shadow-design-section--visible'));
+      closeAllRowMenus();
+      activeRowForTicket = null;
+      clearActiveRow();
+      bindRowMenuHandlers();
+      if (modal) {
+        const existingFooter = qs('.shadow-design-footer', modal);
+        if (existingFooter) existingFooter.remove();
+        const card = qs('.shadow-modal-card', modal);
+        if (card) {
+          card.insertAdjacentHTML(
+            'beforeend',
+            '<footer class="shadow-design-footer" data-popup-key="' +
+              escapeHtml(popupKey) +
+              '"><button type="button" class="shadow-design-footer-btn shadow-design-refresh" data-popup-key="' +
+              escapeHtml(popupKey) +
+              '">Refresh audit</button></footer>'
+          );
+          const refresh = qs('.shadow-design-refresh[data-popup-key="' + popupKey + '"]', modal);
+          if (refresh && !refresh._bound) {
+            refresh._bound = true;
+            refresh.addEventListener('click', () => renderActivity(sectionId, container, popupKey, modal));
+          }
+        }
+      }
+    } catch (err) {
+      console.error('[TWAShadowDesign] renderActivity failed', err);
+      auditCache = null;
+      container.innerHTML =
+        '<p class="shadow-design-empty">Design audit failed. ' +
+        escapeHtml((err && err.message) || String(err)) +
+        '</p>';
+      container.classList.add('shadow-design-section--visible');
+    }
+  }
+
+  function closeActivity(popupKey) {
+    openContainers.delete(popupKey);
+  }
+
+  function getSections() {
+    return SECTIONS.slice();
+  }
+
   function renderAudit() {
     const panel = qs('#shadow-design-section');
     try {
@@ -1432,7 +1489,7 @@
       renderNav();
       if (!panel) return;
       panel.classList.remove('shadow-design-section--visible');
-      panel.innerHTML = renderSection(auditCache);
+      panel.innerHTML = renderSection(auditCache, activeSection);
       requestAnimationFrame(() => panel.classList.add('shadow-design-section--visible'));
       closeAllRowMenus();
       activeRowForTicket = null;
@@ -1465,6 +1522,16 @@
     return { issueCount: data.issues.length };
   }
 
+  function openActivity(sectionId) {
+    if (helpers && helpers.openActivityPopup) {
+      helpers.openActivityPopup('design', sectionId || 'summary');
+      return;
+    }
+    activeSection = sectionId || 'summary';
+    renderAudit();
+    bindDesignControls();
+  }
+
   function onTabActive() {
     activeSection = activeSection || 'summary';
     renderAudit();
@@ -1472,13 +1539,7 @@
   }
 
   function openPanel() {
-    if (helpers && helpers.openReviewTab) {
-      helpers.openReviewTab('design');
-      return;
-    }
-    activeSection = 'summary';
-    renderAudit();
-    bindDesignControls();
+    openActivity('summary');
   }
 
   function closePanel() {
@@ -1503,6 +1564,7 @@
   function shutdown() {
     clearLocateHighlight();
     closeAllRowMenus();
+    openContainers.clear();
     closePanel();
   }
 
@@ -1516,6 +1578,10 @@
     close: closePanel,
     refresh: renderAudit,
     onTabActive,
+    openActivity,
+    renderActivity,
+    closeActivity,
+    getSections,
     onReviewClosed,
     onToolsClosed,
     onTicketClosed,

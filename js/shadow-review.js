@@ -1,6 +1,6 @@
 /**
  * Meridian shadow review overlay — shadow branch only.
- * Review FAB opens the unified page review panel (Summary, SEO, Design, Pick); Tickets toolbar button opens inbox.
+ * Review FAB explodes into category menu; each activity opens its own draggable popup. Tickets stay in toolbar.
  */
 (function () {
   'use strict';
@@ -54,8 +54,22 @@
   const STORAGE_INBOX_COLLAPSED = 'twa_shadow_inbox_collapsed';
   const STORAGE_DETAIL_COLLAPSED = 'twa_shadow_detail_collapsed';
   const MODAL_COLLAPSED_HEIGHT = 48;
-  const COLLAPSIBLE_MODALS = ['inbox', 'detail', 'review'];
-  const REVIEW_TABS = ['summary', 'seo', 'design', 'pick'];
+  const COLLAPSIBLE_MODALS = ['inbox', 'detail'];
+  const INSIGHTS_SECTIONS = [
+    { id: 'summary', label: 'Summary' },
+    { id: 'gsc', label: 'Search (GSC)' },
+    { id: 'ga4', label: 'Traffic (GA4)' },
+    { id: 'linkgraph', label: 'Link graph' }
+  ];
+  const TOOL_CATEGORIES = [
+    { id: 'insights', label: 'Insights', angle: 200 },
+    { id: 'seo', label: 'SEO', angle: 235 },
+    { id: 'design', label: 'Design', angle: 270 },
+    { id: 'pick', label: 'Pick', angle: 305 }
+  ];
+  const ACTIVITY_DEFAULT_SIZE = { width: 400, height: 480 };
+  const ACTIVITY_STACK_OFFSET = 24;
+  const TOOLS_MENU_RADIUS = 72;
   const IDLE_MS = 60 * 60 * 1000;
   const IDLE_CHECK_MS = 60 * 1000;
   const AUDIT_SHEET_URL =
@@ -68,13 +82,10 @@
   const DRAGGABLE_MODALS = {
     inbox: 'shadow-inbox-modal',
     detail: 'shadow-detail-modal',
-    new: 'shadow-new-modal',
-    review: 'shadow-review-modal'
+    new: 'shadow-new-modal'
   };
 
-  const DEFAULT_MODAL_SIZES = {
-    review: { width: 520, height: 640 }
-  };
+  const DEFAULT_MODAL_SIZES = {};
 
   const TOOLS_FAB_ICON =
     '<svg class="shadow-fab-icon" width="22" height="22" viewBox="0 0 22 22" aria-hidden="true" focusable="false">' +
@@ -115,7 +126,10 @@
   let inboxTab = 'open';
   let pageBadgeNodes = [];
   let badgePositionBound = false;
-  let activeReviewTab = 'summary';
+  let toolsMenuExpanded = false;
+  let activeToolCategory = null;
+  const openActivityPopups = new Map();
+  let activityPopupCounter = 0;
   let insightsCache = null;
   let insightsFetchPath = '';
   let insightsLoading = false;
@@ -453,7 +467,7 @@
 
   function collapseButtonLabel(key, collapsed) {
     if (key === 'inbox') return collapsed ? 'Expand inbox' : 'Collapse inbox';
-    if (key === 'review') return collapsed ? 'Expand review panel' : 'Collapse review panel';
+    if (key.startsWith('activity-')) return collapsed ? 'Expand panel' : 'Collapse panel';
     return collapsed ? 'Expand ticket' : 'Collapse ticket';
   }
 
@@ -541,9 +555,10 @@
       const h = card.offsetHeight;
       let left;
       let top;
-      if (key === 'review') {
-        left = window.innerWidth - w - DEFAULT_MODAL_EDGE_MARGIN;
-        top = (window.innerHeight - h) * 0.38;
+      if (key.startsWith('activity-')) {
+        const stack = openActivityPopups.size;
+        left = window.innerWidth - w - DEFAULT_MODAL_EDGE_MARGIN - stack * ACTIVITY_STACK_OFFSET;
+        top = (window.innerHeight - h) * 0.32 - stack * ACTIVITY_STACK_OFFSET;
       } else {
         left = (window.innerWidth - w) / 2;
         top = (window.innerHeight - h) / 2;
@@ -594,7 +609,9 @@
     }
     defaultModalPlacement(key, card);
     toast(
-      key === 'review' ? 'Modal reset to default position' : 'Modal re-centred'
+      key.startsWith('activity-')
+        ? 'Modal reset to default position'
+        : 'Modal re-centred'
     );
   }
 
@@ -810,89 +827,92 @@
     head.appendChild(actions);
   }
 
+  function setupDraggableModal(modal, key, options) {
+    options = options || {};
+    if (!modal || modal._draggableReady) return;
+    modal._draggableReady = true;
+    modal.classList.add('shadow-modal--floating');
+    const card = qs('.shadow-modal-card', modal);
+    const head = qs('.shadow-modal-head', modal);
+    if (!card || !head) return;
+
+    const keepOutside = (options.keepOutside || []).filter(Boolean);
+    setupModalScrollArea(card, head, keepOutside);
+    setupModalHeadActions(head);
+
+    const dragGrip = document.createElement('button');
+    dragGrip.type = 'button';
+    dragGrip.className = 'shadow-modal-drag';
+    dragGrip.setAttribute('aria-label', 'Drag to move');
+    dragGrip.innerHTML = DRAG_GRIP_SVG;
+    head.insertBefore(dragGrip, head.firstChild);
+
+    addModalResizeHandles(card, modal, key);
+
+    if (options.collapsible) initModalCollapse(key, modal, card, head);
+
+    head.addEventListener('dblclick', (e) => {
+      if (e.target.closest('.shadow-close, .shadow-modal-drag, .shadow-modal-collapse')) return;
+      resetModalPosition(key, card);
+    });
+
+    dragGrip.addEventListener('pointerdown', (e) => {
+      if (e.button !== 0) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const rect = card.getBoundingClientRect();
+      const startX = e.clientX;
+      const startY = e.clientY;
+      const startLeft = rect.left;
+      const startTop = rect.top;
+      let dragged = false;
+
+      card.style.position = 'fixed';
+      card.style.left = startLeft + 'px';
+      card.style.top = startTop + 'px';
+      card.style.margin = '0';
+
+      dragGrip.setPointerCapture(e.pointerId);
+      document.body.classList.add('shadow-modal-drag-active');
+
+      const onMove = (ev) => {
+        const dx = ev.clientX - startX;
+        const dy = ev.clientY - startY;
+        if (!dragged && (Math.abs(dx) > 3 || Math.abs(dy) > 3)) {
+          dragged = true;
+          modal.classList.add('shadow-modal--dragging');
+        }
+        if (!dragged) return;
+        const pos = clampModalPosition(startLeft + dx, startTop + dy, card);
+        card.style.left = pos.left + 'px';
+        card.style.top = pos.top + 'px';
+      };
+
+      const onUp = (ev) => {
+        dragGrip.releasePointerCapture(ev.pointerId);
+        document.removeEventListener('pointermove', onMove);
+        document.removeEventListener('pointerup', onUp);
+        document.removeEventListener('pointercancel', onUp);
+        modal.classList.remove('shadow-modal--dragging');
+        document.body.classList.remove('shadow-modal-drag-active');
+        if (dragged) saveModalState(key, card);
+      };
+
+      document.addEventListener('pointermove', onMove);
+      document.addEventListener('pointerup', onUp);
+      document.addEventListener('pointercancel', onUp);
+    });
+  }
+
   function initDraggableModals() {
     Object.entries(DRAGGABLE_MODALS).forEach(([key, id]) => {
       const modal = qs('#' + id);
       if (!modal) return;
-      modal.classList.add('shadow-modal--floating');
-      const card = qs('.shadow-modal-card', modal);
-      const head = qs('.shadow-modal-head', modal);
-      if (!card || !head) return;
-
       const keepOutside =
-        key === 'detail'
-          ? [qs('#shadow-comment-form', modal)].filter(Boolean)
-          : key === 'review'
-            ? [
-                qs('.shadow-review-tabs', modal),
-                qs('.shadow-review-body', modal)
-              ].filter(Boolean)
-            : [];
-      setupModalScrollArea(card, head, keepOutside);
-
-      setupModalHeadActions(head);
-
-      const dragGrip = document.createElement('button');
-      dragGrip.type = 'button';
-      dragGrip.className = 'shadow-modal-drag';
-      dragGrip.setAttribute('aria-label', 'Drag to move');
-      dragGrip.innerHTML = DRAG_GRIP_SVG;
-      head.insertBefore(dragGrip, head.firstChild);
-
-      addModalResizeHandles(card, modal, key);
-
-      if (COLLAPSIBLE_MODALS.includes(key)) initModalCollapse(key, modal, card, head);
-
-      head.addEventListener('dblclick', (e) => {
-        if (e.target.closest('.shadow-close, .shadow-modal-drag, .shadow-modal-collapse')) return;
-        resetModalPosition(key, card);
-      });
-
-      dragGrip.addEventListener('pointerdown', (e) => {
-        if (e.button !== 0) return;
-        e.preventDefault();
-        e.stopPropagation();
-        const rect = card.getBoundingClientRect();
-        const startX = e.clientX;
-        const startY = e.clientY;
-        const startLeft = rect.left;
-        const startTop = rect.top;
-        let dragged = false;
-
-        card.style.position = 'fixed';
-        card.style.left = startLeft + 'px';
-        card.style.top = startTop + 'px';
-        card.style.margin = '0';
-
-        dragGrip.setPointerCapture(e.pointerId);
-        document.body.classList.add('shadow-modal-drag-active');
-
-        const onMove = (ev) => {
-          const dx = ev.clientX - startX;
-          const dy = ev.clientY - startY;
-          if (!dragged && (Math.abs(dx) > 3 || Math.abs(dy) > 3)) {
-            dragged = true;
-            modal.classList.add('shadow-modal--dragging');
-          }
-          if (!dragged) return;
-          const pos = clampModalPosition(startLeft + dx, startTop + dy, card);
-          card.style.left = pos.left + 'px';
-          card.style.top = pos.top + 'px';
-        };
-
-        const onUp = (ev) => {
-          dragGrip.releasePointerCapture(ev.pointerId);
-          document.removeEventListener('pointermove', onMove);
-          document.removeEventListener('pointerup', onUp);
-          document.removeEventListener('pointercancel', onUp);
-          modal.classList.remove('shadow-modal--dragging');
-          document.body.classList.remove('shadow-modal-drag-active');
-          if (dragged) saveModalState(key, card);
-        };
-
-        document.addEventListener('pointermove', onMove);
-        document.addEventListener('pointerup', onUp);
-        document.addEventListener('pointercancel', onUp);
+        key === 'detail' ? [qs('#shadow-comment-form', modal)].filter(Boolean) : [];
+      setupDraggableModal(modal, key, {
+        keepOutside,
+        collapsible: COLLAPSIBLE_MODALS.includes(key)
       });
     });
   }
@@ -957,16 +977,13 @@
       btn.textContent = on ? 'Turn off pick mode' : 'Turn on pick mode';
       btn.setAttribute('aria-pressed', on ? 'true' : 'false');
     }
-  }
-
-  function isReviewOpen() {
-    const el = qs('#shadow-review-modal');
-    return el && !el.hidden;
+    const fabPick = qs('.shadow-tools-cat-btn[data-category="pick"]');
+    if (fabPick) fabPick.classList.toggle('shadow-tools-cat-btn--active', on);
   }
 
   function requirePersonForReview() {
     if (getPerson()) return true;
-    hideFloating('review');
+    collapseToolsMenu();
     show('person');
     return false;
   }
@@ -1199,15 +1216,13 @@
     window.TWAShadowGraph.renderMiniPreview(container, currentPagePath());
   }
 
-  function bindSummaryInsightsControls() {
-    const openGraph = qs('.shadow-insights-graph-open');
+  function bindSummaryInsightsControls(container) {
+    const root = container || document;
+    const openGraph = root.querySelector('.shadow-insights-graph-open');
     if (openGraph && !openGraph._bound) {
       openGraph._bound = true;
       openGraph.addEventListener('click', () => {
-        switchReviewTab('seo');
-        if (window.TWAShadowSEO && window.TWAShadowSEO.activateSection) {
-          window.TWAShadowSEO.activateSection('linkgraph');
-        }
+        openActivityPopup('insights', 'linkgraph');
       });
     }
   }
@@ -1234,98 +1249,6 @@
     }
   }
 
-  function updateInsightsPanel(data) {
-    const panel = qs('#shadow-review-insights');
-    if (!panel) return;
-    if (!data || data.error) {
-      panel.innerHTML =
-        '<p class="shadow-hint">Page insights unavailable. Link graph still works without Google credentials.</p>';
-    } else {
-      panel.innerHTML = renderInsightsConfiguredBlock(data);
-    }
-    mountSummaryGraphMini();
-    bindSummaryInsightsControls();
-  }
-
-  function renderReviewSummary() {
-    const panel = qs('#shadow-review-panel-summary');
-    if (!panel) return;
-    const path = currentPagePath();
-    let seoBlock = '<p class="shadow-hint">Open the SEO tab to run an audit.</p>';
-    let designCount = '—';
-    if (window.TWAShadowSEO && window.TWAShadowSEO.renderSummaryHtml) {
-      seoBlock = window.TWAShadowSEO.renderSummaryHtml();
-    }
-    if (window.TWAShadowDesign && window.TWAShadowDesign.getAuditSummary) {
-      designCount = String(window.TWAShadowDesign.getAuditSummary().issueCount);
-    }
-    panel.innerHTML =
-      '<div class="shadow-review-summary">' +
-      '<p class="shadow-review-summary-url"><span class="shadow-review-summary-label">Page</span> <code>' +
-      escapeHtml(path) +
-      '</code></p>' +
-      seoBlock +
-      '<div id="shadow-review-insights" class="shadow-review-insights">' +
-      renderInsightsLoading() +
-      '</div>' +
-      renderLinkGraphSummary() +
-      '<dl class="shadow-review-summary-stats shadow-review-summary-stats--extra">' +
-      '<div><dt>Design issues</dt><dd>' +
-      escapeHtml(designCount) +
-      '</dd></div>' +
-      '</dl>' +
-      '<div class="shadow-review-summary-actions">' +
-      '<button type="button" class="shadow-btn shadow-btn-secondary" data-goto-review-tab="seo">Open SEO tab</button>' +
-      '<button type="button" class="shadow-btn shadow-btn-secondary" data-goto-review-tab="design">Open Design tab</button>' +
-      '<button type="button" class="shadow-btn shadow-btn-secondary" data-goto-review-tab="pick">Open Pick tab</button>' +
-      '</div>' +
-      '<p class="shadow-hint shadow-review-summary-note">Tickets stay in the bottom toolbar for conversation threads.</p>' +
-      '</div>';
-
-    mountSummaryGraphMini();
-    bindSummaryInsightsControls();
-    loadPageInsights(false).then(updateInsightsPanel);
-  }
-
-  function switchReviewTab(tab) {
-    if (!REVIEW_TABS.includes(tab)) tab = 'summary';
-    activeReviewTab = tab;
-    REVIEW_TABS.forEach((name) => {
-      const btn = qs('[data-review-tab="' + name + '"]');
-      const panel = qs('#shadow-review-panel-' + name);
-      if (btn) {
-        btn.classList.toggle('shadow-review-tab--active', name === tab);
-        btn.setAttribute('aria-selected', name === tab ? 'true' : 'false');
-      }
-      if (panel) panel.hidden = name !== tab;
-    });
-    if (tab === 'summary') renderReviewSummary();
-    if (tab === 'seo' && window.TWAShadowSEO && window.TWAShadowSEO.onTabActive) {
-      window.TWAShadowSEO.onTabActive();
-    }
-    if (tab === 'design' && window.TWAShadowDesign && window.TWAShadowDesign.onTabActive) {
-      window.TWAShadowDesign.onTabActive();
-    }
-    if (tab === 'pick') {
-      updatePickToggleLabel(document.body.classList.contains('shadow-pick-mode'));
-    }
-  }
-
-  function openReview(tab) {
-    if (!requirePersonForReview()) return;
-    if (!isReviewOpen()) showFloating('review');
-    switchReviewTab(tab || 'summary');
-  }
-
-  function openReviewTab(tab) {
-    openReview(tab);
-  }
-
-  function toggleReview() {
-    if (isReviewOpen()) hideFloating('review');
-    else openReview('summary');
-  }
-
   function togglePickMode() {
     document.body.classList.toggle('shadow-pick-mode');
     const on = document.body.classList.contains('shadow-pick-mode');
@@ -1336,19 +1259,20 @@
 
   function openToolCategory(category) {
     if (!requirePersonForReview()) return;
-    if (category === 'pick') openReview('pick');
-    else if (category === 'seo') openReview('seo');
-    else if (category === 'design') openReview('design');
+    if (category === 'pick') togglePickMode();
+    else if (category === 'seo') openActivityPopup('seo', 'overview');
+    else if (category === 'design') openActivityPopup('design', 'summary');
+    else if (category === 'insights') openActivityPopup('insights', 'summary');
   }
 
   function closeAllModals() {
-    ['person', 'inbox', 'detail', 'new', 'whatsnew', 'review'].forEach((key) => hide(key));
-    if (window.TWAShadowSEO) window.TWAShadowSEO.shutdown();
-    if (window.TWAShadowDesign) window.TWAShadowDesign.shutdown();
+    ['person', 'inbox', 'detail', 'new', 'whatsnew'].forEach((key) => hide(key));
+    closeAllActivityPopups();
     clearHighlight();
     clearPickHover();
     document.body.classList.remove('shadow-pick-mode');
     updatePickToggleLabel(false);
+    collapseToolsMenu();
   }
 
   function performLogout(message) {
@@ -1596,13 +1520,457 @@
     if (fileInput) fileInput.value = '';
   }
 
+  function getCategorySections(category) {
+    if (category === 'seo' && window.TWAShadowSEO && window.TWAShadowSEO.getSections) {
+      return window.TWAShadowSEO.getSections();
+    }
+    if (category === 'design' && window.TWAShadowDesign && window.TWAShadowDesign.getSections) {
+      return window.TWAShadowDesign.getSections();
+    }
+    if (category === 'insights') return INSIGHTS_SECTIONS.slice();
+    if (category === 'pick') {
+      return [{ id: 'pick', label: 'Pick element' }];
+    }
+    return [];
+  }
+
+  function activityPopupKey(category, sectionId) {
+    return category + '-' + sectionId;
+  }
+
+  function activityModalId(key) {
+    return 'shadow-activity-' + key.replace(/[^a-z0-9-]/gi, '-');
+  }
+
+  function activityStorageKey(key) {
+    return 'activity-' + key;
+  }
+
+  function activitySectionLabel(category, sectionId) {
+    const sections = getCategorySections(category);
+    const match = sections.find((s) => s.id === sectionId);
+    if (match) return match.label;
+    if (category === 'insights' && sectionId === 'summary') return 'Summary';
+    if (category === 'pick') return 'Pick element';
+    return sectionId;
+  }
+
+  function activityPopupTitle(category, sectionId) {
+    const label = activitySectionLabel(category, sectionId);
+    if (category === 'seo') return 'SEO · ' + label;
+    if (category === 'design') return 'Design · ' + label;
+    if (category === 'insights') return 'Insights · ' + label;
+    if (category === 'pick') return 'Pick element';
+    return label;
+  }
+
+  function updateInsightsPanel(container, data) {
+    if (!container) return;
+    if (!data || data.error) {
+      container.innerHTML =
+        '<p class="shadow-hint">Page insights unavailable. Link graph still works without Google credentials.</p>';
+    } else {
+      container.innerHTML = renderInsightsConfiguredBlock(data);
+    }
+    bindSummaryInsightsControls(container);
+  }
+
+  function renderInsightsSummaryHtml(container) {
+    if (!container) return;
+    const path = currentPagePath();
+    let seoBlock = '<p class="shadow-hint">Open SEO from the toolbox to run an audit.</p>';
+    let designCount = '—';
+    if (window.TWAShadowSEO && window.TWAShadowSEO.renderSummaryHtml) {
+      seoBlock = window.TWAShadowSEO.renderSummaryHtml();
+    }
+    if (window.TWAShadowDesign && window.TWAShadowDesign.getAuditSummary) {
+      designCount = String(window.TWAShadowDesign.getAuditSummary().issueCount);
+    }
+    container.innerHTML =
+      '<div class="shadow-review-summary">' +
+      '<p class="shadow-review-summary-url"><span class="shadow-review-summary-label">Page</span> <code>' +
+      escapeHtml(path) +
+      '</code></p>' +
+      seoBlock +
+      '<div class="shadow-review-insights">' +
+      renderInsightsLoading() +
+      '</div>' +
+      renderLinkGraphSummary() +
+      '<dl class="shadow-review-summary-stats shadow-review-summary-stats--extra">' +
+      '<div><dt>Design issues</dt><dd>' +
+      escapeHtml(designCount) +
+      '</dd></div>' +
+      '</dl>' +
+      '<p class="shadow-hint shadow-review-summary-note">Open multiple activities from the toolbox. Tickets stay in the toolbar.</p>' +
+      '</div>';
+    const mini = container.querySelector('#shadow-review-graph-mini');
+    if (mini && window.TWAShadowGraph) {
+      window.TWAShadowGraph.renderMiniPreview(mini, currentPagePath());
+    }
+    bindSummaryInsightsControls(container);
+    loadPageInsights(false).then((data) => {
+      const insightsEl = container.querySelector('.shadow-review-insights');
+      if (insightsEl) updateInsightsPanel(insightsEl, data);
+      const miniGraph = container.querySelector('#shadow-review-graph-mini');
+      if (miniGraph && window.TWAShadowGraph) {
+        window.TWAShadowGraph.renderMiniPreview(miniGraph, currentPagePath());
+      }
+    });
+  }
+
+  function renderInsightsSectionHtml(sectionId, container) {
+    if (!container) return;
+    if (sectionId === 'summary') {
+      renderInsightsSummaryHtml(container);
+      return;
+    }
+    if (sectionId === 'gsc') {
+      container.innerHTML = renderInsightsLoading();
+      loadPageInsights(false).then((data) => {
+        if (!data || data.error || !data.configured || !data.configured.gsc) {
+          container.innerHTML =
+            '<p class="shadow-hint">Search Console not configured or unavailable.</p>';
+          return;
+        }
+        const gsc = data.gsc;
+        if (!gsc || gsc.error) {
+          container.innerHTML = '<p class="shadow-hint">Could not load Search Console data.</p>';
+          return;
+        }
+        container.innerHTML = renderInsightsCard(
+          'Search (GSC · 28 days)',
+          '<div class="shadow-seo-stat-grid">' +
+            '<div class="shadow-seo-stat-card"><span class="shadow-seo-stat-value">' +
+            formatNumber(gsc.page.clicks) +
+            '</span><span class="shadow-seo-stat-label">Clicks</span></div>' +
+            '<div class="shadow-seo-stat-card"><span class="shadow-seo-stat-value">' +
+            formatNumber(gsc.page.impressions) +
+            '</span><span class="shadow-seo-stat-label">Impressions</span></div>' +
+            '<div class="shadow-seo-stat-card"><span class="shadow-seo-stat-value">' +
+            formatPercent(gsc.page.ctr) +
+            '</span><span class="shadow-seo-stat-label">CTR</span></div>' +
+            '<div class="shadow-seo-stat-card"><span class="shadow-seo-stat-value">' +
+            formatNumber(gsc.page.position, 1) +
+            '</span><span class="shadow-seo-stat-label">Avg position</span></div>' +
+            '</div>',
+          'gsc'
+        );
+      });
+      return;
+    }
+    if (sectionId === 'ga4') {
+      container.innerHTML = renderInsightsLoading();
+      loadPageInsights(false).then((data) => {
+        if (!data || data.error || !data.configured || !data.configured.ga4) {
+          container.innerHTML =
+            '<p class="shadow-hint">GA4 not configured or unavailable.</p>';
+          return;
+        }
+        const ga4 = data.ga4;
+        if (!ga4 || ga4.error) {
+          container.innerHTML = '<p class="shadow-hint">Could not load Analytics data.</p>';
+          return;
+        }
+        container.innerHTML = renderInsightsCard(
+          'Traffic (GA4 · 28 days)',
+          '<div class="shadow-seo-stat-grid">' +
+            '<div class="shadow-seo-stat-card"><span class="shadow-seo-stat-value">' +
+            formatNumber(ga4.page.sessions) +
+            '</span><span class="shadow-seo-stat-label">Sessions</span></div>' +
+            '<div class="shadow-seo-stat-card"><span class="shadow-seo-stat-value">' +
+            formatNumber(ga4.page.users) +
+            '</span><span class="shadow-seo-stat-label">Users</span></div>' +
+            '<div class="shadow-seo-stat-card"><span class="shadow-seo-stat-value">' +
+            formatPercent(ga4.page.engagementRate) +
+            '</span><span class="shadow-seo-stat-label">Engagement rate</span></div>' +
+            '<div class="shadow-seo-stat-card"><span class="shadow-seo-stat-value">' +
+            formatDuration(ga4.page.avgEngagementTime) +
+            '</span><span class="shadow-seo-stat-label">Avg engagement</span></div>' +
+            '</div>',
+          'ga4'
+        );
+      });
+      return;
+    }
+    if (sectionId === 'linkgraph') {
+      container.innerHTML =
+        '<div class="shadow-seo-groups">' +
+        '<p class="shadow-seo-subhead">Internal link relationships across sitemap pages.</p>' +
+        '<div class="shadow-graph-panel shadow-activity-graph"></div></div>';
+      const graphEl = container.querySelector('.shadow-activity-graph');
+      if (graphEl && window.TWAShadowGraph) {
+        window.TWAShadowGraph.renderGraphPanel(graphEl, currentPagePath());
+      }
+    }
+  }
+
+  function renderPickActivityHtml(container) {
+    if (!container) return;
+    const on = document.body.classList.contains('shadow-pick-mode');
+    container.innerHTML =
+      '<div class="shadow-review-pick-copy">' +
+      '<h3 class="shadow-review-pick-title">Pick an element</h3>' +
+      '<p>Turn on pick mode, then click any element on the page to file a ticket with that location attached.</p>' +
+      '<button type="button" id="shadow-review-pick-toggle" class="shadow-btn" aria-pressed="' +
+      (on ? 'true' : 'false') +
+      '">' +
+      (on ? 'Turn off pick mode' : 'Turn on pick mode') +
+      '</button>' +
+      '<p class="shadow-hint">Or hold ⌘ (Mac) or Alt (Windows) and click any element.</p>' +
+      '<p class="shadow-hint">Use <strong>Tickets</strong> in the toolbar to view conversation threads.</p>' +
+      '</div>';
+    const pickToggle = container.querySelector('#shadow-review-pick-toggle');
+    if (pickToggle) {
+      pickToggle.addEventListener('click', () => {
+        if (!requirePersonForReview()) return;
+        togglePickMode();
+        renderPickActivityHtml(container);
+      });
+    }
+  }
+
+  function renderActivityContent(category, sectionId, bodyEl, popupKey, modal) {
+    if (category === 'seo' && window.TWAShadowSEO && window.TWAShadowSEO.renderActivity) {
+      window.TWAShadowSEO.renderActivity(sectionId, bodyEl, popupKey, modal);
+      return;
+    }
+    if (category === 'design' && window.TWAShadowDesign && window.TWAShadowDesign.renderActivity) {
+      window.TWAShadowDesign.renderActivity(sectionId, bodyEl, popupKey, modal);
+      return;
+    }
+    if (category === 'insights') {
+      renderInsightsSectionHtml(sectionId, bodyEl);
+      return;
+    }
+    if (category === 'pick') {
+      renderPickActivityHtml(bodyEl);
+    }
+  }
+
+  function bringActivityToFront(modal) {
+    activityPopupCounter += 1;
+    modal.style.zIndex = String(99990 + activityPopupCounter);
+  }
+
+  function closeActivityPopup(key) {
+    const entry = openActivityPopups.get(key);
+    if (!entry) return;
+    const modal = entry.modal;
+    openActivityPopups.delete(key);
+    if (entry.category === 'seo' && window.TWAShadowSEO && window.TWAShadowSEO.closeActivity) {
+      window.TWAShadowSEO.closeActivity(key);
+    }
+    if (entry.category === 'design' && window.TWAShadowDesign && window.TWAShadowDesign.closeActivity) {
+      window.TWAShadowDesign.closeActivity(key);
+    }
+    if (modal && modal.parentNode) modal.parentNode.removeChild(modal);
+  }
+
+  function closeAllActivityPopups() {
+    [...openActivityPopups.keys()].forEach((key) => closeActivityPopup(key));
+    if (window.TWAShadowSEO) window.TWAShadowSEO.shutdown();
+    if (window.TWAShadowDesign) window.TWAShadowDesign.shutdown();
+  }
+
+  function openActivityPopup(category, sectionId) {
+    if (!requirePersonForReview()) return;
+    if (category === 'pick') {
+      togglePickMode();
+      collapseToolsMenu();
+      return;
+    }
+    const key = activityPopupKey(category, sectionId);
+    if (openActivityPopups.has(key)) {
+      bringActivityToFront(openActivityPopups.get(key).modal);
+      collapseToolsMenu();
+      return;
+    }
+    const layer = qs('#shadow-activity-layer');
+    if (!layer) return;
+    const modalId = activityModalId(key);
+    const storageKey = activityStorageKey(key);
+    const title = activityPopupTitle(category, sectionId);
+    const modal = document.createElement('div');
+    modal.id = modalId;
+    modal.className = 'shadow-modal shadow-modal--floating shadow-activity-modal';
+    modal.dataset.activityKey = key;
+    modal.innerHTML =
+      '<div class="shadow-modal-card shadow-activity-card shadow-modal-review" data-category="' +
+      escapeHtml(category) +
+      '" data-section="' +
+      escapeHtml(sectionId) +
+      '">' +
+      '<div class="shadow-modal-head">' +
+      '<h2>' +
+      escapeHtml(title) +
+      '</h2>' +
+      '<button type="button" class="shadow-close shadow-activity-close" aria-label="Close">&times;</button>' +
+      '</div>' +
+      '<div class="shadow-activity-body shadow-review-panel"></div>' +
+      '</div>';
+    layer.appendChild(modal);
+    modal.hidden = false;
+    const card = qs('.shadow-modal-card', modal);
+    const bodyEl = qs('.shadow-activity-body', modal);
+    const footerSelector =
+      category === 'seo'
+        ? '.shadow-seo-footer'
+        : category === 'design'
+          ? '.shadow-design-footer'
+          : null;
+    setupDraggableModal(modal, storageKey, {
+      keepOutside: footerSelector ? [qs(footerSelector, modal)].filter(Boolean) : [],
+      collapsible: true
+    });
+    applyModalSize(card, ACTIVITY_DEFAULT_SIZE.width, ACTIVITY_DEFAULT_SIZE.height);
+    applyModalPosition(storageKey, card);
+    qs('.shadow-activity-close', modal).addEventListener('click', () => closeActivityPopup(key));
+    renderActivityContent(category, sectionId, bodyEl, key, modal);
+    openActivityPopups.set(key, { modal, category, sectionId, bodyEl });
+    bringActivityToFront(modal);
+    collapseToolsMenu();
+  }
+
+  function openReviewTab(tab) {
+    if (tab === 'seo') openActivityPopup('seo', 'overview');
+    else if (tab === 'design') openActivityPopup('design', 'summary');
+    else if (tab === 'pick') togglePickMode();
+    else openActivityPopup('insights', 'summary');
+  }
+
+  function buildToolsMenu() {
+    const categoriesEl = qs('#shadow-tools-categories');
+    if (!categoriesEl) return;
+    categoriesEl.innerHTML = TOOL_CATEGORIES.map((cat, index) => {
+      const rad = (cat.angle * Math.PI) / 180;
+      const x = Math.round(Math.cos(rad) * TOOLS_MENU_RADIUS);
+      const y = Math.round(Math.sin(rad) * -TOOLS_MENU_RADIUS);
+      return (
+        '<button type="button" class="shadow-tools-cat-btn" data-category="' +
+        escapeHtml(cat.id) +
+        '" style="--tools-x:' +
+        x +
+        'px;--tools-y:' +
+        y +
+        'px;--tools-delay:' +
+        index * 40 +
+        'ms" aria-label="' +
+        escapeHtml(cat.label) +
+        '"><span class="shadow-tools-cat-label">' +
+        escapeHtml(cat.label) +
+        '</span></button>'
+      );
+    }).join('');
+    categoriesEl.querySelectorAll('.shadow-tools-cat-btn').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const category = btn.getAttribute('data-category');
+        if (category === 'pick') {
+          openActivityPopup('pick', 'pick');
+          return;
+        }
+        showToolsSubmenu(category, btn);
+      });
+    });
+  }
+
+  function showToolsSubmenu(category, anchorBtn) {
+    const submenu = qs('#shadow-tools-submenu');
+    if (!submenu) return;
+    activeToolCategory = category;
+    const sections = getCategorySections(category);
+    submenu.innerHTML =
+      '<div class="shadow-tools-submenu-head">' +
+      '<span>' +
+      escapeHtml(TOOL_CATEGORIES.find((c) => c.id === category)?.label || category) +
+      '</span>' +
+      '<button type="button" class="shadow-tools-submenu-back" aria-label="Back">&larr;</button>' +
+      '</div>' +
+      '<div class="shadow-tools-submenu-list">' +
+      sections
+        .map(
+          (section) =>
+            '<button type="button" class="shadow-tools-section-btn" data-category="' +
+            escapeHtml(category) +
+            '" data-section="' +
+            escapeHtml(section.id) +
+            '">' +
+            escapeHtml(section.label) +
+            '</button>'
+        )
+        .join('') +
+      '</div>';
+    submenu.hidden = false;
+    qs('.shadow-tools-submenu-back', submenu).addEventListener('click', (e) => {
+      e.stopPropagation();
+      hideToolsSubmenu();
+    });
+    submenu.querySelectorAll('.shadow-tools-section-btn').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openActivityPopup(btn.getAttribute('data-category'), btn.getAttribute('data-section'));
+      });
+    });
+    const wrap = qs('#shadow-tools-wrap');
+    if (wrap) wrap.classList.add('shadow-tools-submenu-open');
+  }
+
+  function hideToolsSubmenu() {
+    const submenu = qs('#shadow-tools-submenu');
+    if (submenu) submenu.hidden = true;
+    activeToolCategory = null;
+    const wrap = qs('#shadow-tools-wrap');
+    if (wrap) wrap.classList.remove('shadow-tools-submenu-open');
+  }
+
+  function collapseToolsMenu() {
+    toolsMenuExpanded = false;
+    hideToolsSubmenu();
+    const wrap = qs('#shadow-tools-wrap');
+    const fab = qs('#shadow-fab');
+    if (wrap) wrap.classList.remove('shadow-tools-exploded');
+    if (fab) fab.setAttribute('aria-expanded', 'false');
+  }
+
+  function expandToolsMenu() {
+    toolsMenuExpanded = true;
+    const wrap = qs('#shadow-tools-wrap');
+    const fab = qs('#shadow-fab');
+    if (wrap) wrap.classList.add('shadow-tools-exploded');
+    if (fab) fab.setAttribute('aria-expanded', 'true');
+  }
+
+  function toggleToolsMenu() {
+    if (toolsMenuExpanded) collapseToolsMenu();
+    else expandToolsMenu();
+  }
+
+  function bindToolsMenuOutsideClick() {
+    if (bindToolsMenuOutsideClick._bound) return;
+    bindToolsMenuOutsideClick._bound = true;
+    document.addEventListener(
+      'pointerdown',
+      (event) => {
+        if (!toolsMenuExpanded) return;
+        if (event.target.closest('#shadow-tools-wrap')) return;
+        collapseToolsMenu();
+      },
+      true
+    );
+  }
+
   function ensureUI() {
     if (qs('#shadow-review-root')) return;
 
     const root = document.createElement('div');
     root.id = 'shadow-review-root';
     root.innerHTML = `
-      <button type="button" id="shadow-fab" class="shadow-fab" title="Page review" aria-label="Open page review panel">${TOOLS_FAB_ICON}</button>
+      <div id="shadow-tools-wrap" class="shadow-tools-wrap">
+        <div id="shadow-tools-submenu" class="shadow-tools-submenu" hidden></div>
+        <div id="shadow-tools-categories" class="shadow-tools-categories" aria-hidden="true"></div>
+        <button type="button" id="shadow-fab" class="shadow-fab shadow-tools-fab" title="Review tools" aria-label="Open review tools menu" aria-expanded="false" aria-haspopup="true">${TOOLS_FAB_ICON}</button>
+      </div>
+      <div id="shadow-activity-layer" class="shadow-activity-layer" aria-live="polite"></div>
 
       <div id="shadow-person-modal" class="shadow-modal" hidden>
         <div class="shadow-modal-card">
@@ -1682,56 +2050,6 @@
         </div>
       </div>
 
-      <div id="shadow-review-modal" class="shadow-modal" hidden>
-        <div class="shadow-modal-card shadow-modal-review">
-          <div class="shadow-modal-head">
-            <h2>Page review</h2>
-            <button type="button" class="shadow-close" data-close="review" aria-label="Close">&times;</button>
-          </div>
-          <nav id="shadow-review-tabs" class="shadow-review-tabs" role="tablist" aria-label="Review sections">
-            <button type="button" class="shadow-review-tab shadow-review-tab--active" data-review-tab="summary" role="tab" aria-selected="true">Summary</button>
-            <button type="button" class="shadow-review-tab" data-review-tab="seo" role="tab" aria-selected="false">SEO</button>
-            <button type="button" class="shadow-review-tab" data-review-tab="design" role="tab" aria-selected="false">Design</button>
-            <button type="button" class="shadow-review-tab" data-review-tab="pick" role="tab" aria-selected="false">Pick</button>
-          </nav>
-          <div class="shadow-review-body">
-            <div id="shadow-review-panel-summary" class="shadow-review-panel shadow-review-panel-summary" role="tabpanel"></div>
-            <div id="shadow-review-panel-seo" class="shadow-review-panel shadow-review-panel-seo" role="tabpanel" hidden>
-              <div class="shadow-seo-body">
-                <nav id="shadow-seo-nav" class="shadow-seo-nav" role="tablist" aria-label="SEO audit sections"></nav>
-                <div class="shadow-seo-content">
-                  <div id="shadow-seo-section" class="shadow-seo-section" role="tabpanel"></div>
-                </div>
-              </div>
-              <footer class="shadow-seo-footer">
-                <button type="button" id="shadow-seo-highlight-toggle" class="shadow-seo-footer-btn" aria-pressed="false">Highlight on page</button>
-                <button type="button" id="shadow-seo-refresh" class="shadow-seo-footer-btn">Refresh audit</button>
-              </footer>
-            </div>
-            <div id="shadow-review-panel-design" class="shadow-review-panel shadow-review-panel-design" role="tabpanel" hidden>
-              <div class="shadow-design-body">
-                <nav id="shadow-design-nav" class="shadow-design-nav" role="tablist" aria-label="Design audit sections"></nav>
-                <div class="shadow-design-content">
-                  <div id="shadow-design-section" class="shadow-design-section" role="tabpanel"></div>
-                </div>
-              </div>
-              <footer class="shadow-design-footer">
-                <button type="button" id="shadow-design-refresh" class="shadow-design-footer-btn">Refresh audit</button>
-              </footer>
-            </div>
-            <div id="shadow-review-panel-pick" class="shadow-review-panel shadow-review-panel-pick" role="tabpanel" hidden>
-              <div class="shadow-review-pick-copy">
-                <h3 class="shadow-review-pick-title">Pick an element</h3>
-                <p>Turn on pick mode, then click any element on the page to file a ticket with that location attached.</p>
-                <button type="button" id="shadow-review-pick-toggle" class="shadow-btn" aria-pressed="false">Turn on pick mode</button>
-                <p class="shadow-hint">Or hold ⌘ (Mac) or Alt (Windows) and click any element without opening this panel.</p>
-                <p class="shadow-hint">Use <strong>Tickets</strong> in the toolbar to view and manage conversation threads.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <div id="shadow-pick-tooltip" hidden aria-hidden="true"></div>
       <div id="shadow-toast" class="shadow-toast" hidden></div>
     `;
@@ -1759,40 +2077,17 @@
       list.appendChild(btn);
     });
 
-    qs('#shadow-fab').addEventListener('click', () => {
+    qs('#shadow-fab').addEventListener('click', (e) => {
+      e.stopPropagation();
       if (!getPerson()) {
         show('person');
         return;
       }
-      toggleReview();
+      toggleToolsMenu();
     });
 
-    const reviewTabs = qs('#shadow-review-tabs');
-    if (reviewTabs) {
-      reviewTabs.addEventListener('click', (e) => {
-        const btn = e.target.closest('[data-review-tab]');
-        if (!btn) return;
-        if (!requirePersonForReview()) return;
-        switchReviewTab(btn.getAttribute('data-review-tab'));
-      });
-    }
-
-    const reviewBody = qs('.shadow-review-body');
-    if (reviewBody) {
-      reviewBody.addEventListener('click', (e) => {
-        const goto = e.target.closest('[data-goto-review-tab]');
-        if (!goto) return;
-        switchReviewTab(goto.getAttribute('data-goto-review-tab'));
-      });
-    }
-
-    const pickToggle = qs('#shadow-review-pick-toggle');
-    if (pickToggle) {
-      pickToggle.addEventListener('click', () => {
-        if (!requirePersonForReview()) return;
-        togglePickMode();
-      });
-    }
+    buildToolsMenu();
+    bindToolsMenuOutsideClick();
 
     root.querySelectorAll('[data-close]').forEach((btn) => {
       btn.addEventListener('click', () => hide(btn.getAttribute('data-close')));
@@ -1811,8 +2106,8 @@
         escapeHtml,
         getPerson,
         showExclusive: show,
+        openActivityPopup,
         openReviewTab,
-        isReviewOpen,
         toast,
         openChangeTicket
       });
@@ -1822,14 +2117,12 @@
       window.TWAShadowDesign.init({
         getPerson,
         showExclusive: show,
+        openActivityPopup,
         openReviewTab,
-        isReviewOpen,
         toast,
         openChangeTicket
       });
     }
-
-    renderReviewSummary();
   }
 
   function updateVersionBadge() {
@@ -1926,8 +2219,7 @@
     inbox: 'shadow-inbox-modal',
     detail: 'shadow-detail-modal',
     new: 'shadow-new-modal',
-    whatsnew: 'shadow-whatsnew-modal',
-    review: 'shadow-review-modal'
+    whatsnew: 'shadow-whatsnew-modal'
   };
 
   function showFloating(which) {
@@ -1938,27 +2230,18 @@
       const card = qs('.shadow-modal-card', el);
       if (card) applyModalPosition(which, card);
     }
-    if (which === 'review' && activeReviewTab === 'summary') renderReviewSummary();
   }
 
   function hideFloating(which) {
     const el = qs('#' + MODAL_MAP[which]);
     if (!el) return;
     el.hidden = true;
-    if (which === 'review') {
-      if (window.TWAShadowSEO) window.TWAShadowSEO.shutdown();
-      if (window.TWAShadowDesign) window.TWAShadowDesign.shutdown();
-      clearPickHover();
-      document.body.classList.remove('shadow-pick-mode');
-      updatePickToggleLabel(false);
-    }
   }
 
   function show(which) {
     Object.entries(MODAL_MAP).forEach(([key, id]) => {
       const el = qs('#' + id);
       if (!el || el.hidden) return;
-      if (key === 'review' && which !== 'review') hideFloating('review');
       el.hidden = true;
     });
     const el = qs('#' + MODAL_MAP[which]);
@@ -1972,10 +2255,6 @@
   }
 
   function hide(which) {
-    if (which === 'review') {
-      hideFloating('review');
-      return;
-    }
     const el = qs('#' + MODAL_MAP[which]);
     if (el) el.hidden = true;
     if (which === 'new') {

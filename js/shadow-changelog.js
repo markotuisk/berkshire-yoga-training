@@ -7,8 +7,22 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.15.0',
+    version: '1.16.0',
     releases: [
+      {
+        version: '1.16.0',
+        date: '2026-08-26',
+        title: 'Exploding toolbox and separate activity popups',
+        user: [
+          'Orange toolbox button now explodes into category buttons: Insights, SEO, Design and Pick',
+          'Tap a category to see its activities (Meta, Links, Typography, GSC, and more), then open each as its own draggable popup',
+          'Keep multiple popups open at once (e.g. Meta and Links) and close them individually',
+          'Pick toggles element selection directly from the toolbox'
+        ],
+        dev: [
+          'shadow-review.js exploding FAB + openActivityPopup; shadow-seo.js and shadow-design.js renderActivity per popup; unified #shadow-review-modal removed; cache-bust via ?v=1.16.0'
+        ]
+      },
       {
         version: '1.15.0',
         date: '2026-08-26',
