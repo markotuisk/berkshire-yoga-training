@@ -12,7 +12,8 @@
     { id: 'overview', label: 'Overview' },
     { id: 'meta', label: 'Meta' },
     { id: 'international', label: 'International' },
-    { id: 'social', label: 'Social' },
+    { id: 'og', label: 'Open Graph' },
+    { id: 'twitter', label: 'Twitter' },
     { id: 'security', label: 'Crawl & security' },
     { id: 'keywords', label: 'Keywords' },
     { id: 'headings', label: 'Headings' },
@@ -1236,38 +1237,22 @@
     return renderFieldTable(rows, 'Document meta');
   }
 
-  function renderSocial(data) {
-    const ogRows = OG_FIELDS.map((key) => {
+  function renderOgTable(data) {
+    const rows = OG_FIELDS.map((key) => {
       const rowOpts = { mono: true, truncate: 64, emptyLabel: 'Not set' };
       if (OG_LOCATE_KEYS[key]) rowOpts.locate = OG_LOCATE_KEYS[key];
       return [key, data.og[key] || '', rowOpts];
     });
-    const twitterRows = TWITTER_FIELDS.map((key) => {
+    return renderFieldTable(rows, 'Open Graph');
+  }
+
+  function renderTwitterTable(data) {
+    const rows = TWITTER_FIELDS.map((key) => {
       const rowOpts = { mono: true, truncate: 64, emptyLabel: 'Not set' };
       if (TWITTER_LOCATE_KEYS[key]) rowOpts.locate = TWITTER_LOCATE_KEYS[key];
       return [key, data.twitter[key] || '', rowOpts];
     });
-    const otherRows = [
-      [
-        'Pinterest (pin:media)',
-        data.pinMedia || '',
-        {
-          mono: true,
-          truncate: 64,
-          emptyLabel: 'Not set',
-          locate: 'pin-media',
-          fieldName: 'Pinterest pin:media'
-        }
-      ],
-      ['LinkedIn', 'Uses Open Graph', { info: true }]
-    ];
-    return (
-      '<div class="shadow-seo-groups">' +
-      renderFieldGroup('Open Graph', renderFieldRows(ogRows)) +
-      renderFieldGroup('Twitter / X', renderFieldRows(twitterRows)) +
-      renderFieldGroup('Other social', renderFieldRows(otherRows)) +
-      '</div>'
-    );
+    return renderFieldTable(rows, 'Twitter cards');
   }
 
   function renderInternational(data) {
@@ -1882,8 +1867,10 @@
         return renderMetaTable(data);
       case 'international':
         return renderInternational(data);
-      case 'social':
-        return renderSocial(data);
+      case 'og':
+        return renderOgTable(data);
+      case 'twitter':
+        return renderTwitterTable(data);
       case 'security':
         return renderCrawlSecurity(data);
       case 'headings':

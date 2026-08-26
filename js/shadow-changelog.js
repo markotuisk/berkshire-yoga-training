@@ -7,50 +7,24 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.9.2',
+    version: '1.9.0',
     releases: [
-      {
-        version: '1.9.2',
-        date: '2026-08-26',
-        title: 'Google guidance on SEO fields',
-        user: [
-          'View SEO fields now include a short note on what Google looks for and why it matters',
-          'Status pills show Found, Might be relevant, Might be added, or Not set — based on this page URL depth',
-          'Structured data tab splits breadcrumbs into JSON-LD and visible navigation rows with Google guidance',
-          'Meta, International, Headings, and Images tabs highlight key Google fields (title, description, canonical, hreflang, H1, alt text)'
-        ],
-        dev: [
-          'GOOGLE_FIELD_HINTS metadata with page-depth relevance logic; Social sidebar tab; cache-bust via ?v=1.9.2'
-        ]
-      },
-      {
-        version: '1.9.1',
-        date: '2026-08-26',
-        title: 'Social tab and View SEO fix',
-        user: [
-          'Open Graph and Twitter are now one Social tab with grouped Open Graph, Twitter / X, and Other social sections',
-          'View SEO in the Tools modal opens the Page SEO panel again'
-        ],
-        dev: [
-          'Social tab replaces separate og/twitter sidebar items (11 nav items); pin:media + LinkedIn guidance row',
-          'Overview warns on missing og:title/og:image and thin OG without twitter:card',
-          'Fix syntax error in shadow-seo.js renderLinks; cache-bust via ?v=1.9.1'
-        ]
-      },
       {
         version: '1.9.0',
         date: '2026-08-26',
         title: 'Complete Google SEO template',
         user: [
           'Page SEO now shows every field Google looks for, even when missing: empty values appear as Not set or Missing pills',
-          'New International tab: hreflang alternates, x-default, and Content-Language',
+          'New International tab: hreflang alternates, x-default, HTML lang, and Content-Language',
           'Meta tab expanded with Googlebot, charset, and viewport; Crawl & security covers noindex, nofollow, and server header note',
+          'Open Graph and Twitter each have their own sidebar tab with the full og:* and twitter:* template',
           'Structured data lists all common Google rich result types (Course, Organization, FAQ, and more) plus JSON-LD blocks',
           'Technical tab adds favicon, apple touch icon, theme colour, lazy images, iframes, and resource hints',
+          'Key fields include a short note on what Google looks for, with Found / Might be relevant / Not set status pills',
           'Overview warnings flag title/description length, missing H1, alt text, og:image, viewport, and key structured data'
         ],
         dev: [
-          'Full Google-focused field template in shadow-seo.js; International sidebar section',
+          'Full Google-focused field template; GOOGLE_FIELD_HINTS with page-depth relevance; separate og/twitter sidebar tabs',
           'Structured data @type mapping with SearchAction check for WebSite; cache-bust via ?v=1.9.0'
         ]
       },
