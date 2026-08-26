@@ -7,8 +7,24 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.11.1',
+    version: '1.12.0',
     releases: [
+      {
+        version: '1.12.0',
+        date: '2026-08-26',
+        title: 'Link checker and ranking SEO tools',
+        user: [
+          'View SEO → Links tab now checks broken links on the current page or crawls the whole site from sitemap.xml',
+          'Summary shows broken internal, broken external, and redirects worth reviewing',
+          'Each link row has ⋯ menu: Locate on page, Open link, and Request change',
+          'Technical tab adds canonical mismatch, mixed content, DOM size, image dimensions, and page load timing',
+          'Structured data tab validates required fields for Organization, WebSite, Article, and other schema types',
+          'New ticket category: Broken link'
+        ],
+        dev: [
+          'js/shadow-links.js page + sitemap crawl (concurrency 5, 8s timeout); shadow-seo.js extended technical/structured validation; try/catch on renderAudit; cache-bust via ?v=1.12.0'
+        ]
+      },
       {
         version: '1.11.1',
         date: '2026-08-26',

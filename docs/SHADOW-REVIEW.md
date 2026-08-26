@@ -27,7 +27,7 @@ Partners do **not** need Cloudflare accounts. Access only needs their emails on 
 2. Choose your name (Katia / Raili / Marko).
 3. **What's new** on login when there are unread partner updates (ticket inbox does not auto-open).
 4. **Tickets** FAB (bottom right) opens the ticket inbox.
-5. **Tools** in the toolbar opens Pick element and **View SEO** (client-side page audit).
+5. **Tools** in the toolbar opens Pick element, **View SEO**, and **View design**.
 6. **Open** tab (default) lists tickets that still need attention; **Closed** holds finished items (Approved, Shipped to live, Won't fix, Duplicate).
 7. Orange **TWA-xxx** markers appear on page elements with open tickets — click to open the thread and jump to the element.
 8. **Show on page** in a ticket (or **Locate** in the inbox) scrolls to the linked element and highlights it. Drag ticket windows by the six-dot grip; drag any corner to resize.
@@ -35,7 +35,7 @@ Partners do **not** need Cloudflare accounts. Access only needs their emails on 
 10. For images or placeholders, the **Storycard** section lets you upload a replacement file (optional).
 11. Add category + comment → ticket created (stored in KV and mirrored to Google Sheets).
 12. Open a ticket to read the thread and add further comments.
-13. **View SEO** shows overview score, meta, headings, images, links, JSON-LD, and technical checks from the current page DOM. **Highlight on page** labels headings and marks images missing alt.
+13. **View SEO** shows overview score, meta, headings, images, links, JSON-LD, and technical checks from the current page DOM. **Links** tab can check broken links on the page or crawl the site from `sitemap.xml`. **Technical** tab reports canonical mismatch, mixed content, DOM size, and load timing. **Structured data** tab validates required schema fields. **Highlight on page** labels headings and marks images missing alt.
 
 **Open tab** (default inbox + on-page markers): Open, Discussing, Accepted, On shadow, In progress, Ready for review, Blocked.
 
@@ -60,6 +60,7 @@ On next login, partners see a **What's new** popup for any release newer than th
 
 ```text
 js/shadow-changelog.js   version + release notes
+js/shadow-links.js         link checker (page + sitemap crawl)
 js/shadow-seo.js           client-side SEO audit panel
 js/shadow-design.js        fonts, colours, accessibility and design mismatch audit
 js/shadow-review.js        overlay UI

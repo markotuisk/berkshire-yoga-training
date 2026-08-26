@@ -229,6 +229,11 @@
   let activeRowLocateKey = null;
   let activeRowForTicket = null;
   let lastKeywordAnalysis = null;
+  let linkCheckResults = null;
+  let linkCheckSummary = null;
+  let linkCheckRunning = false;
+  let linkCheckProgress = null;
+  let linkCheckMode = null;
 
   const STOP_WORDS = new Set(
     'a about above after again against all am an and any are as at be because been before being below between both but by can did do does doing done down during each few for from further had has have having he her here hers herself him himself his how if in into is it its itself just let like ll me more most much must my myself no nor not now of off on once only or other our ours ourselves out over own re s same shall she should so some such t than that the their theirs them themselves then there these they this those though through to too under until up very was we were what when where which while who whom why will with would you your yours yourself yourselves'.split(
@@ -489,6 +494,117 @@
     return list;
   }
 
+  function collectMixedContent() {
+    if (location.protocol !== 'https:') return [];
+    const list = [];
+    const selectors = [
+      ['img[src^="http:"]', 'image'],
+      ['script[src^="http:"]', 'script'],
+      ['link[href^="http:"]', 'stylesheet'],
+      ['iframe[src^="http:"]', 'iframe'],
+      ['video[src^="http:"]', 'video'],
+      ['audio[src^="http:"]', 'audio']
+    ];
+    selectors.forEach(([sel, kind]) => {
+      document.querySelectorAll(sel).forEach((el) => {
+        if (isExcluded(el)) return;
+        const attr = sel.indexOf('href') >= 0 ? 'href' : 'src';
+        list.push({
+          kind,
+          url: el.getAttribute(attr) || '',
+          el
+        });
+      });
+    });
+    return list;
+  }
+
+  function canonicalMismatch(canonical) {
+    if (!canonical) return null;
+    try {
+      const canon = new URL(canonical, location.href);
+      const current = new URL(location.href);
+      const canonPath = canon.pathname.replace(/\/index\.html$/i, '/').replace(/\/+$/, '') || '/';
+      let currentPath = current.pathname.replace(/\/index\.html$/i, '/').replace(/\/+$/, '') || '/';
+      if (canonPath !== currentPath) {
+        return { canonical: canon.href, current: current.href };
+      }
+      return null;
+    } catch (e) {
+      return { canonical, current: location.href, invalid: true };
+    }
+  }
+
+  function collectNavigationTiming() {
+    try {
+      const nav = performance.getEntriesByType('navigation')[0];
+      if (!nav) return null;
+      return {
+        domContentLoaded: Math.round(nav.domContentLoadedEventEnd - nav.startTime),
+        loadComplete: Math.round(nav.loadEventEnd - nav.startTime),
+        transferSize: nav.transferSize || 0
+      };
+    } catch (e) {
+      return null;
+    }
+  }
+
+  const SCHEMA_REQUIRED = {
+    Organization: ['name'],
+    LocalBusiness: ['name'],
+    EducationalOrganization: ['name'],
+    WebSite: ['name', 'url'],
+    Article: ['headline', 'datePublished'],
+    BlogPosting: ['headline', 'datePublished'],
+    Course: ['name', 'description'],
+    FAQPage: ['mainEntity'],
+    BreadcrumbList: ['itemListElement'],
+    Event: ['name', 'startDate'],
+    Person: ['name'],
+    VideoObject: ['name', 'thumbnailUrl'],
+    Review: ['reviewRating', 'author'],
+    AggregateRating: ['ratingValue', 'reviewCount']
+  };
+
+  function validateStructuredItems(allItems) {
+    const issues = [];
+    allItems.forEach((item, index) => {
+      const types = itemTypes(item);
+      types.forEach((type) => {
+        const required = SCHEMA_REQUIRED[type];
+        if (!required) return;
+        required.forEach((field) => {
+          const val = item[field];
+          const missing =
+            val == null ||
+            val === '' ||
+            (Array.isArray(val) && val.length === 0);
+          if (missing) {
+            issues.push({
+              level: 'error',
+              type,
+              field,
+              index,
+              message: type + ' missing required field: ' + field,
+              item
+            });
+          }
+        });
+        if (type === 'WebSite' && !hasSearchAction(item)) {
+          issues.push({
+            level: 'warn',
+            type: 'WebSite',
+            field: 'potentialAction',
+            index,
+            message: 'WebSite schema has no SearchAction (sitelinks search box)',
+            item
+          });
+        }
+      });
+    });
+    return issues;
+  }
+
   function collectLinks() {
     const internal = [];
     const external = [];
@@ -659,7 +775,28 @@
     const links = collectLinks();
     const jsonLd = collectJsonLd();
     const structured = analyseStructuredData(jsonLd);
+    let structuredIssues = validateStructuredItems(structured.allItems);
+    jsonLd.forEach((block) => {
+      try {
+        JSON.parse(block.raw);
+      } catch (e) {
+        structuredIssues.push({
+          level: 'error',
+          type: 'JSON-LD',
+          field: 'parse',
+          message: 'Invalid JSON-LD block ' + block.index,
+          item: null
+        });
+      }
+    });
     const visibleBreadcrumbs = detectVisibleBreadcrumbs();
+    const mixedContent = collectMixedContent();
+    const canonMismatch = canonicalMismatch(canonical);
+    const navTiming = collectNavigationTiming();
+    const domNodeCount = document.getElementsByTagName('*').length;
+    const imagesWithoutDims = images.filter((img) => !img.dims).length;
+    const deferScripts = document.querySelectorAll('script[defer]').length;
+    const asyncScripts = document.querySelectorAll('script[async]').length;
 
     const headScripts = [...document.querySelectorAll('head script[src]')];
     const blockingHeadScripts = headScripts.filter((s) => {
@@ -789,6 +926,46 @@
       });
     }
 
+    if (canonMismatch) {
+      warnings.push({
+        level: 'warn',
+        text: 'Canonical URL does not match current page URL'
+      });
+      score -= 8;
+    }
+
+    if (mixedContent.length) {
+      warnings.push({
+        level: 'error',
+        text: mixedContent.length + ' mixed content resource(s) loaded over HTTP on HTTPS page'
+      });
+      score -= Math.min(15, mixedContent.length * 3);
+    }
+
+    structuredIssues
+      .filter((i) => i.level === 'error')
+      .slice(0, 3)
+      .forEach((i) => {
+        warnings.push({ level: 'warn', text: i.message });
+        score -= 3;
+      });
+
+    if (domNodeCount > 1500) {
+      warnings.push({
+        level: 'warn',
+        text: 'Large DOM (' + domNodeCount + ' nodes) may slow rendering'
+      });
+      score -= 3;
+    }
+
+    if (imagesWithoutDims > 0) {
+      warnings.push({
+        level: 'warn',
+        text: imagesWithoutDims + ' image(s) missing width/height (layout shift risk)'
+      });
+      score -= Math.min(10, imagesWithoutDims * 2);
+    }
+
     const courseType = structured.template.find((t) => t.id === 'course');
     if (courseType && !courseType.found) {
       warnings.push({ level: 'warn', text: 'Course structured data not found (recommended for programme pages)' });
@@ -840,7 +1017,11 @@
       links,
       jsonLd,
       structured,
+      structuredIssues,
       visibleBreadcrumbs,
+      navTiming,
+      mixedContent,
+      canonMismatch,
       technical: {
         https: location.protocol === 'https:',
         wordCount,
@@ -854,7 +1035,11 @@
         preconnectCount,
         prefetchCount,
         lazyImageCount,
-        iframeCount
+        iframeCount,
+        domNodeCount,
+        imagesWithoutDims,
+        deferScripts,
+        asyncScripts
       },
       score,
       warnings
@@ -1126,6 +1311,7 @@
     menuOpts = menuOpts || {};
     const canLocate = canLocateField(locateKey);
     const showPreview = !!menuOpts.previewSrc;
+    const openUrl = menuOpts.openUrl || '';
     const previewAttrs = showPreview
       ? ' data-preview-src="' +
         escapeHtml(menuOpts.previewSrc) +
@@ -1135,6 +1321,7 @@
         escapeHtml(menuOpts.previewDims || '') +
         '"'
       : '';
+    const openAttrs = openUrl ? ' data-open-url="' + escapeHtml(openUrl) + '"' : '';
     return (
       '<span class="shadow-seo-row-menu">' +
       '<button type="button" class="shadow-seo-row-menu-btn" aria-haspopup="menu" aria-expanded="false" ' +
@@ -1146,6 +1333,7 @@
       escapeHtml(locateKey || '') +
       '"' +
       previewAttrs +
+      openAttrs +
       '>' +
       '<span class="shadow-seo-row-menu-dots" aria-hidden="true">⋯</span>' +
       '</button>' +
@@ -1161,6 +1349,11 @@
         : '') +
       (canLocate
         ? '<button type="button" class="shadow-seo-row-menu-item" role="menuitem" data-action="locate">Locate on page</button>'
+        : '') +
+      (openUrl
+        ? '<button type="button" class="shadow-seo-row-menu-item" role="menuitem" data-action="open-link" data-open-url="' +
+          escapeHtml(openUrl) +
+          '">Open link</button>'
         : '') +
       '<button type="button" class="shadow-seo-row-menu-item" role="menuitem" data-action="change">Request change</button>' +
       '</div></span>'
@@ -1235,7 +1428,8 @@
       rowMenuHtml(fieldName, locateKey, {
         previewSrc: opts.previewSrc,
         previewAlt: opts.previewAlt,
-        previewDims: opts.previewDims
+        previewDims: opts.previewDims,
+        openUrl: opts.openUrl
       }) +
       '</div></div>'
     );
@@ -1482,33 +1676,148 @@
     return html;
   }
 
+  function linkStatusBadge(cls) {
+    const tone = cls && cls.tone ? cls.tone : 'warn';
+    const label = cls && cls.label ? cls.label : 'Unknown';
+    return (
+      '<span class="shadow-seo-link-status shadow-seo-link-status--' +
+      tone +
+      '">' +
+      escapeHtml(label) +
+      '</span>'
+    );
+  }
+
+  function renderLinkCheckProgress() {
+    if (!linkCheckRunning || !linkCheckProgress) return '';
+    const p = linkCheckProgress;
+    const pct = p.total ? Math.round((p.done / p.total) * 100) : 0;
+    const label =
+      p.phase === 'pages'
+        ? 'Crawling pages ' + p.done + ' / ' + p.total
+        : 'Checking links ' + p.done + ' / ' + p.total;
+    return (
+      '<div class="shadow-seo-link-progress">' +
+      '<p class="shadow-seo-link-progress-label">' +
+      escapeHtml(label) +
+      '</p>' +
+      '<div class="shadow-seo-link-progress-bar" role="progressbar" aria-valuenow="' +
+      pct +
+      '" aria-valuemin="0" aria-valuemax="100">' +
+      '<span class="shadow-seo-link-progress-fill" style="width:' +
+      pct +
+      '%"></span></div>' +
+      (p.current ? '<p class="shadow-seo-link-progress-current">' + escapeHtml(truncate(p.current, 64)) + '</p>' : '') +
+      '</div>'
+    );
+  }
+
+  function renderLinkCheckSummary(summary) {
+    if (!summary) return '';
+    return (
+      '<div class="shadow-seo-link-summary">' +
+      '<span class="shadow-seo-link-summary-item shadow-seo-link-summary-item--error">' +
+      'Broken internal: <strong>' +
+      summary.brokenInternal +
+      '</strong></span>' +
+      '<span class="shadow-seo-link-summary-item shadow-seo-link-summary-item--warn">' +
+      'Broken external: <strong>' +
+      summary.brokenExternal +
+      '</strong></span>' +
+      '<span class="shadow-seo-link-summary-item">' +
+      'Redirects: <strong>' +
+      summary.redirects +
+      '</strong></span>' +
+      '</div>'
+    );
+  }
+
+  function renderLinkCheckRow(result, index) {
+    const fieldName = (result.isInternal ? 'Internal link' : 'External link') + ': ' + truncate(result.href, 40);
+    const locateKey = result.locateKey || '';
+    const value =
+      linkStatusBadge(result.cls) +
+      ' <span class="shadow-seo-value shadow-seo-value--mono">' +
+      escapeHtml(truncate(result.href, 52)) +
+      '</span>' +
+      (result.text ? ' <span class="shadow-seo-link-text">' + escapeHtml(result.text) + '</span>' : '') +
+      (result.sourcePage
+        ? ' <span class="shadow-seo-link-text">on ' + escapeHtml(truncate(result.sourcePage, 40)) + '</span>'
+        : '') +
+      (result.finalUrl && result.finalUrl !== result.href
+        ? ' <span class="shadow-seo-link-text">→ ' + escapeHtml(truncate(result.finalUrl, 40)) + '</span>'
+        : '');
+    const warn = result.cls && (result.cls.kind === 'broken' || result.cls.kind === 'timeout');
+    return [
+      result.isInternal ? 'Internal' : 'External',
+      value,
+      {
+        media: true,
+        raw: true,
+        warn,
+        locate: locateKey,
+        openUrl: result.href,
+        fieldName,
+        badge: result.isInternal
+          ? 'shadow-seo-link-badge shadow-seo-link-badge--internal'
+          : 'shadow-seo-link-badge shadow-seo-link-badge--external'
+      }
+    ];
+  }
+
   function renderLinks(data) {
     const links = data.links;
     let html =
-      '<p class="shadow-seo-counts">Total: ' +
+      '<div class="shadow-seo-link-actions">' +
+      '<button type="button" id="shadow-seo-check-page-links" class="shadow-seo-link-action-btn"' +
+      (linkCheckRunning ? ' disabled' : '') +
+      '>Check links on this page</button>' +
+      '<button type="button" id="shadow-seo-crawl-site-links" class="shadow-seo-link-action-btn shadow-seo-link-action-btn--secondary"' +
+      (linkCheckRunning ? ' disabled' : '') +
+      '>Crawl site from sitemap</button>' +
+      (linkCheckRunning
+        ? '<button type="button" id="shadow-seo-cancel-link-check" class="shadow-seo-link-action-btn shadow-seo-link-action-btn--cancel">Cancel</button>'
+        : '') +
+      '</div>' +
+      renderLinkCheckProgress() +
+      renderLinkCheckSummary(linkCheckSummary) +
+      '<p class="shadow-seo-counts">On page: ' +
       links.total +
-      ' · Internal: ' +
+      ' links · Internal: ' +
       links.internal.length +
       ' · External: ' +
       links.external.length +
       ' · rel=nofollow: ' +
       links.nofollowCount +
-      '</p>' +
-      '<p class="shadow-seo-subhead">Broken links cannot be fully detected client-side without fetching each URL.</p>';
-    const slice = links.internal.slice(0, 15);
+      '</p>';
+
+    if (linkCheckResults && linkCheckResults.length) {
+      const problemRows = linkCheckResults.filter(
+        (r) => r.cls.kind === 'broken' || r.cls.kind === 'timeout' || r.cls.kind === 'redirect'
+      );
+      const showRows = problemRows.length ? problemRows : linkCheckResults;
+      const title = problemRows.length ? 'Issues found (' + problemRows.length + ')' : 'All links checked (' + linkCheckResults.length + ')';
+      html +=
+        '<div class="shadow-seo-groups">' +
+        renderFieldGroup(
+          title,
+          renderFieldRows(showRows.slice(0, 50).map((r, i) => renderLinkCheckRow(r, i)))
+        ) +
+        (showRows.length > 50 ? '<p class="shadow-seo-subhead">Showing first 50 of ' + showRows.length + '</p>' : '') +
+        '</div>';
+    } else if (!linkCheckRunning) {
+      html += '<p class="shadow-seo-subhead">Run a check to verify link targets (same-origin links return full status; external links may show Unverified due to browser limits).</p>';
+    }
+
+    const slice = links.internal.slice(0, 10);
     if (slice.length) {
       const intRows = slice.map((l, i) => [
         'Internal',
-        '<a href="' +
-          escapeHtml(l.href) +
-          '" target="_blank" rel="noopener">' +
-          escapeHtml(truncate(l.href, 56)) +
-          '</a>' +
-          (l.text ? ' <span class="shadow-seo-link-text">' + escapeHtml(l.text) + '</span>' : '') +
-          (l.nofollow ? ' <span class="shadow-seo-link-text">nofollow</span>' : ''),
+        escapeHtml(truncate(l.href, 56)) + (l.text ? ' <span class="shadow-seo-link-text">' + escapeHtml(l.text) + '</span>' : ''),
         {
           media: true,
           locate: 'link-int-' + i,
+          openUrl: l.href,
           fieldName: 'Internal link',
           raw: true,
           badge: 'shadow-seo-link-badge shadow-seo-link-badge--internal'
@@ -1516,35 +1825,8 @@
       ]);
       html +=
         '<div class="shadow-seo-groups">' +
-        renderFieldGroup('Internal (first ' + slice.length + ')', renderFieldRows(intRows)) +
+        renderFieldGroup('Link inventory (internal)', renderFieldRows(intRows)) +
         '</div>';
-    } else {
-      html += '<p class="shadow-seo-empty-state">' + emptyPill('None') + '</p>';
-    }
-    const extSlice = links.external.slice(0, 10);
-    if (extSlice.length) {
-      const extRows = extSlice.map((l, i) => [
-        'External',
-        '<a href="' +
-          escapeHtml(l.href) +
-          '" target="_blank" rel="noopener">' +
-          escapeHtml(truncate(l.href, 56)) +
-          '</a>' +
-          (l.nofollow ? ' <span class="shadow-seo-link-text">nofollow</span>' : ''),
-        {
-          media: true,
-          locate: 'link-ext-' + i,
-          fieldName: 'External link',
-          raw: true,
-          badge: 'shadow-seo-link-badge shadow-seo-link-badge--external'
-        }
-      ]);
-      html +=
-        '<div class="shadow-seo-groups">' +
-        renderFieldGroup('External (first ' + extSlice.length + ')', renderFieldRows(extRows)) +
-        '</div>';
-    } else if (!slice.length) {
-      html += '<p class="shadow-seo-empty-state">' + emptyPill('None') + '</p>';
     }
     return html;
   }
@@ -1613,12 +1895,35 @@
   }
 
   function renderStructured(data) {
+    let html = '<div class="shadow-seo-groups">';
+
+    if (data.structuredIssues && data.structuredIssues.length) {
+      const issueRows = data.structuredIssues.map((issue, i) => {
+        const fieldName = issue.message;
+        return [
+          issue.level === 'error' ? 'Error' : 'Warning',
+          escapeHtml(issue.message),
+          {
+            warn: issue.level === 'error',
+            fieldName,
+            locate: 'structured-issue-' + i,
+            raw: true
+          }
+        ];
+      });
+      html += renderFieldGroup('Validation (' + data.structuredIssues.length + ')', renderFieldRows(issueRows));
+    } else {
+      html += renderFieldGroup(
+        'Validation',
+        '<p class="shadow-seo-empty-state"><span class="shadow-seo-value shadow-seo-value--found">No schema errors on required fields</span></p>',
+        { plain: true }
+      );
+    }
+
     const templateRows = data.structured.template
       .map((entry) => renderStructuredTypeRow(entry, data))
       .join('');
-    let html =
-      '<div class="shadow-seo-groups">' +
-      renderFieldGroup('Google rich result types', templateRows);
+    html += renderFieldGroup('Google rich result types', templateRows);
 
     if (data.jsonLd.length) {
       html += data.jsonLd
@@ -1652,8 +1957,12 @@
   function renderTechnical(data) {
     const t = data.technical;
     const stats = [
+      { label: 'DOM nodes', value: String(t.domNodeCount), tone: t.domNodeCount > 1500 ? 'warn' : '' },
+      { label: 'Images', value: String(data.images.length) },
+      { label: 'Images no dimensions', value: String(t.imagesWithoutDims), tone: t.imagesWithoutDims ? 'warn' : 'good' },
+      { label: 'Scripts (defer)', value: String(t.deferScripts) },
+      { label: 'Scripts (async)', value: String(t.asyncScripts) },
       { label: 'Stylesheets', value: String(t.stylesheetCount) },
-      { label: 'Scripts', value: String(t.scriptCount) },
       {
         label: 'Blocking in head',
         value: String(t.blockingHeadScripts),
@@ -1664,6 +1973,17 @@
       { label: 'Preconnect hints', value: String(t.preconnectCount) },
       { label: 'Prefetch / dns-prefetch', value: String(t.prefetchCount) }
     ];
+    if (data.navTiming) {
+      stats.push({
+        label: 'DOM ready',
+        value: data.navTiming.domContentLoaded + ' ms'
+      });
+      stats.push({
+        label: 'Page load',
+        value: data.navTiming.loadComplete + ' ms',
+        tone: data.navTiming.loadComplete > 3000 ? 'warn' : 'good'
+      });
+    }
     let html =
       '<div class="shadow-seo-groups">' +
       '<div class="shadow-seo-stat-grid">' +
@@ -1680,6 +2000,32 @@
         )
         .join('') +
       '</div>';
+
+    const techRows = [];
+    if (data.canonMismatch) {
+      techRows.push([
+        'Canonical mismatch',
+        'Canonical: ' + truncate(data.canonical, 48) + ' · Current: ' + truncate(data.url, 48),
+        { warn: true, fieldName: 'Canonical URL mismatch', locate: 'meta-canonical', raw: true }
+      ]);
+    }
+    techRows.push([
+      'robots noindex',
+      data.robotsFlags.noindex ? 'Yes' : 'No',
+      { fieldName: 'robots noindex', locate: data.robotsFlags.noindex ? 'meta-robots' : '' }
+    ]);
+    if (data.mixedContent && data.mixedContent.length) {
+      data.mixedContent.slice(0, 8).forEach((item, i) => {
+        techRows.push([
+          'Mixed content',
+          item.kind + ': ' + truncate(item.url, 48),
+          { warn: true, fieldName: 'Mixed content', locate: 'mixed-' + i, openUrl: item.url, raw: true }
+        ]);
+      });
+    } else {
+      techRows.push(['Mixed content', 'None detected', { fieldName: 'Mixed content' }]);
+    }
+    html += renderFieldGroup('Technical SEO', renderFieldRows(techRows));
     const assetRows = [
       ['Favicon', t.favicon, { mono: true, truncate: 56, emptyLabel: 'Not set', locate: 'tech-favicon' }],
       [
@@ -2179,6 +2525,12 @@
       return data.visibleBreadcrumbs.el;
     }
 
+    const mixedMatch = key.match(/^mixed-(\d+)$/);
+    if (mixedMatch && data.mixedContent) {
+      const item = data.mixedContent[parseInt(mixedMatch[1], 10)];
+      return item ? item.el : null;
+    }
+
     const structuredMatch = key.match(/^structured-([a-z-]+)$/);
     if (structuredMatch) {
       const typeId = structuredMatch[1];
@@ -2629,6 +2981,14 @@
       setActiveRow(locateKey);
       closeRowMenu(menu, { keepActiveRow: true });
       locateOnPage(locateKey);
+    } else if (action === 'open-link') {
+      const url =
+        previewAttrFrom(item, 'open-url') ||
+        previewAttrFrom(menuBtnEl, 'open-url') ||
+        '';
+      closeRowMenu(menu);
+      if (url) window.open(url, '_blank', 'noopener,noreferrer');
+      else if (helpers && helpers.toast) helpers.toast('No link URL');
     } else if (action === 'change') {
       setActiveRow(locateKey);
       closeRowMenu(menu, { keepActiveRow: true });
@@ -2679,21 +3039,124 @@
     document.addEventListener('pointerdown', onDocumentPointerDown, true);
   }
 
+  function updateLinkCheckUi() {
+    if (activeSection !== 'links') return;
+    const body = qs('#shadow-seo-section');
+    if (!body || !lastAuditData) return;
+    body.innerHTML = renderSection(lastAuditData, 'links');
+    bindLinkCheckControls();
+  }
+
+  async function runPageLinkCheck() {
+    if (!window.TWAShadowLinks || linkCheckRunning) return;
+    linkCheckRunning = true;
+    linkCheckMode = 'page';
+    linkCheckProgress = { done: 0, total: 0, phase: 'links' };
+    linkCheckResults = null;
+    linkCheckSummary = null;
+    updateLinkCheckUi();
+    try {
+      const data = await window.TWAShadowLinks.checkCurrentPageLinks((p) => {
+        linkCheckProgress = Object.assign({ phase: 'links' }, p);
+        updateLinkCheckUi();
+      });
+      linkCheckResults = data.results;
+      linkCheckSummary = data.summary;
+      if (helpers && helpers.toast) {
+        helpers.toast(
+          'Checked ' + data.summary.total + ' links — ' + data.summary.brokenInternal + ' broken internal'
+        );
+      }
+    } catch (err) {
+      console.error('[TWAShadowSEO] page link check failed', err);
+      if (helpers && helpers.toast) helpers.toast('Link check failed');
+    } finally {
+      linkCheckRunning = false;
+      linkCheckProgress = null;
+      updateLinkCheckUi();
+    }
+  }
+
+  async function runSiteLinkCrawl() {
+    if (!window.TWAShadowLinks || linkCheckRunning) return;
+    linkCheckRunning = true;
+    linkCheckMode = 'crawl';
+    linkCheckProgress = { done: 0, total: 0, phase: 'pages' };
+    linkCheckResults = null;
+    linkCheckSummary = null;
+    updateLinkCheckUi();
+    try {
+      const data = await window.TWAShadowLinks.crawlSiteFromSitemap((p) => {
+        linkCheckProgress = p;
+        updateLinkCheckUi();
+      });
+      linkCheckResults = data.results;
+      linkCheckSummary = data.summary;
+      if (helpers && helpers.toast) {
+        helpers.toast(
+          'Crawled ' + data.pagesCrawled + ' pages — ' + data.summary.brokenInternal + ' broken internal links'
+        );
+      }
+    } catch (err) {
+      console.error('[TWAShadowSEO] site crawl failed', err);
+      if (helpers && helpers.toast) {
+        helpers.toast(err.message === 'Crawl cancelled' ? 'Crawl cancelled' : 'Site crawl failed');
+      }
+    } finally {
+      linkCheckRunning = false;
+      linkCheckProgress = null;
+      linkCheckMode = null;
+      updateLinkCheckUi();
+    }
+  }
+
+  function cancelLinkCheck() {
+    if (window.TWAShadowLinks) window.TWAShadowLinks.cancelCrawl();
+    linkCheckRunning = false;
+    linkCheckProgress = null;
+    updateLinkCheckUi();
+  }
+
+  function bindLinkCheckControls() {
+    const section = qs('#shadow-seo-section');
+    if (!section || section._linkCheckBound) return;
+    section._linkCheckBound = true;
+    section.addEventListener('click', (event) => {
+      if (event.target.closest('#shadow-seo-check-page-links')) {
+        event.preventDefault();
+        runPageLinkCheck();
+      } else if (event.target.closest('#shadow-seo-crawl-site-links')) {
+        event.preventDefault();
+        runSiteLinkCrawl();
+      } else if (event.target.closest('#shadow-seo-cancel-link-check')) {
+        event.preventDefault();
+        cancelLinkCheck();
+      }
+    });
+  }
+
   function renderAudit() {
     const body = qs('#shadow-seo-section');
     if (!body) return;
-    const data = auditPage();
-    lastAuditData = data;
-    renderTabs();
-    body.classList.remove('shadow-seo-section--visible');
-    body.innerHTML = renderSection(data, activeSection);
-    requestAnimationFrame(() => {
-      body.classList.add('shadow-seo-section--visible');
-    });
-    if (highlightOn) applyHighlights(data);
-    closeAllRowMenus();
-    activeRowForTicket = null;
-    clearActiveRow();
+    try {
+      const data = auditPage();
+      lastAuditData = data;
+      renderTabs();
+      body.classList.remove('shadow-seo-section--visible');
+      body.innerHTML = renderSection(data, activeSection);
+      requestAnimationFrame(() => {
+        body.classList.add('shadow-seo-section--visible');
+      });
+      if (highlightOn) applyHighlights(data);
+      closeAllRowMenus();
+      activeRowForTicket = null;
+      clearActiveRow();
+      if (activeSection === 'links') bindLinkCheckControls();
+    } catch (err) {
+      console.error('[TWAShadowSEO] renderAudit failed', err);
+      body.innerHTML =
+        '<p class="shadow-seo-empty-state">Could not run SEO audit. Try refreshing the page.</p>';
+    }
   }
 
   function ensureOverlayLayer() {
@@ -2791,6 +3254,7 @@
 
   function bindSeoControls() {
     bindRowMenuHandlers();
+    bindLinkCheckControls();
     const toggle = qs('#shadow-seo-highlight-toggle');
     if (toggle && !toggle._bound) {
       toggle._bound = true;
@@ -2827,6 +3291,7 @@
     clearActiveRow();
     closeAllRowMenus();
     closeImagePreview();
+    cancelLinkCheck();
     closePanel();
   }
 

@@ -17,6 +17,7 @@
     'Bug',
     'Missing image',
     'Broken button',
+    'Broken link',
     'Other'
   ];
 

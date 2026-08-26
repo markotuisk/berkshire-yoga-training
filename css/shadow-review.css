@@ -2731,3 +2731,137 @@ body.shadow-seo-image-preview-open {
   flex-shrink: 0;
   align-self: flex-start;
 }
+
+/* Link checker (SEO Links tab) */
+.shadow-seo-link-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.shadow-seo-link-action-btn {
+  margin: 0;
+  padding: 0.45rem 0.75rem;
+  border: 1px solid rgba(232, 97, 46, 0.35);
+  border-radius: 8px;
+  background: var(--shadow-accent);
+  color: #fff;
+  font-family: var(--shadow-font);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity var(--shadow-ease), transform var(--shadow-ease);
+}
+
+.shadow-seo-link-action-btn:hover:not(:disabled) {
+  opacity: 0.92;
+}
+
+.shadow-seo-link-action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.shadow-seo-link-action-btn--secondary {
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--shadow-text);
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+.shadow-seo-link-action-btn--cancel {
+  background: transparent;
+  color: #c62828;
+  border-color: rgba(198, 40, 40, 0.3);
+}
+
+.shadow-seo-link-progress {
+  margin-bottom: 0.75rem;
+  padding: 0.65rem 0.75rem;
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 10px;
+}
+
+.shadow-seo-link-progress-label {
+  margin: 0 0 0.4rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--shadow-text);
+}
+
+.shadow-seo-link-progress-bar {
+  height: 6px;
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.shadow-seo-link-progress-fill {
+  display: block;
+  height: 100%;
+  background: var(--shadow-accent);
+  border-radius: 3px;
+  transition: width 0.2s ease;
+}
+
+.shadow-seo-link-progress-current {
+  margin: 0.35rem 0 0;
+  font-size: 0.75rem;
+  color: #8e8e93;
+  word-break: break-all;
+}
+
+.shadow-seo-link-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  margin-bottom: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(232, 97, 46, 0.06);
+  border-radius: 10px;
+  font-size: 0.8125rem;
+}
+
+.shadow-seo-link-summary-item strong {
+  font-weight: 700;
+}
+
+.shadow-seo-link-summary-item--error strong {
+  color: #c62828;
+}
+
+.shadow-seo-link-summary-item--warn strong {
+  color: #e65100;
+}
+
+.shadow-seo-link-status {
+  display: inline-block;
+  padding: 0.1rem 0.45rem;
+  border-radius: 6px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  vertical-align: middle;
+  margin-right: 0.35rem;
+}
+
+.shadow-seo-link-status--good {
+  background: rgba(52, 199, 89, 0.15);
+  color: #248a3d;
+}
+
+.shadow-seo-link-status--warn {
+  background: rgba(255, 149, 0, 0.15);
+  color: #c93400;
+}
+
+.shadow-seo-link-status--error {
+  background: rgba(255, 59, 48, 0.12);
+  color: #c62828;
+}
+
+.shadow-seo-link-status--info {
+  background: rgba(0, 122, 255, 0.12);
+  color: #0040dd;
+}
