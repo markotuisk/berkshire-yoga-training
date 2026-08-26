@@ -7,8 +7,20 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.20.0',
+    version: '1.20.1',
     releases: [
+      {
+        version: '1.20.1',
+        date: '2026-08-26',
+        title: 'Toolbox sub-menu close controls',
+        user: [
+          'Close any toolbox category sub-menu with the × button, Escape, or a tap outside the menu',
+          'Back arrow still returns to the category list without closing the toolbox'
+        ],
+        dev: [
+          'shadow-tools-submenu-close; header grid [← title ×]; bindToolsMenuEscapeKey; outside-click when submenu open; drag excludes close btn; cache-bust via ?v=1.20.1'
+        ]
+      },
       {
         version: '1.20.0',
         date: '2026-08-26',

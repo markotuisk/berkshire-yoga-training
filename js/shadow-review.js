@@ -2251,7 +2251,7 @@
       if (submenu.hidden) return;
       const head = e.target.closest('.shadow-tools-submenu-head');
       if (!head || !submenu.contains(head)) return;
-      if (e.target.closest('.shadow-tools-submenu-back')) return;
+      if (e.target.closest('.shadow-tools-submenu-back, .shadow-tools-submenu-close')) return;
       if (e.button !== 0) return;
       e.preventDefault();
 
@@ -2319,10 +2319,11 @@
       .join('');
     submenu.innerHTML =
       '<div class="shadow-tools-submenu-head">' +
-      '<span>' +
+      '<button type="button" class="shadow-tools-submenu-back" aria-label="Back">&larr;</button>' +
+      '<span class="shadow-tools-submenu-title">' +
       escapeHtml(TOOL_CATEGORIES.find((c) => c.id === category)?.label || category) +
       '</span>' +
-      '<button type="button" class="shadow-tools-submenu-back" aria-label="Back">&larr;</button>' +
+      '<button type="button" class="shadow-tools-submenu-close" aria-label="Close menu">&times;</button>' +
       '</div>' +
       '<div class="shadow-tools-submenu-list">' +
       groupHtml +
@@ -2333,6 +2334,10 @@
     qs('.shadow-tools-submenu-back', submenu).addEventListener('click', (e) => {
       e.stopPropagation();
       hideToolsSubmenu();
+    });
+    qs('.shadow-tools-submenu-close', submenu).addEventListener('click', (e) => {
+      e.stopPropagation();
+      collapseToolsMenu();
     });
     submenu.querySelectorAll('.shadow-tools-section-btn').forEach((btn) => {
       btn.addEventListener('click', (e) => {
@@ -2395,6 +2400,11 @@
     else expandToolsMenu();
   }
 
+  function isToolsSubmenuOpen() {
+    const submenu = qs('#shadow-tools-submenu');
+    return !!(submenu && !submenu.hidden);
+  }
+
   function bindToolsMenuOutsideClick() {
     if (bindToolsMenuOutsideClick._bound) return;
     bindToolsMenuOutsideClick._bound = true;
@@ -2402,12 +2412,36 @@
       'pointerdown',
       (event) => {
         if (!toolsMenuExpanded && !dockOverflowOpen) return;
-        if (event.target.closest('#shadow-tools-wrap')) return;
         if (event.target.closest('#shadow-activity-dock')) return;
+        if (isToolsSubmenuOpen()) {
+          if (event.target.closest('#shadow-tools-submenu')) return;
+          if (event.target.closest('#shadow-fab')) return;
+          if (event.target.closest('#shadow-tools-categories')) return;
+          collapseToolsMenu();
+          return;
+        }
+        if (event.target.closest('#shadow-tools-wrap')) return;
         collapseToolsMenu();
       },
       true
     );
+  }
+
+  function bindToolsMenuEscapeKey() {
+    if (bindToolsMenuEscapeKey._bound) return;
+    bindToolsMenuEscapeKey._bound = true;
+    document.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape') return;
+      if (isToolsSubmenuOpen()) {
+        event.preventDefault();
+        hideToolsSubmenu();
+        return;
+      }
+      if (toolsMenuExpanded) {
+        event.preventDefault();
+        collapseToolsMenu();
+      }
+    });
   }
 
   function pulseToolsFabOnce() {
@@ -2561,6 +2595,7 @@
 
     buildToolsMenu();
     bindToolsMenuOutsideClick();
+    bindToolsMenuEscapeKey();
     addActivityDock();
     pulseToolsFabOnce();
 
