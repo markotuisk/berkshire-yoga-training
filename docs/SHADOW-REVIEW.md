@@ -25,15 +25,17 @@ Partners do **not** need Cloudflare accounts. Access only needs their emails on 
 
 1. Open the shadow site (Cloudflare Access login → one-time email code or Google).
 2. Choose your name (Katia / Raili / Marko).
-3. **What's new** on login when there are unread partner updates, then the ticket inbox.
-4. The inbox shows **all reviewers' tickets** (not just your own) so partners can spot duplicates.
-5. **Open** tab (default) lists tickets that still need attention; **Closed** holds finished items (Approved, Shipped, Won't fix, Duplicate).
-6. Orange **TWA-xxx** markers appear on page elements with open tickets — click to open the thread and jump to the element.
-7. **Show on page** in a ticket (or **Locate** in the inbox) scrolls to the linked element and highlights it. Drag ticket windows by the six-dot grip; drag any corner to resize.
-8. Click **Pick element** (or ⌘/Alt+click) on any text, image, or button.
-9. For images or placeholders, the **Storycard** section lets you upload a replacement file (optional).
-10. Add category + comment → ticket created (stored in KV and mirrored to Google Sheets).
-11. Open a ticket to read the thread and add further comments.
+3. **What's new** on login when there are unread partner updates (ticket inbox does not auto-open).
+4. **Tickets** FAB (bottom right) opens the ticket inbox.
+5. **Tools** in the toolbar opens Pick element and **View SEO** (client-side page audit).
+6. **Open** tab (default) lists tickets that still need attention; **Closed** holds finished items (Approved, Shipped to live, Won't fix, Duplicate).
+7. Orange **TWA-xxx** markers appear on page elements with open tickets — click to open the thread and jump to the element.
+8. **Show on page** in a ticket (or **Locate** in the inbox) scrolls to the linked element and highlights it. Drag ticket windows by the six-dot grip; drag any corner to resize.
+9. Use **Pick element** in Tools (or ⌘/Alt+click) on any text, image, or button.
+10. For images or placeholders, the **Storycard** section lets you upload a replacement file (optional).
+11. Add category + comment → ticket created (stored in KV and mirrored to Google Sheets).
+12. Open a ticket to read the thread and add further comments.
+13. **View SEO** shows overview score, meta, headings, images, links, JSON-LD, and technical checks from the current page DOM. **Highlight on page** labels headings and marks images missing alt.
 
 **Open tab** (default inbox + on-page markers): Open, Discussing, Accepted, On shadow, In progress, Ready for review, Blocked.
 
@@ -43,7 +45,7 @@ Partners use **Comment** to discuss, **Accept** to agree with the proposed direc
 
 ## Version and What's new
 
-Shadow mode tools are versioned in `js/shadow-changelog.js` (currently loaded before `js/shadow-review.js`).
+Shadow mode tools are versioned in `js/shadow-changelog.js` (loaded before `js/shadow-seo.js` and `js/shadow-review.js`).
 
 When shipping partner-facing changes:
 
@@ -57,6 +59,7 @@ On next login, partners see a **What's new** popup for any release newer than th
 
 ```text
 js/shadow-changelog.js   version + release notes
+js/shadow-seo.js           client-side SEO audit panel
 js/shadow-review.js        overlay UI
 css/shadow-review.css      overlay styles
 ```

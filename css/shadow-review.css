@@ -1118,3 +1118,296 @@ body.shadow-modal-drag-active {
   padding: 0.35rem 0;
   border: none;
 }
+
+/* Tools modal */
+.shadow-modal-tools {
+  width: min(18.75rem, 100%);
+}
+
+.shadow-tools-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.shadow-tools-action {
+  width: 100%;
+  justify-content: center;
+  text-align: center;
+  padding: 0.65rem 1rem;
+}
+
+.shadow-tools-hint {
+  margin-bottom: 0;
+  font-size: 0.75rem;
+}
+
+.shadow-btn--active {
+  background: var(--shadow-accent);
+  color: #fff;
+  border-color: transparent;
+}
+
+/* SEO audit panel */
+.shadow-modal-seo {
+  width: min(25rem, 100%);
+}
+
+.shadow-seo-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.shadow-seo-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.shadow-seo-tab {
+  border: none;
+  border-radius: 8px;
+  padding: 0.35rem 0.6rem;
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--shadow-text-secondary);
+  font: inherit;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--shadow-ease), color var(--shadow-ease);
+}
+
+.shadow-seo-tab:hover {
+  color: var(--shadow-text);
+}
+
+.shadow-seo-tab--active {
+  background: rgba(232, 97, 46, 0.12);
+  color: var(--shadow-accent);
+}
+
+.shadow-seo-section {
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+
+.shadow-seo-overview {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.shadow-seo-score {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 5.5rem;
+  height: 5.5rem;
+  border-radius: 50%;
+  margin: 0 auto;
+  font-weight: 700;
+}
+
+.shadow-seo-score--good {
+  background: rgba(52, 199, 89, 0.14);
+  color: #248a3d;
+}
+
+.shadow-seo-score--ok {
+  background: rgba(255, 149, 0, 0.14);
+  color: #c93400;
+}
+
+.shadow-seo-score--poor {
+  background: rgba(255, 59, 48, 0.12);
+  color: #c41e12;
+}
+
+.shadow-seo-score-num {
+  font-size: 1.5rem;
+  line-height: 1.1;
+}
+
+.shadow-seo-score-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+.shadow-seo-warnings {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.shadow-seo-warning {
+  display: flex;
+  gap: 0.45rem;
+  align-items: flex-start;
+  font-size: 0.8125rem;
+}
+
+.shadow-seo-warning-icon {
+  flex-shrink: 0;
+  font-size: 0.625rem;
+  line-height: 1.4;
+}
+
+.shadow-seo-warning--error {
+  color: #c41e12;
+}
+
+.shadow-seo-warning--warn {
+  color: #c93400;
+}
+
+.shadow-seo-warning--info {
+  color: var(--shadow-text-secondary);
+}
+
+.shadow-seo-warning--good {
+  color: #248a3d;
+}
+
+.shadow-seo-dl {
+  display: grid;
+  grid-template-columns: 6.5rem 1fr;
+  gap: 0.35rem 0.65rem;
+  margin: 0;
+  font-size: 0.8125rem;
+}
+
+.shadow-seo-dl dt {
+  color: var(--shadow-text-secondary);
+  font-weight: 600;
+}
+
+.shadow-seo-dl dd {
+  margin: 0;
+  word-break: break-word;
+}
+
+.shadow-seo-counts,
+.shadow-seo-subhead {
+  margin: 0 0 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--shadow-text-secondary);
+}
+
+.shadow-seo-heading-list,
+.shadow-seo-link-list,
+.shadow-seo-script-list {
+  margin: 0 0 0.75rem;
+  padding-left: 1rem;
+  font-size: 0.8125rem;
+}
+
+.shadow-seo-heading-tag {
+  display: inline-block;
+  min-width: 1.75rem;
+  font-weight: 700;
+  font-size: 0.6875rem;
+  color: var(--shadow-accent);
+}
+
+.shadow-seo-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.75rem;
+}
+
+.shadow-seo-table th,
+.shadow-seo-table td {
+  padding: 0.35rem 0.4rem;
+  border-bottom: 1px solid var(--shadow-border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.shadow-seo-table th {
+  font-weight: 600;
+  color: var(--shadow-text-secondary);
+}
+
+.shadow-seo-row--warn {
+  background: rgba(255, 59, 48, 0.06);
+}
+
+.shadow-seo-missing {
+  color: #c41e12;
+  font-weight: 700;
+}
+
+.shadow-seo-cell-src {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.6875rem;
+}
+
+.shadow-seo-link-text {
+  color: var(--shadow-text-secondary);
+}
+
+.shadow-seo-jsonld {
+  margin-bottom: 0.5rem;
+  border: 1px solid var(--shadow-border);
+  border-radius: 8px;
+  padding: 0.35rem 0.5rem;
+}
+
+.shadow-seo-jsonld summary {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+
+.shadow-seo-pre {
+  margin: 0.5rem 0 0;
+  padding: 0.5rem;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 6px;
+  font-size: 0.6875rem;
+  line-height: 1.4;
+  overflow-x: auto;
+  max-height: 12rem;
+}
+
+.shadow-seo-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 75;
+  pointer-events: none;
+}
+
+.shadow-seo-badge {
+  position: fixed;
+  z-index: 76;
+  pointer-events: none;
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  background: rgba(29, 29, 31, 0.88);
+  color: #fff;
+  font-family: var(--shadow-font);
+  font-size: 0.625rem;
+  font-weight: 700;
+  line-height: 1.2;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.shadow-seo-badge--heading {
+  letter-spacing: 0.02em;
+}
+
+.shadow-seo-img-missing {
+  outline: 2px solid #ff3b30 !important;
+  outline-offset: 2px;
+}
+

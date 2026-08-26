@@ -16,6 +16,7 @@ const SHADOW_STYLE_SCRIPT = `
 <meta name="robots" content="noindex, nofollow, noarchive">
 <meta name="theme-color" content="#E8612E">
 <script src="/js/shadow-changelog.js" defer></script>
+<script src="/js/shadow-seo.js" defer></script>
 <script src="/js/shadow-review.js" defer></script>
 `;
 

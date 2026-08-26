@@ -1,6 +1,6 @@
 /**
  * Meridian shadow review overlay — shadow branch only.
- * Click any element to file a ticket; open ticket inbox on load.
+ * Tickets FAB opens inbox; Tools modal holds pick mode and View SEO.
  */
 (function () {
   'use strict';
@@ -53,7 +53,7 @@
   const STORAGE_INBOX_COLLAPSED = 'twa_shadow_inbox_collapsed';
   const STORAGE_DETAIL_COLLAPSED = 'twa_shadow_detail_collapsed';
   const MODAL_COLLAPSED_HEIGHT = 48;
-  const COLLAPSIBLE_MODALS = ['inbox', 'detail'];
+  const COLLAPSIBLE_MODALS = ['inbox', 'detail', 'tools', 'seo'];
   const IDLE_MS = 60 * 60 * 1000;
   const IDLE_CHECK_MS = 60 * 1000;
   const AUDIT_SHEET_URL =
@@ -66,7 +66,14 @@
   const DRAGGABLE_MODALS = {
     inbox: 'shadow-inbox-modal',
     detail: 'shadow-detail-modal',
-    new: 'shadow-new-modal'
+    new: 'shadow-new-modal',
+    tools: 'shadow-tools-modal',
+    seo: 'shadow-seo-modal'
+  };
+
+  const DEFAULT_MODAL_SIZES = {
+    tools: { width: 300, height: 210 },
+    seo: { width: 400, height: 480 }
   };
 
   const DRAG_GRIP_SVG =
@@ -91,7 +98,7 @@
   const PICK_TARGET_SELECTOR =
     'img, [class*="placeholder-img"], a, button, h1, h2, h3, h4, p, li, section, article, .btn, [class*="card"], [class*="section"]';
   const PICK_EXCLUDE_SELECTOR =
-    '#shadow-review-root, .shadow-toolbar, .shadow-modal, #shadow-page-badges';
+    '#shadow-review-root, .shadow-toolbar, .shadow-modal, #shadow-page-badges, #shadow-seo-overlay, .shadow-seo-badge';
 
   let ticketsCache = [];
   let activeEl = null;
@@ -436,6 +443,8 @@
 
   function collapseButtonLabel(key, collapsed) {
     if (key === 'inbox') return collapsed ? 'Expand inbox' : 'Collapse inbox';
+    if (key === 'tools') return collapsed ? 'Expand tools' : 'Collapse tools';
+    if (key === 'seo') return collapsed ? 'Expand SEO panel' : 'Collapse SEO panel';
     return collapsed ? 'Expand ticket' : 'Collapse ticket';
   }
 
@@ -548,6 +557,10 @@
       return;
     }
     if (modal && collapsed) applyModalCollapseState(key, modal, card, true);
+    if (DEFAULT_MODAL_SIZES[key]) {
+      const def = DEFAULT_MODAL_SIZES[key];
+      applyModalSize(card, def.width, def.height);
+    }
     centerModalCard(card);
   }
 
@@ -908,13 +921,18 @@
     }
   }
 
+  function updatePickToggleLabel(on) {
+    const toggle = qs('#shadow-tools-pick-toggle');
+    if (toggle) toggle.textContent = on ? 'Cancel pick' : 'Pick element';
+  }
+
   function closeAllModals() {
-    ['person', 'inbox', 'detail', 'new', 'whatsnew'].forEach((key) => hide(key));
+    ['person', 'inbox', 'detail', 'new', 'whatsnew', 'tools', 'seo'].forEach((key) => hide(key));
+    if (window.TWAShadowSEO) window.TWAShadowSEO.shutdown();
     clearHighlight();
     clearPickHover();
     document.body.classList.remove('shadow-pick-mode');
-    const toggle = qs('#shadow-pick-toggle');
-    if (toggle) toggle.textContent = 'Pick element';
+    updatePickToggleLabel(false);
   }
 
   function performLogout(message) {
@@ -1235,6 +1253,35 @@
         </div>
       </div>
 
+      <div id="shadow-tools-modal" class="shadow-modal" hidden>
+        <div class="shadow-modal-card shadow-modal-tools">
+          <div class="shadow-modal-head">
+            <h2>Tools</h2>
+            <button type="button" class="shadow-close" data-close="tools" aria-label="Close">&times;</button>
+          </div>
+          <div class="shadow-tools-actions">
+            <button type="button" id="shadow-tools-pick-toggle" class="shadow-btn shadow-tools-action">Pick element</button>
+            <button type="button" id="shadow-tools-seo-btn" class="shadow-btn shadow-tools-action shadow-btn-secondary">View SEO</button>
+          </div>
+          <p class="shadow-hint shadow-tools-hint">Or ⌘/Alt+click any element to file a ticket</p>
+        </div>
+      </div>
+
+      <div id="shadow-seo-modal" class="shadow-modal" hidden>
+        <div class="shadow-modal-card shadow-modal-wide shadow-modal-seo">
+          <div class="shadow-modal-head">
+            <h2>Page SEO</h2>
+            <button type="button" class="shadow-close" data-close="seo" aria-label="Close">&times;</button>
+          </div>
+          <div class="shadow-seo-toolbar">
+            <button type="button" id="shadow-seo-highlight-toggle" class="shadow-btn shadow-btn-small shadow-btn-secondary" aria-pressed="false">Highlight on page</button>
+            <button type="button" id="shadow-seo-refresh" class="shadow-btn shadow-btn-small shadow-btn-secondary">Refresh</button>
+          </div>
+          <div id="shadow-seo-tabs" class="shadow-seo-tabs" role="tablist" aria-label="SEO sections"></div>
+          <div id="shadow-seo-section" class="shadow-seo-section"></div>
+        </div>
+      </div>
+
       <div id="shadow-pick-tooltip" hidden aria-hidden="true"></div>
       <div id="shadow-toast" class="shadow-toast" hidden></div>
     `;
@@ -1276,7 +1323,26 @@
     qs('#shadow-whatsnew-dismiss').addEventListener('click', onWhatsNewDismiss);
     qs('#shadow-detail-body').addEventListener('click', onDetailActionClick);
     qs('#shadow-ticket-list').addEventListener('click', onInboxListClick);
+
+    qs('#shadow-tools-pick-toggle').addEventListener('click', () => {
+      document.body.classList.toggle('shadow-pick-mode');
+      const on = document.body.classList.contains('shadow-pick-mode');
+      updatePickToggleLabel(on);
+      if (!on) clearPickHover();
+      toast(on ? 'Click an element to file a ticket' : 'Pick mode off');
+    });
+
     initDraggableModals();
+
+    if (window.TWAShadowSEO) {
+      window.TWAShadowSEO.init({
+        escapeHtml,
+        getPerson,
+        showExclusive: show,
+        showFloating,
+        hideFloating
+      });
+    }
   }
 
   function updateVersionBadge() {
@@ -1307,9 +1373,7 @@
     const params = new URLSearchParams(location.search);
     if (params.get('ticket')) {
       await handleTicketDeepLink();
-      return;
     }
-    openInbox();
   }
 
   function renderWhatsNewContent(person) {
@@ -1367,23 +1431,54 @@
     markVersionSeen();
     updateVersionBadge();
     hide('whatsnew');
-    if (!whatsNewManual) openInbox();
     whatsNewManual = false;
   }
 
+  const MODAL_MAP = {
+    person: 'shadow-person-modal',
+    inbox: 'shadow-inbox-modal',
+    detail: 'shadow-detail-modal',
+    new: 'shadow-new-modal',
+    whatsnew: 'shadow-whatsnew-modal',
+    tools: 'shadow-tools-modal',
+    seo: 'shadow-seo-modal'
+  };
+
+  function showFloating(which) {
+    const el = qs('#' + MODAL_MAP[which]);
+    if (!el) return;
+    el.hidden = false;
+    if (DRAGGABLE_MODALS[which]) {
+      const card = qs('.shadow-modal-card', el);
+      if (card) applyModalPosition(which, card);
+    }
+  }
+
+  function hideFloating(which) {
+    const el = qs('#' + MODAL_MAP[which]);
+    if (!el) return;
+    el.hidden = true;
+    if (which === 'tools' && window.TWAShadowSEO) window.TWAShadowSEO.onToolsClosed();
+    if (which === 'seo' && window.TWAShadowSEO) window.TWAShadowSEO.close();
+  }
+
+  function openTools() {
+    showFloating('tools');
+  }
+
   function show(which) {
-    const map = {
-      person: 'shadow-person-modal',
-      inbox: 'shadow-inbox-modal',
-      detail: 'shadow-detail-modal',
-      new: 'shadow-new-modal',
-      whatsnew: 'shadow-whatsnew-modal'
-    };
-    Object.values(map).forEach((id) => {
+    Object.entries(MODAL_MAP).forEach(([key, id]) => {
       const el = qs('#' + id);
-      if (el) el.hidden = true;
+      if (!el || el.hidden) return;
+      if (key === 'tools' && which !== 'tools' && window.TWAShadowSEO) {
+        window.TWAShadowSEO.onToolsClosed();
+      }
+      if (key === 'seo' && which !== 'seo' && window.TWAShadowSEO) {
+        window.TWAShadowSEO.close();
+      }
+      el.hidden = true;
     });
-    const el = qs('#' + map[which]);
+    const el = qs('#' + MODAL_MAP[which]);
     if (el) {
       el.hidden = false;
       if (DRAGGABLE_MODALS[which]) {
@@ -1394,14 +1489,11 @@
   }
 
   function hide(which) {
-    const map = {
-      person: 'shadow-person-modal',
-      inbox: 'shadow-inbox-modal',
-      detail: 'shadow-detail-modal',
-      new: 'shadow-new-modal',
-      whatsnew: 'shadow-whatsnew-modal'
-    };
-    const el = qs('#' + map[which]);
+    if (which === 'tools' || which === 'seo') {
+      hideFloating(which);
+      return;
+    }
+    const el = qs('#' + MODAL_MAP[which]);
     if (el) el.hidden = true;
     if (which === 'detail') clearHighlight();
   }
@@ -2108,8 +2200,7 @@
     qs('#shadow-new-target').textContent = meta.type + ': ' + (meta.label || meta.selector);
     updateStorycard(activeEl, meta);
     document.body.classList.remove('shadow-pick-mode');
-    const toggle = qs('#shadow-pick-toggle');
-    if (toggle) toggle.textContent = 'Pick element';
+    updatePickToggleLabel(false);
     show('new');
   }
 
@@ -2141,14 +2232,14 @@
       escapeHtml(changelog().version) +
       '</span>' +
       '<button type="button" id="shadow-whatsnew-btn" class="shadow-btn shadow-btn-small shadow-btn-secondary">What\'s new</button>' +
-      '<button type="button" id="shadow-pick-toggle" class="shadow-btn shadow-btn-small">Pick element</button>' +
+      '<button type="button" id="shadow-tools-btn" class="shadow-btn shadow-btn-small">Tools</button>' +
       '<a href="' +
       AUDIT_SHEET_URL +
       '" class="shadow-btn shadow-btn-small shadow-btn-secondary shadow-toolbar-link" target="_blank" rel="noopener">Open audit sheet</a>' +
       '<a href="' +
       ASSETS_FOLDER_URL +
       '" class="shadow-btn shadow-btn-small shadow-btn-secondary shadow-toolbar-link" target="_blank" rel="noopener">Open asset folder</a>' +
-      '<span class="shadow-toolbar-hint">Or ⌘/Alt+click any element</span>' +
+      '<span class="shadow-toolbar-hint">Tickets FAB · Tools for pick and SEO</span>' +
       '<span class="shadow-toolbar-spacer"></span>' +
       '<span class="shadow-toolbar-user" id="shadow-toolbar-user" hidden></span>' +
       '<button type="button" id="shadow-switch-user-btn" class="shadow-btn shadow-btn-small shadow-btn-secondary" hidden>Switch user</button>' +
@@ -2161,12 +2252,12 @@
       }
       showWhatsNew(true);
     });
-    qs('#shadow-pick-toggle').addEventListener('click', () => {
-      document.body.classList.toggle('shadow-pick-mode');
-      const on = document.body.classList.contains('shadow-pick-mode');
-      qs('#shadow-pick-toggle').textContent = on ? 'Cancel pick' : 'Pick element';
-      if (!on) clearPickHover();
-      toast(on ? 'Click an element to file a ticket' : 'Pick mode off');
+    qs('#shadow-tools-btn').addEventListener('click', () => {
+      if (!getPerson()) {
+        show('person');
+        return;
+      }
+      openTools();
     });
     qs('#shadow-logout-btn').addEventListener('click', logout);
     qs('#shadow-switch-user-btn').addEventListener('click', switchUser);

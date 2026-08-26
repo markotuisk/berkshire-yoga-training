@@ -7,8 +7,23 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.5.8',
+    version: '1.6.0',
     releases: [
+      {
+        version: '1.6.0',
+        date: '2026-08-26',
+        title: 'Tools panel and View SEO',
+        user: [
+          'Toolbar Tools button opens a compact tools window with Pick element and View SEO',
+          'Tickets FAB opens the ticket inbox only — inbox no longer auto-opens after login',
+          'View SEO audits the current page: score, meta tags, headings, images, links, and structured data',
+          'Highlight on page labels headings and marks images missing alt text while SEO is open'
+        ],
+        dev: [
+          'Client-side SEO audit in js/shadow-seo.js; loaded after shadow-changelog.js',
+          'Tools and SEO modals use the same draggable, resizable, collapsible pattern as ticket windows'
+        ]
+      },
       {
         version: '1.5.8',
         date: '2026-08-26',
