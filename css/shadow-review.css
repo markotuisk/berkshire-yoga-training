@@ -1,7 +1,8 @@
 /* Shadow mode overlay — only loaded on shadow.berkshireyogatraining.co.uk */
 
 :root {
-  --shadow-font: -apple-system, BlinkMacSystemFont, "Figtree", system-ui, sans-serif;
+  --shadow-font: "Figtree", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --shadow-font-display: "Cormorant Garamond", Georgia, "Times New Roman", serif;
   --shadow-text: #1d1d1f;
   --shadow-text-secondary: #6e6e73;
   --shadow-accent: #e8612e;
@@ -3657,4 +3658,399 @@ body.shadow-seo-image-preview-open {
 .shadow-activity-card .shadow-seo-section,
 .shadow-activity-card .shadow-design-section {
   padding: 0.65rem 0.75rem 0.85rem;
+}
+
+/* Curator's desk — v1.17.0 */
+.shadow-activity-dock {
+  position: fixed;
+  left: 50%;
+  bottom: 3.35rem;
+  transform: translateX(-50%);
+  z-index: 91;
+  max-width: min(42rem, calc(100vw - 1.5rem));
+  pointer-events: none;
+  transition: opacity 220ms ease, transform 280ms cubic-bezier(0.34, 1.2, 0.64, 1);
+}
+
+.shadow-activity-dock[hidden] {
+  display: none !important;
+}
+
+.shadow-activity-dock--empty {
+  pointer-events: none;
+}
+
+.shadow-activity-dock-empty {
+  margin: 0;
+  padding: 0.45rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--shadow-text-secondary);
+  text-align: center;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border-radius: var(--shadow-radius-pill);
+  border: 1px solid var(--shadow-border);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.shadow-activity-dock-track {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.5rem;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: var(--shadow-radius-pill);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.1);
+  pointer-events: auto;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.shadow-activity-dock-track::-webkit-scrollbar {
+  display: none;
+}
+
+.shadow-activity-dock-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+  flex-shrink: 0;
+  padding: 0.1rem 0.15rem 0.1rem 0.1rem;
+  border-radius: var(--shadow-radius-pill);
+  background: rgba(0, 0, 0, 0.04);
+  animation: shadow-dock-pill-in 280ms cubic-bezier(0.34, 1.2, 0.64, 1);
+}
+
+@keyframes shadow-dock-pill-in {
+  from {
+    opacity: 0;
+    transform: scale(0.88) translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.shadow-activity-dock-pill--active {
+  background: rgba(232, 97, 46, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(232, 97, 46, 0.28);
+}
+
+.shadow-activity-dock-focus {
+  border: none;
+  background: transparent;
+  color: var(--shadow-text);
+  font-family: var(--shadow-font);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.35rem 0.55rem;
+  min-height: 44px;
+  border-radius: var(--shadow-radius-pill);
+  cursor: pointer;
+  white-space: nowrap;
+  letter-spacing: -0.01em;
+  transition: background var(--shadow-ease);
+}
+
+.shadow-activity-dock-focus:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.shadow-activity-dock-focus:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(232, 97, 46, 0.28);
+}
+
+.shadow-activity-dock-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--shadow-text-secondary);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background var(--shadow-ease), color var(--shadow-ease);
+}
+
+.shadow-activity-dock-close:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--shadow-text);
+}
+
+.shadow-activity-dock-overflow-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.shadow-activity-dock-overflow {
+  border: none;
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--shadow-text);
+  font-family: var(--shadow-font);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.35rem 0.65rem;
+  min-height: 44px;
+  border-radius: var(--shadow-radius-pill);
+  cursor: pointer;
+}
+
+.shadow-activity-dock-overflow-menu {
+  position: absolute;
+  bottom: calc(100% + 0.35rem);
+  right: 0;
+  min-width: 11rem;
+  padding: 0.35rem;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--shadow-border);
+  border-radius: 12px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.14);
+  display: none;
+  pointer-events: auto;
+}
+
+.shadow-activity-dock-overflow-menu--open {
+  display: block;
+}
+
+.shadow-activity-dock-overflow-item {
+  display: block;
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: left;
+  padding: 0.45rem 0.6rem;
+  font-family: var(--shadow-font);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--shadow-text);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.shadow-activity-dock-overflow-item:hover {
+  background: rgba(232, 97, 46, 0.08);
+  color: var(--shadow-accent);
+}
+
+.shadow-activity-title {
+  font-family: var(--shadow-font-display);
+  font-weight: 600;
+  font-size: 1.2rem;
+  letter-spacing: -0.01em;
+}
+
+.shadow-activity-card.shadow-modal-card {
+  background:
+    linear-gradient(165deg, rgba(255, 255, 255, 0.97) 0%, rgba(253, 248, 242, 0.94) 100%),
+  radial-gradient(circle at 12% 8%, rgba(0, 0, 0, 0.025) 0%, transparent 42%),
+  radial-gradient(circle at 88% 92%, rgba(0, 0, 0, 0.02) 0%, transparent 38%);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 16px;
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.12),
+    0 2px 0 rgba(255, 255, 255, 0.8) inset;
+}
+
+.shadow-activity-modal .shadow-modal-head {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  padding-bottom: 0.35rem;
+}
+
+.shadow-tools-wrap {
+  width: 3.5rem;
+  height: 3.5rem;
+}
+
+.shadow-tools-fab {
+  width: 3.5rem;
+  height: 3.5rem;
+}
+
+.shadow-tools-fab--pulse {
+  animation: shadow-fab-pulse 1.1s cubic-bezier(0.34, 1.2, 0.64, 1) 1;
+}
+
+@keyframes shadow-fab-pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 8px 24px rgba(232, 97, 46, 0.35);
+  }
+  45% {
+    transform: scale(1.06);
+    box-shadow: 0 12px 32px rgba(232, 97, 46, 0.45);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 8px 24px rgba(232, 97, 46, 0.35);
+  }
+}
+
+.shadow-tools-exploded .shadow-tools-fab--pulse {
+  animation: none;
+}
+
+.shadow-tools-cat-btn {
+  gap: 0.35rem;
+  min-width: 3.5rem;
+  min-height: 44px;
+  padding: 0 0.75rem;
+  transition:
+    transform 280ms cubic-bezier(0.34, 1.4, 0.64, 1),
+    opacity 200ms ease,
+    background var(--shadow-ease),
+    border-color var(--shadow-ease),
+    box-shadow var(--shadow-ease);
+}
+
+.shadow-tools-cat-icon {
+  flex-shrink: 0;
+  display: block;
+}
+
+.shadow-tools-cat-btn--ring {
+  box-shadow:
+    0 0 0 2px #fff,
+    0 0 0 4px rgba(232, 97, 46, 0.55);
+}
+
+.shadow-tools-cat-btn--active {
+  background: var(--shadow-accent);
+  border-color: var(--shadow-accent);
+  color: #fff;
+}
+
+.shadow-tools-cat-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(232, 97, 46, 0.35);
+}
+
+.shadow-tools-submenu {
+  padding: 0.15rem 0;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.14);
+}
+
+.shadow-tools-submenu-list {
+  gap: 0.55rem;
+  padding: 0.5rem 0.65rem 0.65rem;
+}
+
+.shadow-tools-submenu-group-label {
+  margin: 0 0 0.25rem;
+  padding: 0 0.15rem;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #8e8e93;
+}
+
+.shadow-tools-submenu-group-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.shadow-tools-section-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 44px;
+  padding: 0.45rem 0.65rem;
+  font-weight: 500;
+}
+
+.shadow-tools-section-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(232, 97, 46, 0.22);
+}
+
+.shadow-tools-section-btn--open {
+  background: rgba(232, 97, 46, 0.08);
+}
+
+.shadow-tools-section-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--shadow-accent);
+  flex-shrink: 0;
+  box-shadow: 0 0 0 2px rgba(232, 97, 46, 0.2);
+}
+
+.shadow-tools-section-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--shadow-accent);
+}
+
+.shadow-tools-section-label {
+  flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 767px) {
+  .shadow-tools-cat-btn[data-category="insights"] {
+    --tools-x: 0;
+    --tools-y: -108px;
+  }
+
+  .shadow-tools-cat-btn[data-category="seo"] {
+    --tools-x: 0;
+    --tools-y: -80px;
+  }
+
+  .shadow-tools-cat-btn[data-category="design"] {
+    --tools-x: 0;
+    --tools-y: -52px;
+  }
+
+  .shadow-tools-cat-btn[data-category="pick"] {
+    --tools-x: 0;
+    --tools-y: -24px;
+  }
+
+  .shadow-tools-submenu {
+    position: fixed;
+    left: 0.5rem;
+    right: 0.5rem;
+    bottom: 4.5rem;
+    width: auto;
+    max-height: min(22rem, 55vh);
+    border-radius: 16px 16px 12px 12px;
+  }
+
+  .shadow-activity-card {
+    max-width: calc(100vw - 1rem);
+  }
+
+  .shadow-activity-dock {
+    left: 0.5rem;
+    right: 0.5rem;
+    transform: none;
+    max-width: none;
+    bottom: 3.5rem;
+  }
 }

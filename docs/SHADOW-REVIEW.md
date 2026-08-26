@@ -26,8 +26,8 @@ Partners do **not** need Cloudflare accounts. Access only needs their emails on 
 1. Open the shadow site (Cloudflare Access login → one-time email code or Google).
 2. Choose your name (Katia / Raili / Marko).
 3. **What's new** on login when there are unread partner updates (ticket inbox does not auto-open).
-4. **Review** toolbox FAB (bottom right) explodes into **Insights**, **SEO**, **Design**, and **Pick** categories. Tap a category to see its activities, then open each as its own draggable popup (Meta, Links, Typography, GSC, link graph, and more). You can keep several popups open and close them individually.
-5. **Insights** covers page summary, Search Console, GA4 traffic, and link graph. **SEO** and **Design** list every audit section from the toolbox sub-menu. **Pick** toggles element selection (or use ⌘/Alt+click).
+4. **Review** toolbox FAB (bottom right) opens the **Curator's desk**: categories explode into Insights, SEO, Design and Pick. SEO and Design show **grouped catalogues** (Foundation, Content, Links, Technical). Each activity opens as its own draggable popup. **Open activities** appear as pills above the toolbar (click to focus, × to close). **Link graph** is in Insights only. **Pick** toggles element selection immediately (or use ⌘/Alt+click).
+5. **Insights** covers page summary, Search Console, GA4 traffic, and link graph. **SEO** and **Design** sections open from grouped toolbox menus. **Pick** toggles element selection (or use ⌘/Alt+click).
 6. **Tickets** in the toolbar opens the ticket inbox.
 7. **Open** tab (default) lists tickets that still need attention; **Closed** holds finished items (Approved, Shipped to live, Won't fix, Duplicate).
 8. Orange **TWA-xxx** markers appear on page elements with open tickets — click to open the thread and jump to the element.
@@ -35,13 +35,25 @@ Partners do **not** need Cloudflare accounts. Access only needs their emails on 
 10. For images or placeholders, the **Storycard** section lets you upload a replacement file (optional).
 11. Add category + comment → ticket created (stored in KV and mirrored to Google Sheets).
 12. Open a ticket to read the thread and add further comments.
-13. **SEO** panel shows overview score, meta, headings, images, links, **Link graph**, JSON-LD, and technical checks from the current page DOM. **Links** tab can check broken links on the page or crawl the site from `sitemap.xml`. **Link graph** maps inbound and outbound internal links across sitemap pages. **Summary** tab shows the same graph as a mini preview plus Search Console and GA4 metrics when configured. **Technical** tab reports canonical mismatch, mixed content, DOM size, and load timing. **Structured data** tab validates required schema fields. **Highlight on page** labels headings and marks images missing alt.
+13. **SEO** panel shows overview score, meta, headings, images, links, JSON-LD, and technical checks from the current page DOM. **Links** tab can check broken links on the page or crawl the site from `sitemap.xml`. **Link graph** (Insights only) maps inbound and outbound internal links across sitemap pages. **Summary** tab shows the graph as a mini preview plus Search Console and GA4 metrics when configured. **Technical** tab reports canonical mismatch, mixed content, DOM size, and load timing. **Structured data** tab validates required schema fields. **Highlight on page** labels headings and marks images missing alt.
 
 **Open tab** (default inbox + on-page markers): Open, Discussing, Accepted, On shadow, In progress, Ready for review, Blocked.
 
 **Closed tab**: Approved, Shipped to live, Won't fix, Duplicate.
 
 Partners use **Comment** to discuss, **Accept** to agree with the proposed direction (ticket stays Open), and **Done** when a shadow change looks right (moves to Closed). Marko uses developer actions to mark work on shadow, send for review, and ship to live.
+
+## Review tools UX (v1.17.0)
+
+**Curator's desk** blends a folio-inspired toolbox with Apple-style clarity:
+
+- **Grouped sub-menus** — SEO sections in Foundation, Content, Links and Technical; Design in Summary, Visual and Quality (no flat 12-item list).
+- **Activity dock** — pills above the toolbar list open popups; click to bring forward, × to close; "+N more" when many are open.
+- **Single link graph** — full graph in Insights only (removed from SEO sub-menu to avoid duplicate entry).
+- **Pick** — immediate toggle from the toolbox fan, not a sub-menu.
+- **Open indicators** — orange stamp dot on sub-menu items whose popup is already open; reopening focuses the existing card instead of duplicating.
+
+**UX audit notes (v1.16.0 → 1.17.0):** flat SEO sub-menu did not scale; link graph duplicated in SEO and Insights; multiple popups stacked without a dock; sub-menu competed visually with popups; Pick behaved like a category with a redundant sub-menu; Insights and SEO overlapped on link graph; mobile explosion + sub-menu + popups felt cramped; inconsistent borders and radii; no indicator when a section was already open.
 
 ## Version and What's new
 

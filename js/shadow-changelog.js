@@ -7,8 +7,23 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.16.0',
+    version: '1.17.0',
     releases: [
+      {
+        version: '1.17.0',
+        date: '2026-08-26',
+        title: "Curator's desk — grouped toolbox and activity dock",
+        user: [
+          'Toolbox sub-menus group SEO and Design sections (Foundation, Content, Links, Technical) instead of one long list',
+          'Open activities appear as pills above the toolbar — click to focus, × to close; link graph lives in Insights only',
+          'Pick toggles element selection instantly with a brief confirmation (no sub-menu)',
+          'Activity cards use a softer folio style with display titles; empty dock hint when the toolbox is open'
+        ],
+        dev: [
+          'UX audit: flat 12-item SEO list, duplicate link graph, no open-popup dock, submenu vs popup visual competition, Pick as category vs mode, mobile cramming',
+          'shadow-review.js activity dock, grouped submenu, bringToFront, dedupe popups; shadow-seo.js and shadow-design.js getSectionGroups; cache-bust via ?v=1.17.0'
+        ]
+      },
       {
         version: '1.16.0',
         date: '2026-08-26',

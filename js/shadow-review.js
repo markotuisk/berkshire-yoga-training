@@ -56,20 +56,42 @@
   const MODAL_COLLAPSED_HEIGHT = 48;
   const COLLAPSIBLE_MODALS = ['inbox', 'detail'];
   const INSIGHTS_SECTIONS = [
-    { id: 'summary', label: 'Summary' },
-    { id: 'gsc', label: 'Search (GSC)' },
-    { id: 'ga4', label: 'Traffic (GA4)' },
-    { id: 'linkgraph', label: 'Link graph' }
+    { id: 'summary', label: 'Summary', icon: 'chart' },
+    { id: 'gsc', label: 'Search (GSC)', icon: 'search' },
+    { id: 'ga4', label: 'Traffic (GA4)', icon: 'traffic' },
+    { id: 'linkgraph', label: 'Link graph', icon: 'graph' }
   ];
+  const INSIGHTS_GROUPS = [{ label: 'Page insights', ids: ['summary', 'gsc', 'ga4', 'linkgraph'] }];
   const TOOL_CATEGORIES = [
-    { id: 'insights', label: 'Insights', angle: 200 },
-    { id: 'seo', label: 'SEO', angle: 235 },
-    { id: 'design', label: 'Design', angle: 270 },
-    { id: 'pick', label: 'Pick', angle: 305 }
+    { id: 'insights', label: 'Insights', angle: 200, icon: 'insights' },
+    { id: 'seo', label: 'SEO', angle: 235, icon: 'seo' },
+    { id: 'design', label: 'Design', angle: 270, icon: 'design' },
+    { id: 'pick', label: 'Pick', angle: 305, icon: 'pick' }
   ];
+  const CATEGORY_ICON_SVG = {
+    insights:
+      '<svg class="shadow-tools-cat-icon" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 12V4.5L8 2l6 2.5V12L8 14.5 2 12z" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linejoin="round"/><path d="M8 8.5V14.5M8 8.5L2 6M8 8.5l6-2.5" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linejoin="round"/></svg>',
+    seo:
+      '<svg class="shadow-tools-cat-icon" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.25"/><path d="M10.5 10.5L14 14" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>',
+    design:
+      '<svg class="shadow-tools-cat-icon" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 13.5h11M4 13.5V6l4-3.5L12 6v7.5" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linejoin="round"/><path d="M8 2.5v4" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>',
+    pick:
+      '<svg class="shadow-tools-cat-icon" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v9M5.5 9.5L8 12l2.5-2.5" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 14h10" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg>'
+  };
+  const SECTION_ICON_SVG = {
+    chart:
+      '<svg class="shadow-tools-section-icon" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 11V5h2.5v6H2zm3.5-3V5h2.5v6H5.5zm3.5 5V3h2.5v8H9z" fill="currentColor"/></svg>',
+    search:
+      '<svg class="shadow-tools-section-icon" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="6" cy="6" r="3.5" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M9 9l3 3" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>',
+    traffic:
+      '<svg class="shadow-tools-section-icon" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 10.5V8l2.5-3L7 7l2.5-4L12 6.5v4" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>',
+    graph:
+      '<svg class="shadow-tools-section-icon" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="3.5" cy="10.5" r="1.5" fill="currentColor"/><circle cx="10.5" cy="3.5" r="1.5" fill="currentColor"/><circle cx="10.5" cy="10.5" r="1.5" fill="currentColor"/><path d="M4.5 9.5l5-5M4.5 9.5l5.5.5" fill="none" stroke="currentColor" stroke-width="1.1"/></svg>'
+  };
   const ACTIVITY_DEFAULT_SIZE = { width: 400, height: 480 };
   const ACTIVITY_STACK_OFFSET = 24;
   const TOOLS_MENU_RADIUS = 72;
+  const DOCK_MAX_PILLS = 5;
   const IDLE_MS = 60 * 60 * 1000;
   const IDLE_CHECK_MS = 60 * 1000;
   const AUDIT_SHEET_URL =
@@ -128,8 +150,10 @@
   let badgePositionBound = false;
   let toolsMenuExpanded = false;
   let activeToolCategory = null;
+  let dockOverflowOpen = false;
   const openActivityPopups = new Map();
   let activityPopupCounter = 0;
+  let activeDockKey = null;
   let insightsCache = null;
   let insightsFetchPath = '';
   let insightsLoading = false;
@@ -1520,6 +1544,156 @@
     if (fileInput) fileInput.value = '';
   }
 
+  function getCategorySectionGroups(category) {
+    if (category === 'seo' && window.TWAShadowSEO && window.TWAShadowSEO.getSectionGroups) {
+      return window.TWAShadowSEO.getSectionGroups();
+    }
+    if (category === 'design' && window.TWAShadowDesign && window.TWAShadowDesign.getSectionGroups) {
+      return window.TWAShadowDesign.getSectionGroups();
+    }
+    if (category === 'insights') {
+      return INSIGHTS_GROUPS.map((group) => ({
+        label: group.label,
+        sections: group.ids
+          .map((id) => INSIGHTS_SECTIONS.find((s) => s.id === id))
+          .filter(Boolean)
+      }));
+    }
+    return [];
+  }
+
+  function sectionIconHtml(category, sectionId) {
+    if (category === 'insights') {
+      const match = INSIGHTS_SECTIONS.find((s) => s.id === sectionId);
+      if (match && match.icon && SECTION_ICON_SVG[match.icon]) {
+        return SECTION_ICON_SVG[match.icon];
+      }
+    }
+    return '';
+  }
+
+  function isSectionOpen(category, sectionId) {
+    return openActivityPopups.has(activityPopupKey(category, sectionId));
+  }
+
+  function buildToolsSectionButton(category, section) {
+    const open = isSectionOpen(category, section.id);
+    const icon = sectionIconHtml(category, section.id);
+    return (
+      '<button type="button" class="shadow-tools-section-btn' +
+      (open ? ' shadow-tools-section-btn--open' : '') +
+      '" data-category="' +
+      escapeHtml(category) +
+      '" data-section="' +
+      escapeHtml(section.id) +
+      '"' +
+      (open ? ' aria-current="true"' : '') +
+      '>' +
+      (open ? '<span class="shadow-tools-section-dot" aria-hidden="true"></span>' : '') +
+      (icon ? '<span class="shadow-tools-section-icon-wrap">' + icon + '</span>' : '') +
+      '<span class="shadow-tools-section-label">' +
+      escapeHtml(section.label) +
+      '</span></button>'
+    );
+  }
+
+  function dockShortTitle(category, sectionId) {
+    const label = activitySectionLabel(category, sectionId);
+    if (category === 'insights') return label;
+    const cat = TOOL_CATEGORIES.find((c) => c.id === category);
+    return (cat ? cat.label : category) + ' · ' + label;
+  }
+
+  function updateActivityDock() {
+    const dock = qs('#shadow-activity-dock');
+    if (!dock) return;
+    const entries = [...openActivityPopups.entries()];
+    const showEmpty = toolsMenuExpanded && entries.length === 0;
+    const showDock = entries.length > 0 || showEmpty;
+    dock.hidden = !showDock;
+    dock.classList.toggle('shadow-activity-dock--empty', showEmpty);
+    if (!showDock) {
+      dock.innerHTML = '';
+      dockOverflowOpen = false;
+      return;
+    }
+    if (showEmpty) {
+      dock.innerHTML =
+        '<p class="shadow-activity-dock-empty">Nothing open yet — pick a lens from the toolbox</p>';
+      return;
+    }
+    const visible = entries.slice(0, DOCK_MAX_PILLS);
+    const overflow = entries.slice(DOCK_MAX_PILLS);
+    let html = '<div class="shadow-activity-dock-track" role="tablist" aria-label="Open activities">';
+    visible.forEach(([key, entry]) => {
+      const active = key === activeDockKey;
+      html +=
+        '<div class="shadow-activity-dock-pill' +
+        (active ? ' shadow-activity-dock-pill--active' : '') +
+        '" role="presentation">' +
+        '<button type="button" class="shadow-activity-dock-focus" data-dock-key="' +
+        escapeAttr(key) +
+        '" role="tab"' +
+        (active ? ' aria-selected="true"' : ' aria-selected="false"') +
+        '>' +
+        escapeHtml(dockShortTitle(entry.category, entry.sectionId)) +
+        '</button>' +
+        '<button type="button" class="shadow-activity-dock-close" data-dock-close="' +
+        escapeAttr(key) +
+        '" aria-label="Close ' +
+        escapeAttr(dockShortTitle(entry.category, entry.sectionId)) +
+        '">&times;</button></div>';
+    });
+    if (overflow.length) {
+      html +=
+        '<div class="shadow-activity-dock-overflow-wrap">' +
+        '<button type="button" class="shadow-activity-dock-overflow" aria-expanded="' +
+        (dockOverflowOpen ? 'true' : 'false') +
+        '" aria-haspopup="true">+' +
+        overflow.length +
+        ' more</button>' +
+        '<div class="shadow-activity-dock-overflow-menu' +
+        (dockOverflowOpen ? ' shadow-activity-dock-overflow-menu--open' : '') +
+        '">';
+      overflow.forEach(([key, entry]) => {
+        html +=
+          '<button type="button" class="shadow-activity-dock-overflow-item" data-dock-key="' +
+          escapeAttr(key) +
+          '">' +
+          escapeHtml(dockShortTitle(entry.category, entry.sectionId)) +
+          '</button>';
+      });
+      html += '</div></div>';
+    }
+    html += '</div>';
+    dock.innerHTML = html;
+    dock.querySelectorAll('[data-dock-key]').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const k = btn.getAttribute('data-dock-key');
+        const entry = openActivityPopups.get(k);
+        if (entry) bringActivityToFront(entry.modal, k);
+        dockOverflowOpen = false;
+        updateActivityDock();
+      });
+    });
+    dock.querySelectorAll('[data-dock-close]').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeActivityPopup(btn.getAttribute('data-dock-close'));
+      });
+    });
+    const overflowBtn = qs('.shadow-activity-dock-overflow', dock);
+    if (overflowBtn && !overflowBtn._bound) {
+      overflowBtn._bound = true;
+      overflowBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dockOverflowOpen = !dockOverflowOpen;
+        updateActivityDock();
+      });
+    }
+  }
+
   function getCategorySections(category) {
     if (category === 'seo' && window.TWAShadowSEO && window.TWAShadowSEO.getSections) {
       return window.TWAShadowSEO.getSections();
@@ -1747,9 +1921,26 @@
     }
   }
 
-  function bringActivityToFront(modal) {
+  function bringActivityToFront(modal, key) {
     activityPopupCounter += 1;
     modal.style.zIndex = String(99990 + activityPopupCounter);
+    activeDockKey = key || modal.dataset.activityKey || null;
+    updateActivityDock();
+  }
+
+  function bringToFront(popupId) {
+    if (!popupId) return;
+    let modal = null;
+    let key = null;
+    if (String(popupId).startsWith('shadow-activity-')) {
+      modal = qs('#' + popupId);
+      key = modal ? modal.dataset.activityKey : null;
+    } else {
+      key = popupId;
+      const entry = openActivityPopups.get(key);
+      if (entry) modal = entry.modal;
+    }
+    if (modal && key) bringActivityToFront(modal, key);
   }
 
   function closeActivityPopup(key) {
@@ -1764,6 +1955,8 @@
       window.TWAShadowDesign.closeActivity(key);
     }
     if (modal && modal.parentNode) modal.parentNode.removeChild(modal);
+    if (activeDockKey === key) activeDockKey = null;
+    updateActivityDock();
   }
 
   function closeAllActivityPopups() {
@@ -1781,7 +1974,7 @@
     }
     const key = activityPopupKey(category, sectionId);
     if (openActivityPopups.has(key)) {
-      bringActivityToFront(openActivityPopups.get(key).modal);
+      bringActivityToFront(openActivityPopups.get(key).modal, key);
       collapseToolsMenu();
       return;
     }
@@ -1801,7 +1994,7 @@
       escapeHtml(sectionId) +
       '">' +
       '<div class="shadow-modal-head">' +
-      '<h2>' +
+      '<h2 class="shadow-activity-title">' +
       escapeHtml(title) +
       '</h2>' +
       '<button type="button" class="shadow-close shadow-activity-close" aria-label="Close">&times;</button>' +
@@ -1827,7 +2020,7 @@
     qs('.shadow-activity-close', modal).addEventListener('click', () => closeActivityPopup(key));
     renderActivityContent(category, sectionId, bodyEl, key, modal);
     openActivityPopups.set(key, { modal, category, sectionId, bodyEl });
-    bringActivityToFront(modal);
+    bringActivityToFront(modal, key);
     collapseToolsMenu();
   }
 
@@ -1845,6 +2038,7 @@
       const rad = (cat.angle * Math.PI) / 180;
       const x = Math.round(Math.cos(rad) * TOOLS_MENU_RADIUS);
       const y = Math.round(Math.sin(rad) * -TOOLS_MENU_RADIUS);
+      const icon = CATEGORY_ICON_SVG[cat.icon] || '';
       return (
         '<button type="button" class="shadow-tools-cat-btn" data-category="' +
         escapeHtml(cat.id) +
@@ -1853,10 +2047,12 @@
         'px;--tools-y:' +
         y +
         'px;--tools-delay:' +
-        index * 40 +
+        index * 45 +
         'ms" aria-label="' +
         escapeHtml(cat.label) +
-        '"><span class="shadow-tools-cat-label">' +
+        '">' +
+        icon +
+        '<span class="shadow-tools-cat-label">' +
         escapeHtml(cat.label) +
         '</span></button>'
       );
@@ -1866,7 +2062,15 @@
         e.stopPropagation();
         const category = btn.getAttribute('data-category');
         if (category === 'pick') {
-          openActivityPopup('pick', 'pick');
+          if (!requirePersonForReview()) return;
+          const wasOn = document.body.classList.contains('shadow-pick-mode');
+          togglePickMode();
+          collapseToolsMenu();
+          if (!wasOn) toast('Pick mode on — click any element');
+          return;
+        }
+        if (activeToolCategory === category) {
+          hideToolsSubmenu();
           return;
         }
         showToolsSubmenu(category, btn);
@@ -1878,7 +2082,21 @@
     const submenu = qs('#shadow-tools-submenu');
     if (!submenu) return;
     activeToolCategory = category;
-    const sections = getCategorySections(category);
+    const groups = getCategorySectionGroups(category);
+    const groupHtml = groups
+      .map((group) => {
+        if (!group.sections || !group.sections.length) return '';
+        return (
+          '<div class="shadow-tools-submenu-group">' +
+          '<p class="shadow-tools-submenu-group-label">' +
+          escapeHtml(group.label) +
+          '</p>' +
+          '<div class="shadow-tools-submenu-group-items">' +
+          group.sections.map((section) => buildToolsSectionButton(category, section)).join('') +
+          '</div></div>'
+        );
+      })
+      .join('');
     submenu.innerHTML =
       '<div class="shadow-tools-submenu-head">' +
       '<span>' +
@@ -1887,18 +2105,7 @@
       '<button type="button" class="shadow-tools-submenu-back" aria-label="Back">&larr;</button>' +
       '</div>' +
       '<div class="shadow-tools-submenu-list">' +
-      sections
-        .map(
-          (section) =>
-            '<button type="button" class="shadow-tools-section-btn" data-category="' +
-            escapeHtml(category) +
-            '" data-section="' +
-            escapeHtml(section.id) +
-            '">' +
-            escapeHtml(section.label) +
-            '</button>'
-        )
-        .join('') +
+      groupHtml +
       '</div>';
     submenu.hidden = false;
     qs('.shadow-tools-submenu-back', submenu).addEventListener('click', (e) => {
@@ -1913,6 +2120,15 @@
     });
     const wrap = qs('#shadow-tools-wrap');
     if (wrap) wrap.classList.add('shadow-tools-submenu-open');
+    qs('#shadow-tools-categories')
+      ?.querySelectorAll('.shadow-tools-cat-btn')
+      .forEach((btn) => {
+        btn.classList.toggle(
+          'shadow-tools-cat-btn--ring',
+          btn.getAttribute('data-category') === category
+        );
+      });
+    updateActivityDock();
   }
 
   function hideToolsSubmenu() {
@@ -1921,6 +2137,12 @@
     activeToolCategory = null;
     const wrap = qs('#shadow-tools-wrap');
     if (wrap) wrap.classList.remove('shadow-tools-submenu-open');
+    qs('#shadow-tools-categories')
+      ?.querySelectorAll('.shadow-tools-cat-btn')
+      .forEach((btn) => {
+        btn.classList.remove('shadow-tools-cat-btn--ring');
+      });
+    updateActivityDock();
   }
 
   function collapseToolsMenu() {
@@ -1930,6 +2152,8 @@
     const fab = qs('#shadow-fab');
     if (wrap) wrap.classList.remove('shadow-tools-exploded');
     if (fab) fab.setAttribute('aria-expanded', 'false');
+    dockOverflowOpen = false;
+    updateActivityDock();
   }
 
   function expandToolsMenu() {
@@ -1938,6 +2162,7 @@
     const fab = qs('#shadow-fab');
     if (wrap) wrap.classList.add('shadow-tools-exploded');
     if (fab) fab.setAttribute('aria-expanded', 'true');
+    updateActivityDock();
   }
 
   function toggleToolsMenu() {
@@ -1951,12 +2176,33 @@
     document.addEventListener(
       'pointerdown',
       (event) => {
-        if (!toolsMenuExpanded) return;
+        if (!toolsMenuExpanded && !dockOverflowOpen) return;
         if (event.target.closest('#shadow-tools-wrap')) return;
+        if (event.target.closest('#shadow-activity-dock')) return;
         collapseToolsMenu();
       },
       true
     );
+  }
+
+  function pulseToolsFabOnce() {
+    const fab = qs('#shadow-fab');
+    if (!fab || pulseToolsFabOnce._done) return;
+    pulseToolsFabOnce._done = true;
+    fab.classList.add('shadow-tools-fab--pulse');
+    fab.addEventListener(
+      'animationend',
+      () => fab.classList.remove('shadow-tools-fab--pulse'),
+      { once: true }
+    );
+  }
+
+  function addActivityDock() {
+    const dock = document.createElement('div');
+    dock.id = 'shadow-activity-dock';
+    dock.className = 'shadow-activity-dock';
+    dock.hidden = true;
+    document.body.appendChild(dock);
   }
 
   function ensureUI() {
@@ -2088,6 +2334,8 @@
 
     buildToolsMenu();
     bindToolsMenuOutsideClick();
+    addActivityDock();
+    pulseToolsFabOnce();
 
     root.querySelectorAll('[data-close]').forEach((btn) => {
       btn.addEventListener('click', () => hide(btn.getAttribute('data-close')));

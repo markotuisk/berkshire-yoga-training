@@ -23,6 +23,14 @@
     { id: 'technical', label: 'Technical' }
   ];
 
+  /** Submenu groups — link graph lives in Insights only */
+  const SEO_GROUPS = [
+    { label: 'Foundation', ids: ['overview', 'meta', 'international', 'social', 'security'] },
+    { label: 'Content', ids: ['keywords', 'headings', 'images'] },
+    { label: 'Links', ids: ['links'] },
+    { label: 'Technical', ids: ['structured', 'technical'] }
+  ];
+
   const META_FIELDS = [
     ['Title', 'title', { emptyLabel: 'Missing' }],
     ['Meta description', 'description', { emptyLabel: 'Missing' }],
@@ -3430,6 +3438,15 @@
     return SECTIONS.slice();
   }
 
+  function getSectionGroups() {
+    return SEO_GROUPS.map((group) => ({
+      label: group.label,
+      sections: group.ids
+        .map((id) => SECTIONS.find((s) => s.id === id))
+        .filter(Boolean)
+    }));
+  }
+
   function renderAudit() {
     const body = qs('#shadow-seo-section');
     if (!body) return;
@@ -3682,6 +3699,7 @@
     renderActivity,
     closeActivity,
     getSections,
+    getSectionGroups,
     onReviewClosed,
     onToolsClosed,
     onTicketClosed,

@@ -35,6 +35,12 @@
     { id: 'issues', label: 'Issues' }
   ];
 
+  const DESIGN_GROUPS = [
+    { label: 'Summary', ids: ['summary'] },
+    { label: 'Visual', ids: ['typography', 'colors'] },
+    { label: 'Quality', ids: ['accessibility', 'issues'] }
+  ];
+
   const DESIGN_ISSUE_KINDS = ['inline-style', 'font-family', 'text-color'];
   const A11Y_ISSUE_PREFIX = 'a11y-';
 
@@ -1481,6 +1487,15 @@
     return SECTIONS.slice();
   }
 
+  function getSectionGroups() {
+    return DESIGN_GROUPS.map((group) => ({
+      label: group.label,
+      sections: group.ids
+        .map((id) => SECTIONS.find((s) => s.id === id))
+        .filter(Boolean)
+    }));
+  }
+
   function renderAudit() {
     const panel = qs('#shadow-design-section');
     try {
@@ -1582,6 +1597,7 @@
     renderActivity,
     closeActivity,
     getSections,
+    getSectionGroups,
     onReviewClosed,
     onToolsClosed,
     onTicketClosed,
