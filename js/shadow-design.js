@@ -627,6 +627,12 @@
     return 0;
   }
 
+  function sortMap(map) {
+    return [...map.entries()]
+      .map(([key, val]) => ({ key, count: val.count, samples: val.samples }))
+      .sort((a, b) => b.count - a.count);
+  }
+
   function isA11yIssue(issue) {
     return issue.kind && issue.kind.indexOf(A11Y_ISSUE_PREFIX) === 0;
   }
@@ -1419,18 +1425,31 @@
   }
 
   function renderAudit() {
-    auditCache = auditPage();
-    locateIndex = buildLocateIndex(auditCache);
-    renderNav();
     const panel = qs('#shadow-design-section');
-    if (!panel) return;
-    panel.classList.remove('shadow-design-section--visible');
-    panel.innerHTML = renderSection(auditCache);
-    requestAnimationFrame(() => panel.classList.add('shadow-design-section--visible'));
-    closeAllRowMenus();
-    activeRowForTicket = null;
-    clearActiveRow();
-    bindRowMenuHandlers();
+    try {
+      auditCache = auditPage();
+      locateIndex = buildLocateIndex(auditCache);
+      renderNav();
+      if (!panel) return;
+      panel.classList.remove('shadow-design-section--visible');
+      panel.innerHTML = renderSection(auditCache);
+      requestAnimationFrame(() => panel.classList.add('shadow-design-section--visible'));
+      closeAllRowMenus();
+      activeRowForTicket = null;
+      clearActiveRow();
+      bindRowMenuHandlers();
+    } catch (err) {
+      console.error('[TWAShadowDesign] renderAudit failed', err);
+      auditCache = null;
+      renderNav();
+      if (panel) {
+        panel.innerHTML =
+          '<p class="shadow-design-empty">Design audit failed. ' +
+          escapeHtml((err && err.message) || String(err)) +
+          '</p>';
+        panel.classList.add('shadow-design-section--visible');
+      }
+    }
   }
 
   function bindDesignControls() {

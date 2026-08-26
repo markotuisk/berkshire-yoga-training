@@ -7,8 +7,17 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.11.0',
+    version: '1.11.1',
     releases: [
+      {
+        version: '1.11.1',
+        date: '2026-08-26',
+        title: 'Fix empty Page design panel',
+        user: ['View design panel shows summary, typography, colours, accessibility and issues again'],
+        dev: [
+          'Restore missing sortMap() in js/shadow-design.js; try/catch in renderAudit with fallback message; cache-bust via ?v=1.11.1'
+        ]
+      },
       {
         version: '1.11.0',
         date: '2026-08-26',
