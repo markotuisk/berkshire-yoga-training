@@ -1,6 +1,6 @@
 /**
  * Meridian shadow review overlay — shadow branch only.
- * Tickets FAB opens inbox; Tools modal holds pick mode and View SEO.
+ * Tools FAB opens pick and SEO; Tickets toolbar button opens inbox.
  */
 (function () {
   'use strict';
@@ -1173,7 +1173,7 @@
     const root = document.createElement('div');
     root.id = 'shadow-review-root';
     root.innerHTML = `
-      <button type="button" id="shadow-fab" class="shadow-fab" title="Review tickets">Tickets</button>
+      <button type="button" id="shadow-fab" class="shadow-fab" title="Review tools">Tools</button>
 
       <div id="shadow-person-modal" class="shadow-modal" hidden>
         <div class="shadow-modal-card">
@@ -1311,7 +1311,7 @@
 
     qs('#shadow-fab').addEventListener('click', () => {
       if (!getPerson()) show('person');
-      else openInbox();
+      else openTools();
     });
 
     root.querySelectorAll('[data-close]').forEach((btn) => {
@@ -2232,14 +2232,14 @@
       escapeHtml(changelog().version) +
       '</span>' +
       '<button type="button" id="shadow-whatsnew-btn" class="shadow-btn shadow-btn-small shadow-btn-secondary">What\'s new</button>' +
-      '<button type="button" id="shadow-tools-btn" class="shadow-btn shadow-btn-small">Tools</button>' +
+      '<button type="button" id="shadow-tickets-btn" class="shadow-btn shadow-btn-small">Tickets</button>' +
       '<a href="' +
       AUDIT_SHEET_URL +
       '" class="shadow-btn shadow-btn-small shadow-btn-secondary shadow-toolbar-link" target="_blank" rel="noopener">Open audit sheet</a>' +
       '<a href="' +
       ASSETS_FOLDER_URL +
       '" class="shadow-btn shadow-btn-small shadow-btn-secondary shadow-toolbar-link" target="_blank" rel="noopener">Open asset folder</a>' +
-      '<span class="shadow-toolbar-hint">Tickets FAB · Tools for pick and SEO</span>' +
+      '<span class="shadow-toolbar-hint">Tools FAB · Tickets in toolbar</span>' +
       '<span class="shadow-toolbar-spacer"></span>' +
       '<span class="shadow-toolbar-user" id="shadow-toolbar-user" hidden></span>' +
       '<button type="button" id="shadow-switch-user-btn" class="shadow-btn shadow-btn-small shadow-btn-secondary" hidden>Switch user</button>' +
@@ -2252,12 +2252,12 @@
       }
       showWhatsNew(true);
     });
-    qs('#shadow-tools-btn').addEventListener('click', () => {
+    qs('#shadow-tickets-btn').addEventListener('click', () => {
       if (!getPerson()) {
         show('person');
         return;
       }
-      openTools();
+      openInbox();
     });
     qs('#shadow-logout-btn').addEventListener('click', logout);
     qs('#shadow-switch-user-btn').addEventListener('click', switchUser);

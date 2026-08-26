@@ -7,8 +7,17 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.6.0',
+    version: '1.6.1',
     releases: [
+      {
+        version: '1.6.1',
+        date: '2026-08-26',
+        title: 'Tools and Tickets swapped',
+        user: [
+          'Tools FAB (bottom-right) opens pick and View SEO; Tickets button in the toolbar opens the inbox'
+        ],
+        dev: []
+      },
       {
         version: '1.6.0',
         date: '2026-08-26',
