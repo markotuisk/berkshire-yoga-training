@@ -3725,6 +3725,12 @@ body.shadow-seo-image-preview-open {
 .shadow-graph-edge {
   stroke: rgba(0, 0, 0, 0.1);
   stroke-width: 1.5;
+  transition: stroke 0.2s ease;
+}
+
+.shadow-graph-edge--child {
+  stroke: rgba(0, 0, 0, 0.06);
+  stroke-width: 1;
 }
 
 .shadow-graph-node circle {
@@ -3732,7 +3738,60 @@ body.shadow-seo-image-preview-open {
   stroke: #e8612e;
   stroke-width: 2;
   cursor: pointer;
-  transition: fill 0.15s ease;
+  transition: fill 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    transform 0.24s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.shadow-graph-node--group circle {
+  fill: #fff;
+  stroke: #e8612e;
+  stroke-width: 2.5;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.08));
+}
+
+.shadow-graph-node--child circle {
+  stroke-width: 1.5;
+  stroke: rgba(232, 97, 46, 0.65);
+}
+
+.shadow-graph-node--enter {
+  animation: shadow-graph-fade-in 240ms cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+@keyframes shadow-graph-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.shadow-graph-expand {
+  cursor: pointer;
+  outline: none;
+}
+
+.shadow-graph-expand-bg {
+  fill: #e8612e;
+  stroke: #fff;
+  stroke-width: 1.5;
+  transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.shadow-graph-expand:hover .shadow-graph-expand-bg,
+.shadow-graph-expand:focus .shadow-graph-expand-bg {
+  transform: scale(1.05);
+}
+
+.shadow-graph-expand-icon {
+  fill: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  pointer-events: none;
 }
 
 .shadow-graph-node--center circle {
@@ -3747,9 +3806,22 @@ body.shadow-seo-image-preview-open {
   fill: rgba(232, 97, 46, 0.15);
 }
 
+.shadow-graph-node--group:hover circle,
+.shadow-graph-node--group:focus circle {
+  fill: rgba(232, 97, 46, 0.08);
+}
+
 .shadow-graph-more {
   fill: #8e8e93;
   font-size: 9px;
+}
+
+.shadow-graph-legend {
+  margin: 0.4rem 0 0;
+  font-size: 0.6875rem;
+  line-height: 1.35;
+  color: #8e8e93;
+  text-align: center;
 }
 
 .shadow-graph-actions {
@@ -3866,17 +3938,25 @@ body.shadow-seo-image-preview-open {
 }
 
 .shadow-tools-submenu-head {
-  display: flex;
+  display: grid;
+  grid-template-columns: 44px 1fr 44px;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  padding: 0.55rem 0.65rem;
+  gap: 0.25rem;
+  padding: 0.35rem 0.45rem;
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
   font-size: 0.8rem;
   font-weight: 600;
   cursor: grab;
   touch-action: none;
   user-select: none;
+}
+
+.shadow-tools-submenu-title {
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
 }
 
 .shadow-tools-submenu--floating {
@@ -3893,15 +3973,49 @@ body.shadow-seo-image-preview-open {
   cursor: grabbing;
 }
 
-.shadow-tools-submenu-back {
+.shadow-tools-submenu-back,
+.shadow-tools-submenu-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  margin: 0;
+  padding: 0;
   border: none;
+  border-radius: 50%;
   background: transparent;
-  color: var(--shadow-accent);
-  font-size: 1rem;
   cursor: pointer;
-  padding: 0.15rem 0.35rem;
-  border-radius: 6px;
   touch-action: auto;
+  transition: background var(--shadow-ease), color var(--shadow-ease);
+}
+
+.shadow-tools-submenu-back {
+  color: var(--shadow-accent);
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.shadow-tools-submenu-close {
+  color: var(--shadow-text-secondary);
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.shadow-tools-submenu-back:hover,
+.shadow-tools-submenu-close:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.shadow-tools-submenu-back:focus-visible,
+.shadow-tools-submenu-close:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(232, 97, 46, 0.28);
+}
+
+.shadow-tools-submenu-close:hover {
+  color: var(--shadow-text);
 }
 
 .shadow-tools-submenu-list {

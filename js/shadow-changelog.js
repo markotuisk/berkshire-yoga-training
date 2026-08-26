@@ -7,8 +7,21 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.19.0',
+    version: '1.20.0',
     releases: [
+      {
+        version: '1.20.0',
+        date: '2026-08-26',
+        title: 'Smarter link graph',
+        user: [
+          'Link graph groups related pages by section — tap + to expand and see individual subpages',
+          'Expanded subpages fan out on a secondary ring with lighter connection lines',
+          'Summary mini graph shows a compact preview; open the full graph for expand and explore'
+        ],
+        dev: [
+          'shadow-graph.js pathTree + section grouping; expand/collapse state; group nodes with +/− badges; shadow-graph-legend; cache-bust via ?v=1.20.0'
+        ]
+      },
       {
         version: '1.19.0',
         date: '2026-08-26',
