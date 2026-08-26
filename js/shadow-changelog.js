@@ -12,14 +12,13 @@
       {
         version: '1.18.1',
         date: '2026-08-26',
-        title: 'Toolbox fan opens toward page centre',
+        title: 'Toolbox opens in a straight column',
         user: [
-          'Category buttons (Insights, SEO, Design, Pick) now fan up and left from the orange toolbox — fully visible inside the page',
-          'Sub-menu panel stays anchored above the toolbox without clipping at the screen edge'
+          'Toolbox categories now stack in a neat column above the tools button instead of fanning off the screen edge',
+          'Sub-menus open above the column, anchored toward the page centre'
         ],
         dev: [
-          'TOOL_CATEGORIES angles 200–305° → 105–165° (quadrant II); TOOLS_MENU_RADIUS 72 → 88',
-          'overflow: visible on #shadow-review-root, .shadow-tools-wrap, .shadow-toolbar; cache-bust via ?v=1.18.1'
+          'Replace radial fan (--tools-x/y angles) with flex column stack above FAB; shadow-tools-stack wrapper; cache-bust via ?v=1.18.1'
         ]
       },
       {

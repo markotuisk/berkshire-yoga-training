@@ -63,10 +63,10 @@
   ];
   const INSIGHTS_GROUPS = [{ label: 'Page insights', ids: ['summary', 'gsc', 'ga4', 'linkgraph'] }];
   const TOOL_CATEGORIES = [
-    { id: 'insights', label: 'Insights', angle: 105, icon: 'insights' },
-    { id: 'seo', label: 'SEO', angle: 125, icon: 'seo' },
-    { id: 'design', label: 'Design', angle: 145, icon: 'design' },
-    { id: 'pick', label: 'Pick', angle: 165, icon: 'pick' }
+    { id: 'insights', label: 'Insights', icon: 'insights' },
+    { id: 'seo', label: 'SEO', icon: 'seo' },
+    { id: 'design', label: 'Design', icon: 'design' },
+    { id: 'pick', label: 'Pick', icon: 'pick' }
   ];
   const CATEGORY_ICON_SVG = {
     insights:
@@ -90,7 +90,6 @@
   };
   const ACTIVITY_DEFAULT_SIZE = { width: 400, height: 480 };
   const ACTIVITY_STACK_OFFSET = 24;
-  const TOOLS_MENU_RADIUS = 88;
   const DOCK_MAX_PILLS = 5;
   const IDLE_MS = 60 * 60 * 1000;
   const IDLE_CHECK_MS = 60 * 1000;

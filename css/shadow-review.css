@@ -3570,10 +3570,6 @@ body.shadow-seo-image-preview-open {
 }
 
 .shadow-tools-submenu {
-  position: absolute;
-  right: 0;
-  bottom: calc(100% + 0.75rem);
-  transform: translateX(0);
   width: min(14rem, calc(100vw - 2.5rem));
   max-height: min(18rem, 50vh);
   overflow: hidden;
