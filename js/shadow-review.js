@@ -95,6 +95,11 @@
     '<path d="M4 6h14M4 11h10M4 16h6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>' +
     '<circle cx="17" cy="16" r="2.5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>';
 
+  const TOOLS_FAB_ICON =
+    '<svg class="shadow-fab-icon" width="22" height="22" viewBox="0 0 22 22" aria-hidden="true" focusable="false">' +
+    '<path d="M3.5 7.5h15v10a1.5 1.5 0 0 1-1.5 1.5h-12A1.5 1.5 0 0 1 3.5 17.5v-10z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>' +
+    '<path d="M7 7.5V5.5A2 2 0 0 1 9 3.5h4a2 2 0 0 1 2 2v2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>';
+
   const DRAG_GRIP_SVG =
     '<svg class="shadow-modal-drag-icon" width="10" height="16" viewBox="0 0 10 16" aria-hidden="true" focusable="false">' +
     '<circle cx="2.5" cy="2.5" r="1.5"/><circle cx="7.5" cy="2.5" r="1.5"/>' +
@@ -1261,7 +1266,7 @@
     const root = document.createElement('div');
     root.id = 'shadow-review-root';
     root.innerHTML = `
-      <button type="button" id="shadow-fab" class="shadow-fab" title="Review tools">Tools</button>
+      <button type="button" id="shadow-fab" class="shadow-fab" title="Review tools" aria-label="Open review tools">${TOOLS_FAB_ICON}</button>
 
       <div id="shadow-person-modal" class="shadow-modal" hidden>
         <div class="shadow-modal-card">
@@ -1344,7 +1349,7 @@
       <div id="shadow-tools-modal" class="shadow-modal" hidden>
         <div class="shadow-modal-card shadow-modal-tools">
           <div class="shadow-modal-head">
-            <h2>Tools</h2>
+            <h2>Review tools</h2>
             <button type="button" class="shadow-close" data-close="tools" aria-label="Close">&times;</button>
           </div>
           <div class="shadow-tools-grid" role="group" aria-label="Review tools">
@@ -2562,7 +2567,7 @@
       '<a href="' +
       ASSETS_FOLDER_URL +
       '" class="shadow-btn shadow-btn-small shadow-btn-secondary shadow-toolbar-link" target="_blank" rel="noopener">Open asset folder</a>' +
-      '<span class="shadow-toolbar-hint">Tools FAB · Tickets in toolbar</span>' +
+      '<span class="shadow-toolbar-hint">Review button · Tickets in toolbar</span>' +
       '<span class="shadow-toolbar-spacer"></span>' +
       '<span class="shadow-toolbar-user" id="shadow-toolbar-user" hidden></span>' +
       '<button type="button" id="shadow-switch-user-btn" class="shadow-btn shadow-btn-small shadow-btn-secondary" hidden>Switch user</button>' +

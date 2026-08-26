@@ -7,12 +7,20 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.13.1',
+    version: '1.13.2',
     releases: [
       {
-        version: '1.13.1',
+        version: '1.13.2',
         date: '2026-08-26',
-        title: 'Tools FAB only',
+        title: 'Review tools button icon',
+        user: [
+          'Orange review button is now an icon (toolbox) instead of the word Tools',
+          'Hub title reads Review tools with Pick, SEO and Design tiles'
+        ],
+        dev: [
+          'shadow-fab icon-only FAB; hub h2 Review tools; cache-bust via ?v=1.13.2'
+        ]
+      },
         user: ['Remove duplicate Tools button from toolbar'],
         dev: [
           'shadow-review.js restore flat toolbar layout; remove centre Tools btn and click handler; cache-bust via ?v=1.13.1'
