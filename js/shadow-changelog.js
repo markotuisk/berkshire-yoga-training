@@ -7,8 +7,21 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.9.1',
+    version: '1.9.3',
     releases: [
+      {
+        version: '1.9.3',
+        date: '2026-08-26',
+        title: 'SEO row menu positioning and active row highlight',
+        user: [
+          '⋯ row menus open without shifting the SEO table — menus float above the panel',
+          'The row you are acting on stays highlighted in amber when you open the menu, locate on page, or request a change'
+        ],
+        dev: [
+          'Portal row menus to document.body with fixed coords; constrain flip within SEO modal bounds',
+          'Active row state (.shadow-seo-row--active) with focus-within fallback; cleared on ticket close; cache-bust via ?v=1.9.3'
+        ]
+      },
       {
         version: '1.9.1',
         date: '2026-08-26',

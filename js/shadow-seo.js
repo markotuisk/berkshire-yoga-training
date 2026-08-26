@@ -225,6 +225,9 @@
   let locateHighlightEl = null;
   let locateHighlightTimer = null;
   let openRowMenu = null;
+  let menuPortal = null;
+  let activeRowLocateKey = null;
+  let activeRowForTicket = null;
   let lastKeywordAnalysis = null;
 
   const STOP_WORDS = new Set(
@@ -1119,8 +1122,19 @@
     return !!resolveLocateTarget(locateKey);
   }
 
-  function rowMenuHtml(fieldName, locateKey) {
+  function rowMenuHtml(fieldName, locateKey, menuOpts) {
+    menuOpts = menuOpts || {};
     const canLocate = canLocateField(locateKey);
+    const showPreview = !!menuOpts.previewSrc;
+    const previewAttrs = showPreview
+      ? ' data-preview-src="' +
+        escapeHtml(menuOpts.previewSrc) +
+        '" data-preview-alt="' +
+        escapeHtml(menuOpts.previewAlt || '') +
+        '" data-preview-dims="' +
+        escapeHtml(menuOpts.previewDims || '') +
+        '"'
+      : '';
     return (
       '<span class="shadow-seo-row-menu">' +
       '<button type="button" class="shadow-seo-row-menu-btn" aria-haspopup="menu" aria-expanded="false" ' +
@@ -1130,10 +1144,15 @@
       escapeHtml(fieldName) +
       '" data-locate="' +
       escapeHtml(locateKey || '') +
-      '">' +
+      '"' +
+      previewAttrs +
+      '>' +
       '<span class="shadow-seo-row-menu-dots" aria-hidden="true">⋯</span>' +
       '</button>' +
       '<div class="shadow-seo-row-menu-popover" role="menu" hidden>' +
+      (showPreview
+        ? '<button type="button" class="shadow-seo-row-menu-item" role="menuitem" data-action="preview">Preview</button>'
+        : '') +
       (canLocate
         ? '<button type="button" class="shadow-seo-row-menu-item" role="menuitem" data-action="locate">Locate on page</button>'
         : '') +
@@ -1195,16 +1214,23 @@
         (opts.googleStatus ? googleStatusPill(opts.googleStatus) : '') +
         '</div>';
     }
+    const locateAttr = locateKey ? ' data-locate="' + escapeHtml(locateKey) + '"' : '';
     return (
       '<div class="' +
       rowClass +
-      '">' +
+      '"' +
+      locateAttr +
+      '>' +
       labelHtml +
       '<div class="shadow-seo-field-value">' +
       valueHtml +
       '</div>' +
       '<div class="shadow-seo-field-actions">' +
-      rowMenuHtml(fieldName, locateKey) +
+      rowMenuHtml(fieldName, locateKey, {
+        previewSrc: opts.previewSrc,
+        previewAlt: opts.previewAlt,
+        previewDims: opts.previewDims
+      }) +
       '</div></div>'
     );
   }
@@ -1817,7 +1843,9 @@
         const locateKey = keywordLocateKey(item.term, kind);
         const fieldName = (kind === 'pair' ? 'Keyword pair' : 'Keyword') + ': ' + item.term;
         return (
-          '<tr class="shadow-seo-kw-row">' +
+          '<tr class="shadow-seo-kw-row" data-locate="' +
+          escapeHtml(locateKey) +
+          '">' +
           '<td class="shadow-seo-kw-term">' +
           escapeHtml(item.term) +
           '</td>' +
@@ -2197,52 +2225,176 @@
     return true;
   }
 
-  function closeRowMenu(menu) {
+  function ensureMenuPortal() {
+    if (menuPortal && menuPortal.isConnected) return menuPortal;
+    menuPortal = document.getElementById('shadow-seo-menu-portal');
+    if (!menuPortal) {
+      menuPortal = document.createElement('div');
+      menuPortal.id = 'shadow-seo-menu-portal';
+      menuPortal.className = 'shadow-seo-menu-portal';
+      menuPortal.setAttribute('aria-hidden', 'true');
+      document.body.appendChild(menuPortal);
+    }
+    return menuPortal;
+  }
+
+  function menuForPopover(popover) {
+    if (!popover) return null;
+    const ownerId = popover.dataset.menuOwner;
+    if (ownerId) {
+      if (typeof CSS !== 'undefined' && CSS.escape) {
+        return document.querySelector('.shadow-seo-row-menu[data-menu-id="' + CSS.escape(ownerId) + '"]');
+      }
+      return [...document.querySelectorAll('.shadow-seo-row-menu')].find(
+        (menu) => menu.dataset.menuId === ownerId
+      ) || null;
+    }
+    return popover.closest('.shadow-seo-row-menu');
+  }
+
+  function isRowMenuTarget(target) {
+    if (!target || !openRowMenu) return false;
+    if (target.closest('.shadow-seo-row-menu') === openRowMenu) return true;
+    const popover = target.closest('.shadow-seo-row-menu-popover');
+    if (!popover || popover.hidden) return false;
+    return menuForPopover(popover) === openRowMenu;
+  }
+
+  function attachPopoverToPortal(menu, popover) {
+    const portal = ensureMenuPortal();
+    ensureMenuId(menu);
+    if (popover.parentElement !== portal) portal.appendChild(popover);
+    popover.dataset.menuOwner = menu.dataset.menuId;
+  }
+
+  function returnPopoverToMenu(menu, popover) {
+    if (!menu || !popover || popover.parentElement === menu) return;
+    menu.appendChild(popover);
+    delete popover.dataset.menuOwner;
+  }
+
+  function ensureMenuId(menu) {
+    if (!menu.dataset.menuId) {
+      menu.dataset.menuId = 'seo-menu-' + Math.random().toString(36).slice(2, 9);
+    }
+    return menu.dataset.menuId;
+  }
+
+  function seoPanelBounds() {
+    const card = qs('#shadow-seo-modal .shadow-modal-card');
+    if (card) return card.getBoundingClientRect();
+    const modal = qs('#shadow-seo-modal');
+    if (modal && !modal.hidden) return modal.getBoundingClientRect();
+    return {
+      top: 8,
+      left: 8,
+      right: window.innerWidth - 8,
+      bottom: window.innerHeight - 8
+    };
+  }
+
+  function findRowByLocateKey(key) {
+    if (!key) return null;
+    const section = qs('#shadow-seo-section');
+    if (!section) return null;
+    if (typeof CSS !== 'undefined' && CSS.escape) {
+      return section.querySelector('[data-locate="' + CSS.escape(key) + '"]');
+    }
+    return [...section.querySelectorAll('[data-locate]')].find((el) => el.dataset.locate === key) || null;
+  }
+
+  function syncActiveRowHighlight() {
+    const section = qs('#shadow-seo-section');
+    if (!section) return;
+    section.querySelectorAll('.shadow-seo-row--active').forEach((row) => {
+      row.classList.remove('shadow-seo-row--active');
+    });
+    if (!activeRowLocateKey) return;
+    const row = findRowByLocateKey(activeRowLocateKey);
+    if (row) row.classList.add('shadow-seo-row--active');
+  }
+
+  function setActiveRow(locateKey) {
+    activeRowLocateKey = locateKey || null;
+    syncActiveRowHighlight();
+  }
+
+  function clearActiveRow() {
+    activeRowLocateKey = null;
+    syncActiveRowHighlight();
+  }
+
+  function closeRowMenu(menu, opts) {
+    opts = opts || {};
     if (!menu) return;
     const btn = menu.querySelector('.shadow-seo-row-menu-btn');
     const popover = menu.querySelector('.shadow-seo-row-menu-popover');
     if (btn) btn.setAttribute('aria-expanded', 'false');
     if (popover) {
       popover.hidden = true;
+      popover.style.visibility = '';
       popover.style.top = '';
       popover.style.left = '';
+      returnPopoverToMenu(menu, popover);
     }
     if (openRowMenu === menu) openRowMenu = null;
+    if (!opts.keepActiveRow && !activeRowForTicket) clearActiveRow();
   }
 
   function positionRowMenuPopover(menu) {
     const btn = menu.querySelector('.shadow-seo-row-menu-btn');
     const popover = menu.querySelector('.shadow-seo-row-menu-popover');
     if (!btn || !popover) return;
+    ensureMenuId(menu);
+    attachPopoverToPortal(menu, popover);
     popover.hidden = false;
+    popover.style.visibility = 'hidden';
+    popover.style.top = '0';
+    popover.style.left = '0';
     const rect = btn.getBoundingClientRect();
+    const bounds = seoPanelBounds();
+    const gap = 4;
     const margin = 8;
     const popW = popover.offsetWidth;
     const popH = popover.offsetHeight;
     let left = rect.right - popW;
-    let top = rect.bottom + 4;
-    if (left < margin) left = margin;
-    if (left + popW > window.innerWidth - margin) left = window.innerWidth - popW - margin;
-    if (top + popH > window.innerHeight - margin) top = rect.top - popH - 4;
-    if (top < margin) top = margin;
+    let top = rect.bottom + gap;
+    if (left + popW > bounds.right - margin) left = rect.left - popW;
+    if (left < bounds.left + margin) left = bounds.left + margin;
+    if (left + popW > bounds.right - margin) left = bounds.right - popW - margin;
+    if (top + popH > bounds.bottom - margin) top = rect.top - popH - gap;
+    if (top < bounds.top + margin) top = bounds.top + margin;
+    popover.style.visibility = '';
     popover.style.top = Math.round(top) + 'px';
     popover.style.left = Math.round(left) + 'px';
   }
 
-  function closeAllRowMenus() {
-    document.querySelectorAll('.shadow-seo-row-menu').forEach((menu) => closeRowMenu(menu));
+  function closeAllRowMenus(opts) {
+    document.querySelectorAll('.shadow-seo-row-menu').forEach((menu) => closeRowMenu(menu, opts));
+  }
+
+  function bindMenuReposition() {
+    if (bindMenuReposition._bound) return;
+    bindMenuReposition._bound = true;
+    const reposition = () => {
+      if (openRowMenu) positionRowMenuPopover(openRowMenu);
+    };
+    window.addEventListener('scroll', reposition, { passive: true, capture: true });
+    window.addEventListener('resize', reposition, { passive: true });
   }
 
   function openRowMenuPopover(menu) {
     if (!menu) return;
-    closeAllRowMenus();
     const btn = menu.querySelector('.shadow-seo-row-menu-btn');
     const popover = menu.querySelector('.shadow-seo-row-menu-popover');
     if (!btn || !popover) return;
+    const locateKey = btn.dataset.locate || '';
+    closeAllRowMenus({ keepActiveRow: true });
+    setActiveRow(locateKey);
     btn.setAttribute('aria-expanded', 'true');
-    popover.hidden = false;
     positionRowMenuPopover(menu);
     openRowMenu = menu;
+    bindMenuReposition();
     const firstItem = popover.querySelector('.shadow-seo-row-menu-item');
     if (firstItem) firstItem.focus();
   }
@@ -2256,6 +2408,8 @@
       if (helpers && helpers.toast) helpers.toast('Ticket form unavailable');
       return;
     }
+    activeRowForTicket = locateKey || fieldName;
+    setActiveRow(locateKey);
     const fieldValue = resolveFieldValue(fieldName, locateKey);
     const element = locateKey ? resolveLocateTarget(locateKey) : null;
     helpers.openChangeTicket({
@@ -2282,19 +2436,29 @@
     if (!item) return;
     event.preventDefault();
     event.stopPropagation();
-    const menu = item.closest('.shadow-seo-row-menu');
+    const popover = item.closest('.shadow-seo-row-menu-popover');
+    const menu = menuForPopover(popover) || item.closest('.shadow-seo-row-menu');
     const menuBtnEl = menu && menu.querySelector('.shadow-seo-row-menu-btn');
     const fieldName = menuBtnEl ? menuBtnEl.dataset.fieldName : '';
     const locateKey = menuBtnEl ? menuBtnEl.dataset.locate : '';
     const action = item.dataset.action;
-    closeRowMenu(menu);
-
-    if (action === 'locate' && locateKey) locateOnPage(locateKey);
-    else if (action === 'change') requestSeoChange(fieldName, locateKey);
+    if (action === 'locate' && locateKey) {
+      setActiveRow(locateKey);
+      closeRowMenu(menu, { keepActiveRow: true });
+      locateOnPage(locateKey);
+    } else if (action === 'change') {
+      setActiveRow(locateKey);
+      closeRowMenu(menu, { keepActiveRow: true });
+      requestSeoChange(fieldName, locateKey);
+    } else {
+      closeRowMenu(menu);
+    }
   }
 
   function onRowMenuKeydown(event) {
-    const menu = event.target.closest('.shadow-seo-row-menu');
+    const menu =
+      event.target.closest('.shadow-seo-row-menu') ||
+      menuForPopover(event.target.closest('.shadow-seo-row-menu-popover'));
     if (!menu) return;
 
     if (event.key === 'Escape') {
@@ -2317,7 +2481,7 @@
 
   function onDocumentPointerDown(event) {
     if (!openRowMenu) return;
-    if (event.target.closest('.shadow-seo-row-menu') === openRowMenu) return;
+    if (isRowMenuTarget(event.target)) return;
     closeAllRowMenus();
   }
 
@@ -2346,6 +2510,8 @@
     });
     if (highlightOn) applyHighlights(data);
     closeAllRowMenus();
+    activeRowForTicket = null;
+    clearActiveRow();
   }
 
   function ensureOverlayLayer() {
@@ -2463,11 +2629,20 @@
 
   function onToolsClosed() {
     setHighlight(false);
+    activeRowForTicket = null;
+    clearActiveRow();
+  }
+
+  function onTicketClosed() {
+    activeRowForTicket = null;
+    clearActiveRow();
   }
 
   function shutdown() {
     setHighlight(false);
     clearLocateHighlight();
+    activeRowForTicket = null;
+    clearActiveRow();
     closeAllRowMenus();
     closePanel();
   }
@@ -2493,6 +2668,7 @@
     close: closePanel,
     refresh: renderAudit,
     onToolsClosed,
+    onTicketClosed,
     shutdown,
     isHighlightOn: () => highlightOn
   };

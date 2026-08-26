@@ -1368,6 +1368,18 @@ body.shadow-modal-drag-active {
   border-bottom: none;
 }
 
+.shadow-seo-field-row.shadow-seo-row--active,
+.shadow-seo-kw-row.shadow-seo-row--active {
+  background: rgba(255, 149, 0, 0.08);
+  box-shadow: inset 3px 0 0 var(--shadow-accent, #ff9500);
+}
+
+.shadow-seo-field-row:focus-within:not(.shadow-seo-row--active),
+.shadow-seo-kw-row:focus-within:not(.shadow-seo-row--active) {
+  background: rgba(255, 149, 0, 0.06);
+  box-shadow: inset 3px 0 0 rgba(232, 97, 46, 0.5);
+}
+
 .shadow-seo-field-row--warn {
   background: rgba(255, 59, 48, 0.05);
 }
@@ -1931,6 +1943,17 @@ body.shadow-modal-drag-active {
   padding: 0.1rem 0.45rem;
 }
 
+.shadow-seo-menu-portal {
+  position: fixed;
+  inset: 0;
+  z-index: 100001;
+  pointer-events: none;
+}
+
+.shadow-seo-menu-portal .shadow-seo-row-menu-popover {
+  pointer-events: auto;
+}
+
 .shadow-seo-row-menu {
   position: relative;
   flex-shrink: 0;
@@ -1982,8 +2005,9 @@ body.shadow-modal-drag-active {
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 100001;
+  z-index: 1;
   min-width: 9.5rem;
+  margin: 0;
   padding: 0.3rem;
   background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(24px) saturate(180%);

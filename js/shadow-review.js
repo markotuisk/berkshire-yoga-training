@@ -1523,6 +1523,9 @@
     if (which === 'new') {
       seoTicketDraft = null;
       clearHighlight();
+      if (window.TWAShadowSEO && window.TWAShadowSEO.onTicketClosed) {
+        window.TWAShadowSEO.onTicketClosed();
+      }
     }
     if (which === 'detail') clearHighlight();
   }
