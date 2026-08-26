@@ -3593,6 +3593,23 @@ body.shadow-seo-image-preview-open {
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
   font-size: 0.8rem;
   font-weight: 600;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.shadow-tools-submenu--floating {
+  position: fixed;
+  z-index: 99991;
+  pointer-events: auto;
+}
+
+.shadow-tools-submenu--dragging {
+  transition: none;
+}
+
+.shadow-tools-submenu--dragging .shadow-tools-submenu-head {
+  cursor: grabbing;
 }
 
 .shadow-tools-submenu-back {
@@ -3603,6 +3620,7 @@ body.shadow-seo-image-preview-open {
   cursor: pointer;
   padding: 0.15rem 0.35rem;
   border-radius: 6px;
+  touch-action: auto;
 }
 
 .shadow-tools-submenu-list {
@@ -4023,7 +4041,7 @@ body.shadow-seo-image-preview-open {
 }
 
 @media (max-width: 767px) {
-  .shadow-tools-submenu {
+  .shadow-tools-submenu:not(.shadow-tools-submenu--floating) {
     position: fixed;
     left: 0.5rem;
     right: 0.5rem;
@@ -4031,6 +4049,11 @@ body.shadow-seo-image-preview-open {
     width: auto;
     max-height: min(22rem, 55vh);
     border-radius: 16px 16px 12px 12px;
+  }
+
+  .shadow-tools-submenu--floating {
+    width: min(14rem, calc(100vw - 1rem));
+    max-height: min(22rem, 55vh);
   }
 
   .shadow-activity-card {

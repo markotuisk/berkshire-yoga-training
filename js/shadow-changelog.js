@@ -7,8 +7,20 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.18.2',
+    version: '1.18.3',
     releases: [
+      {
+        version: '1.18.3',
+        date: '2026-08-26',
+        title: 'Draggable toolbox sub-menus',
+        user: [
+          'Drag any toolbox category sub-menu by its header to move it anywhere on screen',
+          'Sub-menu position is remembered for the rest of your session'
+        ],
+        dev: [
+          'initDraggableSubmenu: pointer drag on .shadow-tools-submenu-head, fixed positioning, sessionStorage via SUBMENU_POS_KEY; cache-bust via ?v=1.18.3'
+        ]
+      },
       {
         version: '1.18.2',
         date: '2026-08-26',

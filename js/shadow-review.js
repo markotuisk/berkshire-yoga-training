@@ -106,6 +106,8 @@
     new: 'shadow-new-modal'
   };
 
+  const SUBMENU_POS_KEY = 'tools-submenu';
+
   const DEFAULT_MODAL_SIZES = {};
 
   const TOOLS_FAB_ICON =
@@ -2095,6 +2097,111 @@
     });
   }
 
+  function clearSubmenuInlinePosition(submenu) {
+    submenu.style.left = '';
+    submenu.style.top = '';
+    submenu.style.right = '';
+    submenu.style.bottom = '';
+    submenu.style.width = '';
+    submenu.style.position = '';
+    submenu.style.margin = '';
+    submenu.classList.remove('shadow-tools-submenu--floating', 'shadow-tools-submenu--dragging');
+  }
+
+  function anchorSubmenuFromLayout(submenu) {
+    const rect = submenu.getBoundingClientRect();
+    const pos = clampModalPosition(rect.left, rect.top, submenu);
+    submenu.classList.add('shadow-tools-submenu--floating');
+    submenu.style.position = 'fixed';
+    submenu.style.margin = '0';
+    submenu.style.right = 'auto';
+    submenu.style.bottom = 'auto';
+    submenu.style.left = pos.left + 'px';
+    submenu.style.top = pos.top + 'px';
+  }
+
+  function applySubmenuPosition(submenu) {
+    const saved = getModalPosition(SUBMENU_POS_KEY);
+    if (saved) {
+      submenu.classList.add('shadow-tools-submenu--floating');
+      submenu.style.position = 'fixed';
+      submenu.style.margin = '0';
+      submenu.style.right = 'auto';
+      submenu.style.bottom = 'auto';
+      requestAnimationFrame(() => {
+        const pos = clampModalPosition(saved.left, saved.top, submenu);
+        submenu.style.left = pos.left + 'px';
+        submenu.style.top = pos.top + 'px';
+      });
+      return;
+    }
+    requestAnimationFrame(() => anchorSubmenuFromLayout(submenu));
+  }
+
+  function saveSubmenuPosition(submenu) {
+    const left = parseFloat(submenu.style.left);
+    const top = parseFloat(submenu.style.top);
+    if (!Number.isNaN(left) && !Number.isNaN(top)) {
+      saveModalPosition(SUBMENU_POS_KEY, top, left);
+    }
+  }
+
+  function initDraggableSubmenu() {
+    const submenu = qs('#shadow-tools-submenu');
+    if (!submenu || submenu._dragReady) return;
+    submenu._dragReady = true;
+
+    submenu.addEventListener('pointerdown', (e) => {
+      if (submenu.hidden) return;
+      const head = e.target.closest('.shadow-tools-submenu-head');
+      if (!head || !submenu.contains(head)) return;
+      if (e.target.closest('.shadow-tools-submenu-back')) return;
+      if (e.button !== 0) return;
+      e.preventDefault();
+
+      if (!submenu.classList.contains('shadow-tools-submenu--floating')) {
+        anchorSubmenuFromLayout(submenu);
+      }
+
+      const rect = submenu.getBoundingClientRect();
+      const startX = e.clientX;
+      const startY = e.clientY;
+      const startLeft = rect.left;
+      const startTop = rect.top;
+      let dragged = false;
+
+      head.setPointerCapture(e.pointerId);
+      document.body.classList.add('shadow-modal-drag-active');
+
+      const onMove = (ev) => {
+        const dx = ev.clientX - startX;
+        const dy = ev.clientY - startY;
+        if (!dragged && (Math.abs(dx) > 3 || Math.abs(dy) > 3)) {
+          dragged = true;
+          submenu.classList.add('shadow-tools-submenu--dragging');
+        }
+        if (!dragged) return;
+        const pos = clampModalPosition(startLeft + dx, startTop + dy, submenu);
+        submenu.style.left = pos.left + 'px';
+        submenu.style.top = pos.top + 'px';
+      };
+
+      const onUp = (ev) => {
+        head.releasePointerCapture(ev.pointerId);
+        document.removeEventListener('pointermove', onMove);
+        document.removeEventListener('pointerup', onUp);
+        document.removeEventListener('pointercancel', onUp);
+        submenu.classList.remove('shadow-tools-submenu--dragging');
+        document.body.classList.remove('shadow-modal-drag-active');
+        if (dragged) saveSubmenuPosition(submenu);
+      };
+
+      document.addEventListener('pointermove', onMove);
+      document.addEventListener('pointerup', onUp);
+      document.addEventListener('pointercancel', onUp);
+    });
+  }
+
   function showToolsSubmenu(category, anchorBtn) {
     const submenu = qs('#shadow-tools-submenu');
     if (!submenu) return;
@@ -2124,7 +2231,9 @@
       '<div class="shadow-tools-submenu-list">' +
       groupHtml +
       '</div>';
+    clearSubmenuInlinePosition(submenu);
     submenu.hidden = false;
+    applySubmenuPosition(submenu);
     qs('.shadow-tools-submenu-back', submenu).addEventListener('click', (e) => {
       e.stopPropagation();
       hideToolsSubmenu();
@@ -2150,7 +2259,10 @@
 
   function hideToolsSubmenu() {
     const submenu = qs('#shadow-tools-submenu');
-    if (submenu) submenu.hidden = true;
+    if (submenu) {
+      submenu.hidden = true;
+      clearSubmenuInlinePosition(submenu);
+    }
     activeToolCategory = null;
     const wrap = qs('#shadow-tools-wrap');
     if (wrap) wrap.classList.remove('shadow-tools-submenu-open');
@@ -2367,6 +2479,7 @@
     qs('#shadow-ticket-list').addEventListener('click', onInboxListClick);
 
     initDraggableModals();
+    initDraggableSubmenu();
 
     if (window.TWAShadowSEO) {
       window.TWAShadowSEO.init({
