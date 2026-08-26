@@ -17,6 +17,7 @@
     { id: 'headings', label: 'Headings' },
     { id: 'images', label: 'Images' },
     { id: 'links', label: 'Links' },
+    { id: 'keywords', label: 'Keywords' },
     { id: 'structured', label: 'Structured data' },
     { id: 'technical', label: 'Technical' }
   ];
@@ -60,6 +61,13 @@
   let locateHighlightEl = null;
   let locateHighlightTimer = null;
   let openRowMenu = null;
+  let lastKeywordAnalysis = null;
+
+  const STOP_WORDS = new Set(
+    'a about above after again against all am an and any are as at be because been before being below between both but by can did do does doing done down during each few for from further had has have having he her here hers herself him himself his how if in into is it its itself just let like ll me more most much must my myself no nor not now of off on once only or other our ours ourselves out over own re s same shall she should so some such t than that the their theirs them themselves then there these they this those though through to too under until up very was we were what when where which while who whom why will with would you your yours yourself yourselves'.split(
+      ' '
+    )
+  );
 
   const META_LOCATE_KEYS = {
     title: 'meta-title',
@@ -479,6 +487,24 @@
   }
 
   function renderOverview(data) {
+    const warningsHtml =
+      data.warnings.length
+        ? data.warnings
+            .map(
+              (w) =>
+                '<li class="shadow-seo-warning shadow-seo-warning--' +
+                w.level +
+                '"><span class="shadow-seo-warning-icon">' +
+                warningIcon(w.level) +
+                '</span><span class="shadow-seo-warning-text">' +
+                escapeHtml(w.text) +
+                '</span></li>'
+            )
+            .join('')
+        : '<li class="shadow-seo-warning shadow-seo-warning--good"><span class="shadow-seo-warning-icon">' +
+          warningIcon('good') +
+          '</span><span class="shadow-seo-warning-text">No major issues detected</span></li>';
+
     return (
       '<div class="shadow-seo-overview">' +
       '<div class="shadow-seo-score-ring ' +
@@ -494,24 +520,11 @@
       '<span class="shadow-seo-score-label">Score</span>' +
       '</div>' +
       '</div>' +
-      '<ul class="shadow-seo-warnings">' +
-      (data.warnings.length
-        ? data.warnings
-            .map(
-              (w) =>
-                '<li class="shadow-seo-warning shadow-seo-warning--' +
-                w.level +
-                '"><span class="shadow-seo-warning-icon">' +
-                warningIcon(w.level) +
-                '</span><span class="shadow-seo-warning-text">' +
-                escapeHtml(w.text) +
-                '</span></li>'
-            )
-            .join('')
-        : '<li class="shadow-seo-warning shadow-seo-warning--good"><span class="shadow-seo-warning-icon">' +
-          warningIcon('good') +
-          '</span><span class="shadow-seo-warning-text">No major issues detected</span></li>') +
-      '</ul>' +
+      renderFieldGroup(
+        'Issues',
+        '<ul class="shadow-seo-warnings">' + warningsHtml + '</ul>',
+        { plain: true }
+      ) +
       '</div>'
     );
   }
@@ -570,6 +583,15 @@
         const block = data.jsonLd[parseInt(jsonLdMatch[1], 10)];
         return block ? truncate(block.raw, 120) : '';
       }
+
+      const kwMatch = locateKey.match(/^kw-(single|pair)-(.+)$/);
+      if (kwMatch) {
+        try {
+          return decodeURIComponent(kwMatch[2]);
+        } catch (e) {
+          return '';
+        }
+      }
     }
 
     const staticMap = {
@@ -620,37 +642,56 @@
     );
   }
 
-  function renderValueCell(val, opts) {
+  function renderFieldGroup(title, innerHtml, opts) {
     opts = opts || {};
-    const fieldName = opts.fieldName || '';
-    const locateKey = opts.locate || '';
-    const valueHtml = renderCellValue(val, opts);
+    const bodyClass = opts.plain ? 'shadow-seo-group-card shadow-seo-group-card--plain' : 'shadow-seo-group-card';
     return (
-      '<span class="shadow-seo-value-cell">' +
-      valueHtml +
-      rowMenuHtml(fieldName, locateKey) +
-      '</span>'
+      '<section class="shadow-seo-group">' +
+      (title ? '<h3 class="shadow-seo-group-title">' + escapeHtml(title) + '</h3>' : '') +
+      '<div class="' +
+      bodyClass +
+      '">' +
+      innerHtml +
+      '</div></section>'
     );
   }
 
-  function renderFieldTable(rows, tableClass) {
+  function renderFieldRow(label, value, opts, rowIndex) {
+    opts = opts || {};
+    const fieldName = opts.fieldName || label;
+    const locateKey = opts.locate || '';
+    const rowClass =
+      'shadow-seo-field-row' +
+      (opts.media ? ' shadow-seo-field-row--media' : '') +
+      (opts.warn ? ' shadow-seo-field-row--warn' : '') +
+      (rowIndex % 2 ? ' shadow-seo-field-row--zebra' : '');
     return (
-      '<table class="shadow-seo-table' +
-      (tableClass ? ' ' + tableClass : '') +
-      '"><tbody>' +
-      rows
-        .map(
-          (r, i) =>
-            '<tr class="shadow-seo-row' +
-            (i % 2 ? ' shadow-seo-row--zebra' : '') +
-            '"><th scope="row">' +
-            escapeHtml(r[0]) +
-            '</th><td>' +
-            renderValueCell(r[1], Object.assign({}, r[2] || {}, { fieldName: r[0] })) +
-            '</td></tr>'
-        )
-        .join('') +
-      '</tbody></table>'
+      '<div class="' +
+      rowClass +
+      '">' +
+      '<span class="shadow-seo-field-label">' +
+      escapeHtml(label) +
+      '</span>' +
+      '<div class="shadow-seo-field-value">' +
+      (opts.raw ? String(value) : renderCellValue(value, opts)) +
+      '</div>' +
+      '<div class="shadow-seo-field-actions">' +
+      rowMenuHtml(fieldName, locateKey) +
+      '</div></div>'
+    );
+  }
+
+  function renderFieldRows(rows) {
+    return rows
+      .map((r, i) => renderFieldRow(r[0], r[1], Object.assign({}, r[2] || {}, { fieldName: r[0] }), i))
+      .join('');
+  }
+
+  function renderFieldTable(rows, groupTitle) {
+    return (
+      '<div class="shadow-seo-groups">' +
+      renderFieldGroup(groupTitle || '', renderFieldRows(rows)) +
+      '</div>'
     );
   }
 
@@ -662,7 +703,7 @@
       if (META_LOCATE_KEYS[key]) rowOpts.locate = META_LOCATE_KEYS[key];
       return [label, value, rowOpts];
     });
-    return renderFieldTable(rows, 'shadow-seo-table--meta');
+    return renderFieldTable(rows, 'Document meta');
   }
 
   function renderOgTable(data) {
@@ -671,7 +712,7 @@
       if (OG_LOCATE_KEYS[key]) rowOpts.locate = OG_LOCATE_KEYS[key];
       return [key, data.og[key] || '', rowOpts];
     });
-    return renderFieldTable(rows, 'shadow-seo-table--og');
+    return renderFieldTable(rows, 'Open Graph');
   }
 
   function renderTwitterTable(data) {
@@ -680,7 +721,7 @@
       if (TWITTER_LOCATE_KEYS[key]) rowOpts.locate = TWITTER_LOCATE_KEYS[key];
       return [key, data.twitter[key] || '', rowOpts];
     });
-    return renderFieldTable(rows, 'shadow-seo-table--twitter');
+    return renderFieldTable(rows, 'Twitter cards');
   }
 
   function renderSecurity(data) {
@@ -693,7 +734,7 @@
         { mono: true, truncate: 72, emptyLabel: 'Not set', locate: 'meta-viewport' }
       ]
     ];
-    return renderFieldTable(rows, 'shadow-seo-table--security');
+    return renderFieldTable(rows, 'Transport & viewport');
   }
 
   function renderHeadings(data) {
@@ -715,28 +756,26 @@
       '</div>';
     const list =
       data.headings.length
-        ? '<table class="shadow-seo-table shadow-seo-table--headings"><tbody>' +
-          data.headings
-            .map(
-              (h, i) =>
-                '<tr class="shadow-seo-row' +
-                (i % 2 ? ' shadow-seo-row--zebra' : '') +
-                '"><td class="shadow-seo-cell-badge"><span class="' +
-                headingBadgeClass(h.level) +
-                '">' +
-                escapeHtml(h.tag.toUpperCase()) +
-                '</span></td><td>' +
-                renderValueCell(h.text, {
-                  emptyLabel: 'Empty',
-                  locate: 'heading-' + i,
-                  fieldName: h.tag.toUpperCase() + ' heading'
-                }) +
-                '</td></tr>'
-            )
-            .join('') +
-          '</tbody></table>'
+        ? renderFieldRows(
+            data.headings.map((h, i) => [
+              h.tag.toUpperCase(),
+              h.text,
+              {
+                emptyLabel: 'Empty',
+                locate: 'heading-' + i,
+                fieldName: h.tag.toUpperCase() + ' heading'
+              }
+            ])
+          )
         : '<p class="shadow-seo-empty-state">' + emptyPill('No headings') + '</p>';
-    return summary + list;
+    return (
+      '<div class="shadow-seo-groups">' +
+      summary +
+      (data.headings.length
+        ? renderFieldGroup('On this page', list)
+        : '<div class="shadow-seo-group-card">' + list + '</div>') +
+      '</div>'
+    );
   }
 
   function renderImages(data) {
@@ -752,29 +791,32 @@
       html += '<p class="shadow-seo-empty-state">' + emptyPill('No images') + '</p>';
       return html;
     }
+    const rows = data.images.map((img, i) => {
+      const altDisplay = img.missingAlt
+        ? '<span class="shadow-seo-badge-missing-alt">Missing alt</span>'
+        : img.alt;
+      const value =
+        renderCellValue(img.src, { mono: true, truncate: 48, emptyLabel: 'Not set' }) +
+        (altDisplay
+          ? '<br><span class="shadow-seo-link-text">' +
+            (img.missingAlt ? altDisplay : escapeHtml(truncate(img.alt, 40))) +
+            '</span>'
+          : '') +
+        (img.dims ? ' <span class="shadow-seo-link-text">' + escapeHtml(img.dims) + '</span>' : '');
+      return [
+        img.missingAlt ? 'Image alt' : 'Image',
+        value,
+        {
+          media: true,
+          warn: img.missingAlt,
+          locate: 'image-' + i,
+          fieldName: img.missingAlt ? 'Image alt' : 'Image',
+          raw: true
+        }
+      ];
+    });
     html +=
-      '<table class="shadow-seo-table shadow-seo-table--images">' +
-      '<thead><tr><th>Src</th><th>Alt</th><th>Dims</th><th class="shadow-seo-cell-actions" aria-hidden="true"></th></tr></thead><tbody>' +
-      data.images
-        .map(
-          (img, i) =>
-            '<tr class="shadow-seo-row' +
-            (img.missingAlt ? ' shadow-seo-row--warn' : '') +
-            (i % 2 && !img.missingAlt ? ' shadow-seo-row--zebra' : '') +
-            '"><td class="shadow-seo-cell-src">' +
-            renderCellValue(img.src, { mono: true, truncate: 48, emptyLabel: 'Not set' }) +
-            '</td><td>' +
-            (img.missingAlt
-              ? '<span class="shadow-seo-badge-missing-alt">Missing alt</span>'
-              : renderCellValue(img.alt, { truncate: 40 })) +
-            '</td><td>' +
-            renderCellValue(img.dims, { emptyLabel: 'Not set' }) +
-            '</td><td class="shadow-seo-cell-actions">' +
-            rowMenuHtml(img.missingAlt ? 'Image alt' : 'Image', 'image-' + i) +
-            '</td></tr>'
-        )
-        .join('') +
-      '</tbody></table>';
+      '<div class="shadow-seo-groups">' + renderFieldGroup('Images', renderFieldRows(rows)) + '</div>';
     return html;
   }
 
@@ -789,53 +831,40 @@
       links.external.length +
       '</p>';
     const slice = links.internal.slice(0, 15);
-    html += '<p class="shadow-seo-subhead">Internal' + (slice.length ? ' (first ' + slice.length + ')' : '') + '</p>';
     if (slice.length) {
+      const intRows = slice.map((l, i) => [
+        'Internal link',
+        '<a href="' +
+          escapeHtml(l.href) +
+          '" target="_blank" rel="noopener">' +
+          escapeHtml(truncate(l.href, 56)) +
+          '</a>' +
+          (l.text ? ' <span class="shadow-seo-link-text">' + escapeHtml(l.text) + '</span>' : ''),
+        { media: true, locate: 'link-int-' + i, fieldName: 'Internal link', raw: true }
+      ]);
       html +=
-        '<table class="shadow-seo-table shadow-seo-table--links"><tbody>' +
-        slice
-          .map(
-            (l, i) =>
-              '<tr class="shadow-seo-row' +
-              (i % 2 ? ' shadow-seo-row--zebra' : '') +
-              '"><td class="shadow-seo-cell-link">' +
-              '<a href="' +
-              escapeHtml(l.href) +
-              '" target="_blank" rel="noopener">' +
-              escapeHtml(truncate(l.href, 56)) +
-              '</a>' +
-              (l.text ? ' <span class="shadow-seo-link-text">' + escapeHtml(l.text) + '</span>' : '') +
-              '</td><td class="shadow-seo-cell-actions">' +
-              rowMenuHtml('Internal link', 'link-int-' + i) +
-              '</td></tr>'
-          )
-          .join('') +
-        '</tbody></table>';
+        '<div class="shadow-seo-groups">' +
+        renderFieldGroup('Internal (first ' + slice.length + ')', renderFieldRows(intRows)) +
+        '</div>';
     } else {
       html += '<p class="shadow-seo-empty-state">' + emptyPill('None') + '</p>';
     }
     const extSlice = links.external.slice(0, 10);
-    html += '<p class="shadow-seo-subhead">External' + (extSlice.length ? ' (first ' + extSlice.length + ')' : '') + '</p>';
     if (extSlice.length) {
+      const extRows = extSlice.map((l, i) => [
+        'External link',
+        '<a href="' +
+          escapeHtml(l.href) +
+          '" target="_blank" rel="noopener">' +
+          escapeHtml(truncate(l.href, 56)) +
+          '</a>',
+        { media: true, locate: 'link-ext-' + i, fieldName: 'External link', raw: true }
+      ]);
       html +=
-        '<table class="shadow-seo-table shadow-seo-table--links"><tbody>' +
-        extSlice
-          .map(
-            (l, i) =>
-              '<tr class="shadow-seo-row' +
-              (i % 2 ? ' shadow-seo-row--zebra' : '') +
-              '"><td class="shadow-seo-cell-link">' +
-              '<a href="' +
-              escapeHtml(l.href) +
-              '" target="_blank" rel="noopener">' +
-              escapeHtml(truncate(l.href, 56)) +
-              '</a></td><td class="shadow-seo-cell-actions">' +
-              rowMenuHtml('External link', 'link-ext-' + i) +
-              '</td></tr>'
-          )
-          .join('') +
-        '</tbody></table>';
-    } else {
+        '<div class="shadow-seo-groups">' +
+        renderFieldGroup('External (first ' + extSlice.length + ')', renderFieldRows(extRows)) +
+        '</div>';
+    } else if (!slice.length) {
       html += '<p class="shadow-seo-empty-state">' + emptyPill('None') + '</p>';
     }
     return html;
@@ -845,23 +874,27 @@
     if (!data.jsonLd.length) {
       return '<p class="shadow-seo-empty-state">' + emptyPill('None found') + '</p>';
     }
-    return data.jsonLd
-      .map((block, i) => {
-        const locateKey = findJsonLdLocateKey(block) ? 'jsonld-' + i : '';
-        return (
-          '<details class="shadow-seo-jsonld"><summary class="shadow-seo-jsonld-summary">' +
-          '<span>Block ' +
-          block.index +
-          ' <span class="shadow-seo-jsonld-meta">(' +
-          block.raw.length +
-          ' chars)</span></span>' +
-          rowMenuHtml('Structured data block ' + block.index, locateKey) +
-          '</summary><pre class="shadow-seo-pre shadow-seo-pre--json">' +
-          highlightJson(block.pretty) +
-          '</pre></details>'
-        );
-      })
-      .join('');
+    return (
+      '<div class="shadow-seo-groups">' +
+      data.jsonLd
+        .map((block, i) => {
+          const locateKey = findJsonLdVisibleTarget(block) ? 'jsonld-' + i : '';
+          return renderFieldGroup(
+            'Block ' + block.index,
+            '<details class="shadow-seo-jsonld"><summary class="shadow-seo-jsonld-summary">' +
+              '<span>' +
+              block.raw.length +
+              ' chars</span>' +
+              rowMenuHtml('Structured data block ' + block.index, locateKey) +
+              '</summary><pre class="shadow-seo-pre shadow-seo-pre--json">' +
+              highlightJson(block.pretty) +
+              '</pre></details>',
+            { plain: true }
+          );
+        })
+        .join('') +
+      '</div>'
+    );
   }
 
   function renderTechnical(data) {
@@ -876,6 +909,7 @@
       }
     ];
     let html =
+      '<div class="shadow-seo-groups">' +
       '<div class="shadow-seo-stat-grid">' +
       stats
         .map(
@@ -890,20 +924,206 @@
         )
         .join('') +
       '</div>';
-    html += '<p class="shadow-seo-subhead">Blocking script sources</p>';
-    if (t.blockingHeadScripts) {
-      html +=
-        '<ul class="shadow-seo-script-list">' +
-        t.blockingHeadScriptSrcs
-          .map(
-            (s) =>
-              '<li>' + renderCellValue(s, { mono: true, truncate: 64, emptyLabel: 'Not set' }) + '</li>'
-          )
-          .join('') +
-        '</ul>';
-    } else {
-      html += '<p class="shadow-seo-empty-state">' + emptyPill('None') + '</p>';
+    const scriptRows = t.blockingHeadScripts
+      ? t.blockingHeadScriptSrcs.map((s) => [
+          'Script',
+          s,
+          { mono: true, truncate: 64, emptyLabel: 'Not set', fieldName: 'Blocking script' }
+        ])
+      : [];
+    html += scriptRows.length
+      ? renderFieldGroup('Blocking script sources', renderFieldRows(scriptRows))
+      : renderFieldGroup(
+          'Blocking script sources',
+          '<p class="shadow-seo-empty-state">' + emptyPill('None') + '</p>',
+          { plain: true }
+        );
+    html += '</div>';
+    return html;
+  }
+
+  function normaliseToken(word) {
+    return String(word || '')
+      .toLowerCase()
+      .replace(/^['"]+|['"]+$/g, '')
+      .replace(/[^a-z0-9'-]/g, '');
+  }
+
+  function tokenizeText(text) {
+    const tokens = [];
+    String(text || '')
+      .toLowerCase()
+      .replace(/[^a-z0-9\s'-]/g, ' ')
+      .split(/\s+/)
+      .forEach((raw) => {
+        const word = normaliseToken(raw);
+        if (word.length >= 3 && !STOP_WORDS.has(word)) tokens.push(word);
+      });
+    return tokens;
+  }
+
+  function addTermCount(map, term, source) {
+    if (!term) return;
+    if (!map.has(term)) map.set(term, { count: 0, sources: new Set() });
+    const entry = map.get(term);
+    entry.count += 1;
+    entry.sources.add(source);
+  }
+
+  function addBigramCounts(map, tokens, source) {
+    for (let i = 0; i < tokens.length - 1; i++) {
+      const pair = tokens[i] + ' ' + tokens[i + 1];
+      addTermCount(map, pair, source);
     }
+  }
+
+  function collectKeywordSources() {
+    const sources = { body: [], heading: [], link: [], alt: [] };
+    const root = mainContentRoot();
+
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode(node) {
+        const parent = node.parentElement;
+        if (!parent || isExcluded(parent)) return NodeFilter.FILTER_REJECT;
+        const tag = parent.tagName;
+        if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'NOSCRIPT') return NodeFilter.FILTER_REJECT;
+        if (!node.textContent || !node.textContent.trim()) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    while (walker.nextNode()) {
+      sources.body.push(walker.currentNode.textContent.trim());
+    }
+
+    document.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach((el) => {
+      if (isExcluded(el)) return;
+      const text = (el.innerText || '').trim();
+      if (text) sources.heading.push(text);
+    });
+
+    document.querySelectorAll('a[href]').forEach((el) => {
+      if (isExcluded(el)) return;
+      const text = (el.innerText || el.getAttribute('aria-label') || '').trim();
+      if (text) sources.link.push(text);
+    });
+
+    document.querySelectorAll('img[alt]').forEach((el) => {
+      if (isExcluded(el)) return;
+      const alt = (el.getAttribute('alt') || '').trim();
+      if (alt) sources.alt.push(alt);
+    });
+
+    return sources;
+  }
+
+  function analyseKeywords(data) {
+    const sources = collectKeywordSources();
+    const singles = new Map();
+    const bigrams = new Map();
+    let totalWords = 0;
+
+    Object.entries(sources).forEach(([source, chunks]) => {
+      chunks.forEach((chunk) => {
+        const tokens = tokenizeText(chunk);
+        totalWords += tokens.length;
+        tokens.forEach((token) => addTermCount(singles, token, source));
+        addBigramCounts(bigrams, tokens, source);
+      });
+    });
+
+    function topTerms(map, limit) {
+      return [...map.entries()]
+        .sort((a, b) => b[1].count - a[1].count || a[0].localeCompare(b[0]))
+        .slice(0, limit)
+        .map(([term, entry]) => ({
+          term,
+          count: entry.count,
+          density: totalWords ? (entry.count / totalWords) * 100 : 0,
+          sources: [...entry.sources].sort()
+        }));
+    }
+
+    const analysis = {
+      totalWords,
+      singles: topTerms(singles, 30),
+      bigrams: topTerms(bigrams, 30),
+      metaKeywords: (data.keywords || '').trim()
+    };
+    lastKeywordAnalysis = analysis;
+    return analysis;
+  }
+
+  function keywordSourceBadges(sourceList) {
+    const labels = { body: 'Body', heading: 'Heading', link: 'Link', alt: 'Alt' };
+    return sourceList
+      .map(
+        (s) =>
+          '<span class="shadow-seo-kw-badge shadow-seo-kw-badge--' +
+          s +
+          '">' +
+          escapeHtml(labels[s] || s) +
+          '</span>'
+      )
+      .join('');
+  }
+
+  function keywordLocateKey(term, kind) {
+    return 'kw-' + kind + '-' + encodeURIComponent(term);
+  }
+
+  function renderKeywordTermTable(terms, kind, label) {
+    if (!terms.length) {
+      return renderFieldGroup(label, '<p class="shadow-seo-empty-state">' + emptyPill('None found') + '</p>', {
+        plain: true
+      });
+    }
+    const rows = terms.map((item) => {
+      const locateKey = keywordLocateKey(item.term, kind);
+      const value =
+        '<strong>' +
+        escapeHtml(item.term) +
+        '</strong> · ' +
+        item.count +
+        ' · ' +
+        item.density.toFixed(1) +
+        '%<br>' +
+        keywordSourceBadges(item.sources);
+      return [
+        kind === 'pair' ? 'Phrase' : 'Term',
+        value,
+        {
+          media: true,
+          locate: locateKey,
+          fieldName: (kind === 'pair' ? 'Keyword pair' : 'Keyword') + ': ' + item.term,
+          raw: true
+        }
+      ];
+    });
+    return renderFieldGroup(label, renderFieldRows(rows));
+  }
+
+  function renderKeywords(data) {
+    const analysis = analyseKeywords(data);
+    let html = '<div class="shadow-seo-groups">';
+    if (analysis.metaKeywords) {
+      html += renderFieldGroup(
+        'Meta tag',
+        renderFieldRows([
+          [
+            'Meta keywords',
+            analysis.metaKeywords,
+            { truncate: 80, locate: 'meta-keywords', fieldName: 'Meta keywords' }
+          ]
+        ])
+      );
+    }
+    html +=
+      '<p class="shadow-seo-counts">Analysed ' +
+      analysis.totalWords +
+      ' content words from body, headings, links, and alt text</p>' +
+      renderKeywordTermTable(analysis.singles, 'single', 'Top keywords') +
+      renderKeywordTermTable(analysis.bigrams, 'pair', 'Keyword pairs') +
+      '</div>';
     return html;
   }
 
@@ -925,6 +1145,8 @@
         return renderImages(data);
       case 'links':
         return renderLinks(data);
+      case 'keywords':
+        return renderKeywords(data);
       case 'structured':
         return renderStructured(data);
       case 'technical':
@@ -1041,6 +1263,29 @@
     return findJsonLdVisibleTarget(block) ? 'pending' : '';
   }
 
+  function findFirstVisibleTextMatch(term) {
+    if (!term) return null;
+    const needle = String(term).toLowerCase();
+    const walker = document.createTreeWalker(mainContentRoot(), NodeFilter.SHOW_TEXT, {
+      acceptNode(node) {
+        const parent = node.parentElement;
+        if (!parent || isExcluded(parent)) return NodeFilter.FILTER_REJECT;
+        const tag = parent.tagName;
+        if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'NOSCRIPT') return NodeFilter.FILTER_REJECT;
+        if (!node.textContent || !node.textContent.trim()) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    while (walker.nextNode()) {
+      const text = walker.currentNode.textContent || '';
+      if (text.toLowerCase().indexOf(needle) >= 0) {
+        const parent = walker.currentNode.parentElement;
+        if (parent && !isExcluded(parent)) return parent;
+      }
+    }
+    return null;
+  }
+
   function resolveLocateTarget(key) {
     const data = lastAuditData;
     if (!data || !key) return null;
@@ -1073,6 +1318,15 @@
     if (key === 'og-locale') return metaElement('property', 'og:locale');
     if (key === 'og-site_name') return metaElement('property', 'og:site_name');
     if (key === 'twitter-card') return metaElement('name', 'twitter:card');
+
+    const kwMatch = key.match(/^kw-(single|pair)-(.+)$/);
+    if (kwMatch) {
+      try {
+        return findFirstVisibleTextMatch(decodeURIComponent(kwMatch[2]));
+      } catch (e) {
+        return null;
+      }
+    }
 
     const headingMatch = key.match(/^heading-(\d+)$/);
     if (headingMatch) {
@@ -1141,8 +1395,31 @@
     const btn = menu.querySelector('.shadow-seo-row-menu-btn');
     const popover = menu.querySelector('.shadow-seo-row-menu-popover');
     if (btn) btn.setAttribute('aria-expanded', 'false');
-    if (popover) popover.hidden = true;
+    if (popover) {
+      popover.hidden = true;
+      popover.style.top = '';
+      popover.style.left = '';
+    }
     if (openRowMenu === menu) openRowMenu = null;
+  }
+
+  function positionRowMenuPopover(menu) {
+    const btn = menu.querySelector('.shadow-seo-row-menu-btn');
+    const popover = menu.querySelector('.shadow-seo-row-menu-popover');
+    if (!btn || !popover) return;
+    popover.hidden = false;
+    const rect = btn.getBoundingClientRect();
+    const margin = 8;
+    const popW = popover.offsetWidth;
+    const popH = popover.offsetHeight;
+    let left = rect.right - popW;
+    let top = rect.bottom + 4;
+    if (left < margin) left = margin;
+    if (left + popW > window.innerWidth - margin) left = window.innerWidth - popW - margin;
+    if (top + popH > window.innerHeight - margin) top = rect.top - popH - 4;
+    if (top < margin) top = margin;
+    popover.style.top = Math.round(top) + 'px';
+    popover.style.left = Math.round(left) + 'px';
   }
 
   function closeAllRowMenus() {
@@ -1157,6 +1434,7 @@
     if (!btn || !popover) return;
     btn.setAttribute('aria-expanded', 'true');
     popover.hidden = false;
+    positionRowMenuPopover(menu);
     openRowMenu = menu;
     const firstItem = popover.querySelector('.shadow-seo-row-menu-item');
     if (firstItem) firstItem.focus();

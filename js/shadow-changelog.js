@@ -7,8 +7,24 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.6.5',
+    version: '1.7.0',
     releases: [
+      {
+        version: '1.7.0',
+        date: '2026-08-26',
+        title: 'SEO panel redesign and Keywords tab',
+        user: [
+          'View SEO now uses grouped iOS-style sections with clearer labels, values, and actions',
+          '⋯ menu on every field row is larger and always visible on the right',
+          'Locate on page uses fixed menus and scrolls to visible matches with orange highlight',
+          'New Keywords tab: top single words and two-word phrases from page content, with counts, density, and source badges',
+          'Meta keywords tag shown at the top of Keywords when set'
+        ],
+        dev: [
+          'SEO field rows use grid layout instead of tables to prevent action button clipping',
+          'Client-side keyword extraction with English stop-word filter; no API'
+        ]
+      },
       {
         version: '1.6.5',
         date: '2026-08-26',
