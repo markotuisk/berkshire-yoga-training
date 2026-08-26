@@ -1334,7 +1334,7 @@
           <div class="shadow-modal-head shadow-design-head">
             <div class="shadow-design-head-text">
               <h2>Page design</h2>
-              <p class="shadow-design-subtitle">Fonts, colours and mismatches</p>
+              <p class="shadow-design-subtitle">Fonts, colours, accessibility and mismatches</p>
             </div>
             <button type="button" class="shadow-close" data-close="design" aria-label="Close">&times;</button>
           </div>
@@ -1419,7 +1419,8 @@
         getPerson,
         showExclusive: show,
         showFloating,
-        toast
+        toast,
+        openChangeTicket
       });
     }
   }
@@ -1588,6 +1589,9 @@
       clearHighlight();
       if (window.TWAShadowSEO && window.TWAShadowSEO.onTicketClosed) {
         window.TWAShadowSEO.onTicketClosed();
+      }
+      if (window.TWAShadowDesign && window.TWAShadowDesign.onTicketClosed) {
+        window.TWAShadowDesign.onTicketClosed();
       }
     }
     if (which === 'detail') clearHighlight();

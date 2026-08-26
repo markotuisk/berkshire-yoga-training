@@ -7,8 +7,21 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.10.0',
+    version: '1.11.0',
     releases: [
+      {
+        version: '1.11.0',
+        date: '2026-08-26',
+        title: 'Design audit accessibility and row menus',
+        user: [
+          'View design now includes an Accessibility tab: images, headings, colour contrast, links, buttons, form fields and page landmarks',
+          'Summary shows accessibility error and warning counts plus a note on SEO relevance',
+          'Every design and accessibility row has a ⋯ menu with Locate on page and Request change, matching the SEO panel'
+        ],
+        dev: [
+          'js/shadow-design.js a11y audit (WCAG contrast, heading outline, alt heuristics); portaled row menus; openChangeTicket wired; cache-bust via ?v=1.11.0'
+        ]
+      },
       {
         version: '1.10.0',
         date: '2026-08-26',

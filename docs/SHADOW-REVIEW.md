@@ -61,12 +61,12 @@ On next login, partners see a **What's new** popup for any release newer than th
 ```text
 js/shadow-changelog.js   version + release notes
 js/shadow-seo.js           client-side SEO audit panel
-js/shadow-design.js        fonts, colours and design mismatch audit
+js/shadow-design.js        fonts, colours, accessibility and design mismatch audit
 js/shadow-review.js        overlay UI
 css/shadow-review.css      overlay styles
 ```
 
-**Design audit:** Tools FAB → **View design** scans the page for font families, sizes, weights, line heights and colours; **Issues** flags unexpected fonts, non-token font colours and inline styles. **Locate** highlights matches on the page.
+**Design audit:** Tools FAB → **View design** scans the page for font families, sizes, weights, line heights, colours and accessibility (images, headings, contrast, links, buttons, form fields, landmarks). **Issues** merges design mismatches with accessibility findings. **⋯** row menus offer **Locate on page** and **Request change**, matching the SEO panel.
 
 ---
 
