@@ -1382,54 +1382,6 @@ body.shadow-modal-drag-active {
   font-style: italic;
 }
 
-.shadow-seo-field-row--google {
-  align-items: start;
-}
-
-.shadow-seo-field-stack {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.shadow-seo-google-hint {
-  margin: 0;
-  font-size: 0.6875rem;
-  line-height: 1.35;
-  color: #8e8e93;
-}
-
-.shadow-seo-status-pill {
-  display: inline-block;
-  padding: 0.1rem 0.4rem;
-  border-radius: var(--shadow-radius-pill);
-  font-size: 0.625rem;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  line-height: 1.3;
-}
-
-.shadow-seo-status-pill--found {
-  color: #248a3d;
-  background: rgba(52, 199, 89, 0.12);
-}
-
-.shadow-seo-status-pill--might-relevant {
-  color: #b25000;
-  background: rgba(255, 149, 0, 0.12);
-}
-
-.shadow-seo-status-pill--might-add,
-.shadow-seo-status-pill--not-set {
-  color: #8e8e93;
-  background: rgba(142, 142, 147, 0.12);
-}
-
-.shadow-seo-value--found {
-  color: #248a3d;
-  font-weight: 600;
-}
-
 .shadow-seo-field-label {
   font-size: 0.9375rem;
   font-weight: 500;
