@@ -1836,6 +1836,23 @@ body.shadow-modal-drag-active {
   gap: 0.35rem;
 }
 
+.shadow-seo-jsonld--inline {
+  margin-top: 0.35rem;
+  border: none;
+  padding: 0;
+  background: transparent;
+}
+
+.shadow-seo-value--found {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #1a7f4b;
+  background: rgba(46, 204, 113, 0.12);
+  border-radius: 6px;
+  padding: 0.1rem 0.45rem;
+}
+
 .shadow-seo-row-menu {
   position: relative;
   flex-shrink: 0;

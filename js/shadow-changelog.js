@@ -7,10 +7,25 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.8.0',
+    version: '1.9.0',
     releases: [
       {
-        version: '1.8.0',
+        version: '1.9.0',
+        date: '2026-08-26',
+        title: 'Complete Google SEO template',
+        user: [
+          'Page SEO now shows every field Google looks for, even when missing: empty values appear as Not set or Missing pills',
+          'New International tab: hreflang alternates, x-default, and Content-Language',
+          'Meta tab expanded with Googlebot, charset, and viewport; Crawl & security covers noindex, nofollow, and server header note',
+          'Structured data lists all common Google rich result types (Course, Organization, FAQ, and more) plus JSON-LD blocks',
+          'Technical tab adds favicon, apple touch icon, theme colour, lazy images, iframes, and resource hints',
+          'Overview warnings flag title/description length, missing H1, alt text, og:image, viewport, and key structured data'
+        ],
+        dev: [
+          'Full Google-focused field template in shadow-seo.js; International sidebar section',
+          'Structured data @type mapping with SearchAction check for WebSite; cache-bust via ?v=1.9.0'
+        ]
+      },
         date: '2026-08-26',
         title: 'Page SEO visual redesign',
         user: [

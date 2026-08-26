@@ -11,28 +11,31 @@
   const SECTIONS = [
     { id: 'overview', label: 'Overview' },
     { id: 'meta', label: 'Meta' },
-    { id: 'og', label: 'Open Graph' },
-    { id: 'twitter', label: 'Twitter' },
-    { id: 'security', label: 'Security' },
+    { id: 'international', label: 'International' },
+    { id: 'social', label: 'Social' },
+    { id: 'security', label: 'Crawl & security' },
+    { id: 'keywords', label: 'Keywords' },
     { id: 'headings', label: 'Headings' },
     { id: 'images', label: 'Images' },
     { id: 'links', label: 'Links' },
-    { id: 'keywords', label: 'Keywords' },
     { id: 'structured', label: 'Structured data' },
     { id: 'technical', label: 'Technical' }
   ];
 
   const META_FIELDS = [
-    ['Title', 'title', {}],
+    ['Title', 'title', { emptyLabel: 'Missing' }],
     ['Meta description', 'description', { emptyLabel: 'Missing' }],
-    ['URL', 'url', { mono: true, truncate: 72 }],
-    ['Canonical', 'canonical', { mono: true, truncate: 72, emptyLabel: 'Not set' }],
+    ['Canonical URL', 'canonical', { mono: true, truncate: 72, emptyLabel: 'Not set' }],
     ['Robots', 'robots', { emptyLabel: 'Not set' }],
+    ['Googlebot', 'googlebot', { emptyLabel: 'Not set' }],
     ['Keywords', 'keywords', { emptyLabel: 'Not set' }],
     ['Author', 'author', { emptyLabel: 'Not set' }],
     ['Publisher', 'publisher', { emptyLabel: 'Not set' }],
     ['Language', 'lang', { emptyLabel: 'Not set' }],
-    ['Word count', 'wordCount', {}]
+    ['Charset', 'charset', { emptyLabel: 'Not set' }],
+    ['Viewport', 'viewport', { mono: true, truncate: 72, emptyLabel: 'Not set' }],
+    ['Word count', 'wordCount', {}],
+    ['Page URL', 'url', { mono: true, truncate: 72 }]
   ];
 
   const OG_FIELDS = [
@@ -42,15 +45,176 @@
     'og:image',
     'og:type',
     'og:locale',
-    'og:site_name'
+    'og:site_name',
+    'og:image:width',
+    'og:image:height',
+    'og:image:alt'
   ];
 
   const TWITTER_FIELDS = [
     'twitter:card',
     'twitter:title',
     'twitter:description',
-    'twitter:image'
+    'twitter:image',
+    'twitter:site',
+    'twitter:creator'
   ];
+
+  const STRUCTURED_TYPES = [
+    { id: 'organization', label: 'Organization', types: ['Organization'] },
+    {
+      id: 'local-edu',
+      label: 'LocalBusiness / EducationalOrganization',
+      types: ['LocalBusiness', 'EducationalOrganization']
+    },
+    { id: 'course', label: 'Course', types: ['Course'] },
+    { id: 'faq', label: 'FAQPage', types: ['FAQPage'] },
+    { id: 'breadcrumb', label: 'BreadcrumbList', types: ['BreadcrumbList'] },
+    { id: 'website', label: 'WebSite (with SearchAction)', types: ['WebSite'], needsSearchAction: true },
+    { id: 'article', label: 'Article / BlogPosting', types: ['Article', 'BlogPosting'] },
+    { id: 'review', label: 'Review / AggregateRating', types: ['Review', 'AggregateRating'] },
+    { id: 'event', label: 'Event', types: ['Event'] },
+    { id: 'person', label: 'Person', types: ['Person'] },
+    { id: 'video', label: 'VideoObject', types: ['VideoObject'] }
+  ];
+
+  /** Google rich-results guidance per audit field (id keys match structured type ids where applicable). */
+  const GOOGLE_FIELD_HINTS = {
+    title: {
+      id: 'title',
+      label: 'Title',
+      googleLooksFor: 'Google uses the title tag as the main blue link in search results.',
+      relevance: 'all',
+      section: 'meta'
+    },
+    'meta-description': {
+      id: 'meta-description',
+      label: 'Meta description',
+      googleLooksFor:
+        'Google often shows the meta description as the snippet text under the title in search results.',
+      relevance: 'all',
+      section: 'meta'
+    },
+    canonical: {
+      id: 'canonical',
+      label: 'Canonical URL',
+      googleLooksFor: 'Google uses canonical URLs to choose one preferred URL when duplicates exist.',
+      relevance: 'all',
+      section: 'meta'
+    },
+    hreflang: {
+      id: 'hreflang',
+      label: 'hreflang',
+      googleLooksFor: 'Google uses hreflang to serve the correct language or regional version in search.',
+      relevance: 'optional',
+      section: 'international'
+    },
+    h1: {
+      id: 'h1',
+      label: 'H1 heading',
+      googleLooksFor: 'Google uses the main heading to understand page topic and content structure.',
+      relevance: 'all',
+      section: 'headings'
+    },
+    'image-alt': {
+      id: 'image-alt',
+      label: 'Image alt text',
+      googleLooksFor: 'Google uses alt text to understand images in Image Search and page context.',
+      relevance: 'all',
+      section: 'images'
+    },
+    'breadcrumb-list': {
+      id: 'breadcrumb-list',
+      label: 'BreadcrumbList (JSON-LD)',
+      googleLooksFor: 'Google may show breadcrumb trails in search results for site hierarchy.',
+      relevance: 'inner',
+      section: 'structured'
+    },
+    'visible-breadcrumbs': {
+      id: 'visible-breadcrumbs',
+      label: 'Visible breadcrumbs',
+      googleLooksFor: 'Google may show breadcrumb trails in search results for site hierarchy.',
+      relevance: 'inner',
+      section: 'structured'
+    },
+    organization: {
+      id: 'organization',
+      label: 'Organization',
+      googleLooksFor: 'Google uses Organization schema for brand knowledge panels and entity understanding.',
+      relevance: 'all',
+      section: 'structured'
+    },
+    'local-edu': {
+      id: 'local-edu',
+      label: 'LocalBusiness / EducationalOrganization',
+      googleLooksFor:
+        'Google uses local and educational org schema for local packs, maps, and training provider results.',
+      relevance: 'all',
+      section: 'structured'
+    },
+    course: {
+      id: 'course',
+      label: 'Course',
+      googleLooksFor: 'Google uses Course schema for rich results on training and programme pages.',
+      relevance: 'course',
+      section: 'structured'
+    },
+    faq: {
+      id: 'faq',
+      label: 'FAQPage',
+      googleLooksFor: 'Google may show FAQ rich results with expandable Q&A directly in search.',
+      relevance: 'faq',
+      section: 'structured'
+    },
+    website: {
+      id: 'website',
+      label: 'WebSite (with SearchAction)',
+      googleLooksFor: 'Google may show a sitelinks search box when WebSite schema includes SearchAction.',
+      relevance: 'homepage',
+      section: 'structured'
+    },
+    article: {
+      id: 'article',
+      label: 'Article / BlogPosting',
+      googleLooksFor: 'Google uses Article schema for news and blog rich results (date, author, image).',
+      relevance: 'article',
+      section: 'structured'
+    },
+    review: {
+      id: 'review',
+      label: 'Review / AggregateRating',
+      googleLooksFor: 'Google may show star ratings in search when Review or AggregateRating schema is valid.',
+      relevance: 'optional',
+      section: 'structured'
+    },
+    event: {
+      id: 'event',
+      label: 'Event',
+      googleLooksFor: 'Google may show event rich results with date, location, and ticket info.',
+      relevance: 'optional',
+      section: 'structured'
+    },
+    person: {
+      id: 'person',
+      label: 'Person',
+      googleLooksFor: 'Google uses Person schema for author bylines and knowledge panel connections.',
+      relevance: 'optional',
+      section: 'structured'
+    },
+    video: {
+      id: 'video',
+      label: 'VideoObject',
+      googleLooksFor: 'Google may show video rich results with thumbnail and duration in search.',
+      relevance: 'optional',
+      section: 'structured'
+    }
+  };
+
+  const META_GOOGLE_HINT_IDS = {
+    title: 'title',
+    description: 'meta-description',
+    canonical: 'canonical'
+  };
 
   let helpers = null;
   let activeSection = 'overview';
@@ -74,26 +238,35 @@
     description: 'meta-description',
     canonical: 'meta-canonical',
     robots: 'meta-robots',
+    googlebot: 'meta-googlebot',
     keywords: 'meta-keywords',
     author: 'meta-author',
     publisher: 'meta-publisher',
-    lang: 'meta-lang'
+    lang: 'meta-lang',
+    charset: 'meta-charset',
+    viewport: 'meta-viewport'
   };
 
   const OG_LOCATE_KEYS = {
     'og:title': 'og-title',
     'og:description': 'og-description',
+    'og:url': 'og-url',
     'og:image': 'og-image',
     'og:type': 'og-type',
     'og:locale': 'og-locale',
-    'og:site_name': 'og-site_name'
+    'og:site_name': 'og-site_name',
+    'og:image:width': 'og-image_width',
+    'og:image:height': 'og-image_height',
+    'og:image:alt': 'og-image_alt'
   };
 
   const TWITTER_LOCATE_KEYS = {
     'twitter:card': 'twitter-card',
     'twitter:title': 'twitter-title',
     'twitter:description': 'twitter-description',
-    'twitter:image': 'twitter-image'
+    'twitter:image': 'twitter-image',
+    'twitter:site': 'twitter-site',
+    'twitter:creator': 'twitter-creator'
   };
 
   function qs(sel, root) {
@@ -131,6 +304,115 @@
     const s = String(str || '');
     if (s.length <= max) return s;
     return s.slice(0, max) + '…';
+  }
+
+  function pageDepth() {
+    const path = location.pathname.replace(/\/+$/, '') || '/';
+    if (path === '/') return 0;
+    return path.split('/').filter(Boolean).length;
+  }
+
+  function pathIncludes(segments) {
+    const path = location.pathname.toLowerCase();
+    return segments.some((s) => path.includes(s));
+  }
+
+  function isHomepage() {
+    return pageDepth() === 0;
+  }
+
+  function isCoursePage() {
+    return pathIncludes(['/courses/', '/course/', '/programme', '/training', '/diploma', '/retreat']);
+  }
+
+  function isArticlePage() {
+    return pathIncludes(['/journal/', '/blog/', '/article/', '/news/']);
+  }
+
+  function isFaqPage() {
+    return pathIncludes(['/faq', '/questions']);
+  }
+
+  function computeGoogleStatus(found, hint) {
+    if (found) return 'found';
+    if (!hint) return 'not-set';
+    const rel = hint.relevance;
+    if (rel === 'all') return 'not-set';
+    if (rel === 'optional') return 'might-add';
+    if (rel === 'inner') return pageDepth() >= 1 ? 'might-relevant' : 'might-add';
+    if (rel === 'homepage') return isHomepage() ? 'might-relevant' : 'might-add';
+    if (rel === 'course') return isCoursePage() ? 'might-relevant' : 'might-add';
+    if (rel === 'article') return isArticlePage() ? 'might-relevant' : 'might-add';
+    if (rel === 'faq') return isFaqPage() ? 'might-relevant' : 'might-add';
+    return 'not-set';
+  }
+
+  function googleStatusPill(status) {
+    const labels = {
+      found: 'Found',
+      'might-relevant': 'Might be relevant',
+      'might-add': 'Might be added',
+      'not-set': 'Not set'
+    };
+    return (
+      '<span class="shadow-seo-status-pill shadow-seo-status-pill--' +
+      status +
+      '">' +
+      escapeHtml(labels[status] || status) +
+      '</span>'
+    );
+  }
+
+  function applyGoogleGuidance(label, value, hintId, opts, foundOverride) {
+    const hint = GOOGLE_FIELD_HINTS[hintId];
+    if (!hint) return [label, value, opts || {}];
+    const merged = Object.assign({}, opts || {});
+    merged.googleHint = hint.googleLooksFor;
+    const found =
+      foundOverride !== undefined ? foundOverride : !isEmptyValue(value);
+    merged.googleStatus = computeGoogleStatus(found, hint);
+    return [label, value, merged];
+  }
+
+  function detectVisibleBreadcrumbs() {
+    const selectors = [
+      'nav[aria-label*="breadcrumb" i]',
+      '[role="navigation"][aria-label*="breadcrumb" i]',
+      '.breadcrumb',
+      '.breadcrumbs',
+      'ol.breadcrumb',
+      'ul.breadcrumb',
+      '[itemtype*="BreadcrumbList" i]',
+      '[itemtype*="breadcrumb" i]'
+    ];
+    let nav = null;
+    for (let i = 0; i < selectors.length; i++) {
+      const el = document.querySelector(selectors[i]);
+      if (el && !isExcluded(el)) {
+        nav = el;
+        break;
+      }
+    }
+    if (!nav) return { found: false, items: [], el: null, summary: '' };
+
+    const items = [];
+    nav.querySelectorAll('[itemprop="name"], .breadcrumb-item, li a, li span, ol > li, ul > li').forEach(
+      (el) => {
+        const text = (el.innerText || el.textContent || '').trim().replace(/\s+/g, ' ');
+        if (text && text.length < 80) items.push(text);
+      }
+    );
+    const unique = [];
+    items.forEach((item) => {
+      if (unique.indexOf(item) === -1) unique.push(item);
+    });
+    const trimmed = unique.slice(0, 8);
+    return {
+      found: trimmed.length > 0,
+      items: trimmed,
+      el: nav,
+      summary: trimmed.length ? trimmed.join(' › ') : ''
+    };
   }
 
   function mainContentRoot() {
@@ -185,7 +467,9 @@
     document.querySelectorAll('img').forEach((el) => {
       if (isExcluded(el)) return;
       const alt = el.getAttribute('alt');
-      const missingAlt = !alt || !alt.trim();
+      const hasAltAttr = el.hasAttribute('alt');
+      const missingAlt = !hasAltAttr;
+      const decorative = hasAltAttr && (!alt || !alt.trim());
       const w = el.naturalWidth || el.width || el.getAttribute('width') || '';
       const h = el.naturalHeight || el.height || el.getAttribute('height') || '';
       let dims = '';
@@ -194,6 +478,7 @@
         src: el.currentSrc || el.src || '',
         alt: alt || '',
         missingAlt,
+        decorative,
         dims,
         el
       });
@@ -204,11 +489,14 @@
   function collectLinks() {
     const internal = [];
     const external = [];
+    let nofollowCount = 0;
     const origin = location.origin;
     document.querySelectorAll('a[href]').forEach((el) => {
       if (isExcluded(el)) return;
       const href = (el.getAttribute('href') || '').trim();
       if (!href || href.startsWith('#') || href.startsWith('javascript:')) return;
+      const rel = (el.getAttribute('rel') || '').toLowerCase();
+      if (rel.includes('nofollow')) nofollowCount += 1;
       let url;
       try {
         url = new URL(href, location.href);
@@ -218,12 +506,107 @@
       const entry = {
         href: url.href,
         text: truncate((el.innerText || '').trim(), 60),
+        nofollow: rel.includes('nofollow'),
         el
       };
       if (url.origin === origin) internal.push(entry);
       else external.push(entry);
     });
-    return { internal, external, total: internal.length + external.length };
+    return { internal, external, total: internal.length + external.length, nofollowCount };
+  }
+
+  function collectHreflang() {
+    const list = [];
+    document.querySelectorAll('link[rel="alternate"][hreflang]').forEach((el) => {
+      if (isExcluded(el)) return;
+      const hreflang = (el.getAttribute('hreflang') || '').trim();
+      const href = (el.getAttribute('href') || '').trim();
+      if (hreflang) list.push({ hreflang, href, el });
+    });
+    return list;
+  }
+
+  function collectCharset() {
+    const charsetMeta = document.querySelector('meta[charset]');
+    if (charsetMeta) return (charsetMeta.getAttribute('charset') || '').trim();
+    const httpEquiv = document.querySelector('meta[http-equiv="Content-Type" i]');
+    if (httpEquiv) {
+      const content = httpEquiv.getAttribute('content') || '';
+      const match = content.match(/charset=([^\s;]+)/i);
+      if (match) return match[1];
+    }
+    return '';
+  }
+
+  function parseRobotsFlags(robotsStr) {
+    const robots = (robotsStr || '').toLowerCase();
+    return {
+      noindex: /noindex/.test(robots),
+      nofollow: /nofollow/.test(robots)
+    };
+  }
+
+  function flattenJsonLdItems(parsed) {
+    const items = [];
+    function walk(node) {
+      if (!node) return;
+      if (Array.isArray(node)) {
+        node.forEach(walk);
+        return;
+      }
+      if (typeof node !== 'object') return;
+      items.push(node);
+      if (node['@graph']) walk(node['@graph']);
+    }
+    walk(parsed);
+    return items;
+  }
+
+  function itemTypes(item) {
+    const type = item['@type'];
+    if (!type) return [];
+    return Array.isArray(type) ? type : [type];
+  }
+
+  function hasSearchAction(item) {
+    const action = item.potentialAction;
+    if (!action) return false;
+    const actions = Array.isArray(action) ? action : [action];
+    return actions.some((a) => {
+      const t = a && a['@type'];
+      if (!t) return false;
+      const types = Array.isArray(t) ? t : [t];
+      return types.includes('SearchAction');
+    });
+  }
+
+  function analyseStructuredData(jsonLdBlocks) {
+    const allItems = [];
+    jsonLdBlocks.forEach((block) => {
+      try {
+        const parsed = JSON.parse(block.raw);
+        flattenJsonLdItems(parsed).forEach((item) => allItems.push(item));
+      } catch (e) {
+        /* skip invalid */
+      }
+    });
+
+    const template = STRUCTURED_TYPES.map((def) => {
+      const matches = allItems.filter((item) => {
+        const types = itemTypes(item);
+        if (!types.some((t) => def.types.includes(t))) return false;
+        if (def.needsSearchAction && types.includes('WebSite')) return hasSearchAction(item);
+        return true;
+      });
+      return {
+        id: def.id,
+        label: def.label,
+        found: matches.length > 0,
+        matches
+      };
+    });
+
+    return { template, allItems };
   }
 
   function collectJsonLd() {
@@ -249,19 +632,31 @@
     const canonicalEl = document.querySelector('link[rel="canonical"]');
     const canonical = canonicalEl ? (canonicalEl.getAttribute('href') || '').trim() : '';
     const robots = metaContent('name', 'robots');
+    const googlebot = metaContent('name', 'googlebot');
     const keywords = metaContent('name', 'keywords');
     const author = metaContent('name', 'author');
     const publisher = metaContent('name', 'publisher') || metaContent('property', 'article:publisher');
     const viewport = metaContent('name', 'viewport');
+    const charset = collectCharset();
+    const contentLanguage =
+      metaContent('http-equiv', 'content-language') ||
+      metaContent('http-equiv', 'Content-Language') ||
+      '';
     const og = allMetaByPrefix('property', 'og:');
     const twitter = allMetaByPrefix('name', 'twitter:');
+    const pinMedia =
+      metaContent('property', 'pin:media') || metaContent('name', 'pin:media') || '';
     const lang = (document.documentElement.getAttribute('lang') || '').trim();
+    const hreflang = collectHreflang();
+    const xDefault = hreflang.find((h) => h.hreflang.toLowerCase() === 'x-default');
 
     const headings = collectHeadings();
     const h1Count = headings.filter((h) => h.level === 1).length;
     const images = collectImages();
     const links = collectLinks();
     const jsonLd = collectJsonLd();
+    const structured = analyseStructuredData(jsonLd);
+    const visibleBreadcrumbs = detectVisibleBreadcrumbs();
 
     const headScripts = [...document.querySelectorAll('head script[src]')];
     const blockingHeadScripts = headScripts.filter((s) => {
@@ -270,9 +665,28 @@
       return true;
     });
 
+    const faviconEl =
+      document.querySelector('link[rel="icon"]') ||
+      document.querySelector('link[rel="shortcut icon"]');
+    const favicon = faviconEl ? (faviconEl.getAttribute('href') || '').trim() : '';
+    const appleTouchEl = document.querySelector('link[rel="apple-touch-icon"]');
+    const appleTouchIcon = appleTouchEl ? (appleTouchEl.getAttribute('href') || '').trim() : '';
+    const themeColor = metaContent('name', 'theme-color');
+    const preconnectCount = document.querySelectorAll('link[rel="preconnect"]').length;
+    const prefetchCount = document.querySelectorAll('link[rel="prefetch"], link[rel="dns-prefetch"]').length;
+    let lazyImageCount = 0;
+    document.querySelectorAll('img[loading="lazy"]').forEach((el) => {
+      if (!isExcluded(el)) lazyImageCount += 1;
+    });
+    let iframeCount = 0;
+    document.querySelectorAll('iframe').forEach((el) => {
+      if (!isExcluded(el)) iframeCount += 1;
+    });
+
     const stylesheetCount = document.querySelectorAll('link[rel="stylesheet"], style').length;
     const scriptCount = document.querySelectorAll('script').length;
     const wordCount = visibleTextWordCount(mainContentRoot());
+    const robotsFlags = parseRobotsFlags(robots + ' ' + googlebot);
 
     const warnings = [];
     let score = 100;
@@ -281,10 +695,10 @@
       warnings.push({ level: 'error', text: 'Page title is missing' });
       score -= 20;
     } else if (title.length > 60) {
-      warnings.push({ level: 'warn', text: 'Title is long (' + title.length + ' chars, aim for ≤60)' });
+      warnings.push({ level: 'warn', text: 'Title is long (' + title.length + ' chars, aim for ≤60 for Google snippets)' });
       score -= 5;
     } else if (title.length < 10) {
-      warnings.push({ level: 'warn', text: 'Title is short (' + title.length + ' chars)' });
+      warnings.push({ level: 'warn', text: 'Title is short (' + title.length + ' chars, aim for 10–60)' });
       score -= 5;
     }
 
@@ -292,8 +706,17 @@
       warnings.push({ level: 'error', text: 'Meta description is missing' });
       score -= 15;
     } else if (description.length > 160) {
-      warnings.push({ level: 'warn', text: 'Meta description is long (' + description.length + ' chars, aim for ≤160)' });
+      warnings.push({
+        level: 'warn',
+        text: 'Meta description is long (' + description.length + ' chars, aim for ≤160 for Google snippets)'
+      });
       score -= 5;
+    } else if (description.length < 50) {
+      warnings.push({
+        level: 'warn',
+        text: 'Meta description is short (' + description.length + ' chars, aim for 50–160)'
+      });
+      score -= 3;
     }
 
     if (h1Count === 0) {
@@ -315,7 +738,7 @@
       score -= 5;
     }
 
-    if (/noindex/i.test(robots)) {
+    if (robotsFlags.noindex) {
       warnings.push({
         level: 'info',
         text: 'robots noindex is set (expected on Shadow — live site should not use this)'
@@ -323,12 +746,17 @@
     }
 
     if (!og['og:image']) {
-      warnings.push({ level: 'warn', text: 'og:image is missing' });
+      warnings.push({ level: 'warn', text: 'og:image is missing (social previews need an image)' });
       score -= 5;
     }
-    if (!twitter['twitter:card']) {
-      warnings.push({ level: 'warn', text: 'twitter:card is missing' });
+    if (!og['og:title']) {
+      warnings.push({ level: 'warn', text: 'og:title is missing (social previews need a title)' });
       score -= 5;
+    }
+    const ogThin = !og['og:title'] || !og['og:description'] || !og['og:image'];
+    if (!twitter['twitter:card'] && ogThin) {
+      warnings.push({ level: 'warn', text: 'twitter:card is missing and Open Graph tags are thin' });
+      score -= 3;
     }
 
     if (!viewport) {
@@ -350,6 +778,31 @@
       score -= Math.min(15, missingAltCount);
     }
 
+    const decorativeCount = images.filter((img) => img.decorative).length;
+    if (decorativeCount) {
+      warnings.push({
+        level: 'info',
+        text: decorativeCount + ' decorative image(s) with empty alt (valid if intentional)'
+      });
+    }
+
+    const courseType = structured.template.find((t) => t.id === 'course');
+    if (courseType && !courseType.found) {
+      warnings.push({ level: 'warn', text: 'Course structured data not found (recommended for programme pages)' });
+      score -= 5;
+    }
+    const orgType = structured.template.find((t) => t.id === 'organization');
+    if (orgType && !orgType.found) {
+      const eduType = structured.template.find((t) => t.id === 'local-edu');
+      if (!eduType || !eduType.found) {
+        warnings.push({
+          level: 'warn',
+          text: 'Organization or EducationalOrganization structured data not found'
+        });
+        score -= 5;
+      }
+    }
+
     score = Math.max(0, Math.min(100, score));
 
     const headingCounts = { h1: 0, h2: 0, h3: 0, h4: 0, h5: 0, h6: 0 };
@@ -362,13 +815,20 @@
       description,
       canonical,
       robots,
+      googlebot,
+      robotsFlags,
       keywords,
       author,
       publisher,
       viewport,
+      charset,
+      contentLanguage,
       og,
       twitter,
+      pinMedia,
       lang,
+      hreflang,
+      xDefault,
       url: location.href,
       headings,
       headingCounts,
@@ -376,13 +836,22 @@
       images,
       links,
       jsonLd,
+      structured,
+      visibleBreadcrumbs,
       technical: {
         https: location.protocol === 'https:',
         wordCount,
         scriptCount,
         stylesheetCount,
         blockingHeadScripts: blockingHeadScripts.length,
-        blockingHeadScriptSrcs: blockingHeadScripts.map((s) => s.src || s.getAttribute('src') || '(inline)')
+        blockingHeadScriptSrcs: blockingHeadScripts.map((s) => s.src || s.getAttribute('src') || '(inline)'),
+        favicon,
+        appleTouchIcon,
+        themeColor,
+        preconnectCount,
+        prefetchCount,
+        lazyImageCount,
+        iframeCount
       },
       score,
       warnings
@@ -552,21 +1021,30 @@
       if (locateKey === 'meta-description') return data.description;
       if (locateKey === 'meta-canonical') return data.canonical;
       if (locateKey === 'meta-robots') return data.robots;
+      if (locateKey === 'meta-googlebot') return data.googlebot;
       if (locateKey === 'meta-keywords') return data.keywords;
       if (locateKey === 'meta-author') return data.author;
       if (locateKey === 'meta-publisher') return data.publisher;
       if (locateKey === 'meta-lang') return data.lang;
+      if (locateKey === 'meta-charset') return data.charset;
       if (locateKey === 'meta-viewport') return data.viewport;
       if (locateKey === 'og-title') return data.og['og:title'] || '';
       if (locateKey === 'og-description') return data.og['og:description'] || '';
+      if (locateKey === 'og-url') return data.og['og:url'] || '';
       if (locateKey === 'og-image') return data.og['og:image'] || '';
       if (locateKey === 'og-type') return data.og['og:type'] || '';
       if (locateKey === 'og-locale') return data.og['og:locale'] || '';
       if (locateKey === 'og-site_name') return data.og['og:site_name'] || '';
+      if (locateKey === 'og-image_width') return data.og['og:image:width'] || '';
+      if (locateKey === 'og-image_height') return data.og['og:image:height'] || '';
+      if (locateKey === 'og-image_alt') return data.og['og:image:alt'] || '';
       if (locateKey === 'twitter-card') return data.twitter['twitter:card'] || '';
       if (locateKey === 'twitter-title') return data.twitter['twitter:title'] || '';
       if (locateKey === 'twitter-description') return data.twitter['twitter:description'] || '';
       if (locateKey === 'twitter-image') return data.twitter['twitter:image'] || '';
+      if (locateKey === 'twitter-site') return data.twitter['twitter:site'] || '';
+      if (locateKey === 'twitter-creator') return data.twitter['twitter:creator'] || '';
+      if (locateKey === 'pin-media') return data.pinMedia || '';
 
       const headingMatch = locateKey.match(/^heading-(\d+)$/);
       if (headingMatch) {
@@ -611,16 +1089,24 @@
     const staticMap = {
       Title: data.title,
       'Meta description': data.description,
-      URL: data.url,
+      'Page URL': data.url,
+      'Canonical URL': data.canonical,
       Canonical: data.canonical,
+      URL: data.url,
       Robots: data.robots,
+      Googlebot: data.googlebot,
       Keywords: data.keywords,
       Author: data.author,
       Publisher: data.publisher,
       Language: data.lang,
+      Charset: data.charset,
+      Viewport: data.viewport,
       'Word count': String(data.technical.wordCount),
       HTTPS: data.technical.https ? 'Yes' : 'No',
-      Viewport: data.viewport
+      'Content-Language': data.contentLanguage,
+      Favicon: data.technical.favicon,
+      'Apple touch icon': data.technical.appleTouchIcon,
+      'Theme colour': data.technical.themeColor
     };
     if (staticMap[fieldName] != null) return staticMap[fieldName];
     if (fieldName.indexOf('og:') === 0) return data.og[fieldName] || '';
@@ -676,19 +1162,46 @@
     const locateKey = opts.locate || '';
     const rowClass =
       'shadow-seo-field-row' +
+      (opts.info ? ' shadow-seo-field-row--info' : '') +
       (opts.media ? ' shadow-seo-field-row--media' : '') +
       (opts.warn ? ' shadow-seo-field-row--warn' : '') +
-      (opts.badge ? ' shadow-seo-field-row--badge' : '');
+      (opts.badge ? ' shadow-seo-field-row--badge' : '') +
+      (opts.googleHint || opts.googleStatus ? ' shadow-seo-field-row--google' : '');
     const labelHtml = opts.badge
       ? '<span class="' + opts.badge + '">' + escapeHtml(label) + '</span>'
       : '<span class="shadow-seo-field-label">' + escapeHtml(label) + '</span>';
+    if (opts.info) {
+      return (
+        '<div class="' +
+        rowClass +
+        '">' +
+        labelHtml +
+        '<div class="shadow-seo-field-value">' +
+        '<span class="shadow-seo-info-text">' +
+        escapeHtml(String(value)) +
+        '</span></div></div>'
+      );
+    }
+    let valueHtml = opts.raw ? String(value) : renderCellValue(value, opts);
+    if (opts.googleHint || opts.googleStatus) {
+      valueHtml =
+        '<div class="shadow-seo-field-stack">' +
+        '<div class="shadow-seo-field-primary">' +
+        valueHtml +
+        '</div>' +
+        (opts.googleHint
+          ? '<p class="shadow-seo-google-hint">' + escapeHtml(opts.googleHint) + '</p>'
+          : '') +
+        (opts.googleStatus ? googleStatusPill(opts.googleStatus) : '') +
+        '</div>';
+    }
     return (
       '<div class="' +
       rowClass +
       '">' +
       labelHtml +
       '<div class="shadow-seo-field-value">' +
-      (opts.raw ? String(value) : renderCellValue(value, opts)) +
+      valueHtml +
       '</div>' +
       '<div class="shadow-seo-field-actions">' +
       rowMenuHtml(fieldName, locateKey) +
@@ -721,39 +1234,100 @@
     return renderFieldTable(rows, 'Document meta');
   }
 
-  function renderOgTable(data) {
-    const rows = OG_FIELDS.map((key) => {
+  function renderSocial(data) {
+    const ogRows = OG_FIELDS.map((key) => {
       const rowOpts = { mono: true, truncate: 64, emptyLabel: 'Not set' };
       if (OG_LOCATE_KEYS[key]) rowOpts.locate = OG_LOCATE_KEYS[key];
       return [key, data.og[key] || '', rowOpts];
     });
-    return renderFieldTable(rows, 'Open Graph');
-  }
-
-  function renderTwitterTable(data) {
-    const rows = TWITTER_FIELDS.map((key) => {
+    const twitterRows = TWITTER_FIELDS.map((key) => {
       const rowOpts = { mono: true, truncate: 64, emptyLabel: 'Not set' };
       if (TWITTER_LOCATE_KEYS[key]) rowOpts.locate = TWITTER_LOCATE_KEYS[key];
       return [key, data.twitter[key] || '', rowOpts];
     });
-    return renderFieldTable(rows, 'Twitter cards');
+    const otherRows = [
+      [
+        'Pinterest (pin:media)',
+        data.pinMedia || '',
+        {
+          mono: true,
+          truncate: 64,
+          emptyLabel: 'Not set',
+          locate: 'pin-media',
+          fieldName: 'Pinterest pin:media'
+        }
+      ],
+      ['LinkedIn', 'Uses Open Graph', { info: true }]
+    ];
+    return (
+      '<div class="shadow-seo-groups">' +
+      renderFieldGroup('Open Graph', renderFieldRows(ogRows)) +
+      renderFieldGroup('Twitter / X', renderFieldRows(twitterRows)) +
+      renderFieldGroup('Other social', renderFieldRows(otherRows)) +
+      '</div>'
+    );
   }
 
-  function renderSecurity(data) {
-    const t = data.technical;
+  function renderInternational(data) {
+    const hreflangRows = data.hreflang.length
+      ? data.hreflang.map((h, i) => [
+          h.hreflang,
+          h.href,
+          { mono: true, truncate: 56, locate: 'hreflang-' + i, fieldName: 'hreflang: ' + h.hreflang }
+        ])
+      : [];
     const rows = [
-      ['HTTPS', t.https ? 'Yes' : 'No', {}],
       [
-        'Viewport',
-        data.viewport,
-        { mono: true, truncate: 72, emptyLabel: 'Not set', locate: 'meta-viewport' }
+        'x-default hreflang',
+        data.xDefault ? data.xDefault.href : '',
+        { mono: true, truncate: 56, emptyLabel: 'Not set', locate: data.xDefault ? 'hreflang-x-default' : '' }
+      ],
+      [
+        'Content-Language',
+        data.contentLanguage,
+        { emptyLabel: 'Not set', locate: data.contentLanguage ? 'meta-content-language' : '' }
       ]
     ];
-    return renderFieldTable(rows, 'Transport & viewport');
+    let html = '<div class="shadow-seo-groups">';
+    html += renderFieldGroup('Locale signals', renderFieldRows(rows));
+    if (hreflangRows.length) {
+      html += renderFieldGroup('hreflang alternates', renderFieldRows(hreflangRows));
+    } else {
+      html +=
+        renderFieldGroup(
+          'hreflang alternates',
+          '<p class="shadow-seo-empty-state">' + emptyPill('None') + '</p>',
+          { plain: true }
+        );
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function renderCrawlSecurity(data) {
+    const t = data.technical;
+    const flags = data.robotsFlags;
+    const rows = [
+      ['HTTPS', t.https ? 'Yes' : 'No', {}],
+      ['noindex', flags.noindex ? 'Yes' : 'No', {}],
+      ['nofollow', flags.nofollow ? 'Yes' : 'No', {}],
+      [
+        'X-Robots-Tag (server)',
+        'Check server headers',
+        { fieldName: 'X-Robots-Tag (server)' }
+      ]
+    ];
+    return (
+      '<div class="shadow-seo-groups">' +
+      renderFieldGroup('Crawl & security', renderFieldRows(rows)) +
+      '<p class="shadow-seo-subhead">HTTP response headers (including X-Robots-Tag) cannot be read from the browser. Check server or CDN settings.</p>' +
+      '</div>'
+    );
   }
 
   function renderHeadings(data) {
     const counts = data.headingCounts;
+    const h1Text = data.headings.filter((h) => h.level === 1).map((h) => h.text).join('; ');
     const summary =
       '<div class="shadow-seo-heading-counts">' +
       ['h1', 'h2', 'h3', 'h4', 'h5', 'h6']
@@ -769,6 +1343,13 @@
         )
         .join('') +
       '</div>';
+    const h1Row = applyGoogleGuidance(
+      'H1 heading',
+      h1Text,
+      'h1',
+      { emptyLabel: 'Missing', locate: data.headings.find((h) => h.level === 1) ? 'heading-' + data.headings.findIndex((h) => h.level === 1) : '' },
+      data.h1Count > 0
+    );
     const list =
       data.headings.length
         ? renderFieldRows(
@@ -787,6 +1368,7 @@
     return (
       '<div class="shadow-seo-groups">' +
       renderFieldGroup('Summary', summary, { plain: true }) +
+      renderFieldGroup('Google guidance', renderFieldRows([h1Row])) +
       (data.headings.length
         ? renderFieldGroup('On this page', list)
         : '<div class="shadow-seo-group-card">' + list + '</div>') +
@@ -797,30 +1379,35 @@
   function renderImages(data) {
     const total = data.images.length;
     const missingAltCount = data.images.filter((img) => img.missingAlt).length;
+    const decorativeCount = data.images.filter((img) => img.decorative).length;
     let html =
       '<p class="shadow-seo-counts">Total: ' +
       total +
       ' · Missing alt: ' +
       missingAltCount +
+      (decorativeCount ? ' · Decorative (empty alt): ' + decorativeCount : '') +
       '</p>';
     if (!total) {
       html += '<p class="shadow-seo-empty-state">' + emptyPill('No images') + '</p>';
       return html;
     }
     const rows = data.images.map((img, i) => {
-      const altDisplay = img.missingAlt
-        ? '<span class="shadow-seo-badge-missing-alt">Missing alt</span>'
-        : img.alt;
+      let altDisplay = '';
+      if (img.missingAlt) {
+        altDisplay = '<span class="shadow-seo-badge-missing-alt">Missing alt</span>';
+      } else if (img.decorative) {
+        altDisplay = '<span class="shadow-seo-badge-missing-alt">Decorative (empty alt)</span>';
+      } else {
+        altDisplay = escapeHtml(truncate(img.alt, 40));
+      }
       const value =
         renderCellValue(img.src, { mono: true, truncate: 48, emptyLabel: 'Not set' }) +
-        (altDisplay
-          ? '<br><span class="shadow-seo-link-text">' +
-            (img.missingAlt ? altDisplay : escapeHtml(truncate(img.alt, 40))) +
-            '</span>'
-          : '') +
+        '<br><span class="shadow-seo-link-text">' +
+        altDisplay +
+        '</span>' +
         (img.dims ? ' <span class="shadow-seo-link-text">' + escapeHtml(img.dims) + '</span>' : '');
       return [
-        img.missingAlt ? 'Image alt' : 'Image',
+        img.missingAlt ? 'Image alt' : img.decorative ? 'Image (decorative)' : 'Image',
         value,
         {
           media: true,
@@ -832,7 +1419,8 @@
       ];
     });
     html +=
-      '<div class="shadow-seo-groups">' + renderFieldGroup('Images', renderFieldRows(rows)) + '</div>';
+      renderFieldGroup('Images', renderFieldRows(rows)) +
+      '</div>';
     return html;
   }
 
@@ -845,7 +1433,10 @@
       links.internal.length +
       ' · External: ' +
       links.external.length +
-      '</p>';
+      ' · rel=nofollow: ' +
+      links.nofollowCount +
+      '</p>' +
+      '<p class="shadow-seo-subhead">Broken links cannot be fully detected client-side without fetching each URL.</p>';
     const slice = links.internal.slice(0, 15);
     if (slice.length) {
       const intRows = slice.map((l, i) => [
@@ -855,7 +1446,8 @@
           '" target="_blank" rel="noopener">' +
           escapeHtml(truncate(l.href, 56)) +
           '</a>' +
-          (l.text ? ' <span class="shadow-seo-link-text">' + escapeHtml(l.text) + '</span>' : ''),
+          (l.text ? ' <span class="shadow-seo-link-text">' + escapeHtml(l.text) + '</span>' : '') +
+          (l.nofollow ? ' <span class="shadow-seo-link-text">nofollow</span>' : ''),
         {
           media: true,
           locate: 'link-int-' + i,
@@ -863,6 +1455,7 @@
           raw: true,
           badge: 'shadow-seo-link-badge shadow-seo-link-badge--internal'
         }
+      ]);
       html +=
         '<div class="shadow-seo-groups">' +
         renderFieldGroup('Internal (first ' + slice.length + ')', renderFieldRows(intRows)) +
@@ -878,7 +1471,8 @@
           escapeHtml(l.href) +
           '" target="_blank" rel="noopener">' +
           escapeHtml(truncate(l.href, 56)) +
-          '</a>',
+          '</a>' +
+          (l.nofollow ? ' <span class="shadow-seo-link-text">nofollow</span>' : ''),
         {
           media: true,
           locate: 'link-ext-' + i,
@@ -897,17 +1491,43 @@
     return html;
   }
 
-  function renderStructured(data) {
-    if (!data.jsonLd.length) {
-      return '<p class="shadow-seo-empty-state">' + emptyPill('None found') + '</p>';
+  function renderStructuredTypeRow(entry) {
+    if (!entry.found) {
+      return renderFieldRow(entry.label, '', { emptyLabel: 'Not set', fieldName: entry.label });
     }
-    return (
+    const firstMatch = entry.matches[0];
+    let pretty = '';
+    try {
+      pretty = JSON.stringify(firstMatch, null, 2);
+    } catch (e) {
+      pretty = String(firstMatch);
+    }
+    const value =
+      '<span class="shadow-seo-value shadow-seo-value--found">Found</span>' +
+      (entry.matches.length > 1 ? ' <span class="shadow-seo-link-text">(' + entry.matches.length + ')</span>' : '') +
+      '<details class="shadow-seo-jsonld shadow-seo-jsonld--inline"><summary class="shadow-seo-jsonld-summary">View JSON</summary>' +
+      '<pre class="shadow-seo-pre shadow-seo-pre--json">' +
+      highlightJson(pretty) +
+      '</pre></details>';
+    return renderFieldRow(entry.label, value, {
+      fieldName: entry.label,
+      raw: true,
+      locate: 'structured-' + entry.id
+    });
+  }
+
+  function renderStructured(data) {
+    const templateRows = data.structured.template.map((entry) => renderStructuredTypeRow(entry)).join('');
+    let html =
       '<div class="shadow-seo-groups">' +
-      data.jsonLd
+      renderFieldGroup('Google rich result types', templateRows);
+
+    if (data.jsonLd.length) {
+      html += data.jsonLd
         .map((block, i) => {
           const locateKey = findJsonLdVisibleTarget(block) ? 'jsonld-' + i : '';
           return renderFieldGroup(
-            'Block ' + block.index,
+            'JSON-LD block ' + block.index,
             '<details class="shadow-seo-jsonld"><summary class="shadow-seo-jsonld-summary">' +
               '<span>' +
               block.raw.length +
@@ -919,9 +1539,16 @@
             { plain: true }
           );
         })
-        .join('') +
-      '</div>'
-    );
+        .join('');
+    } else {
+      html += renderFieldGroup(
+        'JSON-LD blocks found',
+        '<p class="shadow-seo-empty-state">' + emptyPill('None') + '</p>',
+        { plain: true }
+      );
+    }
+    html += '</div>';
+    return html;
   }
 
   function renderTechnical(data) {
@@ -933,7 +1560,11 @@
         label: 'Blocking in head',
         value: String(t.blockingHeadScripts),
         tone: t.blockingHeadScripts ? 'warn' : 'good'
-      }
+      },
+      { label: 'Lazy-loaded images', value: String(t.lazyImageCount) },
+      { label: 'iframes', value: String(t.iframeCount) },
+      { label: 'Preconnect hints', value: String(t.preconnectCount) },
+      { label: 'Prefetch / dns-prefetch', value: String(t.prefetchCount) }
     ];
     let html =
       '<div class="shadow-seo-groups">' +
@@ -951,6 +1582,20 @@
         )
         .join('') +
       '</div>';
+    const assetRows = [
+      ['Favicon', t.favicon, { mono: true, truncate: 56, emptyLabel: 'Not set', locate: 'tech-favicon' }],
+      [
+        'Apple touch icon',
+        t.appleTouchIcon,
+        { mono: true, truncate: 56, emptyLabel: 'Not set', locate: 'tech-apple-touch' }
+      ],
+      [
+        'Theme colour',
+        t.themeColor,
+        { emptyLabel: 'Not set', locate: t.themeColor ? 'tech-theme-color' : '' }
+      ]
+    ];
+    html += renderFieldGroup('Icons & theme', renderFieldRows(assetRows));
     const scriptRows = t.blockingHeadScripts
       ? t.blockingHeadScriptSrcs.map((s) => [
           'Script',
@@ -1146,18 +1791,16 @@
   function renderKeywords(data) {
     const analysis = analyseKeywords(data);
     let html = '<div class="shadow-seo-groups">';
-    if (analysis.metaKeywords) {
-      html += renderFieldGroup(
-        'Meta tag',
-        renderFieldRows([
-          [
-            'Meta keywords',
-            analysis.metaKeywords,
-            { truncate: 80, locate: 'meta-keywords', fieldName: 'Meta keywords' }
-          ]
-        ])
-      );
-    }
+    html += renderFieldGroup(
+      'Meta tag',
+      renderFieldRows([
+        [
+          'Meta keywords',
+          analysis.metaKeywords,
+          { truncate: 80, emptyLabel: 'Not set', locate: 'meta-keywords', fieldName: 'Meta keywords' }
+        ]
+      ])
+    );
     html +=
       '<p class="shadow-seo-counts">Analysed ' +
       analysis.totalWords +
@@ -1174,12 +1817,12 @@
         return renderOverview(data);
       case 'meta':
         return renderMetaTable(data);
-      case 'og':
-        return renderOgTable(data);
-      case 'twitter':
-        return renderTwitterTable(data);
+      case 'international':
+        return renderInternational(data);
+      case 'social':
+        return renderSocial(data);
       case 'security':
-        return renderSecurity(data);
+        return renderCrawlSecurity(data);
       case 'headings':
         return renderHeadings(data);
       case 'images':
@@ -1335,13 +1978,29 @@
     if (key === 'meta-description') return metaElement('name', 'description');
     if (key === 'meta-canonical') return document.querySelector('link[rel="canonical"]');
     if (key === 'meta-robots') return metaElement('name', 'robots');
+    if (key === 'meta-googlebot') return metaElement('name', 'googlebot');
     if (key === 'meta-keywords') return metaElement('name', 'keywords');
     if (key === 'meta-author') return metaElement('name', 'author');
     if (key === 'meta-publisher') {
       return metaElement('name', 'publisher') || metaElement('property', 'article:publisher');
     }
     if (key === 'meta-lang') return document.documentElement;
+    if (key === 'meta-charset') {
+      return document.querySelector('meta[charset]') || document.querySelector('meta[http-equiv="Content-Type" i]');
+    }
     if (key === 'meta-viewport') return metaElement('name', 'viewport');
+    if (key === 'meta-content-language') {
+      return (
+        metaElement('http-equiv', 'content-language') || metaElement('http-equiv', 'Content-Language')
+      );
+    }
+
+    const hreflangMatch = key.match(/^hreflang-(\d+)$/);
+    if (hreflangMatch) {
+      const h = data.hreflang[parseInt(hreflangMatch[1], 10)];
+      return h ? h.el : null;
+    }
+    if (key === 'hreflang-x-default' && data.xDefault) return data.xDefault.el;
 
     if (key === 'og-title' || key === 'twitter-title') {
       return firstVisibleH1() || metaElement('property', 'og:title') || metaElement('name', 'twitter:title');
@@ -1351,6 +2010,7 @@
         metaElement('property', 'og:description') || metaElement('name', 'twitter:description')
       );
     }
+    if (key === 'og-url') return metaElement('property', 'og:url');
     if (key === 'og-image') return findImageByUrl(data.og['og:image']) || metaElement('property', 'og:image');
     if (key === 'twitter-image') {
       return findImageByUrl(data.twitter['twitter:image']) || metaElement('name', 'twitter:image');
@@ -1358,7 +2018,23 @@
     if (key === 'og-type') return metaElement('property', 'og:type');
     if (key === 'og-locale') return metaElement('property', 'og:locale');
     if (key === 'og-site_name') return metaElement('property', 'og:site_name');
+    if (key === 'og-image_width') return metaElement('property', 'og:image:width');
+    if (key === 'og-image_height') return metaElement('property', 'og:image:height');
+    if (key === 'og-image_alt') return metaElement('property', 'og:image:alt');
     if (key === 'twitter-card') return metaElement('name', 'twitter:card');
+    if (key === 'twitter-site') return metaElement('name', 'twitter:site');
+    if (key === 'twitter-creator') return metaElement('name', 'twitter:creator');
+    if (key === 'pin-media') {
+      return metaElement('property', 'pin:media') || metaElement('name', 'pin:media');
+    }
+
+    if (key === 'tech-favicon') {
+      return (
+        document.querySelector('link[rel="icon"]') || document.querySelector('link[rel="shortcut icon"]')
+      );
+    }
+    if (key === 'tech-apple-touch') return document.querySelector('link[rel="apple-touch-icon"]');
+    if (key === 'tech-theme-color') return metaElement('name', 'theme-color');
 
     const kwMatch = key.match(/^kw-(single|pair)-(.+)$/);
     if (kwMatch) {
