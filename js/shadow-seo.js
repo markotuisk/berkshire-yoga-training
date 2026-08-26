@@ -2835,9 +2835,9 @@
   }
 
   function seoPanelBounds() {
-    const card = qs('#shadow-seo-modal .shadow-modal-card');
+    const card = qs('#shadow-review-modal .shadow-modal-card');
     if (card) return card.getBoundingClientRect();
-    const modal = qs('#shadow-seo-modal');
+    const modal = qs('#shadow-review-modal');
     if (modal && !modal.hidden) return modal.getBoundingClientRect();
     return {
       top: 8,
@@ -3406,11 +3406,58 @@
     }
   }
 
+  function getAuditData() {
+    return auditPage();
+  }
+
+  function renderSummaryHtml() {
+    const data = auditPage();
+    const titleLen = (data.title || '').length;
+    const descLen = (data.description || '').length;
+    const internalLinks =
+      data.links && data.links.linksInternal != null
+        ? data.links.linksInternal
+        : data.links
+          ? data.links.internal.length
+          : 0;
+    return (
+      '<div class="shadow-review-summary-seo">' +
+      '<div class="shadow-seo-score-ring ' +
+      scoreClass(data.score) +
+      '" aria-label="SEO score ' +
+      data.score +
+      ' out of 100">' +
+      scoreRingSvg(data.score) +
+      '<div class="shadow-seo-score-inner">' +
+      '<span class="shadow-seo-score-num">' +
+      data.score +
+      '</span>' +
+      '<span class="shadow-seo-score-label">SEO</span>' +
+      '</div></div>' +
+      '<dl class="shadow-review-summary-stats">' +
+      '<div><dt>Title length</dt><dd>' +
+      titleLen +
+      ' chars</dd></div>' +
+      '<div><dt>Meta description</dt><dd>' +
+      descLen +
+      ' chars</dd></div>' +
+      '<div><dt>Internal links</dt><dd>' +
+      internalLinks +
+      '</dd></div>' +
+      '</dl></div>'
+    );
+  }
+
+  function onTabActive() {
+    activeSection = activeSection || 'overview';
+    renderAudit();
+    bindSeoControls();
+  }
+
   function openPanel() {
-    if (helpers && helpers.showFloating) helpers.showFloating('seo');
-    else {
-      const modal = qs('#shadow-seo-modal');
-      if (modal) modal.hidden = false;
+    if (helpers && helpers.openReviewTab) {
+      helpers.openReviewTab('seo');
+      return;
     }
     activeSection = 'overview';
     renderAudit();
@@ -3434,14 +3481,16 @@
 
   function closePanel() {
     setHighlight(false);
-    const modal = qs('#shadow-seo-modal');
-    if (modal) modal.hidden = true;
   }
 
-  function onToolsClosed() {
+  function onReviewClosed() {
     setHighlight(false);
     activeRowForTicket = null;
     clearActiveRow();
+  }
+
+  function onToolsClosed() {
+    onReviewClosed();
   }
 
   function onTicketClosed() {
@@ -3469,9 +3518,13 @@
     open: openPanel,
     close: closePanel,
     refresh: renderAudit,
+    onTabActive,
+    onReviewClosed,
     onToolsClosed,
     onTicketClosed,
     shutdown,
-    isHighlightOn: () => highlightOn
+    isHighlightOn: () => highlightOn,
+    getAuditData,
+    renderSummaryHtml
   };
 })();

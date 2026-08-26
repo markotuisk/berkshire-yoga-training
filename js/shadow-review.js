@@ -1,6 +1,6 @@
 /**
  * Meridian shadow review overlay — shadow branch only.
- * Tools FAB opens the tools hub (Pick, SEO, Design); Tickets toolbar button opens inbox.
+ * Review FAB opens the unified page review panel (Summary, SEO, Design, Pick); Tickets toolbar button opens inbox.
  */
 (function () {
   'use strict';
@@ -54,7 +54,8 @@
   const STORAGE_INBOX_COLLAPSED = 'twa_shadow_inbox_collapsed';
   const STORAGE_DETAIL_COLLAPSED = 'twa_shadow_detail_collapsed';
   const MODAL_COLLAPSED_HEIGHT = 48;
-  const COLLAPSIBLE_MODALS = ['inbox', 'detail', 'tools', 'seo', 'design'];
+  const COLLAPSIBLE_MODALS = ['inbox', 'detail', 'review'];
+  const REVIEW_TABS = ['summary', 'seo', 'design', 'pick'];
   const IDLE_MS = 60 * 60 * 1000;
   const IDLE_CHECK_MS = 60 * 1000;
   const AUDIT_SHEET_URL =
@@ -68,32 +69,12 @@
     inbox: 'shadow-inbox-modal',
     detail: 'shadow-detail-modal',
     new: 'shadow-new-modal',
-    tools: 'shadow-tools-modal',
-    seo: 'shadow-seo-modal',
-    design: 'shadow-design-modal'
+    review: 'shadow-review-modal'
   };
 
   const DEFAULT_MODAL_SIZES = {
-    tools: { width: 320, height: 280 },
-    seo: { width: 480, height: 620 },
-    design: { width: 480, height: 620 }
+    review: { width: 520, height: 640 }
   };
-
-  const TOOLS_PICK_ICON =
-    '<svg class="shadow-tools-tile-icon" width="22" height="22" viewBox="0 0 22 22" aria-hidden="true" focusable="false">' +
-    '<path d="M4 17l1.5-4.5L16 2l3 3L8.5 15.5 4 17z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>' +
-    '<path d="M13 5l3 3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>';
-
-  const TOOLS_SEO_ICON =
-    '<svg class="shadow-tools-tile-icon" width="22" height="22" viewBox="0 0 22 22" aria-hidden="true" focusable="false">' +
-    '<circle cx="9.5" cy="9.5" r="5.5" fill="none" stroke="currentColor" stroke-width="1.5"/>' +
-    '<path d="M14 14l4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>' +
-    '<path d="M7.5 9.5h4M9.5 7.5v4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>';
-
-  const TOOLS_DESIGN_ICON =
-    '<svg class="shadow-tools-tile-icon" width="22" height="22" viewBox="0 0 22 22" aria-hidden="true" focusable="false">' +
-    '<path d="M4 6h14M4 11h10M4 16h6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>' +
-    '<circle cx="17" cy="16" r="2.5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>';
 
   const TOOLS_FAB_ICON =
     '<svg class="shadow-fab-icon" width="22" height="22" viewBox="0 0 22 22" aria-hidden="true" focusable="false">' +
@@ -134,6 +115,7 @@
   let inboxTab = 'open';
   let pageBadgeNodes = [];
   let badgePositionBound = false;
+  let activeReviewTab = 'summary';
 
   function changelog() {
     return window.TWAShadowChangelog || { version: '0.0.0', releases: [] };
@@ -468,9 +450,7 @@
 
   function collapseButtonLabel(key, collapsed) {
     if (key === 'inbox') return collapsed ? 'Expand inbox' : 'Collapse inbox';
-    if (key === 'tools') return collapsed ? 'Expand tools' : 'Collapse tools';
-    if (key === 'seo') return collapsed ? 'Expand SEO panel' : 'Collapse SEO panel';
-    if (key === 'design') return collapsed ? 'Expand design panel' : 'Collapse design panel';
+    if (key === 'review') return collapsed ? 'Expand review panel' : 'Collapse review panel';
     return collapsed ? 'Expand ticket' : 'Collapse ticket';
   }
 
@@ -558,9 +538,9 @@
       const h = card.offsetHeight;
       let left;
       let top;
-      if (key === 'tools' || key === 'seo' || key === 'design') {
+      if (key === 'review') {
         left = window.innerWidth - w - DEFAULT_MODAL_EDGE_MARGIN;
-        top = (window.innerHeight - h) * 0.42;
+        top = (window.innerHeight - h) * 0.38;
       } else {
         left = (window.innerWidth - w) / 2;
         top = (window.innerHeight - h) / 2;
@@ -611,9 +591,7 @@
     }
     defaultModalPlacement(key, card);
     toast(
-      key === 'tools' || key === 'seo' || key === 'design'
-        ? 'Modal reset to default position'
-        : 'Modal re-centred'
+      key === 'review' ? 'Modal reset to default position' : 'Modal re-centred'
     );
   }
 
@@ -841,11 +819,12 @@
       const keepOutside =
         key === 'detail'
           ? [qs('#shadow-comment-form', modal)].filter(Boolean)
-          : key === 'seo'
-            ? [qs('.shadow-seo-footer', modal)].filter(Boolean)
-            : key === 'design'
-              ? [qs('.shadow-design-footer', modal)].filter(Boolean)
-              : [];
+          : key === 'review'
+            ? [
+                qs('.shadow-review-tabs', modal),
+                qs('.shadow-review-body', modal)
+              ].filter(Boolean)
+            : [];
       setupModalScrollArea(card, head, keepOutside);
 
       setupModalHeadActions(head);
@@ -969,20 +948,95 @@
   }
 
   function updatePickToggleLabel(on) {
-    const tile = qs('#shadow-tools-pick-btn');
-    if (tile) tile.classList.toggle('shadow-tools-tile--active', on);
+    const btn = qs('#shadow-review-pick-toggle');
+    if (btn) {
+      btn.classList.toggle('shadow-btn--active', on);
+      btn.textContent = on ? 'Turn off pick mode' : 'Turn on pick mode';
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    }
   }
 
-  function isToolsOpen() {
-    const el = qs('#shadow-tools-modal');
+  function isReviewOpen() {
+    const el = qs('#shadow-review-modal');
     return el && !el.hidden;
   }
 
-  function requirePersonForTool() {
+  function requirePersonForReview() {
     if (getPerson()) return true;
-    hideFloating('tools');
+    hideFloating('review');
     show('person');
     return false;
+  }
+
+  function renderReviewSummary() {
+    const panel = qs('#shadow-review-panel-summary');
+    if (!panel) return;
+    const path = currentPagePath();
+    let seoBlock = '<p class="shadow-hint">Open the SEO tab to run an audit.</p>';
+    let designCount = '—';
+    if (window.TWAShadowSEO && window.TWAShadowSEO.renderSummaryHtml) {
+      seoBlock = window.TWAShadowSEO.renderSummaryHtml();
+    }
+    if (window.TWAShadowDesign && window.TWAShadowDesign.getAuditSummary) {
+      designCount = String(window.TWAShadowDesign.getAuditSummary().issueCount);
+    }
+    panel.innerHTML =
+      '<div class="shadow-review-summary">' +
+      '<p class="shadow-review-summary-url"><span class="shadow-review-summary-label">Page</span> <code>' +
+      escapeHtml(path) +
+      '</code></p>' +
+      seoBlock +
+      '<dl class="shadow-review-summary-stats shadow-review-summary-stats--extra">' +
+      '<div><dt>Design issues</dt><dd>' +
+      escapeHtml(designCount) +
+      '</dd></div>' +
+      '</dl>' +
+      '<div class="shadow-review-summary-actions">' +
+      '<button type="button" class="shadow-btn shadow-btn-secondary" data-goto-review-tab="seo">Open SEO tab</button>' +
+      '<button type="button" class="shadow-btn shadow-btn-secondary" data-goto-review-tab="design">Open Design tab</button>' +
+      '<button type="button" class="shadow-btn shadow-btn-secondary" data-goto-review-tab="pick">Open Pick tab</button>' +
+      '</div>' +
+      '<p class="shadow-hint shadow-review-summary-note">Tickets stay in the bottom toolbar for conversation threads.</p>' +
+      '</div>';
+  }
+
+  function switchReviewTab(tab) {
+    if (!REVIEW_TABS.includes(tab)) tab = 'summary';
+    activeReviewTab = tab;
+    REVIEW_TABS.forEach((name) => {
+      const btn = qs('[data-review-tab="' + name + '"]');
+      const panel = qs('#shadow-review-panel-' + name);
+      if (btn) {
+        btn.classList.toggle('shadow-review-tab--active', name === tab);
+        btn.setAttribute('aria-selected', name === tab ? 'true' : 'false');
+      }
+      if (panel) panel.hidden = name !== tab;
+    });
+    if (tab === 'summary') renderReviewSummary();
+    if (tab === 'seo' && window.TWAShadowSEO && window.TWAShadowSEO.onTabActive) {
+      window.TWAShadowSEO.onTabActive();
+    }
+    if (tab === 'design' && window.TWAShadowDesign && window.TWAShadowDesign.onTabActive) {
+      window.TWAShadowDesign.onTabActive();
+    }
+    if (tab === 'pick') {
+      updatePickToggleLabel(document.body.classList.contains('shadow-pick-mode'));
+    }
+  }
+
+  function openReview(tab) {
+    if (!requirePersonForReview()) return;
+    if (!isReviewOpen()) showFloating('review');
+    switchReviewTab(tab || 'summary');
+  }
+
+  function openReviewTab(tab) {
+    openReview(tab);
+  }
+
+  function toggleReview() {
+    if (isReviewOpen()) hideFloating('review');
+    else openReview('summary');
   }
 
   function togglePickMode() {
@@ -994,19 +1048,14 @@
   }
 
   function openToolCategory(category) {
-    if (category === 'pick') {
-      hideFloating('tools');
-      togglePickMode();
-      return;
-    }
-    if (!requirePersonForTool()) return;
-    hideFloating('tools');
-    if (category === 'seo' && window.TWAShadowSEO) window.TWAShadowSEO.open();
-    if (category === 'design' && window.TWAShadowDesign) window.TWAShadowDesign.open();
+    if (!requirePersonForReview()) return;
+    if (category === 'pick') openReview('pick');
+    else if (category === 'seo') openReview('seo');
+    else if (category === 'design') openReview('design');
   }
 
   function closeAllModals() {
-    ['person', 'inbox', 'detail', 'new', 'whatsnew', 'tools', 'seo', 'design'].forEach((key) => hide(key));
+    ['person', 'inbox', 'detail', 'new', 'whatsnew', 'review'].forEach((key) => hide(key));
     if (window.TWAShadowSEO) window.TWAShadowSEO.shutdown();
     if (window.TWAShadowDesign) window.TWAShadowDesign.shutdown();
     clearHighlight();
@@ -1266,7 +1315,7 @@
     const root = document.createElement('div');
     root.id = 'shadow-review-root';
     root.innerHTML = `
-      <button type="button" id="shadow-fab" class="shadow-fab" title="Review tools" aria-label="Open review tools">${TOOLS_FAB_ICON}</button>
+      <button type="button" id="shadow-fab" class="shadow-fab" title="Page review" aria-label="Open page review panel">${TOOLS_FAB_ICON}</button>
 
       <div id="shadow-person-modal" class="shadow-modal" hidden>
         <div class="shadow-modal-card">
@@ -1346,73 +1395,53 @@
         </div>
       </div>
 
-      <div id="shadow-tools-modal" class="shadow-modal" hidden>
-        <div class="shadow-modal-card shadow-modal-tools">
+      <div id="shadow-review-modal" class="shadow-modal" hidden>
+        <div class="shadow-modal-card shadow-modal-review">
           <div class="shadow-modal-head">
-            <h2>Review tools</h2>
-            <button type="button" class="shadow-close" data-close="tools" aria-label="Close">&times;</button>
+            <h2>Page review</h2>
+            <button type="button" class="shadow-close" data-close="review" aria-label="Close">&times;</button>
           </div>
-          <div class="shadow-tools-grid" role="group" aria-label="Review tools">
-            <button type="button" id="shadow-tools-pick-btn" class="shadow-tools-tile" data-tool="pick">
-              <span class="shadow-tools-tile-icon-wrap">${TOOLS_PICK_ICON}</span>
-              <span class="shadow-tools-tile-label">Pick</span>
-              <span class="shadow-tools-tile-desc">Pick element on page</span>
-            </button>
-            <button type="button" id="shadow-tools-seo-btn" class="shadow-tools-tile" data-tool="seo">
-              <span class="shadow-tools-tile-icon-wrap">${TOOLS_SEO_ICON}</span>
-              <span class="shadow-tools-tile-label">SEO</span>
-              <span class="shadow-tools-tile-desc">Page SEO &amp; links</span>
-            </button>
-            <button type="button" id="shadow-tools-design-btn" class="shadow-tools-tile" data-tool="design">
-              <span class="shadow-tools-tile-icon-wrap">${TOOLS_DESIGN_ICON}</span>
-              <span class="shadow-tools-tile-label">Design</span>
-              <span class="shadow-tools-tile-desc">Typography, colours &amp; accessibility</span>
-            </button>
-          </div>
-          <p class="shadow-hint shadow-tools-hint">Or ⌘/Alt+click any element to file a ticket</p>
-        </div>
-      </div>
-
-      <div id="shadow-seo-modal" class="shadow-modal" hidden>
-        <div class="shadow-modal-card shadow-modal-seo">
-          <div class="shadow-modal-head shadow-seo-head">
-            <div class="shadow-seo-head-text">
-              <h2>Page SEO</h2>
-              <p class="shadow-seo-subtitle">Audit of this page</p>
+          <nav id="shadow-review-tabs" class="shadow-review-tabs" role="tablist" aria-label="Review sections">
+            <button type="button" class="shadow-review-tab shadow-review-tab--active" data-review-tab="summary" role="tab" aria-selected="true">Summary</button>
+            <button type="button" class="shadow-review-tab" data-review-tab="seo" role="tab" aria-selected="false">SEO</button>
+            <button type="button" class="shadow-review-tab" data-review-tab="design" role="tab" aria-selected="false">Design</button>
+            <button type="button" class="shadow-review-tab" data-review-tab="pick" role="tab" aria-selected="false">Pick</button>
+          </nav>
+          <div class="shadow-review-body">
+            <div id="shadow-review-panel-summary" class="shadow-review-panel shadow-review-panel-summary" role="tabpanel"></div>
+            <div id="shadow-review-panel-seo" class="shadow-review-panel shadow-review-panel-seo" role="tabpanel" hidden>
+              <div class="shadow-seo-body">
+                <nav id="shadow-seo-nav" class="shadow-seo-nav" role="tablist" aria-label="SEO audit sections"></nav>
+                <div class="shadow-seo-content">
+                  <div id="shadow-seo-section" class="shadow-seo-section" role="tabpanel"></div>
+                </div>
+              </div>
+              <footer class="shadow-seo-footer">
+                <button type="button" id="shadow-seo-highlight-toggle" class="shadow-seo-footer-btn" aria-pressed="false">Highlight on page</button>
+                <button type="button" id="shadow-seo-refresh" class="shadow-seo-footer-btn">Refresh audit</button>
+              </footer>
             </div>
-            <button type="button" class="shadow-close" data-close="seo" aria-label="Close">&times;</button>
-          </div>
-          <div class="shadow-seo-body">
-            <nav id="shadow-seo-nav" class="shadow-seo-nav" role="tablist" aria-label="SEO audit sections"></nav>
-            <div class="shadow-seo-content">
-              <div id="shadow-seo-section" class="shadow-seo-section" role="tabpanel"></div>
+            <div id="shadow-review-panel-design" class="shadow-review-panel shadow-review-panel-design" role="tabpanel" hidden>
+              <div class="shadow-design-body">
+                <nav id="shadow-design-nav" class="shadow-design-nav" role="tablist" aria-label="Design audit sections"></nav>
+                <div class="shadow-design-content">
+                  <div id="shadow-design-section" class="shadow-design-section" role="tabpanel"></div>
+                </div>
+              </div>
+              <footer class="shadow-design-footer">
+                <button type="button" id="shadow-design-refresh" class="shadow-design-footer-btn">Refresh audit</button>
+              </footer>
             </div>
-          </div>
-          <footer class="shadow-seo-footer">
-            <button type="button" id="shadow-seo-highlight-toggle" class="shadow-seo-footer-btn" aria-pressed="false">Highlight on page</button>
-            <button type="button" id="shadow-seo-refresh" class="shadow-seo-footer-btn">Refresh audit</button>
-          </footer>
-        </div>
-      </div>
-
-      <div id="shadow-design-modal" class="shadow-modal" hidden>
-        <div class="shadow-modal-card shadow-modal-design">
-          <div class="shadow-modal-head shadow-design-head">
-            <div class="shadow-design-head-text">
-              <h2>Page design</h2>
-              <p class="shadow-design-subtitle">Fonts, colours, accessibility and mismatches</p>
-            </div>
-            <button type="button" class="shadow-close" data-close="design" aria-label="Close">&times;</button>
-          </div>
-          <div class="shadow-design-body">
-            <nav id="shadow-design-nav" class="shadow-design-nav" role="tablist" aria-label="Design audit sections"></nav>
-            <div class="shadow-design-content">
-              <div id="shadow-design-section" class="shadow-design-section" role="tabpanel"></div>
+            <div id="shadow-review-panel-pick" class="shadow-review-panel shadow-review-panel-pick" role="tabpanel" hidden>
+              <div class="shadow-review-pick-copy">
+                <h3 class="shadow-review-pick-title">Pick an element</h3>
+                <p>Turn on pick mode, then click any element on the page to file a ticket with that location attached.</p>
+                <button type="button" id="shadow-review-pick-toggle" class="shadow-btn" aria-pressed="false">Turn on pick mode</button>
+                <p class="shadow-hint">Or hold ⌘ (Mac) or Alt (Windows) and click any element without opening this panel.</p>
+                <p class="shadow-hint">Use <strong>Tickets</strong> in the toolbar to view and manage conversation threads.</p>
+              </div>
             </div>
           </div>
-          <footer class="shadow-design-footer">
-            <button type="button" id="shadow-design-refresh" class="shadow-design-footer-btn">Refresh audit</button>
-          </footer>
         </div>
       </div>
 
@@ -1448,8 +1477,35 @@
         show('person');
         return;
       }
-      toggleTools();
+      toggleReview();
     });
+
+    const reviewTabs = qs('#shadow-review-tabs');
+    if (reviewTabs) {
+      reviewTabs.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-review-tab]');
+        if (!btn) return;
+        if (!requirePersonForReview()) return;
+        switchReviewTab(btn.getAttribute('data-review-tab'));
+      });
+    }
+
+    const reviewBody = qs('.shadow-review-body');
+    if (reviewBody) {
+      reviewBody.addEventListener('click', (e) => {
+        const goto = e.target.closest('[data-goto-review-tab]');
+        if (!goto) return;
+        switchReviewTab(goto.getAttribute('data-goto-review-tab'));
+      });
+    }
+
+    const pickToggle = qs('#shadow-review-pick-toggle');
+    if (pickToggle) {
+      pickToggle.addEventListener('click', () => {
+        if (!requirePersonForReview()) return;
+        togglePickMode();
+      });
+    }
 
     root.querySelectorAll('[data-close]').forEach((btn) => {
       btn.addEventListener('click', () => hide(btn.getAttribute('data-close')));
@@ -1461,10 +1517,6 @@
     qs('#shadow-detail-body').addEventListener('click', onDetailActionClick);
     qs('#shadow-ticket-list').addEventListener('click', onInboxListClick);
 
-    qs('#shadow-tools-pick-btn').addEventListener('click', () => openToolCategory('pick'));
-    qs('#shadow-tools-seo-btn').addEventListener('click', () => openToolCategory('seo'));
-    qs('#shadow-tools-design-btn').addEventListener('click', () => openToolCategory('design'));
-
     initDraggableModals();
 
     if (window.TWAShadowSEO) {
@@ -1472,8 +1524,8 @@
         escapeHtml,
         getPerson,
         showExclusive: show,
-        showFloating,
-        hideFloating,
+        openReviewTab,
+        isReviewOpen,
         toast,
         openChangeTicket
       });
@@ -1483,11 +1535,14 @@
       window.TWAShadowDesign.init({
         getPerson,
         showExclusive: show,
-        showFloating,
+        openReviewTab,
+        isReviewOpen,
         toast,
         openChangeTicket
       });
     }
+
+    renderReviewSummary();
   }
 
   function updateVersionBadge() {
@@ -1585,9 +1640,7 @@
     detail: 'shadow-detail-modal',
     new: 'shadow-new-modal',
     whatsnew: 'shadow-whatsnew-modal',
-    tools: 'shadow-tools-modal',
-    seo: 'shadow-seo-modal',
-    design: 'shadow-design-modal'
+    review: 'shadow-review-modal'
   };
 
   function showFloating(which) {
@@ -1598,43 +1651,27 @@
       const card = qs('.shadow-modal-card', el);
       if (card) applyModalPosition(which, card);
     }
+    if (which === 'review' && activeReviewTab === 'summary') renderReviewSummary();
   }
 
   function hideFloating(which) {
     const el = qs('#' + MODAL_MAP[which]);
     if (!el) return;
     el.hidden = true;
-    if (which === 'tools') {
-      if (window.TWAShadowSEO) window.TWAShadowSEO.onToolsClosed();
-      if (window.TWAShadowDesign) window.TWAShadowDesign.onToolsClosed();
+    if (which === 'review') {
+      if (window.TWAShadowSEO) window.TWAShadowSEO.shutdown();
+      if (window.TWAShadowDesign) window.TWAShadowDesign.shutdown();
+      clearPickHover();
+      document.body.classList.remove('shadow-pick-mode');
+      updatePickToggleLabel(false);
     }
-    if (which === 'seo' && window.TWAShadowSEO) window.TWAShadowSEO.close();
-    if (which === 'design' && window.TWAShadowDesign) window.TWAShadowDesign.close();
-  }
-
-  function openTools() {
-    showFloating('tools');
-  }
-
-  function toggleTools() {
-    if (isToolsOpen()) hideFloating('tools');
-    else openTools();
   }
 
   function show(which) {
     Object.entries(MODAL_MAP).forEach(([key, id]) => {
       const el = qs('#' + id);
       if (!el || el.hidden) return;
-      if (key === 'tools' && which !== 'tools') {
-        if (window.TWAShadowSEO) window.TWAShadowSEO.onToolsClosed();
-        if (window.TWAShadowDesign) window.TWAShadowDesign.onToolsClosed();
-      }
-      if (key === 'seo' && which !== 'seo' && window.TWAShadowSEO) {
-        window.TWAShadowSEO.close();
-      }
-      if (key === 'design' && which !== 'design' && window.TWAShadowDesign) {
-        window.TWAShadowDesign.close();
-      }
+      if (key === 'review' && which !== 'review') hideFloating('review');
       el.hidden = true;
     });
     const el = qs('#' + MODAL_MAP[which]);
@@ -1648,8 +1685,8 @@
   }
 
   function hide(which) {
-    if (which === 'tools' || which === 'seo' || which === 'design') {
-      hideFloating(which);
+    if (which === 'review') {
+      hideFloating('review');
       return;
     }
     const el = qs('#' + MODAL_MAP[which]);

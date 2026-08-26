@@ -26,8 +26,8 @@ Partners do **not** need Cloudflare accounts. Access only needs their emails on 
 1. Open the shadow site (Cloudflare Access login → one-time email code or Google).
 2. Choose your name (Katia / Raili / Marko).
 3. **What's new** on login when there are unread partner updates (ticket inbox does not auto-open).
-4. **Tools** FAB (bottom right) or **Tools** in the bottom toolbar opens the tools hub: **Pick**, **SEO**, or **Design**.
-5. **Pick** toggles element selection (or use ⌘/Alt+click). **SEO** opens the Page SEO panel with sidebar (Overview, Meta, Links, Technical, Structured data). **Design** opens typography, colours, accessibility, and issues.
+4. **Review** toolbox FAB (bottom right) opens the unified page review panel with **Summary**, **SEO**, **Design**, and **Pick** tabs.
+5. **Summary** shows page health (SEO score, key counts, links to other tabs). **SEO** and **Design** keep their sidebar audits inside the same panel. **Pick** toggles element selection (or use ⌘/Alt+click).
 6. **Tickets** in the toolbar opens the ticket inbox.
 7. **Open** tab (default) lists tickets that still need attention; **Closed** holds finished items (Approved, Shipped to live, Won't fix, Duplicate).
 8. Orange **TWA-xxx** markers appear on page elements with open tickets — click to open the thread and jump to the element.
@@ -67,7 +67,7 @@ js/shadow-review.js        overlay UI
 css/shadow-review.css      overlay styles
 ```
 
-**Design audit:** Tools hub → **Design** scans the page for font families, sizes, weights, line heights, colours and accessibility (images, headings, contrast, links, buttons, form fields, landmarks). **Issues** merges design mismatches with accessibility findings. **⋯** row menus offer **Locate on page** and **Request change**, matching the SEO panel.
+**Design audit:** Review panel → **Design** tab scans the page for font families, sizes, weights, line heights, colours and accessibility (images, headings, contrast, links, buttons, form fields, landmarks). **Issues** merges design mismatches with accessibility findings. **⋯** row menus offer **Locate on page** and **Request change**, matching the SEO panel.
 
 ---
 

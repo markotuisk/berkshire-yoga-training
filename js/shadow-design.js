@@ -1082,9 +1082,9 @@
   }
 
   function designPanelBounds() {
-    const card = qs('#shadow-design-modal .shadow-modal-card');
+    const card = qs('#shadow-review-modal .shadow-modal-card');
     if (card) return card.getBoundingClientRect();
-    const modal = qs('#shadow-design-modal');
+    const modal = qs('#shadow-review-modal');
     if (modal && !modal.hidden) return modal.getBoundingClientRect();
     return {
       top: 8,
@@ -1460,11 +1460,21 @@
     }
   }
 
+  function getAuditSummary() {
+    const data = auditPage();
+    return { issueCount: data.issues.length };
+  }
+
+  function onTabActive() {
+    activeSection = activeSection || 'summary';
+    renderAudit();
+    bindDesignControls();
+  }
+
   function openPanel() {
-    if (helpers && helpers.showFloating) helpers.showFloating('design');
-    else {
-      const modal = qs('#shadow-design-modal');
-      if (modal) modal.hidden = false;
+    if (helpers && helpers.openReviewTab) {
+      helpers.openReviewTab('design');
+      return;
     }
     activeSection = 'summary';
     renderAudit();
@@ -1474,13 +1484,15 @@
   function closePanel() {
     clearLocateHighlight();
     closeAllRowMenus();
-    const modal = qs('#shadow-design-modal');
-    if (modal) modal.hidden = true;
+  }
+
+  function onReviewClosed() {
+    clearLocateHighlight();
+    closeAllRowMenus();
   }
 
   function onToolsClosed() {
-    clearLocateHighlight();
-    closeAllRowMenus();
+    onReviewClosed();
   }
 
   function onTicketClosed() {
@@ -1503,8 +1515,11 @@
     open: openPanel,
     close: closePanel,
     refresh: renderAudit,
+    onTabActive,
+    onReviewClosed,
     onToolsClosed,
     onTicketClosed,
-    shutdown
+    shutdown,
+    getAuditSummary
   };
 })();

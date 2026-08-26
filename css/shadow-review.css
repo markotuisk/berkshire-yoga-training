@@ -1142,7 +1142,202 @@ body.shadow-modal-drag-active {
   border: none;
 }
 
-/* Tools hub modal */
+/* Unified review panel */
+.shadow-modal-review {
+  width: min(32.5rem, 100%);
+  min-height: 28rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.shadow-modal-review .shadow-modal-head {
+  padding: 0.85rem 1rem 0.7rem;
+  margin-bottom: 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.shadow-review-tabs {
+  display: flex;
+  gap: 0;
+  padding: 0 0.5rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  background: rgba(0, 0, 0, 0.015);
+  flex-shrink: 0;
+}
+
+.shadow-review-tab {
+  flex: 1 1 0;
+  margin: 0;
+  padding: 0.55rem 0.35rem;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: #636366;
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.2;
+  cursor: pointer;
+  transition:
+    color var(--shadow-ease),
+    border-color var(--shadow-ease),
+    background var(--shadow-ease);
+}
+
+.shadow-review-tab:hover {
+  color: var(--shadow-text);
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.shadow-review-tab:focus-visible {
+  outline: 2px solid var(--shadow-accent);
+  outline-offset: -2px;
+}
+
+.shadow-review-tab--active {
+  color: var(--shadow-accent);
+  border-bottom-color: var(--shadow-accent);
+  font-weight: 600;
+}
+
+.shadow-review-body {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.shadow-review-panel {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.shadow-review-panel-summary {
+  overflow-y: auto;
+  padding: 0.85rem 1rem 1rem;
+}
+
+.shadow-review-summary-url {
+  margin: 0 0 0.85rem;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+
+.shadow-review-summary-label {
+  display: block;
+  margin-bottom: 0.2rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #8e8e93;
+}
+
+.shadow-review-summary-url code {
+  font-size: 0.8125rem;
+  word-break: break-all;
+}
+
+.shadow-review-summary-seo {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.85rem 1rem;
+  align-items: start;
+  margin-bottom: 0.85rem;
+}
+
+.shadow-review-summary-seo .shadow-seo-score-ring {
+  width: 5.5rem;
+  height: 5.5rem;
+}
+
+.shadow-review-summary-stats {
+  margin: 0;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.shadow-review-summary-stats > div {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.75rem;
+  align-items: baseline;
+  font-size: 0.8125rem;
+  line-height: 1.35;
+}
+
+.shadow-review-summary-stats dt {
+  margin: 0;
+  color: #636366;
+  font-weight: 500;
+}
+
+.shadow-review-summary-stats dd {
+  margin: 0;
+  font-weight: 600;
+  color: var(--shadow-text);
+}
+
+.shadow-review-summary-stats--extra {
+  margin-bottom: 0.85rem;
+}
+
+.shadow-review-summary-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-bottom: 0.65rem;
+}
+
+.shadow-review-summary-note {
+  margin: 0;
+  font-size: 0.75rem;
+}
+
+.shadow-review-pick-copy {
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.shadow-review-pick-title {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.shadow-review-pick-copy p {
+  margin: 0 0 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+.shadow-review-panel-seo,
+.shadow-review-panel-design {
+  min-height: 0;
+}
+
+.shadow-modal-review .shadow-modal-scroll {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.shadow-modal-review .shadow-review-body,
+.shadow-modal-review .shadow-review-panel-seo .shadow-seo-body,
+.shadow-modal-review .shadow-review-panel-design .shadow-design-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Legacy tools hub (removed in v1.14.0) */
 .shadow-modal-tools {
   width: min(20rem, 100%);
 }
@@ -1345,7 +1540,8 @@ body.shadow-modal-drag-active {
 }
 
 .shadow-modal-seo .shadow-modal-scroll,
-.shadow-modal-design .shadow-modal-scroll {
+.shadow-modal-design .shadow-modal-scroll,
+.shadow-modal-review .shadow-modal-scroll {
   display: flex;
   flex-direction: column;
   flex: 1 1 auto;
@@ -1353,7 +1549,8 @@ body.shadow-modal-drag-active {
 }
 
 .shadow-modal-seo .shadow-modal-scroll > .shadow-seo-body,
-.shadow-modal-design .shadow-modal-scroll > .shadow-design-body {
+.shadow-modal-design .shadow-modal-scroll > .shadow-design-body,
+.shadow-modal-review .shadow-review-body {
   flex: 1 1 auto;
   min-height: 0;
   overflow: hidden;

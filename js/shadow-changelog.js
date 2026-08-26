@@ -7,8 +7,22 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.13.2',
+    version: '1.14.0',
     releases: [
+      {
+        version: '1.14.0',
+        date: '2026-08-26',
+        title: 'Unified page review panel',
+        user: [
+          'Orange toolbox button opens one review panel with Summary, SEO, Design and Pick tabs',
+          'Summary shows page health at a glance — SEO score, key counts, and quick links to each tab',
+          'SEO and Design keep their sidebar navigation inside the same panel; Pick explains element selection with a toggle',
+          'Tickets stay in the bottom toolbar only'
+        ],
+        dev: [
+          'shadow-review.js #shadow-review-modal replaces tools/seo/design modals; openReviewTab + switchReviewTab; cache-bust via ?v=1.14.0'
+        ]
+      },
       {
         version: '1.13.2',
         date: '2026-08-26',
@@ -21,6 +35,10 @@
           'shadow-fab icon-only FAB; hub h2 Review tools; cache-bust via ?v=1.13.2'
         ]
       },
+      {
+        version: '1.13.1',
+        date: '2026-08-26',
+        title: 'Toolbar Tools button removed',
         user: ['Remove duplicate Tools button from toolbar'],
         dev: [
           'shadow-review.js restore flat toolbar layout; remove centre Tools btn and click handler; cache-bust via ?v=1.13.1'
