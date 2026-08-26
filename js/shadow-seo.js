@@ -234,6 +234,9 @@
   let linkCheckRunning = false;
   let linkCheckProgress = null;
   let linkCheckMode = null;
+  let linkCheckStats = null;
+  let sitemapPageCount = null;
+  let sitemapCountLoading = false;
 
   const STOP_WORDS = new Set(
     'a about above after again against all am an and any are as at be because been before being below between both but by can did do does doing done down during each few for from further had has have having he her here hers herself him himself his how if in into is it its itself just let like ll me more most much must my myself no nor not now of off on once only or other our ours ourselves out over own re s same shall she should so some such t than that the their theirs them themselves then there these they this those though through to too under until up very was we were what when where which while who whom why will with would you your yours yourself yourselves'.split(
@@ -606,6 +609,9 @@
   }
 
   function collectLinks() {
+    if (window.TWAShadowLinks && window.TWAShadowLinks.collectPageLinks) {
+      return window.TWAShadowLinks.collectPageLinks();
+    }
     const internal = [];
     const external = [];
     let nofollowCount = 0;
@@ -613,7 +619,9 @@
     document.querySelectorAll('a[href]').forEach((el) => {
       if (isExcluded(el)) return;
       const href = (el.getAttribute('href') || '').trim();
-      if (!href || href.startsWith('#') || href.startsWith('javascript:')) return;
+      if (!href || href.startsWith('#') || href.startsWith('javascript:') || href.startsWith('mailto:') || href.startsWith('tel:')) {
+        return;
+      }
       const rel = (el.getAttribute('rel') || '').toLowerCase();
       if (rel.includes('nofollow')) nofollowCount += 1;
       let url;
@@ -631,7 +639,18 @@
       if (url.origin === origin) internal.push(entry);
       else external.push(entry);
     });
-    return { internal, external, total: internal.length + external.length, nofollowCount };
+    const total = internal.length + external.length;
+    return {
+      internal,
+      external,
+      total,
+      linksTotal: total,
+      linksInternal: internal.length,
+      linksExternal: external.length,
+      nofollowCount,
+      uniqueDestinations: null,
+      uniqueInternalDestinations: null
+    };
   }
 
   function collectHreflang() {
@@ -1692,10 +1711,24 @@
     if (!linkCheckRunning || !linkCheckProgress) return '';
     const p = linkCheckProgress;
     const pct = p.total ? Math.round((p.done / p.total) * 100) : 0;
-    const label =
-      p.phase === 'pages'
-        ? 'Crawling pages ' + p.done + ' / ' + p.total
-        : 'Checking links ' + p.done + ' / ' + p.total;
+    let label = '';
+    if (p.phase === 'pages') {
+      label = 'Fetching page ' + p.done + ' of ' + p.total;
+    } else {
+      label = 'Checking link ' + p.done + ' of ' + p.total;
+    }
+    let extra = '';
+    if (p.phase === 'pages' && p.linksCollected != null) {
+      extra =
+        '<p class="shadow-seo-link-progress-stat">Link occurrences collected so far: <strong>' +
+        p.linksCollected +
+        '</strong></p>';
+    } else if (p.phase === 'links' && p.linksCollected != null) {
+      extra =
+        '<p class="shadow-seo-link-progress-stat">From <strong>' +
+        p.linksCollected +
+        '</strong> link occurrences across sitemap pages</p>';
+    }
     return (
       '<div class="shadow-seo-link-progress">' +
       '<p class="shadow-seo-link-progress-label">' +
@@ -1707,9 +1740,98 @@
       '<span class="shadow-seo-link-progress-fill" style="width:' +
       pct +
       '%"></span></div>' +
+      extra +
       (p.current ? '<p class="shadow-seo-link-progress-current">' + escapeHtml(truncate(p.current, 64)) + '</p>' : '') +
       '</div>'
     );
+  }
+
+  function renderLinkScopeCallout(links) {
+    const sitemapLabel =
+      sitemapPageCount != null
+        ? String(sitemapPageCount) + ' pages in sitemap.xml'
+        : sitemapCountLoading
+          ? 'Loading sitemap…'
+          : 'All pages listed in sitemap.xml';
+    const pageTotal = links.linksTotal != null ? links.linksTotal : links.total;
+    const pageInternal = links.linksInternal != null ? links.linksInternal : links.internal.length;
+    const pageExternal = links.linksExternal != null ? links.linksExternal : links.external.length;
+    return (
+      '<div class="shadow-seo-link-scope-callout" role="note">' +
+      '<p class="shadow-seo-link-scope-title">How link checking works</p>' +
+      '<div class="shadow-seo-link-scope-grid">' +
+      '<div class="shadow-seo-link-scope-item">' +
+      '<span class="shadow-seo-link-scope-icon" aria-hidden="true">📄</span>' +
+      '<div class="shadow-seo-link-scope-body">' +
+      '<strong>Check links on this page</strong>' +
+      '<p>Checks every link on the page you are viewing — ' +
+      pageTotal +
+      ' links in total (' +
+      pageInternal +
+      ' internal · ' +
+      pageExternal +
+      ' external). Each unique destination is checked once, even if the same URL appears in the nav and footer.</p>' +
+      '</div></div>' +
+      '<div class="shadow-seo-link-scope-item">' +
+      '<span class="shadow-seo-link-scope-icon" aria-hidden="true">🗺</span>' +
+      '<div class="shadow-seo-link-scope-body">' +
+      '<strong>Crawl site from sitemap</strong>' +
+      '<p>Visits each URL in sitemap.xml (' +
+      escapeHtml(sitemapLabel) +
+      '), collects every link found on those pages, then checks each unique destination once. Nav and footer links repeat on every page, so link totals are higher than unique destinations.</p>' +
+      '</div></div>' +
+      '</div></div>'
+    );
+  }
+
+  function renderLinkCheckStatsCard(stats, mode) {
+    if (!stats) return '';
+    const isCrawl = mode === 'crawl';
+    const issues =
+      stats.issuesFound != null ? stats.issuesFound : linkCheckResults ? linkCheckResults.length : 0;
+    let bullets;
+    if (isCrawl) {
+      bullets = [
+        stats.sitemapPages + ' pages in sitemap',
+        stats.pagesFetched + ' pages fetched',
+        stats.linksCollected + ' link occurrences collected',
+        stats.uniqueDestinations + ' unique destinations checked',
+        stats.uniqueInternalDestinations + ' unique internal destinations checked',
+        issues + ' issues found'
+      ];
+    } else {
+      bullets = [
+        stats.linksTotal +
+          ' links in total (' +
+          stats.linksInternal +
+          ' internal · ' +
+          stats.linksExternal +
+          ' external)',
+        stats.uniqueDestinations + ' unique destinations (same URL in nav counts once for checking)',
+        stats.uniqueInternalDestinations + ' unique internal destinations checked',
+        issues + ' issues found'
+      ];
+    }
+    let html =
+      '<div class="shadow-seo-link-crawl-summary">' +
+      '<p class="shadow-seo-link-crawl-summary-title">' +
+      (isCrawl ? 'Sitemap crawl' : 'This page') +
+      '</p>' +
+      '<ul class="shadow-seo-link-crawl-stats">';
+    bullets.forEach((line) => {
+      html += '<li>' + escapeHtml(line) + '</li>';
+    });
+    html += '</ul>';
+    if (!isCrawl || stats.linksCollected > stats.uniqueDestinations) {
+      html +=
+        '<p class="shadow-seo-link-crawl-note">Nav and footer links repeat on every page, so total link count is higher than unique destinations.</p>';
+    }
+    if (isCrawl) {
+      html +=
+        '<p class="shadow-seo-link-crawl-note">Sitemap crawl covers sitemap pages only. Use <strong>Check links on this page</strong> for full coverage of a specific page, or run checks on other key pages individually.</p>';
+    }
+    html += '</div>';
+    return html;
   }
 
   function renderLinkCheckSummary(summary) {
@@ -1773,7 +1895,7 @@
 
   function renderLinks(data) {
     const links = data.links;
-    let html =
+    let html = renderLinkScopeCallout(links) +
       '<div class="shadow-seo-link-actions">' +
       '<button type="button" id="shadow-seo-check-page-links" class="shadow-seo-link-action-btn"' +
       (linkCheckRunning ? ' disabled' : '') +
@@ -1786,16 +1908,8 @@
         : '') +
       '</div>' +
       renderLinkCheckProgress() +
-      renderLinkCheckSummary(linkCheckSummary) +
-      '<p class="shadow-seo-counts">On page: ' +
-      links.total +
-      ' links · Internal: ' +
-      links.internal.length +
-      ' · External: ' +
-      links.external.length +
-      ' · rel=nofollow: ' +
-      links.nofollowCount +
-      '</p>';
+      (!linkCheckRunning && linkCheckStats ? renderLinkCheckStatsCard(linkCheckStats, linkCheckMode) : '') +
+      renderLinkCheckSummary(linkCheckSummary);
 
     if (linkCheckResults && linkCheckResults.length) {
       const problemRows = linkCheckResults.filter(
@@ -1831,10 +1945,29 @@
       ]);
       html +=
         '<div class="shadow-seo-groups">' +
-        renderFieldGroup('Link inventory (internal)', renderFieldRows(intRows)) +
+        renderFieldGroup('Link inventory (this page, internal)', renderFieldRows(intRows)) +
+        (links.internal.length > 10
+          ? '<p class="shadow-seo-subhead">Showing first 10 of ' +
+            links.internal.length +
+            ' internal links on this page. Nav and footer links appear many times — use a link check above for status, not this list alone.</p>'
+          : '') +
         '</div>';
     }
     return html;
+  }
+
+  function prefetchSitemapPageCount() {
+    if (sitemapPageCount != null || sitemapCountLoading || !window.TWAShadowLinks) return;
+    sitemapCountLoading = true;
+    window.TWAShadowLinks.getSitemapPageCount()
+      .then((count) => {
+        sitemapPageCount = count;
+        sitemapCountLoading = false;
+        if (activeSection === 'links') updateLinkCheckUi();
+      })
+      .catch(() => {
+        sitemapCountLoading = false;
+      });
   }
 
   function renderStructuredTypeRow(entry, data) {
@@ -3047,6 +3180,7 @@
 
   function updateLinkCheckUi() {
     if (activeSection !== 'links') return;
+    prefetchSitemapPageCount();
     const body = qs('#shadow-seo-section');
     if (!body || !lastAuditData) return;
     body.innerHTML = renderSection(lastAuditData, 'links');
@@ -3060,6 +3194,7 @@
     linkCheckProgress = { done: 0, total: 0, phase: 'links' };
     linkCheckResults = null;
     linkCheckSummary = null;
+    linkCheckStats = null;
     updateLinkCheckUi();
     try {
       const data = await window.TWAShadowLinks.checkCurrentPageLinks((p) => {
@@ -3068,9 +3203,18 @@
       });
       linkCheckResults = data.results;
       linkCheckSummary = data.summary;
+      linkCheckStats = Object.assign({}, data.checkStats, {
+        issuesFound: data.results.filter(
+          (r) => r.cls.kind === 'broken' || r.cls.kind === 'timeout' || r.cls.kind === 'redirect'
+        ).length
+      });
       if (helpers && helpers.toast) {
         helpers.toast(
-          'Checked ' + data.summary.total + ' links — ' + data.summary.brokenInternal + ' broken internal'
+          'Checked ' +
+            data.checkStats.uniqueDestinations +
+            ' unique destinations on this page — ' +
+            data.summary.brokenInternal +
+            ' broken internal'
         );
       }
     } catch (err) {
@@ -3090,6 +3234,7 @@
     linkCheckProgress = { done: 0, total: 0, phase: 'pages' };
     linkCheckResults = null;
     linkCheckSummary = null;
+    linkCheckStats = null;
     updateLinkCheckUi();
     try {
       const data = await window.TWAShadowLinks.crawlSiteFromSitemap((p) => {
@@ -3098,9 +3243,19 @@
       });
       linkCheckResults = data.results;
       linkCheckSummary = data.summary;
+      linkCheckStats = data.crawlStats;
+      if (data.crawlStats && data.crawlStats.sitemapPages != null) {
+        sitemapPageCount = data.crawlStats.sitemapPages;
+      }
       if (helpers && helpers.toast) {
         helpers.toast(
-          'Crawled ' + data.pagesCrawled + ' pages — ' + data.summary.brokenInternal + ' broken internal links'
+          'Crawled ' +
+            data.crawlStats.pagesFetched +
+            ' of ' +
+            data.crawlStats.sitemapPages +
+            ' sitemap pages — checked ' +
+            data.crawlStats.uniqueDestinations +
+            ' unique destinations'
         );
       }
     } catch (err) {
@@ -3111,7 +3266,6 @@
     } finally {
       linkCheckRunning = false;
       linkCheckProgress = null;
-      linkCheckMode = null;
       updateLinkCheckUi();
     }
   }
@@ -3157,7 +3311,10 @@
       closeAllRowMenus();
       activeRowForTicket = null;
       clearActiveRow();
-      if (activeSection === 'links') bindLinkCheckControls();
+      if (activeSection === 'links') {
+        prefetchSitemapPageCount();
+        bindLinkCheckControls();
+      }
     } catch (err) {
       console.error('[TWAShadowSEO] renderAudit failed', err);
       renderTabs();
@@ -3305,17 +3462,6 @@
 
   function init(h) {
     helpers = h || null;
-    const seoBtn = qs('#shadow-tools-seo-btn');
-    if (seoBtn && !seoBtn._bound) {
-      seoBtn._bound = true;
-      seoBtn.addEventListener('click', () => {
-        if (!h || !h.getPerson || !h.getPerson()) {
-          if (h && h.showExclusive) h.showExclusive('person');
-          return;
-        }
-        openPanel();
-      });
-    }
   }
 
   window.TWAShadowSEO = {

@@ -7,8 +7,48 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.12.2',
+    version: '1.13.0',
     releases: [
+      {
+        version: '1.13.0',
+        date: '2026-08-26',
+        title: 'Redesigned Tools hub',
+        user: [
+          'Tools FAB or the new Tools button in the bottom toolbar opens a clear hub with three choices: Pick, SEO, and Design',
+          'Pick toggles element selection with a brief hint; SEO and Design open straight to their full sidebar panels (Overview, Meta, Links, Typography, Colours, and more)',
+          'No extra step through a nested View SEO or View design menu'
+        ],
+        dev: [
+          'shadow-review.js openToolCategory hub, toolbar centre Tools btn, 3-tile picker; shadow-seo.js and shadow-design.js init no longer bind tool buttons; cache-bust via ?v=1.13.0'
+        ]
+      },
+      {
+        version: '1.12.4',
+        date: '2026-08-26',
+        title: 'Link counts now match in Links tab',
+        user: [
+          'Page check summary uses one set of numbers — no more conflicting totals',
+          'Clearer labels: links in total, unique destinations, unique internal destinations checked',
+          'Short note explains why nav and footer links make totals higher than unique destinations'
+        ],
+        dev: [
+          'js/shadow-links.js collectPageLinks + isExcluded in anchor scan; unified buildPageLinkStats; shadow-seo.js delegates collectLinks, bullet summary card, footer counts removed; cache-bust via ?v=1.12.4'
+        ]
+      },
+      {
+        version: '1.12.3',
+        date: '2026-08-26',
+        title: 'Clearer link checker scope in Links tab',
+        user: [
+          'Links tab explains the difference between checking this page and crawling from sitemap.xml',
+          'Sitemap crawl shows how many pages were fetched, unique URLs checked, and issues found — not just broken links',
+          'Progress bar now shows page-by-page fetch progress and link counts during a crawl',
+          'Link inventory clarifies it lists the first 10 of all internal links on this page (nav and footer links count separately)'
+        ],
+        dev: [
+          'js/shadow-links.js crawlStats + getSitemapPageCount; shadow-seo.js scope callout, stats card, inventory note; cache-bust via ?v=1.12.3'
+        ]
+      },
       {
         version: '1.12.2',
         date: '2026-08-26',

@@ -1496,17 +1496,6 @@
 
   function init(h) {
     helpers = h || null;
-    const btn = qs('#shadow-tools-design-btn');
-    if (btn && !btn._bound) {
-      btn._bound = true;
-      btn.addEventListener('click', () => {
-        if (!h || !h.getPerson || !h.getPerson()) {
-          if (h && h.showExclusive) h.showExclusive('person');
-          return;
-        }
-        openPanel();
-      });
-    }
   }
 
   window.TWAShadowDesign = {

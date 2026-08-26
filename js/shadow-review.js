@@ -1,6 +1,6 @@
 /**
  * Meridian shadow review overlay — shadow branch only.
- * Tools FAB opens pick and SEO; Tickets toolbar button opens inbox.
+ * Tools FAB and toolbar button open the tools hub (Pick, SEO, Design); Tickets toolbar button opens inbox.
  */
 (function () {
   'use strict';
@@ -74,10 +74,26 @@
   };
 
   const DEFAULT_MODAL_SIZES = {
-    tools: { width: 300, height: 260 },
+    tools: { width: 320, height: 280 },
     seo: { width: 480, height: 620 },
     design: { width: 480, height: 620 }
   };
+
+  const TOOLS_PICK_ICON =
+    '<svg class="shadow-tools-tile-icon" width="22" height="22" viewBox="0 0 22 22" aria-hidden="true" focusable="false">' +
+    '<path d="M4 17l1.5-4.5L16 2l3 3L8.5 15.5 4 17z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>' +
+    '<path d="M13 5l3 3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>';
+
+  const TOOLS_SEO_ICON =
+    '<svg class="shadow-tools-tile-icon" width="22" height="22" viewBox="0 0 22 22" aria-hidden="true" focusable="false">' +
+    '<circle cx="9.5" cy="9.5" r="5.5" fill="none" stroke="currentColor" stroke-width="1.5"/>' +
+    '<path d="M14 14l4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>' +
+    '<path d="M7.5 9.5h4M9.5 7.5v4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>';
+
+  const TOOLS_DESIGN_ICON =
+    '<svg class="shadow-tools-tile-icon" width="22" height="22" viewBox="0 0 22 22" aria-hidden="true" focusable="false">' +
+    '<path d="M4 6h14M4 11h10M4 16h6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>' +
+    '<circle cx="17" cy="16" r="2.5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>';
 
   const DRAG_GRIP_SVG =
     '<svg class="shadow-modal-drag-icon" width="10" height="16" viewBox="0 0 10 16" aria-hidden="true" focusable="false">' +
@@ -948,8 +964,40 @@
   }
 
   function updatePickToggleLabel(on) {
-    const toggle = qs('#shadow-tools-pick-toggle');
-    if (toggle) toggle.textContent = on ? 'Cancel pick' : 'Pick element';
+    const tile = qs('#shadow-tools-pick-btn');
+    if (tile) tile.classList.toggle('shadow-tools-tile--active', on);
+  }
+
+  function isToolsOpen() {
+    const el = qs('#shadow-tools-modal');
+    return el && !el.hidden;
+  }
+
+  function requirePersonForTool() {
+    if (getPerson()) return true;
+    hideFloating('tools');
+    show('person');
+    return false;
+  }
+
+  function togglePickMode() {
+    document.body.classList.toggle('shadow-pick-mode');
+    const on = document.body.classList.contains('shadow-pick-mode');
+    updatePickToggleLabel(on);
+    if (!on) clearPickHover();
+    toast(on ? 'Click an element to file a ticket' : 'Pick mode off');
+  }
+
+  function openToolCategory(category) {
+    if (category === 'pick') {
+      hideFloating('tools');
+      togglePickMode();
+      return;
+    }
+    if (!requirePersonForTool()) return;
+    hideFloating('tools');
+    if (category === 'seo' && window.TWAShadowSEO) window.TWAShadowSEO.open();
+    if (category === 'design' && window.TWAShadowDesign) window.TWAShadowDesign.open();
   }
 
   function closeAllModals() {
@@ -1299,10 +1347,22 @@
             <h2>Tools</h2>
             <button type="button" class="shadow-close" data-close="tools" aria-label="Close">&times;</button>
           </div>
-          <div class="shadow-tools-actions">
-            <button type="button" id="shadow-tools-pick-toggle" class="shadow-btn shadow-tools-action">Pick element</button>
-            <button type="button" id="shadow-tools-seo-btn" class="shadow-btn shadow-tools-action shadow-btn-secondary">View SEO</button>
-            <button type="button" id="shadow-tools-design-btn" class="shadow-btn shadow-tools-action shadow-btn-secondary">View design</button>
+          <div class="shadow-tools-grid" role="group" aria-label="Review tools">
+            <button type="button" id="shadow-tools-pick-btn" class="shadow-tools-tile" data-tool="pick">
+              <span class="shadow-tools-tile-icon-wrap">${TOOLS_PICK_ICON}</span>
+              <span class="shadow-tools-tile-label">Pick</span>
+              <span class="shadow-tools-tile-desc">Pick element on page</span>
+            </button>
+            <button type="button" id="shadow-tools-seo-btn" class="shadow-tools-tile" data-tool="seo">
+              <span class="shadow-tools-tile-icon-wrap">${TOOLS_SEO_ICON}</span>
+              <span class="shadow-tools-tile-label">SEO</span>
+              <span class="shadow-tools-tile-desc">Page SEO &amp; links</span>
+            </button>
+            <button type="button" id="shadow-tools-design-btn" class="shadow-tools-tile" data-tool="design">
+              <span class="shadow-tools-tile-icon-wrap">${TOOLS_DESIGN_ICON}</span>
+              <span class="shadow-tools-tile-label">Design</span>
+              <span class="shadow-tools-tile-desc">Typography, colours &amp; accessibility</span>
+            </button>
           </div>
           <p class="shadow-hint shadow-tools-hint">Or ⌘/Alt+click any element to file a ticket</p>
         </div>
@@ -1379,8 +1439,11 @@
     });
 
     qs('#shadow-fab').addEventListener('click', () => {
-      if (!getPerson()) show('person');
-      else openTools();
+      if (!getPerson()) {
+        show('person');
+        return;
+      }
+      toggleTools();
     });
 
     root.querySelectorAll('[data-close]').forEach((btn) => {
@@ -1393,13 +1456,9 @@
     qs('#shadow-detail-body').addEventListener('click', onDetailActionClick);
     qs('#shadow-ticket-list').addEventListener('click', onInboxListClick);
 
-    qs('#shadow-tools-pick-toggle').addEventListener('click', () => {
-      document.body.classList.toggle('shadow-pick-mode');
-      const on = document.body.classList.contains('shadow-pick-mode');
-      updatePickToggleLabel(on);
-      if (!on) clearPickHover();
-      toast(on ? 'Click an element to file a ticket' : 'Pick mode off');
-    });
+    qs('#shadow-tools-pick-btn').addEventListener('click', () => openToolCategory('pick'));
+    qs('#shadow-tools-seo-btn').addEventListener('click', () => openToolCategory('seo'));
+    qs('#shadow-tools-design-btn').addEventListener('click', () => openToolCategory('design'));
 
     initDraggableModals();
 
@@ -1550,6 +1609,11 @@
 
   function openTools() {
     showFloating('tools');
+  }
+
+  function toggleTools() {
+    if (isToolsOpen()) hideFloating('tools');
+    else openTools();
   }
 
   function show(which) {
@@ -2486,6 +2550,7 @@
     const bar = document.createElement('div');
     bar.className = 'shadow-toolbar';
     bar.innerHTML =
+      '<div class="shadow-toolbar-start">' +
       '<span class="shadow-toolbar-label">Shadow mode</span>' +
       '<span class="shadow-toolbar-version" id="shadow-version-badge" title="Shadow mode version">v' +
       escapeHtml(changelog().version) +
@@ -2498,11 +2563,15 @@
       '<a href="' +
       ASSETS_FOLDER_URL +
       '" class="shadow-btn shadow-btn-small shadow-btn-secondary shadow-toolbar-link" target="_blank" rel="noopener">Open asset folder</a>' +
-      '<span class="shadow-toolbar-hint">Tools FAB · Tickets in toolbar</span>' +
-      '<span class="shadow-toolbar-spacer"></span>' +
+      '</div>' +
+      '<div class="shadow-toolbar-centre">' +
+      '<button type="button" id="shadow-toolbar-tools-btn" class="shadow-btn shadow-btn-small shadow-toolbar-tools-btn">Tools</button>' +
+      '</div>' +
+      '<div class="shadow-toolbar-end">' +
       '<span class="shadow-toolbar-user" id="shadow-toolbar-user" hidden></span>' +
       '<button type="button" id="shadow-switch-user-btn" class="shadow-btn shadow-btn-small shadow-btn-secondary" hidden>Switch user</button>' +
-      '<button type="button" id="shadow-logout-btn" class="shadow-btn shadow-btn-small shadow-btn-secondary" hidden>Log out</button>';
+      '<button type="button" id="shadow-logout-btn" class="shadow-btn shadow-btn-small shadow-btn-secondary" hidden>Log out</button>' +
+      '</div>';
     document.body.appendChild(bar);
     qs('#shadow-whatsnew-btn').addEventListener('click', () => {
       if (!getPerson()) {
@@ -2517,6 +2586,13 @@
         return;
       }
       openInbox();
+    });
+    qs('#shadow-toolbar-tools-btn').addEventListener('click', () => {
+      if (!getPerson()) {
+        show('person');
+        return;
+      }
+      toggleTools();
     });
     qs('#shadow-logout-btn').addEventListener('click', logout);
     qs('#shadow-switch-user-btn').addEventListener('click', switchUser);

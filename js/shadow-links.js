@@ -57,10 +57,12 @@
     const internal = [];
     const external = [];
     doc.querySelectorAll('a[href]').forEach((el) => {
+      if (doc === document && isExcluded(el)) return;
       const href = (el.getAttribute('href') || '').trim();
       if (!href || href.startsWith('#') || href.startsWith('javascript:') || href.startsWith('mailto:') || href.startsWith('tel:')) {
         return;
       }
+      const rel = (el.getAttribute('rel') || '').toLowerCase();
       let url;
       try {
         url = new URL(href, pageUrl);
@@ -70,6 +72,7 @@
       const entry = {
         href: url.href,
         text: (el.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 80),
+        nofollow: rel.includes('nofollow'),
         pageUrl,
         el: el.ownerDocument === document ? el : null
       };
@@ -81,6 +84,26 @@
 
   function collectPageAnchors() {
     return collectAnchorsFromDocument(document, location.href);
+  }
+
+  function buildPageLinkStats(internal, external) {
+    const all = internal.concat(external);
+    const unique = dedupeLinks(all);
+    return {
+      linksTotal: all.length,
+      linksInternal: internal.length,
+      linksExternal: external.length,
+      nofollowCount: all.filter((link) => link.nofollow).length,
+      uniqueDestinations: unique.length,
+      uniqueInternalDestinations: countUniqueInternal(unique)
+    };
+  }
+
+  function collectPageLinks() {
+    const anchors = collectPageAnchors();
+    return Object.assign({}, anchors, buildPageLinkStats(anchors.internal, anchors.external), {
+      total: anchors.internal.length + anchors.external.length
+    });
   }
 
   function classifyStatus(status, error, redirected) {
@@ -179,12 +202,28 @@
     }
   }
 
-  async function checkLinksBatch(links, onProgress) {
+  function dedupeLinks(links) {
     const unique = new Map();
     links.forEach((link) => {
       if (!unique.has(link.href)) unique.set(link.href, link);
     });
-    const entries = [...unique.values()];
+    return [...unique.values()];
+  }
+
+  function countUniqueInternal(links) {
+    const seen = new Set();
+    links.forEach((link) => {
+      try {
+        if (new URL(link.href).origin === location.origin) seen.add(link.href);
+      } catch (e) {
+        /* skip invalid */
+      }
+    });
+    return seen.size;
+  }
+
+  async function checkLinksBatch(links, onProgress) {
+    const entries = dedupeLinks(links);
     const results = [];
     let done = 0;
     const queue = [...entries];
@@ -220,7 +259,12 @@
 
     const workers = Math.min(CRAWL_CONCURRENCY, entries.length || 1);
     await Promise.all(Array.from({ length: workers }, () => worker()));
-    return results;
+    return {
+      results,
+      uniqueDestinations: entries.length,
+      uniqueInternalDestinations: countUniqueInternal(entries),
+      totalLinkChecks: entries.length
+    };
   }
 
   function summariseResults(results) {
@@ -255,6 +299,7 @@
 
   async function checkCurrentPageLinks(onProgress) {
     const anchors = collectPageAnchors();
+    const pageStats = buildPageLinkStats(anchors.internal, anchors.external);
     const all = [];
     anchors.internal.forEach((l, i) => {
       all.push(Object.assign({}, l, { locateKey: 'link-int-' + i, locateIndex: i, isInternal: true }));
@@ -262,8 +307,17 @@
     anchors.external.forEach((l, i) => {
       all.push(Object.assign({}, l, { locateKey: 'link-ext-' + i, locateIndex: i, isInternal: false }));
     });
-    const results = await checkLinksBatch(all, onProgress);
-    return { results, summary: summariseResults(results), pageUrl: location.href };
+    const batch = await checkLinksBatch(all, onProgress);
+    return {
+      results: batch.results,
+      summary: summariseResults(batch.results),
+      pageUrl: location.href,
+      checkStats: Object.assign({}, pageStats, {
+        uniqueDestinations: batch.uniqueDestinations,
+        uniqueInternalDestinations: batch.uniqueInternalDestinations,
+        totalLinkChecks: batch.totalLinkChecks
+      })
+    };
   }
 
   async function parseSitemapUrls() {
@@ -287,6 +341,7 @@
     const pageUrls = await parseSitemapUrls();
     const allLinks = [];
     let pagesDone = 0;
+    let pagesFetched = 0;
 
     for (let i = 0; i < pageUrls.length; i += CRAWL_CONCURRENCY) {
       if (signal.aborted) throw new Error('Crawl cancelled');
@@ -297,6 +352,7 @@
           try {
             const res = await fetch(pageUrl, { credentials: 'same-origin', signal });
             if (!res.ok) return;
+            pagesFetched += 1;
             const html = await res.text();
             const doc = new DOMParser().parseFromString(html, 'text/html');
             const { internal, external } = collectAnchorsFromDocument(doc, pageUrl);
@@ -311,7 +367,8 @@
                 phase: 'pages',
                 done: pagesDone,
                 total: pageUrls.length,
-                current: pageUrl
+                current: pageUrl,
+                linksCollected: allLinks.length
               });
             }
           }
@@ -319,15 +376,37 @@
       );
     }
 
-    const results = await checkLinksBatch(allLinks, (p) => {
-      if (onProgress) onProgress(Object.assign({ phase: 'links' }, p));
+    const batch = await checkLinksBatch(allLinks, (p) => {
+      if (onProgress) {
+        onProgress(
+          Object.assign({ phase: 'links', linksCollected: allLinks.length }, p)
+        );
+      }
     });
+    const allResults = batch.results;
+    const issueResults = allResults.filter(
+      (r) => r.cls.kind === 'broken' || r.cls.kind === 'redirect' || r.cls.kind === 'timeout'
+    );
 
     return {
-      results: results.filter((r) => r.cls.kind === 'broken' || r.cls.kind === 'redirect' || r.cls.kind === 'timeout'),
-      summary: summariseResults(results),
-      pagesCrawled: pageUrls.length
+      results: issueResults,
+      summary: summariseResults(allResults),
+      pagesCrawled: pageUrls.length,
+      crawlStats: {
+        sitemapPages: pageUrls.length,
+        pagesFetched,
+        linksCollected: allLinks.length,
+        uniqueDestinations: batch.uniqueDestinations,
+        uniqueInternalDestinations: batch.uniqueInternalDestinations,
+        totalLinkChecks: batch.totalLinkChecks,
+        issuesFound: issueResults.length
+      }
     };
+  }
+
+  async function getSitemapPageCount() {
+    const urls = await parseSitemapUrls();
+    return urls.length;
   }
 
   function cancelCrawl() {
@@ -339,9 +418,11 @@
 
   window.TWAShadowLinks = {
     checkCurrentPageLinks,
+    collectPageLinks,
     crawlSiteFromSitemap,
     cancelCrawl,
     summariseResults,
+    getSitemapPageCount,
     isCloudflareInfraUrl,
     LINK_TIMEOUT_MS,
     CRAWL_CONCURRENCY
