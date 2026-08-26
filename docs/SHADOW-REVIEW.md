@@ -246,6 +246,8 @@ Without the secret, tickets still work in KV; Sheets stays empty until the webho
 
 ## Google OAuth (partner connect — v1.18.2)
 
+Insights Summary popup redesigned in v1.19.0 (quiet intelligence layout, Visibility/Traffic cards, calmer empty states).
+
 Partners connect their own Google account from **Settings** in the toolbar. Tokens are stored in Cloudflare KV (`SHADOW_TICKETS`, keys prefixed `oauth:tokens:`). The insights API tries the partner OAuth token first, then falls back to the service account if configured.
 
 ### 1. Create an OAuth client (Google Cloud Console)

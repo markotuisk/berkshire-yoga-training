@@ -354,16 +354,16 @@
   function renderGraphStats(graph) {
     const s = graph.stats;
     let html =
-      '<div class="shadow-graph-stats">' +
-      '<span class="shadow-graph-stat"><strong>' +
+      '<div class="shadow-metric-chips">' +
+      '<span class="shadow-metric-chip"><strong>' +
       s.inboundCount +
       '</strong> inbound</span>' +
-      '<span class="shadow-graph-stat"><strong>' +
+      '<span class="shadow-metric-chip"><strong>' +
       s.outboundCount +
       '</strong> outbound</span>';
     if (s.isOrphan) {
       html +=
-        '<span class="shadow-graph-stat shadow-graph-stat--warn">Orphan page — no internal links point here</span>';
+        '<span class="shadow-metric-chip shadow-metric-chip--warn">Orphan page</span>';
     }
     html += '</div>';
     return html;

@@ -115,6 +115,26 @@
     '<path d="M3.5 7.5h15v10a1.5 1.5 0 0 1-1.5 1.5h-12A1.5 1.5 0 0 1 3.5 17.5v-10z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>' +
     '<path d="M7 7.5V5.5A2 2 0 0 1 9 3.5h4a2 2 0 0 1 2 2v2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>';
 
+  const EMPTY_ICON_SEARCH =
+    '<svg class="shadow-empty-state__icon" width="40" height="40" viewBox="0 0 40 40" aria-hidden="true" focusable="false">' +
+    '<circle cx="18" cy="18" r="9" fill="none" stroke="currentColor" stroke-width="1.75" opacity="0.55"/>' +
+    '<path d="M25 25l6 6" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" opacity="0.55"/></svg>';
+
+  const EMPTY_ICON_TRAFFIC =
+    '<svg class="shadow-empty-state__icon" width="40" height="40" viewBox="0 0 40 40" aria-hidden="true" focusable="false">' +
+    '<rect x="8" y="22" width="5" height="10" rx="1.25" fill="currentColor" opacity="0.35"/>' +
+    '<rect x="17.5" y="16" width="5" height="16" rx="1.25" fill="currentColor" opacity="0.5"/>' +
+    '<rect x="27" y="10" width="5" height="22" rx="1.25" fill="currentColor" opacity="0.65"/></svg>';
+
+  const EMPTY_ICON_GRAPH =
+    '<svg class="shadow-empty-state__icon" width="40" height="40" viewBox="0 0 40 40" aria-hidden="true" focusable="false">' +
+    '<circle cx="20" cy="20" r="4" fill="currentColor" opacity="0.55"/>' +
+    '<circle cx="10" cy="12" r="3" fill="currentColor" opacity="0.3"/>' +
+    '<circle cx="30" cy="12" r="3" fill="currentColor" opacity="0.3"/>' +
+    '<circle cx="10" cy="28" r="3" fill="currentColor" opacity="0.3"/>' +
+    '<circle cx="30" cy="28" r="3" fill="currentColor" opacity="0.3"/>' +
+    '<path d="M13 14l5 4M27 14l-5 4M13 26l5-4M27 26l-5-4" stroke="currentColor" stroke-width="1.25" opacity="0.35"/></svg>';
+
   const DRAG_GRIP_SVG =
     '<svg class="shadow-modal-drag-icon" width="10" height="16" viewBox="0 0 10 16" aria-hidden="true" focusable="false">' +
     '<circle cx="2.5" cy="2.5" r="1.5"/><circle cx="7.5" cy="2.5" r="1.5"/>' +
@@ -1064,24 +1084,41 @@
     );
   }
 
-  function renderInsightsCard(title, body, tone) {
+  function renderInsightSectionLabel(title) {
+    return '<p class="shadow-insight-section-label">' + escapeHtml(title) + '</p>';
+  }
+
+  function renderInsightCard(title, body, modifier) {
     return (
-      '<section class="shadow-insights-card' +
-      (tone ? ' shadow-insights-card--' + tone : '') +
+      '<section class="shadow-insight-card' +
+      (modifier ? ' shadow-insight-card--' + modifier : '') +
       '">' +
-      '<h3 class="shadow-insights-card-title">' +
-      escapeHtml(title) +
-      '</h3>' +
+      renderInsightSectionLabel(title) +
       body +
       '</section>'
     );
   }
 
-  function renderInsightsConfiguredBlock(data) {
-    const gsc = data.gsc;
-    const ga4 = data.ga4;
-    let html = '<div class="shadow-insights-grid">';
+  function renderInsightsEmptyState(icon, headline, message, ctaLabel) {
+    return (
+      '<div class="shadow-empty-state">' +
+      icon +
+      '<p class="shadow-empty-state__headline">' +
+      escapeHtml(headline) +
+      '</p>' +
+      '<p class="shadow-empty-state__message">' +
+      escapeHtml(message) +
+      '</p>' +
+      '<button type="button" class="shadow-btn shadow-btn-secondary shadow-insight-settings-cta" aria-label="' +
+      escapeAttr(ctaLabel + ' in Settings') +
+      '">' +
+      escapeHtml(ctaLabel) +
+      '</button></div>'
+    );
+  }
 
+  function renderInsightsVisibilityCard(data) {
+    const gsc = data.gsc;
     if (data.configured.gsc && gsc && !gsc.error) {
       const rankText =
         gsc.pageRank != null
@@ -1097,9 +1134,10 @@
         });
         siteCtr = impressions ? clicks / impressions : 0;
       }
-      html += renderInsightsCard(
-        'Search (GSC · 28 days)',
-        '<div class="shadow-seo-stat-grid">' +
+      return renderInsightCard(
+        'Visibility',
+        '<p class="shadow-insight-card__meta">Search Console · 28 days</p>' +
+          '<div class="shadow-seo-stat-grid shadow-insight-stat-grid">' +
           '<div class="shadow-seo-stat-card"><span class="shadow-seo-stat-value">' +
           formatNumber(gsc.page.clicks) +
           '</span><span class="shadow-seo-stat-label">Clicks</span></div>' +
@@ -1119,28 +1157,37 @@
           ' by clicks</p>',
         'gsc'
       );
-    } else if (data.configured.gsc) {
-      html += renderInsightsCard(
-        'Search (GSC)',
+    }
+    if (data.configured.gsc) {
+      return renderInsightCard(
+        'Visibility',
         '<p class="shadow-hint">Could not load Search Console data.</p>',
         'muted'
       );
-    } else {
-      html += renderInsightsCard(
-        'Search (GSC)',
-        '<p class="shadow-hint">Not configured. Open <strong>Settings</strong> in the toolbar to connect Google, or ask Marko to add service account secrets.</p>',
-        'muted'
-      );
     }
+    return renderInsightCard(
+      'Visibility',
+      renderInsightsEmptyState(
+        EMPTY_ICON_SEARCH,
+        'Search Console not connected',
+        'Connect your Google account to see search performance for this page.',
+        'Connect in Settings'
+      ),
+      'empty'
+    );
+  }
 
+  function renderInsightsTrafficCard(data) {
+    const ga4 = data.ga4;
     if (data.configured.ga4 && ga4 && !ga4.error) {
       const rankText =
         ga4.pageRank != null
           ? 'Page #' + ga4.pageRank + ' of ' + ga4.pagesWithData
           : 'No ranking data';
-      html += renderInsightsCard(
-        'Traffic (GA4 · 28 days)',
-        '<div class="shadow-seo-stat-grid">' +
+      return renderInsightCard(
+        'Traffic',
+        '<p class="shadow-insight-card__meta">Analytics · 28 days</p>' +
+          '<div class="shadow-seo-stat-grid shadow-insight-stat-grid">' +
           '<div class="shadow-seo-stat-card"><span class="shadow-seo-stat-value">' +
           formatNumber(ga4.page.sessions) +
           '</span><span class="shadow-seo-stat-label">Sessions</span></div>' +
@@ -1160,53 +1207,78 @@
           ' by sessions</p>',
         'ga4'
       );
-    } else if (data.configured.ga4) {
-      html += renderInsightsCard(
-        'Traffic (GA4)',
+    }
+    if (data.configured.ga4) {
+      return renderInsightCard(
+        'Traffic',
         '<p class="shadow-hint">Could not load Analytics data.</p>',
         'muted'
       );
-    } else {
-      html += renderInsightsCard(
-        'Traffic (GA4)',
-        '<p class="shadow-hint">Not configured. Open <strong>Settings</strong> to connect Google, or ask Marko to set <code>GA4_PROPERTY_ID</code>.</p>',
-        'muted'
-      );
     }
+    return renderInsightCard(
+      'Traffic',
+      renderInsightsEmptyState(
+        EMPTY_ICON_TRAFFIC,
+        'Analytics not connected',
+        'Connect your Google account to see traffic and engagement for this page.',
+        'Connect in Settings'
+      ),
+      'empty'
+    );
+  }
 
-    html += '</div>';
+  function renderInsightsQueriesCard(data) {
+    const gsc = data.gsc;
+    if (!data.configured.gsc || !gsc || !gsc.queries || !gsc.queries.length) return '';
+    let rows = '';
+    gsc.queries.forEach((row) => {
+      rows +=
+        '<tr><td>' +
+        escapeHtml(row.query) +
+        '</td><td>' +
+        formatNumber(row.clicks) +
+        '</td><td>' +
+        formatNumber(row.impressions) +
+        '</td><td>' +
+        formatNumber(row.position, 1) +
+        '</td></tr>';
+    });
+    return renderInsightCard(
+      'Top queries',
+      '<div class="shadow-seo-kw-table-wrap"><table class="shadow-seo-kw-table shadow-insight-queries-table">' +
+        '<thead><tr><th>Query</th><th>Clicks</th><th>Impr.</th><th>Pos.</th></tr></thead><tbody>' +
+        rows +
+        '</tbody></table></div>',
+      'queries'
+    );
+  }
 
-    if (data.configured.gsc && gsc && gsc.queries && gsc.queries.length) {
-      html +=
-        '<section class="shadow-insights-card shadow-insights-card--queries">' +
-        '<h3 class="shadow-insights-card-title">Top queries (GSC)</h3>' +
-        '<div class="shadow-seo-kw-table-wrap"><table class="shadow-seo-kw-table">' +
-        '<thead><tr><th>Query</th><th>Clicks</th><th>Impr.</th><th>Pos.</th></tr></thead><tbody>';
-      gsc.queries.forEach((row) => {
-        html +=
-          '<tr><td>' +
-          escapeHtml(row.query) +
-          '</td><td>' +
-          formatNumber(row.clicks) +
-          '</td><td>' +
-          formatNumber(row.impressions) +
-          '</td><td>' +
-          formatNumber(row.position, 1) +
-          '</td></tr>';
-      });
-      html += '</tbody></table></div></section>';
-    }
-
-    if (data.hints && data.hints.length && (!data.configured.gsc || !data.configured.ga4)) {
-      html +=
-        '<details class="shadow-insights-hints"><summary class="shadow-insights-hints-summary">Setup hints (Marko)</summary><ul class="shadow-insights-hints-list">';
-      data.hints.forEach((hint) => {
-        html += '<li>' + escapeHtml(hint) + '</li>';
-      });
-      html += '</ul></details>';
-    }
-
+  function renderInsightsDevHints(data) {
+    if (!data.hints || !data.hints.length) return '';
+    if (!isDeveloper(getPerson())) return '';
+    if (data.configured.gsc && data.configured.ga4) return '';
+    let html =
+      '<details class="shadow-insights-hints shadow-insights-hints--dev"><summary class="shadow-insights-hints-summary">Setup hints (Marko)</summary><ul class="shadow-insights-hints-list">';
+    data.hints.forEach((hint) => {
+      html += '<li>' + escapeHtml(hint) + '</li>';
+    });
+    html += '</ul></details>';
     return html;
+  }
+
+  function renderInsightsConfiguredBlock(data) {
+    let html =
+      '<div class="shadow-insight-grid">' +
+      renderInsightsVisibilityCard(data) +
+      renderInsightsTrafficCard(data) +
+      '</div>';
+    html += renderInsightsQueriesCard(data);
+    html += renderInsightsDevHints(data);
+    return html;
+  }
+
+  function renderInsightsCard(title, body, tone) {
+    return renderInsightCard(title, body, tone);
   }
 
   function renderInsightsLoading() {
@@ -1223,13 +1295,16 @@
     let statsHtml = '';
     if (graph && graph.ready) {
       statsHtml = window.TWAShadowGraph.renderGraphStats(graph);
+    } else {
+      statsHtml =
+        '<div class="shadow-metric-chips"><span class="shadow-metric-chip shadow-metric-chip--muted">Loading graph…</span></div>';
     }
     return (
-      renderInsightsCard(
+      renderInsightCard(
         'Link graph',
         statsHtml +
-          '<div id="shadow-review-graph-mini" class="shadow-graph-mini"></div>' +
-          '<button type="button" class="shadow-btn shadow-btn-secondary shadow-insights-graph-open">Open link graph</button>',
+          '<div id="shadow-review-graph-mini" class="shadow-graph-mini shadow-graph-mini--hero" aria-hidden="false"></div>' +
+          '<button type="button" class="shadow-btn-text shadow-insights-graph-open">Open link graph</button>',
         'graph'
       )
     );
@@ -1249,6 +1324,16 @@
       openGraph.addEventListener('click', () => {
         openActivityPopup('insights', 'linkgraph');
       });
+    }
+    root.querySelectorAll('.shadow-insight-settings-cta').forEach((btn) => {
+      if (btn._bound) return;
+      btn._bound = true;
+      btn.addEventListener('click', () => openSettingsPopup());
+    });
+    const openDesign = root.querySelector('.shadow-insight-design-open');
+    if (openDesign && !openDesign._bound) {
+      openDesign._bound = true;
+      openDesign.addEventListener('click', () => openActivityPopup('design', 'summary'));
     }
   }
 
@@ -1767,36 +1852,44 @@
     } else {
       container.innerHTML = renderInsightsConfiguredBlock(data);
     }
-    bindSummaryInsightsControls(container);
+    bindSummaryInsightsControls(container.closest('.shadow-review-summary') || container);
+  }
+
+  function renderInsightsDesignRow() {
+    let designCount = 0;
+    if (window.TWAShadowDesign && window.TWAShadowDesign.getAuditSummary) {
+      designCount = Number(window.TWAShadowDesign.getAuditSummary().issueCount) || 0;
+    }
+    const countLabel = designCount === 1 ? '1 issue' : designCount + ' issues';
+    return (
+      '<div class="shadow-insight-design-row">' +
+      renderInsightSectionLabel('Design') +
+      '<div class="shadow-insight-design-row__actions">' +
+      '<span class="shadow-metric-chip shadow-metric-chip--count">' +
+      escapeHtml(countLabel) +
+      '</span>' +
+      '<button type="button" class="shadow-btn-text shadow-insight-design-open">Open design issues</button>' +
+      '</div></div>'
+    );
   }
 
   function renderInsightsSummaryHtml(container) {
     if (!container) return;
     const path = currentPagePath();
-    let seoBlock = '<p class="shadow-hint">Open SEO from the toolbox to run an audit.</p>';
-    let designCount = '—';
-    if (window.TWAShadowSEO && window.TWAShadowSEO.renderSummaryHtml) {
-      seoBlock = window.TWAShadowSEO.renderSummaryHtml();
-    }
-    if (window.TWAShadowDesign && window.TWAShadowDesign.getAuditSummary) {
-      designCount = String(window.TWAShadowDesign.getAuditSummary().issueCount);
+    let heroBlock = '<p class="shadow-hint">Open SEO from the toolbox to run an audit.</p>';
+    if (window.TWAShadowSEO && window.TWAShadowSEO.renderSummaryHeroHtml) {
+      heroBlock = window.TWAShadowSEO.renderSummaryHeroHtml(path);
+    } else if (window.TWAShadowSEO && window.TWAShadowSEO.renderSummaryHtml) {
+      heroBlock = window.TWAShadowSEO.renderSummaryHtml();
     }
     container.innerHTML =
       '<div class="shadow-review-summary">' +
-      '<p class="shadow-review-summary-url"><span class="shadow-review-summary-label">Page</span> <code>' +
-      escapeHtml(path) +
-      '</code></p>' +
-      seoBlock +
-      '<div class="shadow-review-insights">' +
+      heroBlock +
+      '<div class="shadow-review-insights shadow-insight-panel">' +
       renderInsightsLoading() +
       '</div>' +
       renderLinkGraphSummary() +
-      '<dl class="shadow-review-summary-stats shadow-review-summary-stats--extra">' +
-      '<div><dt>Design issues</dt><dd>' +
-      escapeHtml(designCount) +
-      '</dd></div>' +
-      '</dl>' +
-      '<p class="shadow-hint shadow-review-summary-note">Open multiple activities from the toolbox. Tickets stay in the toolbar.</p>' +
+      renderInsightsDesignRow() +
       '</div>';
     const mini = container.querySelector('#shadow-review-graph-mini');
     if (mini && window.TWAShadowGraph) {
@@ -2022,6 +2115,9 @@
       '<h2 class="shadow-activity-title">' +
       escapeHtml(title) +
       '</h2>' +
+      '<code class="shadow-activity-path-pill" title="Current page">' +
+      escapeHtml(currentPagePath()) +
+      '</code>' +
       '<button type="button" class="shadow-close shadow-activity-close" aria-label="Close">&times;</button>' +
       '</div>' +
       '<div class="shadow-activity-body shadow-review-panel"></div>' +

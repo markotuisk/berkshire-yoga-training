@@ -3570,7 +3570,7 @@
     return auditPage();
   }
 
-  function renderSummaryHtml() {
+  function summaryMetricValues() {
     const data = auditPage();
     const titleLen = (data.title || '').length;
     const descLen = (data.description || '').length;
@@ -3580,9 +3580,16 @@
         : data.links
           ? data.links.internal.length
           : 0;
+    return { data, titleLen, descLen, internalLinks };
+  }
+
+  function renderSummaryHeroHtml(pagePath) {
+    const { data, titleLen, descLen, internalLinks } = summaryMetricValues();
+    const path = pagePath || '/';
     return (
-      '<div class="shadow-review-summary-seo">' +
-      '<div class="shadow-seo-score-ring ' +
+      '<div class="shadow-insight-hero">' +
+      '<div class="shadow-insight-hero__ring">' +
+      '<div class="shadow-seo-score-ring shadow-insight-hero__score ' +
       scoreClass(data.score) +
       '" aria-label="SEO score ' +
       data.score +
@@ -3593,19 +3600,27 @@
       data.score +
       '</span>' +
       '<span class="shadow-seo-score-label">SEO</span>' +
-      '</div></div>' +
-      '<dl class="shadow-review-summary-stats">' +
-      '<div><dt>Title length</dt><dd>' +
+      '</div></div></div>' +
+      '<div class="shadow-insight-hero__aside">' +
+      '<code class="shadow-insight-hero__path" title="Current page">' +
+      escapeHtml(path) +
+      '</code>' +
+      '<dl class="shadow-insight-hero__metrics">' +
+      '<div><dt>Title</dt><dd>' +
       titleLen +
-      ' chars</dd></div>' +
-      '<div><dt>Meta description</dt><dd>' +
+      '</dd></div>' +
+      '<div><dt>Meta</dt><dd>' +
       descLen +
-      ' chars</dd></div>' +
-      '<div><dt>Internal links</dt><dd>' +
+      '</dd></div>' +
+      '<div><dt>Links</dt><dd>' +
       internalLinks +
       '</dd></div>' +
-      '</dl></div>'
+      '</dl></div></div>'
     );
+  }
+
+  function renderSummaryHtml() {
+    return renderSummaryHeroHtml('/');
   }
 
   function activateSection(sectionId) {
@@ -3706,6 +3721,7 @@
     shutdown,
     isHighlightOn: () => highlightOn,
     getAuditData,
-    renderSummaryHtml
+    renderSummaryHtml,
+    renderSummaryHeroHtml
   };
 })();

@@ -7,8 +7,22 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.18.3',
+    version: '1.19.0',
     releases: [
+      {
+        version: '1.19.0',
+        date: '2026-08-26',
+        title: 'Quieter Insights Summary',
+        user: [
+          'Insights Summary redesigned with a clearer hero, Visibility and Traffic cards, and calmer empty states',
+          'Connect Google from elegant empty states instead of long setup paragraphs',
+          'Link graph shows inbound and outbound as compact chips; design issues on one tidy row',
+          'Activity popups have more breathing room, softer cards, and easier drag and close controls'
+        ],
+        dev: [
+          'renderInsightsSummaryHtml rewrite; shadow-insight-hero/grid/empty-state/metric-chip BEM; activity modal 20px radius; Marko hints dev-only; cache-bust via ?v=1.19.0'
+        ]
+      },
       {
         version: '1.18.3',
         date: '2026-08-26',

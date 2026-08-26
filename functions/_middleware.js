@@ -12,7 +12,7 @@ const AGENT_LINK_HEADER =
   '</.well-known/api-catalog>; rel="api-catalog", </.well-known/agent-card.json>; rel="service-desc"; type="application/json", </llms.txt>; rel="describedby"; type="text/plain", </auth.md>; rel="service-doc"; type="text/markdown", </sitemap.xml>; rel="sitemap"; type="application/xml"';
 
 /** Keep in sync with js/shadow-changelog.js — busts browser cache on deploy */
-const SHADOW_ASSET_VERSION = '1.18.3';
+const SHADOW_ASSET_VERSION = '1.19.0';
 
 const SHADOW_STYLE_SCRIPT = `
 <link rel="preconnect" href="https://fonts.googleapis.com">
