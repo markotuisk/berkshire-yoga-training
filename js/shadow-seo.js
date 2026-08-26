@@ -1714,7 +1714,7 @@
 
   function renderLinkCheckSummary(summary) {
     if (!summary) return '';
-    return (
+    let html =
       '<div class="shadow-seo-link-summary">' +
       '<span class="shadow-seo-link-summary-item shadow-seo-link-summary-item--error">' +
       'Broken internal: <strong>' +
@@ -1728,8 +1728,14 @@
       'Redirects: <strong>' +
       summary.redirects +
       '</strong></span>' +
-      '</div>'
-    );
+      '</div>';
+    if (summary.cloudflareIgnored) {
+      html +=
+        '<p class="shadow-seo-subhead">Cloudflare email protection links are excluded from broken link counts (' +
+        summary.cloudflareIgnored +
+        ' ignored).</p>';
+    }
+    return html;
   }
 
   function renderLinkCheckRow(result, index) {

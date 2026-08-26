@@ -31,6 +31,27 @@
     }
   }
 
+  /** Same-origin Cloudflare infrastructure paths (email protection, Access logout, etc.). */
+  function isCloudflareInfraUrl(url) {
+    try {
+      const u = new URL(url);
+      return u.pathname.startsWith('/cdn-cgi/');
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function cloudflareInfraResult(link) {
+    return Object.assign({}, link, {
+      url: link.href,
+      status: 0,
+      finalUrl: '',
+      isInternal: true,
+      error: null,
+      cls: { kind: 'cloudflare', label: 'Cloudflare (ignore)', tone: 'info' }
+    });
+  }
+
   function collectAnchorsFromDocument(doc, pageUrl) {
     const origin = new URL(pageUrl).origin;
     const internal = [];
@@ -172,7 +193,19 @@
       while (queue.length) {
         const link = queue.shift();
         if (!link) break;
-        const isInternal = new URL(link.href).origin === location.origin;
+        const linkOrigin = new URL(link.href).origin;
+        const isInternal = linkOrigin === location.origin;
+        if (isInternal && isCloudflareInfraUrl(link.href)) {
+          results.push(
+            Object.assign({}, cloudflareInfraResult(link), {
+              locateIndex: link.locateIndex,
+              locateKey: link.locateKey
+            })
+          );
+          done += 1;
+          if (onProgress) onProgress({ done, total: entries.length, current: link.href });
+          continue;
+        }
         const result = await fetchLinkStatus(link.href, isInternal);
         results.push(
           Object.assign({}, link, result, {
@@ -195,8 +228,11 @@
     let brokenExternal = 0;
     let redirects = 0;
     let timeouts = 0;
+    let cloudflareIgnored = 0;
     results.forEach((r) => {
-      if (r.cls.kind === 'broken') {
+      if (r.cls.kind === 'cloudflare') {
+        cloudflareIgnored += 1;
+      } else if (r.cls.kind === 'broken') {
         if (r.isInternal) brokenInternal += 1;
         else brokenExternal += 1;
       } else if (r.cls.kind === 'redirect') {
@@ -207,7 +243,14 @@
         else brokenExternal += 1;
       }
     });
-    return { brokenInternal, brokenExternal, redirects, timeouts, total: results.length };
+    return {
+      brokenInternal,
+      brokenExternal,
+      redirects,
+      timeouts,
+      cloudflareIgnored,
+      total: results.length
+    };
   }
 
   async function checkCurrentPageLinks(onProgress) {
@@ -299,6 +342,7 @@
     crawlSiteFromSitemap,
     cancelCrawl,
     summariseResults,
+    isCloudflareInfraUrl,
     LINK_TIMEOUT_MS,
     CRAWL_CONCURRENCY
   };

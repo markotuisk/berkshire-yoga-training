@@ -7,8 +7,20 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.12.1',
+    version: '1.12.2',
     releases: [
+      {
+        version: '1.12.2',
+        date: '2026-08-26',
+        title: 'Cloudflare links excluded from broken counts',
+        user: [
+          'Links tab no longer flags Cloudflare email protection URLs as broken 404s',
+          'Same-origin /cdn-cgi/ paths (email protection, Access logout, etc.) show as Cloudflare (ignore) and are excluded from broken link totals'
+        ],
+        dev: [
+          'js/shadow-links.js isCloudflareInfraUrl + cloudflare cls; summariseResults cloudflareIgnored; cache-bust via ?v=1.12.2'
+        ]
+      },
       {
         version: '1.12.1',
         date: '2026-08-26',
