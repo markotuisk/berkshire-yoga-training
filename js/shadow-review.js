@@ -75,8 +75,8 @@
 
   const DEFAULT_MODAL_SIZES = {
     tools: { width: 300, height: 260 },
-    seo: { width: 480, height: 580 },
-    design: { width: 480, height: 580 }
+    seo: { width: 480, height: 620 },
+    design: { width: 480, height: 620 }
   };
 
   const DRAG_GRIP_SVG =

@@ -1210,6 +1210,8 @@ body.shadow-modal-drag-active {
 
 .shadow-seo-nav {
   flex: 0 0 7.25rem;
+  min-height: 0;
+  align-self: stretch;
   display: flex;
   flex-direction: column;
   gap: 1px;
@@ -1218,6 +1220,8 @@ body.shadow-modal-drag-active {
   background: rgba(0, 0, 0, 0.02);
   overflow-y: auto;
   overflow-x: hidden;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .shadow-seo-nav-item {
@@ -1259,9 +1263,19 @@ body.shadow-modal-drag-active {
   flex-direction: column;
 }
 
-.shadow-modal-seo .shadow-modal-scroll {
+.shadow-modal-seo .shadow-modal-scroll,
+.shadow-modal-design .shadow-modal-scroll {
+  display: flex;
+  flex-direction: column;
   flex: 1 1 auto;
   min-height: 0;
+}
+
+.shadow-modal-seo .shadow-modal-scroll > .shadow-seo-body,
+.shadow-modal-design .shadow-modal-scroll > .shadow-design-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .shadow-seo-section {
@@ -2266,6 +2280,8 @@ body.shadow-seo-image-preview-open {
 
 .shadow-design-nav {
   flex: 0 0 7.25rem;
+  min-height: 0;
+  align-self: stretch;
   display: flex;
   flex-direction: column;
   gap: 1px;
@@ -2274,6 +2290,8 @@ body.shadow-seo-image-preview-open {
   background: rgba(0, 0, 0, 0.02);
   overflow-y: auto;
   overflow-x: hidden;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .shadow-design-nav-item {

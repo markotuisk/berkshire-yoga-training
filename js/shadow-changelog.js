@@ -7,8 +7,20 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.12.0',
+    version: '1.12.1',
     releases: [
+      {
+        version: '1.12.1',
+        date: '2026-08-26',
+        title: 'SEO and design sidebar tabs always visible',
+        user: [
+          'View SEO and View design sidebars now scroll independently — Links, Technical, Structured data and Accessibility tabs stay reachable even in a short panel',
+          'Hard refresh once if the toolbar still shows v1.12.0 after this update'
+        ],
+        dev: [
+          'Flex height chain on shadow-modal-scroll → seo/design body → nav; renderTabs before auditPage; cache-bust via ?v=1.12.1'
+        ]
+      },
       {
         version: '1.12.0',
         date: '2026-08-26',

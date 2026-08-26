@@ -3138,10 +3138,10 @@
   function renderAudit() {
     const body = qs('#shadow-seo-section');
     if (!body) return;
+    renderTabs();
     try {
       const data = auditPage();
       lastAuditData = data;
-      renderTabs();
       body.classList.remove('shadow-seo-section--visible');
       body.innerHTML = renderSection(data, activeSection);
       requestAnimationFrame(() => {
@@ -3154,8 +3154,10 @@
       if (activeSection === 'links') bindLinkCheckControls();
     } catch (err) {
       console.error('[TWAShadowSEO] renderAudit failed', err);
+      renderTabs();
       body.innerHTML =
         '<p class="shadow-seo-empty-state">Could not run SEO audit. Try refreshing the page.</p>';
+      body.classList.add('shadow-seo-section--visible');
     }
   }
 
