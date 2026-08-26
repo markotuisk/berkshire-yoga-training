@@ -7,17 +7,22 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.7.1',
+    version: '1.8.0',
     releases: [
       {
-        version: '1.7.1',
+        version: '1.8.0',
         date: '2026-08-26',
-        title: 'Shadow asset cache fix',
+        title: 'Page SEO visual redesign',
         user: [
-          'View SEO and other shadow tools now load the latest version after each release — no stale panel from browser cache'
+          'Page SEO panel redesigned with Apple-style layout: sidebar navigation, grouped cards, and clearer typography',
+          'Overview shows a larger score ring with individual issue cards instead of a plain list',
+          'Field tabs use iOS Settings-style rows with hairline separators and dashed amber pills for empty values',
+          'Keywords tab has proper tables with Term, Count, Density, and colour-coded source badges',
+          'Headings and links show level/type badges; highlight and refresh moved to a subtle footer bar'
         ],
         dev: [
-          'Middleware injects ?v= on shadow CSS/JS; bump SHADOW_ASSET_VERSION in functions/_middleware.js with changelog version'
+          'Vertical sidebar nav with orange active accent; default modal 480×580px',
+          'Section fade transitions; frosted-glass ⋯ menus; cache-bust via ?v=1.8.0'
         ]
       },
       {

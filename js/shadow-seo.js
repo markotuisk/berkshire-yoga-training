@@ -411,7 +411,9 @@
     const text = opts.truncate ? truncate(val, opts.truncate) : String(val);
     const classes = ['shadow-seo-value'];
     if (opts.mono) classes.push('shadow-seo-value--mono');
-    const title = opts.mono && String(val).length > (opts.truncate || 0) ? ' title="' + escapeHtml(val) + '"' : '';
+    const full = String(val);
+    const needsTitle = opts.truncate && full.length > opts.truncate;
+    const title = needsTitle || (opts.mono && full.length > 40) ? ' title="' + escapeHtml(full) + '"' : '';
     return '<span class="' + classes.join(' ') + '"' + title + '>' + escapeHtml(text) + '</span>';
   }
 
@@ -422,24 +424,31 @@
   }
 
   function scoreRingSvg(score) {
-    const r = 15.5;
+    const r = 42;
     const circ = 2 * Math.PI * r;
     const offset = circ * (1 - score / 100);
     return (
-      '<svg class="shadow-seo-score-svg" viewBox="0 0 36 36" aria-hidden="true">' +
-      '<circle class="shadow-seo-score-track" cx="18" cy="18" r="' +
+      '<svg class="shadow-seo-score-svg" viewBox="0 0 100 100" aria-hidden="true">' +
+      '<circle class="shadow-seo-score-track" cx="50" cy="50" r="' +
       r +
-      '" fill="none" stroke-width="3"/>' +
-      '<circle class="shadow-seo-score-fill" cx="18" cy="18" r="' +
+      '" fill="none" stroke-width="6"/>' +
+      '<circle class="shadow-seo-score-fill" cx="50" cy="50" r="' +
       r +
-      '" fill="none" stroke-width="3" stroke-linecap="round" ' +
+      '" fill="none" stroke-width="6" stroke-linecap="round" ' +
       'stroke-dasharray="' +
       circ.toFixed(2) +
       '" stroke-dashoffset="' +
       offset.toFixed(2) +
-      '" transform="rotate(-90 18 18)"/>' +
+      '" transform="rotate(-90 50 50)"/>' +
       '</svg>'
     );
+  }
+
+  function warningTitle(level) {
+    if (level === 'error') return 'Critical';
+    if (level === 'warn') return 'Warning';
+    if (level === 'good') return 'All clear';
+    return 'Note';
   }
 
   function warningIcon(level) {
@@ -487,23 +496,30 @@
   }
 
   function renderOverview(data) {
-    const warningsHtml =
+    const issues =
       data.warnings.length
         ? data.warnings
-            .map(
-              (w) =>
-                '<li class="shadow-seo-warning shadow-seo-warning--' +
-                w.level +
-                '"><span class="shadow-seo-warning-icon">' +
-                warningIcon(w.level) +
-                '</span><span class="shadow-seo-warning-text">' +
-                escapeHtml(w.text) +
-                '</span></li>'
-            )
-            .join('')
-        : '<li class="shadow-seo-warning shadow-seo-warning--good"><span class="shadow-seo-warning-icon">' +
-          warningIcon('good') +
-          '</span><span class="shadow-seo-warning-text">No major issues detected</span></li>';
+        : [{ level: 'good', text: 'No major issues detected on this page' }];
+
+    const issueCards = issues
+      .map(
+        (w) =>
+          '<article class="shadow-seo-issue-card shadow-seo-issue-card--' +
+          w.level +
+          '">' +
+          '<span class="shadow-seo-issue-icon" aria-hidden="true">' +
+          warningIcon(w.level) +
+          '</span>' +
+          '<div class="shadow-seo-issue-body">' +
+          '<h4 class="shadow-seo-issue-title">' +
+          escapeHtml(warningTitle(w.level)) +
+          '</h4>' +
+          '<p class="shadow-seo-issue-detail">' +
+          escapeHtml(w.text) +
+          '</p>' +
+          '</div></article>'
+      )
+      .join('');
 
     return (
       '<div class="shadow-seo-overview">' +
@@ -520,11 +536,9 @@
       '<span class="shadow-seo-score-label">Score</span>' +
       '</div>' +
       '</div>' +
-      renderFieldGroup(
-        'Issues',
-        '<ul class="shadow-seo-warnings">' + warningsHtml + '</ul>',
-        { plain: true }
-      ) +
+      renderFieldGroup('Issues', '<div class="shadow-seo-issue-cards">' + issueCards + '</div>', {
+        plain: true
+      }) +
       '</div>'
     );
   }
@@ -656,7 +670,7 @@
     );
   }
 
-  function renderFieldRow(label, value, opts, rowIndex) {
+  function renderFieldRow(label, value, opts) {
     opts = opts || {};
     const fieldName = opts.fieldName || label;
     const locateKey = opts.locate || '';
@@ -664,14 +678,15 @@
       'shadow-seo-field-row' +
       (opts.media ? ' shadow-seo-field-row--media' : '') +
       (opts.warn ? ' shadow-seo-field-row--warn' : '') +
-      (rowIndex % 2 ? ' shadow-seo-field-row--zebra' : '');
+      (opts.badge ? ' shadow-seo-field-row--badge' : '');
+    const labelHtml = opts.badge
+      ? '<span class="' + opts.badge + '">' + escapeHtml(label) + '</span>'
+      : '<span class="shadow-seo-field-label">' + escapeHtml(label) + '</span>';
     return (
       '<div class="' +
       rowClass +
       '">' +
-      '<span class="shadow-seo-field-label">' +
-      escapeHtml(label) +
-      '</span>' +
+      labelHtml +
       '<div class="shadow-seo-field-value">' +
       (opts.raw ? String(value) : renderCellValue(value, opts)) +
       '</div>' +
@@ -683,7 +698,7 @@
 
   function renderFieldRows(rows) {
     return rows
-      .map((r, i) => renderFieldRow(r[0], r[1], Object.assign({}, r[2] || {}, { fieldName: r[0] }), i))
+      .map((r) => renderFieldRow(r[0], r[1], Object.assign({}, r[2] || {}, { fieldName: r[0] })))
       .join('');
   }
 
@@ -748,9 +763,9 @@
             headingBadgeClass(parseInt(k.charAt(1), 10)) +
             '">' +
             k.toUpperCase() +
-            ' ' +
+            ' <span class="shadow-seo-tabular">' +
             counts[k] +
-            '</span>'
+            '</span></span>'
         )
         .join('') +
       '</div>';
@@ -763,14 +778,15 @@
               {
                 emptyLabel: 'Empty',
                 locate: 'heading-' + i,
-                fieldName: h.tag.toUpperCase() + ' heading'
+                fieldName: h.tag.toUpperCase() + ' heading',
+                badge: headingBadgeClass(h.level)
               }
             ])
           )
         : '<p class="shadow-seo-empty-state">' + emptyPill('No headings') + '</p>';
     return (
       '<div class="shadow-seo-groups">' +
-      summary +
+      renderFieldGroup('Summary', summary, { plain: true }) +
       (data.headings.length
         ? renderFieldGroup('On this page', list)
         : '<div class="shadow-seo-group-card">' + list + '</div>') +
@@ -833,15 +849,20 @@
     const slice = links.internal.slice(0, 15);
     if (slice.length) {
       const intRows = slice.map((l, i) => [
-        'Internal link',
+        'Internal',
         '<a href="' +
           escapeHtml(l.href) +
           '" target="_blank" rel="noopener">' +
           escapeHtml(truncate(l.href, 56)) +
           '</a>' +
           (l.text ? ' <span class="shadow-seo-link-text">' + escapeHtml(l.text) + '</span>' : ''),
-        { media: true, locate: 'link-int-' + i, fieldName: 'Internal link', raw: true }
-      ]);
+        {
+          media: true,
+          locate: 'link-int-' + i,
+          fieldName: 'Internal link',
+          raw: true,
+          badge: 'shadow-seo-link-badge shadow-seo-link-badge--internal'
+        }
       html +=
         '<div class="shadow-seo-groups">' +
         renderFieldGroup('Internal (first ' + slice.length + ')', renderFieldRows(intRows)) +
@@ -852,13 +873,19 @@
     const extSlice = links.external.slice(0, 10);
     if (extSlice.length) {
       const extRows = extSlice.map((l, i) => [
-        'External link',
+        'External',
         '<a href="' +
           escapeHtml(l.href) +
           '" target="_blank" rel="noopener">' +
           escapeHtml(truncate(l.href, 56)) +
           '</a>',
-        { media: true, locate: 'link-ext-' + i, fieldName: 'External link', raw: true }
+        {
+          media: true,
+          locate: 'link-ext-' + i,
+          fieldName: 'External link',
+          raw: true,
+          badge: 'shadow-seo-link-badge shadow-seo-link-badge--external'
+        }
       ]);
       html +=
         '<div class="shadow-seo-groups">' +
@@ -1077,29 +1104,43 @@
         plain: true
       });
     }
-    const rows = terms.map((item) => {
-      const locateKey = keywordLocateKey(item.term, kind);
-      const value =
-        '<strong>' +
-        escapeHtml(item.term) +
-        '</strong> · ' +
-        item.count +
-        ' · ' +
-        item.density.toFixed(1) +
-        '%<br>' +
-        keywordSourceBadges(item.sources);
-      return [
-        kind === 'pair' ? 'Phrase' : 'Term',
-        value,
-        {
-          media: true,
-          locate: locateKey,
-          fieldName: (kind === 'pair' ? 'Keyword pair' : 'Keyword') + ': ' + item.term,
-          raw: true
-        }
-      ];
-    });
-    return renderFieldGroup(label, renderFieldRows(rows));
+    const rows = terms
+      .map((item) => {
+        const locateKey = keywordLocateKey(item.term, kind);
+        const fieldName = (kind === 'pair' ? 'Keyword pair' : 'Keyword') + ': ' + item.term;
+        return (
+          '<tr class="shadow-seo-kw-row">' +
+          '<td class="shadow-seo-kw-term">' +
+          escapeHtml(item.term) +
+          '</td>' +
+          '<td class="shadow-seo-kw-count shadow-seo-tabular">' +
+          item.count +
+          '</td>' +
+          '<td class="shadow-seo-kw-density shadow-seo-tabular">' +
+          item.density.toFixed(1) +
+          '%</td>' +
+          '<td class="shadow-seo-kw-sources">' +
+          keywordSourceBadges(item.sources) +
+          '</td>' +
+          '<td class="shadow-seo-kw-actions">' +
+          rowMenuHtml(fieldName, locateKey) +
+          '</td></tr>'
+        );
+      })
+      .join('');
+    const table =
+      '<div class="shadow-seo-kw-table-wrap">' +
+      '<table class="shadow-seo-kw-table">' +
+      '<thead><tr>' +
+      '<th scope="col">Term</th>' +
+      '<th scope="col">Count</th>' +
+      '<th scope="col">Density</th>' +
+      '<th scope="col">Sources</th>' +
+      '<th scope="col"><span class="shadow-seo-sr-only">Actions</span></th>' +
+      '</tr></thead><tbody>' +
+      rows +
+      '</tbody></table></div>';
+    return renderFieldGroup(label, table);
   }
 
   function renderKeywords(data) {
@@ -1157,16 +1198,16 @@
   }
 
   function renderTabs() {
-    const tabsEl = qs('#shadow-seo-tabs');
-    if (!tabsEl) return;
-    tabsEl.innerHTML = '';
-    tabsEl.setAttribute('role', 'tablist');
-    tabsEl.setAttribute('aria-label', 'SEO audit sections');
+    const navEl = qs('#shadow-seo-nav');
+    if (!navEl) return;
+    navEl.innerHTML = '';
+    navEl.setAttribute('role', 'tablist');
+    navEl.setAttribute('aria-label', 'SEO audit sections');
     SECTIONS.forEach((section) => {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className =
-        'shadow-seo-tab' + (activeSection === section.id ? ' shadow-seo-tab--active' : '');
+        'shadow-seo-nav-item' + (activeSection === section.id ? ' shadow-seo-nav-item--active' : '');
       btn.textContent = section.label;
       btn.dataset.section = section.id;
       btn.setAttribute('role', 'tab');
@@ -1176,7 +1217,7 @@
         activeSection = section.id;
         renderAudit();
       });
-      tabsEl.appendChild(btn);
+      navEl.appendChild(btn);
     });
   }
 
@@ -1532,7 +1573,11 @@
     const data = auditPage();
     lastAuditData = data;
     renderTabs();
+    body.classList.remove('shadow-seo-section--visible');
     body.innerHTML = renderSection(data, activeSection);
+    requestAnimationFrame(() => {
+      body.classList.add('shadow-seo-section--visible');
+    });
     if (highlightOn) applyHighlights(data);
     closeAllRowMenus();
   }
@@ -1609,8 +1654,8 @@
     const toggle = qs('#shadow-seo-highlight-toggle');
     if (toggle) {
       toggle.setAttribute('aria-pressed', highlightOn ? 'true' : 'false');
-      toggle.classList.toggle('shadow-btn--active', highlightOn);
-      toggle.textContent = highlightOn ? 'Hide on-page highlights' : 'Highlight on page';
+      toggle.classList.toggle('shadow-seo-footer-btn--active', highlightOn);
+      toggle.textContent = highlightOn ? 'Hide highlights' : 'Highlight on page';
     }
     if (highlightOn) {
       applyHighlights(auditPage());

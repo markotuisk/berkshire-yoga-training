@@ -73,7 +73,7 @@
 
   const DEFAULT_MODAL_SIZES = {
     tools: { width: 300, height: 210 },
-    seo: { width: 440, height: 520 }
+    seo: { width: 480, height: 580 }
   };
 
   const DRAG_GRIP_SVG =
@@ -810,7 +810,11 @@
       if (!card || !head) return;
 
       const keepOutside =
-        key === 'detail' ? [qs('#shadow-comment-form', modal)].filter(Boolean) : [];
+        key === 'detail'
+          ? [qs('#shadow-comment-form', modal)].filter(Boolean)
+          : key === 'seo'
+            ? [qs('.shadow-seo-footer', modal)].filter(Boolean)
+            : [];
       setupModalScrollArea(card, head, keepOutside);
 
       setupModalHeadActions(head);
@@ -1280,17 +1284,24 @@
       </div>
 
       <div id="shadow-seo-modal" class="shadow-modal" hidden>
-        <div class="shadow-modal-card shadow-modal-wide shadow-modal-seo">
-          <div class="shadow-modal-head">
-            <h2>Page SEO</h2>
+        <div class="shadow-modal-card shadow-modal-seo">
+          <div class="shadow-modal-head shadow-seo-head">
+            <div class="shadow-seo-head-text">
+              <h2>Page SEO</h2>
+              <p class="shadow-seo-subtitle">Audit of this page</p>
+            </div>
             <button type="button" class="shadow-close" data-close="seo" aria-label="Close">&times;</button>
           </div>
-          <div class="shadow-seo-toolbar">
-            <button type="button" id="shadow-seo-highlight-toggle" class="shadow-btn shadow-btn-small shadow-btn-secondary" aria-pressed="false">Highlight on page</button>
-            <button type="button" id="shadow-seo-refresh" class="shadow-btn shadow-btn-small shadow-btn-secondary">Refresh</button>
+          <div class="shadow-seo-body">
+            <nav id="shadow-seo-nav" class="shadow-seo-nav" role="tablist" aria-label="SEO audit sections"></nav>
+            <div class="shadow-seo-content">
+              <div id="shadow-seo-section" class="shadow-seo-section" role="tabpanel"></div>
+            </div>
           </div>
-          <div id="shadow-seo-tabs" class="shadow-seo-tabs" role="tablist" aria-label="SEO sections"></div>
-          <div id="shadow-seo-section" class="shadow-seo-section"></div>
+          <footer class="shadow-seo-footer">
+            <button type="button" id="shadow-seo-highlight-toggle" class="shadow-seo-footer-btn" aria-pressed="false">Highlight on page</button>
+            <button type="button" id="shadow-seo-refresh" class="shadow-seo-footer-btn">Refresh audit</button>
+          </footer>
         </div>
       </div>
 
