@@ -4033,6 +4033,10 @@ body.shadow-seo-image-preview-open {
   color: #fff;
 }
 
+.shadow-tools-submenu[hidden] {
+  display: none !important;
+}
+
 .shadow-tools-submenu {
   width: min(14rem, calc(100vw - 2.5rem));
   max-height: min(18rem, 50vh);
@@ -4072,7 +4076,11 @@ body.shadow-seo-image-preview-open {
 
 .shadow-tools-submenu--floating {
   position: fixed;
-  z-index: 99991;
+  z-index: 100002;
+  pointer-events: auto;
+}
+
+.shadow-tools-wrap.shadow-tools-submenu-open .shadow-tools-submenu {
   pointer-events: auto;
 }
 

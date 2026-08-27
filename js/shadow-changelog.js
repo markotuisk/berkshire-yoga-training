@@ -7,8 +7,20 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.20.2',
+    version: '1.20.3',
     releases: [
+      {
+        version: '1.20.3',
+        date: '2026-08-27',
+        title: 'Toolbox sub-menu stays usable',
+        user: [
+          'Opening an SEO or Design section from the toolbox sub-menu keeps the menu open so you can launch another section straight away',
+          'Close, back, and drag on the sub-menu header work reliably after opening activity popups'
+        ],
+        dev: [
+          'Fix [hidden] overridden by display:flex on submenu; keep submenu open via afterActivityPopupOpened; releaseSubmenuDragState; outside-click ignores activity layer; submenu z-index 100002; cache-bust via ?v=1.20.3'
+        ]
+      },
       {
         version: '1.20.2',
         date: '2026-08-27',

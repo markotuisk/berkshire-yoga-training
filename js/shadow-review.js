@@ -1786,6 +1786,49 @@
     );
   }
 
+  function refreshToolsSubmenuStates() {
+    const submenu = qs('#shadow-tools-submenu');
+    if (!submenu || submenu.hidden || !activeToolCategory) return;
+    submenu.querySelectorAll('.shadow-tools-section-btn').forEach((btn) => {
+      const category = btn.getAttribute('data-category');
+      const sectionId = btn.getAttribute('data-section');
+      const open = isSectionOpen(category, sectionId);
+      btn.classList.toggle('shadow-tools-section-btn--open', open);
+      if (open) btn.setAttribute('aria-current', 'true');
+      else btn.removeAttribute('aria-current');
+      let dot = btn.querySelector('.shadow-tools-section-dot');
+      if (open && !dot) {
+        dot = document.createElement('span');
+        dot.className = 'shadow-tools-section-dot';
+        dot.setAttribute('aria-hidden', 'true');
+        btn.insertBefore(dot, btn.firstChild);
+      } else if (!open && dot) {
+        dot.remove();
+      }
+    });
+    updateActivityDock();
+  }
+
+  function releaseSubmenuDragState(submenu) {
+    submenu = submenu || qs('#shadow-tools-submenu');
+    if (!submenu) return;
+    if (typeof submenu._dragCleanup === 'function') {
+      submenu._dragCleanup();
+      submenu._dragCleanup = null;
+    }
+    submenu.classList.remove('shadow-tools-submenu--dragging');
+    document.body.classList.remove('shadow-modal-drag-active');
+  }
+
+  function afterActivityPopupOpened() {
+    if (isToolsSubmenuOpen()) {
+      releaseSubmenuDragState();
+      refreshToolsSubmenuStates();
+      return;
+    }
+    collapseToolsMenu();
+  }
+
   function dockShortTitle(category, sectionId) {
     const label = activitySectionLabel(category, sectionId);
     if (category === 'insights') return label;
@@ -2162,6 +2205,7 @@
     if (modal && modal.parentNode) modal.parentNode.removeChild(modal);
     if (activeDockKey === key) activeDockKey = null;
     updateActivityDock();
+    if (isToolsSubmenuOpen()) refreshToolsSubmenuStates();
   }
 
   function closeAllActivityPopups() {
@@ -2181,7 +2225,7 @@
     const key = activityPopupKey(category, sectionId);
     if (openActivityPopups.has(key)) {
       bringActivityToFront(openActivityPopups.get(key).modal, key);
-      collapseToolsMenu();
+      afterActivityPopupOpened();
       return;
     }
     const layer = qs('#shadow-activity-layer');
@@ -2230,7 +2274,7 @@
     renderActivityContent(category, sectionId, bodyEl, key, modal);
     openActivityPopups.set(key, { modal, category, sectionId, bodyEl });
     bringActivityToFront(modal, key);
-    collapseToolsMenu();
+    afterActivityPopupOpened();
   }
 
   function openReviewTab(tab) {
@@ -2343,6 +2387,8 @@
       if (e.button !== 0) return;
       e.preventDefault();
 
+      releaseSubmenuDragState(submenu);
+
       if (!submenu.classList.contains('shadow-tools-submenu--floating')) {
         anchorSubmenuFromLayout(submenu);
       }
@@ -2352,9 +2398,10 @@
       const startY = e.clientY;
       const startLeft = rect.left;
       const startTop = rect.top;
+      const pointerId = e.pointerId;
       let dragged = false;
 
-      head.setPointerCapture(e.pointerId);
+      head.setPointerCapture(pointerId);
       document.body.classList.add('shadow-modal-drag-active');
 
       const onMove = (ev) => {
@@ -2371,13 +2418,29 @@
       };
 
       const onUp = (ev) => {
-        head.releasePointerCapture(ev.pointerId);
+        try {
+          if (head.hasPointerCapture(ev.pointerId)) head.releasePointerCapture(ev.pointerId);
+        } catch (_) {
+          /* pointer already released */
+        }
         document.removeEventListener('pointermove', onMove);
         document.removeEventListener('pointerup', onUp);
         document.removeEventListener('pointercancel', onUp);
+        submenu._dragCleanup = null;
         submenu.classList.remove('shadow-tools-submenu--dragging');
         document.body.classList.remove('shadow-modal-drag-active');
         if (dragged) saveSubmenuPosition(submenu);
+      };
+
+      submenu._dragCleanup = () => {
+        document.removeEventListener('pointermove', onMove);
+        document.removeEventListener('pointerup', onUp);
+        document.removeEventListener('pointercancel', onUp);
+        try {
+          if (head.hasPointerCapture(pointerId)) head.releasePointerCapture(pointerId);
+        } catch (_) {
+          /* pointer already released */
+        }
       };
 
       document.addEventListener('pointermove', onMove);
@@ -2430,6 +2493,7 @@
     submenu.querySelectorAll('.shadow-tools-section-btn').forEach((btn) => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
+        releaseSubmenuDragState(submenu);
         openActivityPopup(btn.getAttribute('data-category'), btn.getAttribute('data-section'));
       });
     });
@@ -2449,6 +2513,7 @@
   function hideToolsSubmenu() {
     const submenu = qs('#shadow-tools-submenu');
     if (submenu) {
+      releaseSubmenuDragState(submenu);
       submenu.hidden = true;
       clearSubmenuInlinePosition(submenu);
     }
@@ -2501,6 +2566,9 @@
       (event) => {
         if (!toolsMenuExpanded && !dockOverflowOpen) return;
         if (event.target.closest('#shadow-activity-dock')) return;
+        if (event.target.closest('#shadow-activity-layer, .shadow-activity-modal, .shadow-activity-card')) {
+          return;
+        }
         if (isToolsSubmenuOpen()) {
           if (event.target.closest('#shadow-tools-submenu')) return;
           if (event.target.closest('#shadow-fab')) return;
