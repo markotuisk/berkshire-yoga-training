@@ -1907,7 +1907,7 @@
     const id = graphId || 'shadow-seo-link-graph';
     return (
       '<div class="shadow-seo-groups">' +
-      '<p class="shadow-seo-subhead">Internal link relationships across sitemap pages. Click a node to open that page on shadow. Graph is cached for this session.</p>' +
+      '<p class="shadow-seo-subhead">Who links here, where this page links, and how it sits in the site structure.</p>' +
       '<div id="' +
       escapeHtml(id) +
       '" class="shadow-graph-panel"></div>' +

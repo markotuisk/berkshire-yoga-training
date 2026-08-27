@@ -2113,7 +2113,7 @@
     if (sectionId === 'linkgraph') {
       container.innerHTML =
         '<div class="shadow-seo-groups">' +
-        '<p class="shadow-seo-subhead">Internal link relationships across sitemap pages.</p>' +
+        '<p class="shadow-seo-subhead">Who links here, where this page links, and how it sits in the site structure.</p>' +
         '<div class="shadow-graph-panel shadow-activity-graph"></div></div>';
       const graphEl = container.querySelector('.shadow-activity-graph');
       if (graphEl && window.TWAShadowGraph) {

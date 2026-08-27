@@ -1,5 +1,5 @@
 /**
- * Shadow mode site link graph — sitemap crawl, adjacency, radial SVG with grouped sections.
+ * Shadow mode site link graph — sitemap crawl, adjacency, expandable link tree panels.
  */
 (function () {
   'use strict';
@@ -339,450 +339,370 @@
       .replace(/</g, '&lt;');
   }
 
-  function buildDisplayItems(side, grouped, center, compact) {
-    const items = [];
-    const { leaves, groups } = grouped;
-
-    groups.forEach((g) => {
-      const key = expandKeyFor(center, side, g.id);
-      const isExpanded = expandedGroups.has(key);
-      if (isExpanded) {
-        items.push({
-          type: 'anchor',
-          groupId: g.id,
-          label: g.label,
-          expandKey: key,
-          expanded: true
-        });
-        g.paths.forEach((p) => {
-          items.push({
-            type: 'leaf',
-            path: p,
-            label: pathLabel(p),
-            isChild: true,
-            parentGroupId: g.id
-          });
-        });
-      } else {
-        items.push({
-          type: 'group',
-          groupId: g.id,
-          label: g.label,
-          paths: g.paths,
-          childCount: g.childCount,
-          expandable: g.expandable,
-          expandKey: key,
-          expanded: false
-        });
-      }
-    });
-
-    leaves.forEach((leaf) => {
-      const children = getDirectChildren(leaf.path);
-      const key = expandKeyFor(center, side, 'path:' + leaf.path);
-      const isExpanded = expandedGroups.has(key);
-
-      if (children.length > 0 && isExpanded) {
-        items.push({
-          type: 'anchor',
-          path: leaf.path,
-          label: leaf.label,
-          expandKey: key,
-          expanded: true
-        });
-        children.forEach((childPath) => {
-          items.push({
-            type: 'leaf',
-            path: childPath,
-            label: pathLabel(childPath),
-            isChild: true,
-            parentPath: leaf.path
-          });
-        });
-      } else {
-        items.push({
-          type: 'leaf',
-          path: leaf.path,
-          label: leaf.label,
-          expandable: children.length > 0,
-          expandKey: children.length > 0 ? key : null,
-          expanded: isExpanded,
-          isChild: false
-        });
-      }
-    });
-
-    if (compact) {
-      const groupItems = items.filter((i) => i.type === 'group');
-      const leafItems = items.filter((i) => i.type === 'leaf' && !i.isChild);
-      const anchorItems = items.filter((i) => i.type === 'anchor');
-      const childItems = items.filter((i) => i.isChild);
-      const shownGroups = groupItems.slice(0, 2);
-      const shownLeaves = leafItems.slice(0, 2);
-      const hiddenSections =
-        groupItems.length - shownGroups.length + (leafItems.length - shownLeaves.length);
-      return {
-        items: [...shownGroups, ...shownLeaves, ...anchorItems, ...childItems],
-        hiddenSections: hiddenSections > 0 ? hiddenSections : 0
-      };
-    }
-
-    return { items, hiddenSections: 0 };
+  function escapeHtml(str) {
+    return String(str || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
   }
 
-  function renderExpandBadge(x, y, expandKey, expanded, ariaLabel) {
-    const badgeR = 8;
-    const bx = x + 10;
-    const by = y + 10;
-    const symbol = expanded ? '−' : '+';
-    const action = expanded ? 'Collapse' : 'Expand';
+  function countGroupedPaths(grouped) {
     return (
-      '<g class="shadow-graph-expand" data-expand-key="' +
-      escapeAttr(expandKey) +
-      '" tabindex="0" role="button" aria-label="' +
-      escapeAttr(action + ' ' + ariaLabel) +
-      '">' +
-      '<circle class="shadow-graph-expand-bg" cx="' +
-      bx +
-      '" cy="' +
-      by +
-      '" r="' +
-      badgeR +
-      '"/>' +
-      '<text class="shadow-graph-expand-icon" x="' +
-      bx +
-      '" y="' +
-      by +
-      '" text-anchor="middle" dominant-baseline="central">' +
-      symbol +
-      '</text>' +
-      '</g>'
+      grouped.leaves.length + grouped.groups.reduce((n, g) => n + g.childCount, 0)
     );
   }
 
-  function renderRadialSvg(graph, options) {
-    const opts = options || {};
-    const compact = !!opts.compact;
-    const width = compact ? 220 : 360;
-    const height = compact ? 160 : 320;
-    const cx = width / 2;
-    const cy = height / 2;
-    const rCenter = compact ? 16 : 22;
-    const rNode = compact ? 10 : 14;
-    const rGroup = compact ? 12 : 17;
-    const orbit = compact ? 58 : 110;
-    const childOrbit = compact ? 22 : 32;
-
-    const inDisplay = buildDisplayItems('in', graph.inbound, graph.center, compact);
-    const outDisplay = buildDisplayItems('out', graph.outbound, graph.center, compact);
-
-    let svg =
-      '<svg class="shadow-graph-svg' +
-      (compact ? ' shadow-graph-svg--compact' : '') +
-      '" viewBox="0 0 ' +
-      width +
-      ' ' +
-      height +
-      '" role="img" aria-label="Link graph for ' +
-      escapeAttr(graph.center) +
-      '">';
-
-    function polar(angle, radius) {
-      return { x: cx + radius * Math.cos(angle), y: cy + radius * Math.sin(angle) };
-    }
-
-    function hasEdgeTo(path) {
-      if (!siteGraph) return false;
-      const out = siteGraph.outbound.get(graph.center);
-      const inn = siteGraph.inbound.get(graph.center);
-      return (out && out.has(path)) || (inn && inn.has(path));
-    }
-
-    function placeItems(items, startAngle, endAngle, side) {
-      if (!items.length) return '';
-      let html = '';
-      const primary = items.filter((i) => !i.isChild);
-      const children = items.filter((i) => i.isChild);
-      const allowExpand = !compact;
-
-      const parentAngles = new Map();
-      const parentCollapseKeys = new Map();
-
-      primary.forEach((item, i) => {
-        const angle =
-          primary.length === 1
-            ? (startAngle + endAngle) / 2
-            : startAngle + ((endAngle - startAngle) * i) / (primary.length - 1);
-        const pos = polar(angle, orbit);
-        const isGroup = item.type === 'group';
-        const isAnchor = item.type === 'anchor';
-        const r = isGroup ? rGroup : rNode;
-        const nodeClass =
-          'shadow-graph-node' +
-          (isGroup ? ' shadow-graph-node--group' : isAnchor ? ' shadow-graph-node--anchor' : ' shadow-graph-node--link') +
-          (item.isChild ? ' shadow-graph-node--child shadow-graph-node--enter' : '');
-
-        if (isGroup) {
-          parentAngles.set(item.groupId, angle);
-          parentCollapseKeys.set(item.groupId, item.expandKey);
-        }
-        if (isAnchor) {
-          const anchorKey = item.groupId || item.path;
-          parentAngles.set(anchorKey, angle);
-          parentCollapseKeys.set(anchorKey, item.expandKey);
-        }
-
-        if (isAnchor) {
-          if (allowExpand) {
-            html += renderExpandBadge(pos.x, pos.y, item.expandKey, true, item.label);
-          }
-        } else {
-          html +=
-            '<line class="shadow-graph-edge' +
-            (item.isChild ? ' shadow-graph-edge--child' : '') +
-            '" x1="' +
-            cx +
-            '" y1="' +
-            cy +
-            '" x2="' +
-            pos.x +
-            '" y2="' +
-            pos.y +
-            '"/>';
-
-          if (isGroup) {
-            html +=
-              '<g class="' +
-              nodeClass +
-              '" data-expand-key="' +
-              escapeAttr(item.expandKey) +
-              '" tabindex="0" role="button" aria-label="' +
-              escapeAttr(item.label) +
-              '">' +
-              '<circle cx="' +
-              pos.x +
-              '" cy="' +
-              pos.y +
-              '" r="' +
-              r +
-              '"/>' +
-              '<title>' +
-              escapeAttr(item.paths.join(', ')) +
-              '</title>' +
-              '</g>';
-            if (allowExpand && item.expandable) {
-              html += renderExpandBadge(pos.x, pos.y, item.expandKey, false, item.label);
-            }
-          } else {
-            html +=
-              '<g class="' +
-              nodeClass +
-              '" data-graph-path="' +
-              escapeAttr(item.path) +
-              '" tabindex="0" role="link" aria-label="' +
-              escapeAttr(item.label) +
-              '">' +
-              '<circle cx="' +
-              pos.x +
-              '" cy="' +
-              pos.y +
-              '" r="' +
-              r +
-              '"/>' +
-              '<title>' +
-              escapeAttr(item.path) +
-              '</title>' +
-              '</g>';
-            if (allowExpand && item.expandable && item.expandKey) {
-              html += renderExpandBadge(pos.x, pos.y, item.expandKey, item.expanded, item.label);
-            }
-          }
-        }
+  function getLinkHealth(stats) {
+    const { inboundCount, outboundCount, isOrphan } = stats;
+    const signals = [];
+    if (isOrphan) {
+      signals.push({
+        type: 'warn',
+        label: 'Orphan page',
+        hint: 'No internal pages link here yet'
       });
-
-      if (!allowExpand) return html;
-
-      const childBuckets = new Map();
-      children.forEach((child) => {
-        const bucketKey = child.parentGroupId || child.parentPath || 'misc';
-        if (!childBuckets.has(bucketKey)) childBuckets.set(bucketKey, []);
-        childBuckets.get(bucketKey).push(child);
+    }
+    const total = inboundCount + outboundCount;
+    if (total >= 8 && inboundCount >= 3 && outboundCount >= 3) {
+      signals.push({
+        type: 'info',
+        label: 'Hub page',
+        hint: 'Well connected across the site link structure'
       });
-
-      childBuckets.forEach((bucket, bucketKey) => {
-        const parentAngle = parentAngles.get(bucketKey);
-        const baseAngle = parentAngle != null ? parentAngle : (startAngle + endAngle) / 2;
-        const spread = Math.min(0.5, bucket.length * 0.12);
-
-        bucket.forEach((child, ci) => {
-          const angle =
-            bucket.length === 1
-              ? baseAngle
-              : baseAngle - spread / 2 + (spread * ci) / (bucket.length - 1);
-          const pos = polar(angle, orbit + childOrbit);
-
-          if (hasEdgeTo(child.path)) {
-            html +=
-              '<line class="shadow-graph-edge shadow-graph-edge--child" x1="' +
-              cx +
-              '" y1="' +
-              cy +
-              '" x2="' +
-              pos.x +
-              '" y2="' +
-              pos.y +
-              '"/>';
-          }
-
-          html +=
-            '<g class="shadow-graph-node shadow-graph-node--link shadow-graph-node--child shadow-graph-node--enter" data-graph-path="' +
-            escapeAttr(child.path) +
-            '" tabindex="0" role="link" aria-label="' +
-            escapeAttr(child.label) +
-            '">' +
-            '<circle cx="' +
-            pos.x +
-            '" cy="' +
-            pos.y +
-            '" r="' +
-            (rNode - 2) +
-            '"/>' +
-            '<title>' +
-            escapeAttr(child.path) +
-            '</title>' +
-            '</g>';
-
-          const subChildren = getDirectChildren(child.path);
-          if (subChildren.length > 0) {
-            const childKey = expandKeyFor(graph.center, side, 'path:' + child.path);
-            const childExpanded = expandedGroups.has(childKey);
-            html += renderExpandBadge(pos.x, pos.y, childKey, childExpanded, child.label);
-          }
+    } else if (outboundCount <= 1 && inboundCount > 0 && !isOrphan) {
+      signals.push({
+        type: 'muted',
+        label: 'Leaf page',
+        hint: 'Mostly a destination with few outbound links'
+      });
+    }
+    if (inboundCount > 0 && outboundCount > 0) {
+      const diff = Math.abs(inboundCount - outboundCount);
+      if (diff <= 2) {
+        signals.push({
+          type: 'muted',
+          label: 'Balanced links',
+          hint: 'Similar inbound and outbound counts'
         });
-      });
-
-      return html;
-    }
-
-    svg += placeItems(inDisplay.items, Math.PI * 0.55, Math.PI * 1.45, 'in');
-    svg += placeItems(outDisplay.items, -Math.PI * 0.45, Math.PI * 0.45, 'out');
-
-    svg +=
-      '<g class="shadow-graph-node shadow-graph-node--center" data-graph-path="' +
-      escapeAttr(graph.center) +
-      '" aria-label="Current page">' +
-      '<circle cx="' +
-      cx +
-      '" cy="' +
-      cy +
-      '" r="' +
-      rCenter +
-      '"/>' +
-      '<title>' +
-      escapeAttr(graph.center) +
-      '</title>' +
-      '</g>';
-
-    const hiddenTotal = inDisplay.hiddenSections + outDisplay.hiddenSections;
-    if (compact && hiddenTotal > 0) {
-      svg +=
-        '<text class="shadow-graph-more" x="' +
-        cx +
-        '" y="' +
-        (height - 8) +
-        '" text-anchor="middle">+' +
-        hiddenTotal +
-        ' sections</text>';
-    } else if (!compact) {
-      const totalIn =
-        graph.inbound.leaves.length +
-        graph.inbound.groups.reduce((n, g) => n + g.childCount, 0);
-      const totalOut =
-        graph.outbound.leaves.length +
-        graph.outbound.groups.reduce((n, g) => n + g.childCount, 0);
-      const shownIn = inDisplay.items.filter((i) => !i.isChild).length;
-      const shownOut = outDisplay.items.filter((i) => !i.isChild).length;
-      if (totalIn > shownIn || totalOut > shownOut) {
-        svg +=
-          '<text class="shadow-graph-more" x="' +
-          cx +
-          '" y="' +
-          (height - 12) +
-          '" text-anchor="middle">Expand groups to see all links</text>';
+      } else if (inboundCount > outboundCount * 1.5) {
+        signals.push({
+          type: 'info',
+          label: 'Popular destination',
+          hint: 'More pages link here than this page links out'
+        });
+      } else if (outboundCount > inboundCount * 1.5) {
+        signals.push({
+          type: 'info',
+          label: 'Navigation hub',
+          hint: 'This page links out more than it receives links'
+        });
       }
     }
-
-    svg += '</svg>';
-    return svg;
+    return signals;
   }
 
-  function bindGraphInteractions(container, centerPath, options) {
+  function renderLinkHealth(stats) {
+    const signals = getLinkHealth(stats);
+    if (!signals.length) return '';
+    let html = '<div class="shadow-link-tree-health">';
+    signals.forEach((sig) => {
+      html +=
+        '<span class="shadow-link-tree-health-chip shadow-link-tree-health-chip--' +
+        escapeAttr(sig.type) +
+        '" title="' +
+        escapeAttr(sig.hint) +
+        '">' +
+        escapeHtml(sig.label) +
+        '</span>';
+    });
+    html += '</div>';
+    return html;
+  }
+
+  function renderLinkTreeLeafInner(path, depth) {
+    const label = pathLabel(path);
+    const depthClass = depth > 0 ? ' shadow-link-tree-row--nested' : '';
+    return (
+      '<a class="shadow-link-tree-row shadow-link-tree-row--leaf' +
+      depthClass +
+      '" href="' +
+      escapeAttr(pathToUrl(path)) +
+      '" data-graph-path="' +
+      escapeAttr(path) +
+      '" title="' +
+      escapeAttr(path) +
+      '">' +
+      '<span class="shadow-link-tree-label">' +
+      escapeHtml(label) +
+      '</span>' +
+      '<span class="shadow-link-tree-open" aria-hidden="true">' +
+      '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3.5 2.5L8.5 6L3.5 9.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+      '</span>' +
+      '</a>'
+    );
+  }
+
+  function renderLinkTreeLeaf(path, depth) {
+    return '<li class="shadow-link-tree-leaf">' + renderLinkTreeLeafInner(path, depth) + '</li>';
+  }
+
+  function renderLinkTreeGroup(group, centerPath, side, depth) {
+    const key = expandKeyFor(centerPath, side, group.id);
+    const isExpanded = expandedGroups.has(key);
+    const sectionName = sectionLabel(group.sectionKey);
+    let html =
+      '<li class="shadow-link-tree-group' +
+      (isExpanded ? ' is-expanded' : '') +
+      '">' +
+      '<button type="button" class="shadow-link-tree-row shadow-link-tree-row--group" data-expand-key="' +
+      escapeAttr(key) +
+      '" aria-expanded="' +
+      (isExpanded ? 'true' : 'false') +
+      '">' +
+      '<span class="shadow-link-tree-chevron" aria-hidden="true">' +
+      (isExpanded ? '▼' : '▶') +
+      '</span>' +
+      '<span class="shadow-link-tree-label">' +
+      escapeHtml(sectionName) +
+      '</span>' +
+      '<span class="shadow-link-tree-badge">' +
+      group.childCount +
+      '</span>' +
+      '</button>' +
+      '<ul class="shadow-link-tree shadow-link-tree-children"' +
+      (isExpanded ? '' : ' hidden') +
+      '>';
+    group.paths.forEach((p) => {
+      html += renderLinkTreeLeaf(p, depth + 1);
+    });
+    html += '</ul></li>';
+    return html;
+  }
+
+  function getSectionTree(side, grouped, centerPath) {
+    const { leaves, groups } = grouped;
+    let html = '';
+    groups.forEach((g) => {
+      html += renderLinkTreeGroup(g, centerPath, side, 0);
+    });
+    leaves.forEach((leaf) => {
+      html += renderLinkTreeLeaf(leaf.path, 0);
+    });
+    return html;
+  }
+
+  function renderLinkTreeSide(title, side, grouped, centerPath, emptyMessage) {
+    const total = countGroupedPaths(grouped);
+    let body = getSectionTree(side, grouped, centerPath);
+    if (!body) {
+      body =
+        '<li class="shadow-link-tree-empty">' +
+        '<p class="shadow-link-tree-empty-text">' +
+        escapeHtml(emptyMessage) +
+        '</p></li>';
+    }
+    return (
+      '<section class="shadow-link-tree-column" aria-label="' +
+      escapeAttr(title) +
+      '">' +
+      '<h3 class="shadow-link-tree-column-title">' +
+      escapeHtml(title) +
+      ' <span class="shadow-link-tree-column-count">(' +
+      total +
+      ')</span></h3>' +
+      '<ul class="shadow-link-tree shadow-link-tree-root">' +
+      body +
+      '</ul></section>'
+    );
+  }
+
+  function renderSiteMapNode(path, centerPath, depth) {
+    const children = getDirectChildren(path);
+    const isCurrent = normalizePath(path) === normalizePath(centerPath);
+    const label = pathLabel(path);
+    const hasKids = children.length > 0;
+    const key = expandKeyFor(centerPath, 'sitemap', path);
+    const isExpanded = expandedGroups.has(key) || depth === 0;
+
+    if (!hasKids) {
+      return (
+        '<li class="shadow-link-tree-leaf' +
+        (isCurrent ? ' shadow-link-tree-leaf--current' : '') +
+        '">' +
+        renderLinkTreeLeafInner(path, depth) +
+        '</li>'
+      );
+    }
+
+    let html =
+      '<li class="shadow-link-tree-group shadow-link-tree-group--sitemap' +
+      (isExpanded ? ' is-expanded' : '') +
+      (isCurrent ? ' shadow-link-tree-group--current' : '') +
+      '">' +
+      '<button type="button" class="shadow-link-tree-row shadow-link-tree-row--group shadow-link-tree-row--sitemap" data-expand-key="' +
+      escapeAttr(key) +
+      '" aria-expanded="' +
+      (isExpanded ? 'true' : 'false') +
+      '">' +
+      '<span class="shadow-link-tree-chevron" aria-hidden="true">' +
+      (isExpanded ? '▼' : '▶') +
+      '</span>' +
+      '<span class="shadow-link-tree-label">' +
+      escapeHtml(label) +
+      '</span>' +
+      '<span class="shadow-link-tree-path">' +
+      escapeHtml(path) +
+      '</span>' +
+      '</button>' +
+      '<ul class="shadow-link-tree shadow-link-tree-children"' +
+      (isExpanded ? '' : ' hidden') +
+      '>';
+    children.forEach((child) => {
+      html += renderSiteMapNode(child, centerPath, depth + 1);
+    });
+    html += '</ul></li>';
+    return html;
+  }
+
+  function renderSiteMapSection(centerPath) {
+    if (!siteGraph || !siteGraph.pathTree) return '';
+    const rootChildren = getDirectChildren('/');
+    let treeHtml = '';
+    if (siteGraph.pathTree.has('/')) {
+      treeHtml = renderSiteMapNode('/', centerPath, 0);
+    } else {
+      treeHtml = '<ul class="shadow-link-tree shadow-link-tree-root">';
+      rootChildren.forEach((child) => {
+        treeHtml += renderSiteMapNode(child, centerPath, 0);
+      });
+      treeHtml += '</ul>';
+    }
+    return (
+      '<details class="shadow-link-tree-sitemap">' +
+      '<summary class="shadow-link-tree-sitemap-summary">Site map</summary>' +
+      '<div class="shadow-link-tree-sitemap-body">' +
+      treeHtml +
+      '</div></details>'
+    );
+  }
+
+  function renderLinkTreePanel(graph) {
+    const s = graph.stats;
+    let html =
+      '<div class="shadow-link-tree-panel">' +
+      '<header class="shadow-link-tree-header">' +
+      '<code class="shadow-link-tree-page" title="Current page">' +
+      escapeHtml(graph.center) +
+      '</code>' +
+      renderGraphStats(graph) +
+      renderLinkHealth(s) +
+      '</header>' +
+      '<div class="shadow-link-tree-split">' +
+      renderLinkTreeSide(
+        'Links TO this page',
+        'in',
+        graph.inbound,
+        graph.center,
+        'No internal pages link here yet'
+      ) +
+      renderLinkTreeSide(
+        'Links FROM this page',
+        'out',
+        graph.outbound,
+        graph.center,
+        'This page has no internal outbound links'
+      ) +
+      '</div>' +
+      renderSiteMapSection(graph.center) +
+      '<p class="shadow-link-tree-legend">Grouped by site section · tap to expand</p>' +
+      '<div class="shadow-graph-actions">' +
+      '<button type="button" class="shadow-btn shadow-btn-secondary shadow-graph-rebuild">Rebuild graph</button>' +
+      '</div></div>';
+    return html;
+  }
+
+  function previewSectionNames(grouped, limit) {
+    const names = [];
+    grouped.groups.forEach((g) => {
+      names.push(sectionLabel(g.sectionKey) + ' (' + g.childCount + ')');
+    });
+    grouped.leaves.forEach((leaf) => {
+      names.push(leaf.label);
+    });
+    const shown = names.slice(0, limit);
+    const extra = names.length - shown.length;
+    if (extra > 0) shown.push('+' + extra + ' more');
+    return shown.join(', ') || 'None';
+  }
+
+  function renderCompactLinkPreview(graph) {
+    const inPreview = previewSectionNames(graph.inbound, 2);
+    const outPreview = previewSectionNames(graph.outbound, 2);
+    return (
+      '<div class="shadow-link-tree-mini">' +
+      '<p class="shadow-link-tree-mini-line"><span class="shadow-link-tree-mini-label">Inbound</span> ' +
+      escapeHtml(inPreview) +
+      '</p>' +
+      '<p class="shadow-link-tree-mini-line"><span class="shadow-link-tree-mini-label">Outbound</span> ' +
+      escapeHtml(outPreview) +
+      '</p>' +
+      renderLinkHealth(graph.stats) +
+      '</div>'
+    );
+  }
+
+  function toggleLinkTreeGroup(button) {
+    const key = button.getAttribute('data-expand-key');
+    if (!key) return;
+    const willExpand = !expandedGroups.has(key);
+    if (willExpand) expandedGroups.add(key);
+    else expandedGroups.delete(key);
+
+    button.setAttribute('aria-expanded', willExpand ? 'true' : 'false');
+    const group = button.closest('.shadow-link-tree-group');
+    if (group) group.classList.toggle('is-expanded', willExpand);
+    const chevron = button.querySelector('.shadow-link-tree-chevron');
+    if (chevron) chevron.textContent = willExpand ? '▼' : '▶';
+    const children = group ? group.querySelector(':scope > .shadow-link-tree-children') : null;
+    if (children) children.hidden = !willExpand;
+  }
+
+  function bindLinkTreeInteractions(container, centerPath, options) {
     if (!container) return;
     const opts = options || {};
 
-    if (container._graphInteractBound) {
+    if (container._linkTreeBound) {
       container._graphInteractCenter = centerPath;
       container._graphInteractOpts = opts;
       return;
     }
-    container._graphInteractBound = true;
+    container._linkTreeBound = true;
     container._graphInteractCenter = centerPath;
     container._graphInteractOpts = opts;
 
     container.addEventListener('click', (event) => {
-      const expandBtn = event.target.closest('.shadow-graph-expand');
-      if (expandBtn) {
+      const groupBtn = event.target.closest('.shadow-link-tree-row--group');
+      if (groupBtn) {
         event.preventDefault();
-        event.stopPropagation();
-        const key = expandBtn.getAttribute('data-expand-key');
-        if (!key) return;
-        if (expandedGroups.has(key)) expandedGroups.delete(key);
-        else expandedGroups.add(key);
-        renderGraphPanel(container, container._graphInteractCenter, container._graphInteractOpts);
+        toggleLinkTreeGroup(groupBtn);
         return;
       }
 
-      const groupNode = event.target.closest('.shadow-graph-node--group');
-      if (groupNode) {
+      const leafLink = event.target.closest('.shadow-link-tree-row--leaf');
+      if (leafLink && leafLink.tagName === 'A') {
         event.preventDefault();
-        event.stopPropagation();
-        const key = groupNode.getAttribute('data-expand-key');
-        if (!key) return;
-        if (expandedGroups.has(key)) expandedGroups.delete(key);
-        else expandedGroups.add(key);
-        renderGraphPanel(container, container._graphInteractCenter, container._graphInteractOpts);
-        return;
+        const path = leafLink.getAttribute('data-graph-path');
+        if (path) location.href = pathToUrl(path);
       }
-
-      const linkNode = event.target.closest('.shadow-graph-node--link');
-      if (!linkNode || linkNode.classList.contains('shadow-graph-node--center')) return;
-      const path = linkNode.getAttribute('data-graph-path');
-      if (!path) return;
-      location.href = pathToUrl(path);
     });
 
     container.addEventListener('keydown', (event) => {
       if (event.key !== 'Enter' && event.key !== ' ') return;
-
-      const expandBtn = event.target.closest('.shadow-graph-expand');
-      if (expandBtn) {
+      const groupBtn = event.target.closest('.shadow-link-tree-row--group');
+      if (groupBtn) {
         event.preventDefault();
-        expandBtn.click();
-        return;
+        toggleLinkTreeGroup(groupBtn);
       }
-
-      const groupNode = event.target.closest('.shadow-graph-node--group');
-      if (groupNode) {
-        event.preventDefault();
-        groupNode.click();
-        return;
-      }
-
-      const linkNode = event.target.closest('.shadow-graph-node--link');
-      if (!linkNode || linkNode.classList.contains('shadow-graph-node--center')) return;
-      event.preventDefault();
-      const path = linkNode.getAttribute('data-graph-path');
-      if (path) location.href = pathToUrl(path);
     });
   }
 
@@ -829,17 +749,14 @@
       return;
     }
 
-    let html = renderGraphStats(graph);
-    html += renderRadialSvg(graph, opts);
-    if (!opts.compact) {
-      html +=
-        '<p class="shadow-graph-legend">Grouped by section · tap + to expand subpages</p>' +
-        '<div class="shadow-graph-actions">' +
-        '<button type="button" class="shadow-btn shadow-btn-secondary shadow-graph-rebuild">Rebuild graph</button>' +
-        '</div>';
+    let html;
+    if (opts.compact) {
+      html = renderCompactLinkPreview(graph);
+    } else {
+      html = renderLinkTreePanel(graph);
     }
     container.innerHTML = html;
-    bindGraphInteractions(container, centerPath, opts);
+    bindLinkTreeInteractions(container, centerPath, opts);
 
     const rebuildBtn = container.querySelector('.shadow-graph-rebuild');
     if (rebuildBtn && !rebuildBtn._bound) {
@@ -877,8 +794,9 @@
     getPageGraph,
     renderGraphPanel,
     renderMiniPreview,
-    renderRadialSvg,
+    renderLinkTreePanel,
     renderGraphStats,
+    getSectionTree,
     normalizePath,
     hasChildren,
     getDirectChildren,

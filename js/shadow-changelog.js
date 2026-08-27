@@ -7,8 +7,22 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.20.3',
+    version: '1.21.0',
     releases: [
+      {
+        version: '1.21.0',
+        date: '2026-08-27',
+        title: 'Link tree redesign',
+        user: [
+          'Link graph replaced with a clear two-panel tree — see who links here and where this page links, grouped by site section',
+          'Tap a section to expand exact pages; tap a page row to open it on shadow',
+          'Health signals show orphan warnings, hub vs leaf, and link balance at a glance',
+          'Summary mini preview shows a text overview instead of the crowded radial diagram'
+        ],
+        dev: [
+          'shadow-graph.js renderLinkTreePanel + bindLinkTreeInteractions; radial SVG removed from full view; shadow-link-tree BEM CSS; cache-bust via ?v=1.21.0'
+        ]
+      },
       {
         version: '1.20.3',
         date: '2026-08-27',
