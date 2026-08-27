@@ -7,8 +7,21 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.23.0',
+    version: '1.23.1',
     releases: [
+      {
+        version: '1.23.1',
+        date: '2026-08-27',
+        title: 'Bigger resizable activity panels',
+        user: [
+          'Activity popups open larger — Link graph, Summary, and SEO links have roomier defaults',
+          'Drag any edge or corner to resize panels; size is remembered while you browse',
+          'Resize handles are easier to grab along all four edges and corners'
+        ],
+        dev: [
+          'ACTIVITY_DEFAULT_SIZE 560×640; section overrides for linkgraph/summary/seo links; CSS max min(96vw,1200px); edge grips 14px corners 18px z-index 20; cache-bust via ?v=1.23.1'
+        ]
+      },
       {
         version: '1.23.0',
         date: '2026-08-27',

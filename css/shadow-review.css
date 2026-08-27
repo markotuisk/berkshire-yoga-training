@@ -248,8 +248,8 @@ body.shadow-pick-mode::before {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  min-width: 280px;
-  min-height: 220px;
+  min-width: 320px;
+  min-height: 280px;
   transition: height 200ms ease;
 }
 
@@ -311,40 +311,40 @@ body.shadow-pick-mode::before {
 }
 
 .shadow-modal-resize--corner {
-  width: 12px;
-  height: 12px;
+  width: 18px;
+  height: 18px;
   z-index: 4;
 }
 
 .shadow-modal-resize--top {
   top: 0;
-  left: 12px;
-  right: 12px;
-  height: 7px;
+  left: 18px;
+  right: 18px;
+  height: 14px;
   cursor: ns-resize;
 }
 
 .shadow-modal-resize--bottom {
   bottom: 0;
-  left: 12px;
+  left: 18px;
   right: 18px;
-  height: 7px;
+  height: 14px;
   cursor: ns-resize;
 }
 
 .shadow-modal-resize--left {
   left: 0;
-  top: 12px;
-  bottom: 12px;
-  width: 7px;
+  top: 18px;
+  bottom: 18px;
+  width: 14px;
   cursor: ew-resize;
 }
 
 .shadow-modal-resize--right {
   right: 0;
-  top: 12px;
+  top: 18px;
   bottom: 18px;
-  width: 7px;
+  width: 14px;
   cursor: ew-resize;
 }
 
@@ -4971,12 +4971,24 @@ body.shadow-seo-image-preview-open {
   padding: 0;
 }
 
+.shadow-activity-card .shadow-modal-scroll {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
 .shadow-activity-card {
-  width: 420px;
-  height: 500px;
-  max-width: min(420px, 95vw);
-  max-height: 90vh;
-  min-width: min(320px, 95vw);
+  width: auto;
+  height: auto;
+  max-width: min(96vw, 1200px);
+  max-height: min(92vh, 900px);
+  min-width: 320px;
+  min-height: 280px;
+}
+
+.shadow-activity-card .shadow-modal-resize {
+  z-index: 20;
 }
 
 .shadow-activity-card .shadow-seo-body,
@@ -5032,6 +5044,7 @@ body.shadow-seo-image-preview-open {
     0 24px 56px rgba(0, 0, 0, 0.1),
     0 2px 8px rgba(0, 0, 0, 0.04),
     0 1px 0 rgba(255, 255, 255, 0.85) inset;
+  overflow: visible;
 }
 
 .shadow-activity-modal .shadow-modal-head {
@@ -5388,7 +5401,7 @@ body.shadow-seo-image-preview-open {
 
   .shadow-activity-card {
     max-width: calc(100vw - 1rem);
-    width: min(420px, calc(100vw - 1rem));
+    min-width: min(320px, calc(100vw - 1rem));
   }
 
   .shadow-activity-path-pill {
@@ -5549,7 +5562,57 @@ body.shadow-seo-image-preview-open {
   color: #636366;
 }
 
-.shadow-activity-card[data-category='settings'] {
-  width: 420px;
-  height: 520px;
+.shadow-activity-card .shadow-graph-panel {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.shadow-activity-card .shadow-graph-view-switch {
+  flex: 0 0 auto;
+}
+
+.shadow-activity-card .shadow-graph-view-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.shadow-activity-card .shadow-graph-dir-tree {
+  flex: 1 1 auto;
+  max-height: none;
+  min-height: 8rem;
+}
+
+.shadow-activity-card .shadow-graph-crawl-panel {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.shadow-activity-card .shadow-graph-crawl-map {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.shadow-activity-card .shadow-graph-crawl-column {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.shadow-activity-card .shadow-graph-crawl-column-body {
+  flex: 1 1 auto;
+  max-height: none;
+  min-height: 4rem;
+}
+
+.shadow-activity-card .shadow-link-tree-panel {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }

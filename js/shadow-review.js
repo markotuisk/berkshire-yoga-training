@@ -88,7 +88,12 @@
     graph:
       '<svg class="shadow-tools-section-icon" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="3.5" cy="10.5" r="1.5" fill="currentColor"/><circle cx="10.5" cy="3.5" r="1.5" fill="currentColor"/><circle cx="10.5" cy="10.5" r="1.5" fill="currentColor"/><path d="M4.5 9.5l5-5M4.5 9.5l5.5.5" fill="none" stroke="currentColor" stroke-width="1.1"/></svg>'
   };
-  const ACTIVITY_DEFAULT_SIZE = { width: 400, height: 480 };
+  const ACTIVITY_DEFAULT_SIZE = { width: 560, height: 640 };
+  const ACTIVITY_SIZE_BY_SECTION = {
+    'insights:linkgraph': { width: 720, height: 680 },
+    'insights:summary': { width: 560, height: 620 },
+    'seo:links': { width: 640, height: 600 }
+  };
   const ACTIVITY_STACK_OFFSET = 24;
   const DOCK_MAX_PILLS = 5;
   const IDLE_MS = 60 * 60 * 1000;
@@ -149,10 +154,12 @@
     '<svg class="shadow-modal-collapse-icon" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true" focusable="false">' +
     '<path d="M2.5 7.5L6 4l3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
-  const MODAL_MIN_WIDTH = 280;
-  const MODAL_MIN_HEIGHT = 220;
-  const MODAL_MAX_WIDTH_VW = 0.95;
-  const MODAL_MAX_HEIGHT_VH = 0.9;
+  const MODAL_MIN_WIDTH = 320;
+  const MODAL_MIN_HEIGHT = 280;
+  const MODAL_MAX_WIDTH_VW = 0.96;
+  const MODAL_MAX_HEIGHT_VH = 0.92;
+  const MODAL_MAX_WIDTH_PX = 1200;
+  const MODAL_MAX_HEIGHT_PX = 900;
 
   const PICK_TARGET_SELECTOR =
     'img, [class*="placeholder-img"], a, button, h1, h2, h3, h4, h5, h6, p, li, span, time, small, strong, em, mark, label, figcaption, blockquote, dt, dd, td, th, div, ul, ol, nav, header, footer, main, aside, dl, section, article, .btn, [class*="card"], [class*="section"], [class*="badge"], [class*="tag"], [class*="category"]';
@@ -435,8 +442,24 @@
     return {
       minW: MODAL_MIN_WIDTH,
       minH: MODAL_MIN_HEIGHT,
-      maxW: Math.floor(window.innerWidth * MODAL_MAX_WIDTH_VW),
-      maxH: Math.floor(window.innerHeight * MODAL_MAX_HEIGHT_VH)
+      maxW: Math.min(Math.floor(window.innerWidth * MODAL_MAX_WIDTH_VW), MODAL_MAX_WIDTH_PX),
+      maxH: Math.min(Math.floor(window.innerHeight * MODAL_MAX_HEIGHT_VH), MODAL_MAX_HEIGHT_PX)
+    };
+  }
+
+  function getActivityDefaultSize(category, sectionId) {
+    const key = category + ':' + sectionId;
+    return ACTIVITY_SIZE_BY_SECTION[key] || ACTIVITY_DEFAULT_SIZE;
+  }
+
+  function parseActivityStorageKey(key) {
+    if (!key.startsWith('activity-')) return null;
+    const rest = key.slice('activity-'.length);
+    const dash = rest.indexOf('-');
+    if (dash === -1) return null;
+    return {
+      category: rest.slice(0, dash),
+      sectionId: rest.slice(dash + 1)
     };
   }
 
@@ -656,7 +679,13 @@
 
   function resetModalPosition(key, card) {
     clearModalPosition(key);
-    clearModalSize(card);
+    const activity = parseActivityStorageKey(key);
+    if (activity) {
+      const size = getActivityDefaultSize(activity.category, activity.sectionId);
+      applyModalSize(card, size.width, size.height);
+    } else {
+      clearModalSize(card);
+    }
     if (COLLAPSIBLE_MODALS.includes(key)) {
       const modal = card.closest('.shadow-modal');
       setModalCollapsed(key, false);
@@ -2292,7 +2321,8 @@
       keepOutside: footerSelector ? [qs(footerSelector, modal)].filter(Boolean) : [],
       collapsible: true
     });
-    applyModalSize(card, ACTIVITY_DEFAULT_SIZE.width, ACTIVITY_DEFAULT_SIZE.height);
+    const defaultSize = getActivityDefaultSize(category, sectionId);
+    applyModalSize(card, defaultSize.width, defaultSize.height);
     applyModalPosition(storageKey, card);
     qs('.shadow-activity-close', modal).addEventListener('click', () => closeActivityPopup(key));
     renderActivityContent(category, sectionId, bodyEl, key, modal);
