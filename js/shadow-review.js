@@ -178,6 +178,8 @@
   let insightsCache = null;
   let insightsFetchPath = '';
   let insightsLoading = false;
+  let metricDetailModal = null;
+  const METRIC_DETAIL_STORAGE_KEY = 'activity-metric-detail';
 
   function changelog() {
     return window.TWAShadowChangelog || { version: '0.0.0', releases: [] };
@@ -1316,6 +1318,83 @@
     window.TWAShadowGraph.renderMiniPreview(container, currentPagePath());
   }
 
+  function closeMetricDetailPopup() {
+    if (!metricDetailModal) return;
+    if (metricDetailModal.parentNode) metricDetailModal.parentNode.removeChild(metricDetailModal);
+    metricDetailModal = null;
+  }
+
+  function bindMetricDetailPopupControls(modal) {
+    const closeBtn = qs('.shadow-activity-close', modal);
+    if (closeBtn && !closeBtn._bound) {
+      closeBtn._bound = true;
+      closeBtn.addEventListener('click', () => closeMetricDetailPopup());
+    }
+    const openLinks = qs('.shadow-insight-metric-detail__open-links', modal);
+    if (openLinks && !openLinks._bound) {
+      openLinks._bound = true;
+      openLinks.addEventListener('click', () => {
+        closeMetricDetailPopup();
+        openActivityPopup('seo', 'links');
+      });
+    }
+  }
+
+  function openMetricDetailPopup(metric) {
+    if (!requirePersonForReview()) return;
+    if (!window.TWAShadowSEO || !window.TWAShadowSEO.renderMetricDetailHtml) return;
+    const layer = qs('#shadow-activity-layer');
+    if (!layer) return;
+    const title = window.TWAShadowSEO.getMetricPopupTitle
+      ? window.TWAShadowSEO.getMetricPopupTitle(metric)
+      : 'SEO detail';
+    const bodyHtml = window.TWAShadowSEO.renderMetricDetailHtml(metric);
+    if (metricDetailModal) {
+      const titleEl = qs('.shadow-activity-title', metricDetailModal);
+      const bodyEl = qs('.shadow-activity-body', metricDetailModal);
+      const pathEl = qs('.shadow-activity-path-pill', metricDetailModal);
+      const card = qs('.shadow-modal-card', metricDetailModal);
+      if (titleEl) titleEl.textContent = title;
+      if (pathEl) pathEl.textContent = currentPagePath();
+      if (card) card.setAttribute('data-metric', metric);
+      if (bodyEl) {
+        bodyEl.innerHTML = bodyHtml;
+        bindMetricDetailPopupControls(metricDetailModal);
+      }
+      bringActivityToFront(metricDetailModal, METRIC_DETAIL_STORAGE_KEY);
+      return;
+    }
+    const modal = document.createElement('div');
+    modal.id = 'shadow-metric-detail-modal';
+    modal.className = 'shadow-modal shadow-modal--floating shadow-activity-modal shadow-metric-detail-modal';
+    modal.dataset.activityKey = METRIC_DETAIL_STORAGE_KEY;
+    modal.innerHTML =
+      '<div class="shadow-modal-card shadow-activity-card shadow-modal-review shadow-metric-detail-card" data-metric="' +
+      escapeHtml(metric) +
+      '">' +
+      '<div class="shadow-modal-head">' +
+      '<h2 class="shadow-activity-title">' +
+      escapeHtml(title) +
+      '</h2>' +
+      '<code class="shadow-activity-path-pill" title="Current page">' +
+      escapeHtml(currentPagePath()) +
+      '</code>' +
+      '<button type="button" class="shadow-close shadow-activity-close" aria-label="Close">&times;</button>' +
+      '</div>' +
+      '<div class="shadow-activity-body shadow-review-panel">' +
+      bodyHtml +
+      '</div></div>';
+    layer.appendChild(modal);
+    modal.hidden = false;
+    const card = qs('.shadow-modal-card', modal);
+    setupDraggableModal(modal, METRIC_DETAIL_STORAGE_KEY, { collapsible: true });
+    applyModalSize(card, ACTIVITY_DEFAULT_SIZE.width, ACTIVITY_DEFAULT_SIZE.height);
+    applyModalPosition(METRIC_DETAIL_STORAGE_KEY, card);
+    bindMetricDetailPopupControls(modal);
+    metricDetailModal = modal;
+    bringActivityToFront(modal, METRIC_DETAIL_STORAGE_KEY);
+  }
+
   function bindSummaryInsightsControls(container) {
     const root = container || document;
     const openGraph = root.querySelector('.shadow-insights-graph-open');
@@ -1335,6 +1414,14 @@
       openDesign._bound = true;
       openDesign.addEventListener('click', () => openActivityPopup('design', 'summary'));
     }
+    root.querySelectorAll('.shadow-insight-metric-btn').forEach((btn) => {
+      if (btn._bound) return;
+      btn._bound = true;
+      btn.addEventListener('click', () => {
+        const metric = btn.getAttribute('data-metric');
+        if (metric) openMetricDetailPopup(metric);
+      });
+    });
   }
 
   function invalidateInsightsCache() {
@@ -2079,6 +2166,7 @@
 
   function closeAllActivityPopups() {
     [...openActivityPopups.keys()].forEach((key) => closeActivityPopup(key));
+    closeMetricDetailPopup();
     if (window.TWAShadowSEO) window.TWAShadowSEO.shutdown();
     if (window.TWAShadowDesign) window.TWAShadowDesign.shutdown();
   }

@@ -3376,18 +3376,39 @@ body.shadow-seo-image-preview-open {
   gap: 0.35rem;
 }
 
-.shadow-insight-hero__metrics > div {
+.shadow-insight-metric-btn {
   display: flex;
   flex-direction: column;
   gap: 0.1rem;
   padding: 0.45rem 0.5rem;
+  border: 1px solid transparent;
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.72);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 120ms ease;
 }
 
-.shadow-insight-hero__metrics dt {
-  margin: 0;
+.shadow-insight-metric-btn:hover {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+}
+
+.shadow-insight-metric-btn:focus-visible {
+  outline: none;
+  border-color: rgba(232, 97, 46, 0.45);
+  box-shadow: 0 0 0 3px rgba(232, 97, 46, 0.18);
+}
+
+.shadow-insight-metric-btn__label {
   font-size: 0.625rem;
   font-weight: 600;
   letter-spacing: 0.05em;
@@ -3395,12 +3416,102 @@ body.shadow-seo-image-preview-open {
   color: #8e8e93;
 }
 
-.shadow-insight-hero__metrics dd {
-  margin: 0;
+.shadow-insight-metric-btn__value {
   font-size: 0.9375rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   color: var(--shadow-text);
+}
+
+.shadow-insight-metric-detail {
+  padding: 1.1rem 1.25rem 1.25rem;
+}
+
+.shadow-insight-metric-detail__lead {
+  margin: 0 0 0.85rem;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--shadow-text-secondary);
+}
+
+.shadow-insight-metric-detail__value {
+  margin: 0 0 0.55rem;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--shadow-text);
+  word-break: break-word;
+}
+
+.shadow-insight-metric-detail__value--empty {
+  color: #8e8e93;
+  font-style: italic;
+}
+
+.shadow-insight-metric-detail__count {
+  margin: 0 0 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #636366;
+}
+
+.shadow-insight-metric-detail__guidance {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: var(--shadow-text-secondary);
+}
+
+.shadow-insight-metric-detail__list-block {
+  margin: 0 0 0.85rem;
+}
+
+.shadow-insight-metric-detail__list-label {
+  margin: 0 0 0.35rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #8e8e93;
+}
+
+.shadow-insight-metric-detail__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.3rem;
+}
+
+.shadow-insight-metric-detail__path {
+  display: block;
+  padding: 0.28rem 0.45rem;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.04);
+  font-size: 0.6875rem;
+  line-height: 1.4;
+  word-break: break-all;
+}
+
+.shadow-insight-metric-detail__more {
+  font-size: 0.75rem;
+  color: #8e8e93;
+  font-style: italic;
+}
+
+.shadow-insight-metric-detail__actions {
+  margin: 0.35rem 0 0;
+  padding-top: 0.65rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.shadow-metric-detail-card {
+  width: 380px;
+  height: auto;
+  max-height: min(520px, 88vh);
+}
+
+.shadow-metric-detail-modal .shadow-activity-body {
+  overflow-y: auto;
 }
 
 .shadow-insight-panel {

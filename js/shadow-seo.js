@@ -3572,19 +3572,180 @@
 
   function summaryMetricValues() {
     const data = auditPage();
-    const titleLen = (data.title || '').length;
-    const descLen = (data.description || '').length;
+    const title = (data.title || '').trim();
+    const description = (data.description || '').trim();
+    const titleLen = title.length;
+    const descLen = description.length;
+    const links = data.links || { internal: [], external: [] };
     const internalLinks =
-      data.links && data.links.linksInternal != null
-        ? data.links.linksInternal
-        : data.links
-          ? data.links.internal.length
-          : 0;
-    return { data, titleLen, descLen, internalLinks };
+      links.linksInternal != null ? links.linksInternal : links.internal ? links.internal.length : 0;
+    const externalLinks =
+      links.linksExternal != null ? links.linksExternal : links.external ? links.external.length : 0;
+    const totalLinks = links.linksTotal != null ? links.linksTotal : links.total != null ? links.total : internalLinks + externalLinks;
+    return {
+      data,
+      title,
+      description,
+      titleLen,
+      descLen,
+      internalLinks,
+      externalLinks,
+      totalLinks,
+      links
+    };
+  }
+
+  function titleGuidance(len) {
+    if (!len) {
+      return 'This page has no title tag. Search engines and browser tabs need one — add a short, descriptive title.';
+    }
+    if (len <= 60) {
+      return (
+        'Google typically shows around 50–60 characters in search results; yours is ' +
+        len +
+        ' — that fits well.'
+      );
+    }
+    if (len <= 70) {
+      return (
+        'Google typically shows around 50–60 characters in search results; yours is ' +
+        len +
+        ' — slightly long, but usually fine.'
+      );
+    }
+    return (
+      'Google typically shows around 50–60 characters in search results; yours is ' +
+      len +
+      ' — consider shortening so the full title appears in search.'
+    );
+  }
+
+  function metaGuidance(len) {
+    if (!len) {
+      return 'This page has no meta description. Google may pull text from the page instead — a clear 150–160 character summary helps partners see what searchers will read.';
+    }
+    if (len >= 50 && len <= 160) {
+      return 'Aim for around 150–160 characters; yours is ' + len + ' — a good length for search snippets.';
+    }
+    if (len < 50) {
+      return 'Aim for around 150–160 characters; yours is ' + len + ' — a bit short. Consider expanding to summarise the page.';
+    }
+    return 'Aim for around 150–160 characters; yours is ' + len + ' — long descriptions may be truncated in search results.';
+  }
+
+  function linkDisplayPath(href) {
+    try {
+      const u = new URL(href, location.href);
+      const path = u.pathname + (u.search || '') + (u.hash || '');
+      return truncate(path || '/', 72);
+    } catch (e) {
+      return truncate(href, 72);
+    }
+  }
+
+  function renderLinkPreviewList(links, label, max) {
+    if (!links || !links.length) return '';
+    const items = links
+      .slice(0, max)
+      .map(
+        (l) =>
+          '<li><code class="shadow-insight-metric-detail__path">' +
+          escapeHtml(linkDisplayPath(l.href)) +
+          '</code></li>'
+      )
+      .join('');
+    const more =
+      links.length > max
+        ? '<li class="shadow-insight-metric-detail__more">…and ' +
+          (links.length - max) +
+          ' more</li>'
+        : '';
+    return (
+      '<div class="shadow-insight-metric-detail__list-block">' +
+      '<h3 class="shadow-insight-metric-detail__list-label">' +
+      escapeHtml(label) +
+      ' (' +
+      links.length +
+      ')</h3>' +
+      '<ul class="shadow-insight-metric-detail__list">' +
+      items +
+      more +
+      '</ul></div>'
+    );
+  }
+
+  function getMetricPopupTitle(metric) {
+    if (metric === 'title') return 'Title tag';
+    if (metric === 'meta') return 'Meta description';
+    if (metric === 'links') return 'Links on this page';
+    return 'SEO detail';
+  }
+
+  function renderMetricDetailHtml(metric) {
+    const { title, description, titleLen, descLen, internalLinks, externalLinks, totalLinks, links } =
+      summaryMetricValues();
+    if (metric === 'title') {
+      return (
+        '<div class="shadow-insight-metric-detail">' +
+        '<p class="shadow-insight-metric-detail__lead">The title tag is what appears in browser tabs and often in Google search results.</p>' +
+        (title
+          ? '<p class="shadow-insight-metric-detail__value">' + escapeHtml(title) + '</p>'
+          : '<p class="shadow-insight-metric-detail__value shadow-insight-metric-detail__value--empty">Not set</p>') +
+        '<p class="shadow-insight-metric-detail__count">' +
+        titleLen +
+        ' character' +
+        (titleLen === 1 ? '' : 's') +
+        '</p>' +
+        '<p class="shadow-insight-metric-detail__guidance">' +
+        escapeHtml(titleGuidance(titleLen)) +
+        '</p></div>'
+      );
+    }
+    if (metric === 'meta') {
+      return (
+        '<div class="shadow-insight-metric-detail">' +
+        '<p class="shadow-insight-metric-detail__lead">The meta description is the short summary partners often see under the page title in search results.</p>' +
+        (description
+          ? '<p class="shadow-insight-metric-detail__value">' + escapeHtml(description) + '</p>'
+          : '<p class="shadow-insight-metric-detail__value shadow-insight-metric-detail__value--empty">Not set</p>') +
+        '<p class="shadow-insight-metric-detail__count">' +
+        descLen +
+        ' character' +
+        (descLen === 1 ? '' : 's') +
+        '</p>' +
+        '<p class="shadow-insight-metric-detail__guidance">' +
+        escapeHtml(metaGuidance(descLen)) +
+        '</p></div>'
+      );
+    }
+    if (metric === 'links') {
+      const internal = links.internal || [];
+      const external = links.external || [];
+      return (
+        '<div class="shadow-insight-metric-detail">' +
+        '<p class="shadow-insight-metric-detail__lead">Every clickable link on this page — internal links stay on the Academy site; external links go elsewhere.</p>' +
+        '<p class="shadow-insight-metric-detail__count"><strong>' +
+        totalLinks +
+        '</strong> links total (' +
+        internalLinks +
+        ' internal, ' +
+        externalLinks +
+        ' external)</p>' +
+        renderLinkPreviewList(internal, 'Internal links', 10) +
+        renderLinkPreviewList(external, 'External links', 10) +
+        (!internal.length && !external.length
+          ? '<p class="shadow-insight-metric-detail__guidance">No navigable links found on this page.</p>'
+          : '') +
+        '<p class="shadow-insight-metric-detail__actions">' +
+        '<button type="button" class="shadow-btn-text shadow-insight-metric-detail__open-links">Open full SEO Links activity</button>' +
+        '</p></div>'
+      );
+    }
+    return '<p class="shadow-hint">Detail unavailable.</p>';
   }
 
   function renderSummaryHeroHtml(pagePath) {
-    const { data, titleLen, descLen, internalLinks } = summaryMetricValues();
+    const { data, titleLen, descLen, totalLinks } = summaryMetricValues();
     const path = pagePath || '/';
     return (
       '<div class="shadow-insight-hero">' +
@@ -3605,17 +3766,33 @@
       '<code class="shadow-insight-hero__path" title="Current page">' +
       escapeHtml(path) +
       '</code>' +
-      '<dl class="shadow-insight-hero__metrics">' +
-      '<div><dt>Title</dt><dd>' +
+      '<div class="shadow-insight-hero__metrics" role="group" aria-label="SEO summary metrics">' +
+      '<button type="button" class="shadow-insight-metric-btn" data-metric="title" aria-label="Title tag, ' +
       titleLen +
-      '</dd></div>' +
-      '<div><dt>Meta</dt><dd>' +
+      ' character' +
+      (titleLen === 1 ? '' : 's') +
+      ' — open details">' +
+      '<span class="shadow-insight-metric-btn__label">Title</span>' +
+      '<span class="shadow-insight-metric-btn__value">' +
+      titleLen +
+      '</span></button>' +
+      '<button type="button" class="shadow-insight-metric-btn" data-metric="meta" aria-label="Meta description, ' +
       descLen +
-      '</dd></div>' +
-      '<div><dt>Links</dt><dd>' +
-      internalLinks +
-      '</dd></div>' +
-      '</dl></div></div>'
+      ' character' +
+      (descLen === 1 ? '' : 's') +
+      ' — open details">' +
+      '<span class="shadow-insight-metric-btn__label">Meta</span>' +
+      '<span class="shadow-insight-metric-btn__value">' +
+      descLen +
+      '</span></button>' +
+      '<button type="button" class="shadow-insight-metric-btn" data-metric="links" aria-label="Links on this page, ' +
+      totalLinks +
+      ' total — open details">' +
+      '<span class="shadow-insight-metric-btn__label">Links</span>' +
+      '<span class="shadow-insight-metric-btn__value">' +
+      totalLinks +
+      '</span></button>' +
+      '</div></div></div>'
     );
   }
 
@@ -3722,6 +3899,8 @@
     isHighlightOn: () => highlightOn,
     getAuditData,
     renderSummaryHtml,
-    renderSummaryHeroHtml
+    renderSummaryHeroHtml,
+    getMetricPopupTitle,
+    renderMetricDetailHtml
   };
 })();

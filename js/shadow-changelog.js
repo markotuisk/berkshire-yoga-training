@@ -7,8 +7,21 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.20.1',
+    version: '1.20.2',
     releases: [
+      {
+        version: '1.20.2',
+        date: '2026-08-27',
+        title: 'Insights hero metric details',
+        user: [
+          'Insights Summary hero shows total links (internal + external), not just internal',
+          'Tap Title, Meta or Links chips to open a plain-language detail popup with the actual text and guidance',
+          'Links popup lists a preview of internal and external links, with a shortcut to the full SEO Links activity'
+        ],
+        dev: [
+          'renderSummaryHeroHtml metric buttons; openMetricDetailPopup in shadow-review.js; renderMetricDetailHtml in shadow-seo.js; shadow-insight-metric-btn/detail CSS; cache-bust via ?v=1.20.2'
+        ]
+      },
       {
         version: '1.20.1',
         date: '2026-08-26',
