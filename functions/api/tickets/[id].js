@@ -28,7 +28,12 @@ export async function onRequestPatch(context) {
   if (!body.status || !body.actor) {
     return json({ error: 'status and actor are required' }, 400);
   }
-  const ticket = await updateTicketStatus(context.env, id, body);
+  const ticket = await updateTicketStatus(context.env, id, {
+    status: body.status,
+    actor: body.actor,
+    comment: body.comment,
+    notifyRaiser: body.notifyRaiser
+  });
   if (!ticket) return json({ error: 'Ticket not found' }, 404);
   return json({ ticket });
 }

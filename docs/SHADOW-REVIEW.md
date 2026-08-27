@@ -30,7 +30,7 @@ Partners do **not** need Cloudflare accounts. Access only needs their emails on 
 5. **Insights** covers page summary, Search Console, GA4 traffic, and link graph. **SEO** and **Design** sections open from grouped toolbox menus. **Pick** toggles element selection (or use ⌘/Alt+click).
 6. **Tickets** in the toolbar opens the ticket inbox.
 7. **Settings** (gear icon, before your name) opens environment options — connect Google for Search Console and Analytics insights, see connection status, and view Shadow version.
-8. **Open** tab (default) lists tickets that still need attention; **Closed** holds finished items (Approved, Shipped to live, Won't fix, Duplicate).
+8. **Open** tab (default) lists tickets that still need attention; **In progress** shows accepted work being implemented; **Closed** holds finished items (Approved, Shipped to live, Won't fix, Duplicate).
 9. Orange **TWA-xxx** markers appear on page elements with open tickets — click to open the thread and jump to the element.
 10. **Show on page** in a ticket (or **Locate** in the inbox) scrolls to the linked element and highlights it. Drag ticket windows by the six-dot grip; drag any corner to resize.
 11. For images or placeholders, the **Storycard** section lets you upload a replacement file (optional).
@@ -39,6 +39,8 @@ Partners do **not** need Cloudflare accounts. Access only needs their emails on 
 14. **SEO** panel shows overview score, meta, headings, images, links, JSON-LD, and technical checks from the current page DOM. **Links** tab can check broken links on the page or crawl the site from `sitemap.xml`. **Link graph** (Insights only) maps inbound and outbound internal links across sitemap pages. **Summary** tab shows the graph as a mini preview plus Search Console and GA4 metrics when configured. **Technical** tab reports canonical mismatch, mixed content, DOM size, and load timing. **Structured data** tab validates required schema fields. **Highlight on page** labels headings and marks images missing alt.
 
 **Open tab** (default inbox + on-page markers): Open, Discussing, Accepted, On shadow, In progress, Ready for review, Blocked.
+
+**In progress tab**: Accepted, On shadow, In progress (work being implemented on shadow).
 
 **Closed tab**: Approved, Shipped to live, Won't fix, Duplicate.
 
@@ -225,6 +227,22 @@ Humans still hit Access login; only those bots see **Shadow Access** OG.
 2. **Mirror:** Google Sheets via `SHEETS_WEBHOOK_URL` (create / comment / status + optional full `sync`)
 
 Without the secret, tickets still work in KV; Sheets stays empty until the webhook is set.
+
+## Reporting back to the ticket raiser
+
+There is **no automatic email or push notification** today. The person who raised a ticket learns about updates in these ways:
+
+1. **In-app (primary)** — All partners share one ticket list. When someone resolves or updates a ticket, a **comment is added to the thread** (unless *Notify raiser* is unchecked). The raiser sees it the next time they open **Tickets** (the panel fetches `/api/tickets` on open and via **Refresh**). There is no separate “my tickets only” inbox unless you filter mentally by *Raised by*.
+2. **Google Sheet mirror** — If `SHEETS_WEBHOOK_URL` is set, status changes and comments sync to the **Tickets** and **Comments** tabs. Anyone watching the Sheet sees updates in near real time.
+3. **Email (optional, not configured)** — The Apps Script webhook (`docs/shadow-sheets-apps-script.js`) does **not** send email today. To email the raiser when status becomes *Ready for review* or *Approved*, extend Apps Script:
+
+   - On `status_changed`, look up `Created by` on the ticket row.
+   - Match name to email on the **People** tab (`Katia.major@thameswellness.com`, etc.).
+   - Call `MailApp.sendEmail()` with ticket id, summary, and shadow URL.
+
+   Redeploy the web app after editing the script. No Cloudflare changes required.
+
+**When raiser gets reported back:** when a reviewer changes status with *Notify raiser* checked (default), or adds a manual **Comment**. Default note is pre-filled (e.g. “Fixed on shadow”). Uncheck *Notify raiser* for silent status-only updates.
 
 ## API
 

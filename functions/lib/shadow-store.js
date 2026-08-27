@@ -183,7 +183,19 @@ export async function addComment(env, ticketId, { author, message }) {
   return { ticket, comment };
 }
 
-export async function updateTicketStatus(env, ticketId, { status, actor }) {
+function formatStatusNotifyDate(iso) {
+  try {
+    return new Date(iso).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' });
+  } catch {
+    return iso || '';
+  }
+}
+
+export async function updateTicketStatus(
+  env,
+  ticketId,
+  { status, actor, comment, notifyRaiser }
+) {
   const state = await getState(env);
   const ticket = state.tickets.find((t) => t.id === ticketId);
   if (!ticket) return null;
@@ -191,7 +203,7 @@ export async function updateTicketStatus(env, ticketId, { status, actor }) {
   ticket.status = status;
   ticket.lastUpdatedAt = nowIso();
   ticket.lastUpdatedBy = actor;
-  if (['Shipped to live', "Won't fix", 'Duplicate'].includes(status)) {
+  if (['Shipped to live', "Won't fix", 'Duplicate', 'Approved'].includes(status)) {
     ticket.closedAt = ticket.lastUpdatedAt;
     ticket.closedBy = actor;
   }
@@ -206,7 +218,20 @@ export async function updateTicketStatus(env, ticketId, { status, actor }) {
   });
   await persist(state);
   await pushToSheets(env, { action: 'status_changed', ticket, audit });
-  return ticket;
+
+  if (notifyRaiser === false) return ticket;
+
+  const trimmed = comment && String(comment).trim();
+  const message =
+    trimmed ||
+    'Marked ' +
+      status +
+      ' by ' +
+      actor +
+      ' on ' +
+      formatStatusNotifyDate(ticket.lastUpdatedAt);
+  const commentResult = await addComment(env, ticketId, { author: actor, message });
+  return commentResult ? commentResult.ticket : ticket;
 }
 
 export async function exportAudit(env) {

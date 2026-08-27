@@ -197,6 +197,14 @@
     return CLOSED_STATUSES.includes(status);
   }
 
+  function isInProgressStatus(status) {
+    return status === 'In progress' || status === 'On shadow' || status === 'Accepted';
+  }
+
+  function inProgressTicketCount() {
+    return ticketsCache.filter((t) => isOpenStatus(t.status) && isInProgressStatus(t.status)).length;
+  }
+
   function partnerStatusLabel(status) {
     if (isClosedStatus(status)) {
       if (status === 'Approved') return 'Done';
@@ -2663,10 +2671,13 @@
         <div class="shadow-modal-card shadow-modal-wide">
           <div class="shadow-modal-head">
             <h2>Ticket inbox</h2>
-            <button type="button" class="shadow-close" data-close="inbox" aria-label="Close">&times;</button>
+            <div class="shadow-modal-head-actions">
+              <button type="button" id="shadow-inbox-refresh" class="shadow-btn shadow-btn-small shadow-btn-secondary" title="Refresh tickets from server">Refresh</button>
+              <button type="button" class="shadow-close" data-close="inbox" aria-label="Close">&times;</button>
+            </div>
           </div>
           <p class="shadow-hint">All reviewers see the same tickets. Orange markers on the page show open items for this page.</p>
-          <div id="shadow-inbox-tabs" class="shadow-inbox-tabs" role="tablist" aria-label="Open and closed tickets"></div>
+          <div id="shadow-inbox-tabs" class="shadow-inbox-tabs" role="tablist" aria-label="Open, in progress, and closed tickets"></div>
           <div id="shadow-ticket-list" class="shadow-ticket-list"></div>
         </div>
       </div>
@@ -2678,6 +2689,15 @@
             <button type="button" class="shadow-close" data-close="detail" aria-label="Close">&times;</button>
           </div>
           <div id="shadow-detail-body"></div>
+          <div id="shadow-status-notify" class="shadow-status-notify" hidden>
+            <label class="shadow-checkbox-label">
+              <input type="checkbox" id="shadow-notify-raiser" checked />
+              Notify raiser (adds a comment they see when they open Tickets)
+            </label>
+            <label>Update note for status changes
+              <textarea id="shadow-status-comment" rows="2" placeholder="Fixed on shadow"></textarea>
+            </label>
+          </div>
           <form id="shadow-comment-form" class="shadow-form">
             <label>Add comment
               <textarea name="message" rows="3" required placeholder="Follow-up note"></textarea>
@@ -2780,6 +2800,7 @@
     qs('#shadow-whatsnew-dismiss').addEventListener('click', onWhatsNewDismiss);
     qs('#shadow-detail-body').addEventListener('click', onDetailActionClick);
     qs('#shadow-ticket-list').addEventListener('click', onInboxListClick);
+    qs('#shadow-inbox-refresh').addEventListener('click', onInboxRefresh);
 
     initDraggableModals();
     initDraggableSubmenu();
@@ -3176,16 +3197,95 @@
   }
 
   function ticketsByTab(tab) {
-    return ticketsCache.filter((t) =>
-      tab === 'closed' ? isClosedStatus(t.status) : isOpenStatus(t.status)
-    );
+    if (tab === 'closed') {
+      return ticketsCache.filter((t) => isClosedStatus(t.status));
+    }
+    if (tab === 'progress') {
+      return ticketsCache.filter((t) => isOpenStatus(t.status) && isInProgressStatus(t.status));
+    }
+    return ticketsCache.filter((t) => isOpenStatus(t.status));
   }
 
   function inboxTabCounts() {
     return {
       open: ticketsByTab('open').length,
+      progress: ticketsByTab('progress').length,
       closed: ticketsByTab('closed').length
     };
+  }
+
+  function updateTicketsToolbarBadge() {
+    const btn = qs('#shadow-tickets-btn');
+    if (!btn) return;
+    const count = inProgressTicketCount();
+    let badge = qs('#shadow-tickets-badge');
+    if (count > 0) {
+      if (!badge) {
+        badge = document.createElement('span');
+        badge.id = 'shadow-tickets-badge';
+        badge.className = 'shadow-toolbar-badge';
+        btn.classList.add('shadow-btn--badged');
+        btn.appendChild(badge);
+      }
+      badge.textContent = String(count);
+      badge.setAttribute('aria-label', count + ' in progress');
+      badge.hidden = false;
+    } else if (badge) {
+      badge.hidden = true;
+    }
+  }
+
+  function defaultStatusComment(action, person) {
+    const map = {
+      approved: 'Looks good on shadow — marked done.',
+      ready: 'Ready for your review on shadow.',
+      'on-shadow': 'Fixed on shadow — please take a look.',
+      shipped: 'Shipped to the live site.',
+      accepted: 'Accepted — we will implement this.',
+      duplicate: 'Marked as duplicate.',
+      wontfix: "Won't fix — see comment above if needed."
+    };
+    const base = map[action] || 'Updated on shadow.';
+    return base + ' — ' + (person ? person.name : 'Reviewer') + ', ' + formatDate(new Date().toISOString());
+  }
+
+  function statusNotifyOptions(action, person) {
+    const notifyEl = qs('#shadow-notify-raiser');
+    const msgEl = qs('#shadow-status-comment');
+    const notifyRaiser = !notifyEl || notifyEl.checked;
+    let comment = msgEl ? msgEl.value.trim() : '';
+    if (notifyRaiser && !comment) {
+      comment = defaultStatusComment(action, person);
+    }
+    return { notifyRaiser, comment: notifyRaiser ? comment : '' };
+  }
+
+  function setStatusNotifyPanel(ticket, actionHint) {
+    const panel = qs('#shadow-status-notify');
+    const msgEl = qs('#shadow-status-comment');
+    if (!panel) return;
+    if (!ticket || isClosedStatus(ticket.status)) {
+      panel.hidden = true;
+      return;
+    }
+    panel.hidden = false;
+    if (msgEl && !msgEl.value.trim()) {
+      msgEl.value = defaultStatusComment(actionHint || 'ready', getPerson());
+    }
+  }
+
+  async function onInboxRefresh() {
+    const btn = qs('#shadow-inbox-refresh');
+    if (btn) btn.disabled = true;
+    try {
+      await refreshTickets();
+      renderInboxList();
+      toast('Tickets refreshed');
+    } catch (err) {
+      toast(err.message);
+    } finally {
+      if (btn) btn.disabled = false;
+    }
   }
 
   function renderInboxTabs() {
@@ -3195,12 +3295,15 @@
     tabsEl.innerHTML = '';
     [
       { id: 'open', label: 'Open' },
+      { id: 'progress', label: 'In progress' },
       { id: 'closed', label: 'Closed' }
     ].forEach((tab) => {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className =
-        'shadow-inbox-tab' + (inboxTab === tab.id ? ' shadow-inbox-tab--active' : '');
+        'shadow-inbox-tab' +
+        (inboxTab === tab.id ? ' shadow-inbox-tab--active' : '') +
+        (tab.id === 'progress' && counts.progress > 0 ? ' shadow-inbox-tab--highlight' : '');
       btn.setAttribute('role', 'tab');
       btn.setAttribute('aria-selected', inboxTab === tab.id ? 'true' : 'false');
       btn.dataset.tab = tab.id;
@@ -3220,7 +3323,8 @@
 
   function createTicketRow(t) {
     const row = document.createElement('div');
-    row.className = 'shadow-ticket-row';
+    row.className =
+      'shadow-ticket-row' + (isInProgressStatus(t.status) ? ' shadow-ticket-row--progress' : '');
     row.setAttribute('role', 'button');
     row.tabIndex = 0;
     const locateBtn = t.cssSelector
@@ -3228,6 +3332,7 @@
         escapeAttr(t.id) +
         '" title="Show on page">Locate</button>'
       : '';
+    const pagePath = ticketPagePath(t);
     row.innerHTML =
       '<span class="shadow-ticket-id">' +
       escapeHtml(t.id) +
@@ -3235,7 +3340,13 @@
       statusPillModifier(t.status) +
       '">' +
       escapeHtml(partnerStatusLabel(t.status)) +
-      '</span><span class="shadow-ticket-meta">' +
+      '</span><span class="shadow-ticket-meta shadow-ticket-page">' +
+      escapeHtml(pageLabel(pagePath)) +
+      ' <span class="shadow-ticket-path">' +
+      escapeHtml(pagePath) +
+      '</span></span><span class="shadow-ticket-meta">' +
+      escapeHtml(t.category || 'Other') +
+      ' · ' +
       escapeHtml(formatDate(t.createdAt)) +
       ' · ' +
       escapeHtml(t.createdBy || 'Unknown') +
@@ -3286,10 +3397,13 @@
     renderInboxTabs();
     const visible = ticketsByTab(inboxTab);
     if (!visible.length) {
-      list.innerHTML =
+      const emptyMsg =
         inboxTab === 'closed'
-          ? '<p class="shadow-hint">No closed tickets yet.</p>'
-          : '<p class="shadow-hint">No open tickets. Click any page element to create one.</p>';
+          ? 'No closed tickets yet.'
+          : inboxTab === 'progress'
+            ? 'No tickets in progress. Marko moves accepted work to On shadow or In progress.'
+            : 'No open tickets. Click any page element to create one.';
+      list.innerHTML = '<p class="shadow-hint">' + emptyMsg + '</p>';
       return;
     }
     list.innerHTML = '';
@@ -3421,6 +3535,7 @@
     if (!getPerson()) return ticketsCache;
     await loadTickets();
     renderPageBadges();
+    updateTicketsToolbarBadge();
     const inboxOpen = qs('#shadow-inbox-modal') && !qs('#shadow-inbox-modal').hidden;
     if (inboxOpen) renderInboxList();
     return ticketsCache;
@@ -3455,8 +3570,13 @@
         );
       }
       if (['Accepted', 'On shadow', 'In progress'].includes(status)) {
+        const readyLabel = isInProgressStatus(status)
+          ? 'Mark done (send for review)'
+          : 'Send for review';
         parts.push(
-          '<button type="button" class="shadow-btn shadow-btn-secondary shadow-action" data-action="ready">Send for review</button>'
+          '<button type="button" class="shadow-btn shadow-action shadow-action--done" data-action="ready">' +
+            readyLabel +
+            '</button>'
         );
       }
       if (status === 'Approved') {
@@ -3478,7 +3598,8 @@
     return '<div class="shadow-ticket-actions">' + parts.join('') + '</div>';
   }
 
-  async function updateTicketStatus(ticketId, action, person) {
+  async function updateTicketStatus(ticketId, action, person, opts) {
+    opts = opts || {};
     const map = {
       accepted: 'Accepted',
       approved: 'Approved',
@@ -3491,9 +3612,12 @@
     };
     const status = map[action];
     if (!status) return;
+    const body = { status, actor: person.name };
+    if (opts.notifyRaiser === false) body.notifyRaiser = false;
+    else if (opts.comment) body.comment = opts.comment;
     await api('/api/tickets/' + encodeURIComponent(ticketId), {
       method: 'PATCH',
-      body: JSON.stringify({ status, actor: person.name })
+      body: JSON.stringify(body)
     });
     toast('Status: ' + partnerStatusLabel(status));
   }
@@ -3515,7 +3639,8 @@
     }
 
     try {
-      await updateTicketStatus(id, action, person);
+      const notify = statusNotifyOptions(action, person);
+      await updateTicketStatus(id, action, person, notify);
       await refreshTickets();
       const updated = ticketsCache.find((t) => t.id === id);
       if (updated && isClosedStatus(updated.status)) {
@@ -3536,6 +3661,7 @@
     list.innerHTML = '<p class="shadow-hint">Loading…</p>';
     try {
       await refreshTickets();
+      inboxTab = inProgressTicketCount() > 0 ? 'progress' : 'open';
       renderInboxList();
     } catch (err) {
       list.innerHTML = '<p class="shadow-hint">Could not load tickets: ' + escapeHtml(err.message) + '</p>';
@@ -3558,6 +3684,9 @@
       const person = getPerson();
       title.textContent = t.id + ' · ' + partnerStatusLabel(t.status);
       form.dataset.ticketStatus = t.status;
+      const msgEl = qs('#shadow-status-comment');
+      if (msgEl) msgEl.value = '';
+      setStatusNotifyPanel(t, isInProgressStatus(t.status) ? 'ready' : 'on-shadow');
       body.innerHTML =
         ticketActionButtons(t, person) +
         '<dl class="shadow-dl">' +

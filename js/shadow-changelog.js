@@ -7,8 +7,23 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.22.0',
+    version: '1.23.0',
     releases: [
+      {
+        version: '1.23.0',
+        date: '2026-08-27',
+        title: 'Ticket inbox and raiser updates',
+        user: [
+          'Tickets panel refreshes from the server when you open it — use Refresh any time',
+          'New In progress tab lists work Marko is implementing; orange badge on Tickets shows the count',
+          'Each ticket row shows page, category, who raised it, date, and status',
+          'When a ticket is resolved, a comment is added for the person who raised it (they see it in Tickets)',
+          'Uncheck Notify raiser on a ticket if you only want a silent status change'
+        ],
+        dev: [
+          'PATCH /api/tickets/:id accepts comment + notifyRaiser; updateTicketStatus auto-comments; inbox progress tab + toolbar badge; cache-bust via ?v=1.23.0'
+        ]
+      },
       {
         version: '1.22.0',
         date: '2026-08-27',
