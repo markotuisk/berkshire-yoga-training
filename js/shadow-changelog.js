@@ -7,8 +7,23 @@
   'use strict';
 
   window.TWAShadowChangelog = {
-    version: '1.21.0',
+    version: '1.22.0',
     releases: [
+      {
+        version: '1.22.0',
+        date: '2026-08-27',
+        title: 'Partner link graph views',
+        user: [
+          'Link graph popup has four views — This page, URL structure, Crawl map, and Incoming links',
+          'URL structure shows folders like Screaming Frog — green indexable pages, soft red noindex',
+          'Crawl map shows depth from home in columns; unreachable pages listed separately',
+          'Incoming links highlights every page that links to the one you are on',
+          'Summary shows site-wide page count and noindex count with a shortcut to URL structure'
+        ],
+        dev: [
+          'shadow-graph.js nodeMeta + buildDirectoryTree + buildCrawlTree + view switcher; shadow-graph-view-switch CSS; cache-bust via ?v=1.22.0'
+        ]
+      },
       {
         version: '1.21.0',
         date: '2026-08-27',

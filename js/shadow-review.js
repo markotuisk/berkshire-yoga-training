@@ -1293,6 +1293,13 @@
   }
 
   function renderLinkGraphSummary() {
+    let summaryLine = '';
+    if (window.TWAShadowGraph && window.TWAShadowGraph.renderGraphSummaryLine) {
+      summaryLine = window.TWAShadowGraph.renderGraphSummaryLine();
+    } else {
+      summaryLine =
+        '<p class="shadow-graph-summary-line shadow-graph-summary-line--loading">Loading site graph…</p>';
+    }
     const graph = window.TWAShadowGraph ? window.TWAShadowGraph.getPageGraph(currentPagePath()) : null;
     let statsHtml = '';
     if (graph && graph.ready) {
@@ -1304,7 +1311,8 @@
     return (
       renderInsightCard(
         'Link graph',
-        statsHtml +
+        summaryLine +
+          statsHtml +
           '<div id="shadow-review-graph-mini" class="shadow-graph-mini shadow-graph-mini--hero" aria-hidden="false"></div>' +
           '<button type="button" class="shadow-btn-text shadow-insights-graph-open">Open link graph</button>',
         'graph'
@@ -1404,6 +1412,14 @@
         openActivityPopup('insights', 'linkgraph');
       });
     }
+    root.querySelectorAll('.shadow-graph-open-structure').forEach((btn) => {
+      if (btn._bound) return;
+      btn._bound = true;
+      btn.addEventListener('click', () => {
+        if (window.TWAShadowGraph) window.TWAShadowGraph.setPendingView('url-structure');
+        openActivityPopup('insights', 'linkgraph');
+      });
+    });
     root.querySelectorAll('.shadow-insight-settings-cta').forEach((btn) => {
       if (btn._bound) return;
       btn._bound = true;
@@ -2113,7 +2129,7 @@
     if (sectionId === 'linkgraph') {
       container.innerHTML =
         '<div class="shadow-seo-groups">' +
-        '<p class="shadow-seo-subhead">Who links here, where this page links, and how it sits in the site structure.</p>' +
+        '<p class="shadow-seo-subhead">Who links here, where this page links, URL folders, and crawl depth from home.</p>' +
         '<div class="shadow-graph-panel shadow-activity-graph"></div></div>';
       const graphEl = container.querySelector('.shadow-activity-graph');
       if (graphEl && window.TWAShadowGraph) {

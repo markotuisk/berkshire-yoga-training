@@ -4238,6 +4238,441 @@ body.shadow-seo-image-preview-open {
   width: 100%;
 }
 
+/* Link graph views (v1.22.0) */
+.shadow-graph-header-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-bottom: 0.55rem;
+}
+
+.shadow-graph-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+.shadow-graph-view-switch {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  padding: 2px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.06);
+  gap: 2px;
+}
+
+.shadow-graph-view-switch-btn {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  border-radius: 6px;
+  padding: 0.35rem 0.4rem;
+  font-family: 'Figtree', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: #636366;
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.shadow-graph-view-switch-btn:hover {
+  color: #1c1c1e;
+}
+
+.shadow-graph-view-switch-btn.is-active {
+  background: #fff;
+  color: #1c1c1e;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.shadow-graph-view-body {
+  margin-bottom: 0.5rem;
+}
+
+.shadow-graph-summary-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin: 0 0 0.5rem;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: #48484a;
+}
+
+.shadow-graph-summary-line--loading {
+  color: #8e8e93;
+}
+
+.shadow-graph-open-structure {
+  flex-shrink: 0;
+  font-size: 0.75rem;
+}
+
+.shadow-graph-legend-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 999px;
+  background: #fff;
+  color: #636366;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  font-style: italic;
+  font-family: Georgia, 'Times New Roman', serif;
+  cursor: pointer;
+}
+
+.shadow-graph-legend-btn:hover {
+  border-color: rgba(232, 97, 46, 0.35);
+  color: #e8612e;
+}
+
+.shadow-graph-header-actions {
+  position: relative;
+}
+
+.shadow-graph-legend-popover {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 5;
+  width: 11.5rem;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: #48484a;
+  display: none;
+}
+
+.shadow-graph-legend-popover.is-open {
+  display: block;
+}
+
+.shadow-graph-legend-popover p {
+  margin: 0 0 0.35rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.shadow-graph-legend-popover p:last-child {
+  margin-bottom: 0;
+}
+
+.shadow-graph-legend-note {
+  margin-top: 0.35rem;
+  color: #8e8e93;
+  font-size: 0.6875rem;
+}
+
+.shadow-graph-legend-swatch {
+  flex-shrink: 0;
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: 3px;
+}
+
+.shadow-graph-legend-swatch--indexable {
+  background: #34c759;
+}
+
+.shadow-graph-legend-swatch--noindex {
+  background: #ff6b6b;
+}
+
+.shadow-graph-legend-swatch--folder {
+  background: #c7c7cc;
+}
+
+.shadow-graph-legend-swatch--inbound {
+  background: #34c759;
+  box-shadow: 0 0 0 2px rgba(52, 199, 89, 0.25);
+}
+
+.shadow-graph-inbound-header-count {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: #248a3d;
+  white-space: nowrap;
+}
+
+.shadow-graph-dir-toolbar {
+  margin-bottom: 0.5rem;
+}
+
+.shadow-graph-incoming-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  color: #48484a;
+  cursor: pointer;
+}
+
+.shadow-graph-incoming-count {
+  font-weight: 600;
+  color: #248a3d;
+}
+
+.shadow-graph-dir-tree {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  background: #fff;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.shadow-graph-dir-group {
+  list-style: none;
+}
+
+.shadow-graph-dir-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: 100%;
+  min-height: 2.25rem;
+  padding: 0.35rem 0.65rem;
+  border: 0;
+  background: transparent;
+  font-family: 'Figtree', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  font-size: 0.8125rem;
+  color: #636366;
+  text-align: left;
+  cursor: pointer;
+}
+
+.shadow-graph-dir-row--muted {
+  cursor: default;
+  color: #8e8e93;
+}
+
+.shadow-graph-dir-children {
+  padding-left: 0.65rem;
+}
+
+.shadow-graph-dir-leaf {
+  list-style: none;
+}
+
+.shadow-graph-page-node {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding: 0.45rem 0.65rem;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background 0.15s ease, opacity 0.15s ease;
+}
+
+.shadow-graph-page-node__label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #1c1c1e;
+  line-height: 1.35;
+}
+
+.shadow-graph-page-node__path {
+  font-size: 0.6875rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  color: #8e8e93;
+  line-height: 1.3;
+}
+
+.shadow-graph-node--indexable .shadow-graph-page-node__label::before {
+  content: '';
+  display: inline-block;
+  width: 0.45rem;
+  height: 0.45rem;
+  margin-right: 0.35rem;
+  border-radius: 999px;
+  background: #34c759;
+  vertical-align: middle;
+}
+
+.shadow-graph-node--noindex .shadow-graph-page-node__label::before {
+  content: '';
+  display: inline-block;
+  width: 0.45rem;
+  height: 0.45rem;
+  margin-right: 0.35rem;
+  border-radius: 999px;
+  background: #ff6b6b;
+  vertical-align: middle;
+}
+
+.shadow-graph-node--folder .shadow-graph-dir-label::before {
+  content: '';
+  display: inline-block;
+  width: 0.45rem;
+  height: 0.45rem;
+  margin-right: 0.35rem;
+  border-radius: 2px;
+  background: #c7c7cc;
+  vertical-align: middle;
+}
+
+.shadow-graph-node--current {
+  background: rgba(232, 97, 46, 0.12);
+  outline: 1px solid rgba(232, 97, 46, 0.25);
+}
+
+.shadow-graph-page-node.shadow-graph-node--current {
+  background: rgba(232, 97, 46, 0.12);
+}
+
+.shadow-graph-page-node:hover,
+.shadow-graph-page-node:focus-visible {
+  background: rgba(232, 97, 46, 0.08);
+  outline: none;
+}
+
+.shadow-graph-node--highlight-inbound {
+  background: rgba(52, 199, 89, 0.12);
+}
+
+.shadow-graph-node--highlight-inbound .shadow-graph-page-node__label {
+  color: #248a3d;
+  font-weight: 600;
+}
+
+.shadow-graph-node--faded {
+  opacity: 0.38;
+}
+
+.shadow-graph-crawl-panel {
+  min-height: 0;
+}
+
+.shadow-graph-crawl-map {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+}
+
+.shadow-graph-crawl-column {
+  flex: 0 0 auto;
+  min-width: 7.5rem;
+  max-width: 10rem;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.shadow-graph-crawl-column-title {
+  margin: 0;
+  padding: 0.45rem 0.55rem;
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #8e8e93;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.shadow-graph-crawl-column-body {
+  padding: 0.35rem;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.shadow-graph-crawl-node-wrap {
+  margin-bottom: 0.25rem;
+}
+
+.shadow-graph-crawl-node {
+  padding: 0.35rem 0.45rem;
+}
+
+.shadow-graph-crawl-more {
+  margin: 0.25rem 0 0;
+  font-size: 0.6875rem;
+  color: #8e8e93;
+  text-align: center;
+}
+
+.shadow-graph-crawl-column--orphan {
+  border-color: rgba(201, 52, 0, 0.15);
+}
+
+.shadow-crawl-depth-0 .shadow-graph-crawl-node {
+  font-size: 0.875rem;
+}
+
+.shadow-crawl-depth-0 .shadow-graph-page-node__label {
+  font-weight: 600;
+}
+
+.shadow-crawl-depth-1 .shadow-graph-crawl-node {
+  font-size: 0.8125rem;
+}
+
+.shadow-crawl-depth-2 .shadow-graph-crawl-node,
+.shadow-crawl-depth-3 .shadow-graph-crawl-node {
+  font-size: 0.75rem;
+}
+
+.shadow-crawl-depth-0 .shadow-graph-crawl-node-wrap {
+  --shadow-crawl-scale: 1;
+}
+
+.shadow-crawl-depth-1 .shadow-graph-crawl-node-wrap {
+  --shadow-crawl-scale: 0.94;
+}
+
+.shadow-crawl-depth-2 .shadow-graph-crawl-node-wrap {
+  --shadow-crawl-scale: 0.88;
+}
+
+.shadow-crawl-depth-3 .shadow-graph-crawl-node-wrap,
+.shadow-crawl-depth-4 .shadow-graph-crawl-node-wrap {
+  --shadow-crawl-scale: 0.82;
+}
+
+.shadow-graph-crawl-node-wrap .shadow-graph-page-node {
+  transform: scale(var(--shadow-crawl-scale, 1));
+  transform-origin: left center;
+}
+
+@media (max-width: 640px) {
+  .shadow-graph-view-switch {
+    flex-wrap: wrap;
+  }
+
+  .shadow-graph-view-switch-btn {
+    flex: 1 1 calc(50% - 2px);
+  }
+
+  .shadow-graph-crawl-map {
+    flex-direction: column;
+    overflow-x: hidden;
+  }
+
+  .shadow-graph-crawl-column {
+    max-width: none;
+    width: 100%;
+  }
+}
+
 /* Exploding toolbox FAB — linear column above FAB (v1.18.1) */
 .shadow-tools-stack {
   position: absolute;

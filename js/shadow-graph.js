@@ -1,5 +1,5 @@
 /**
- * Shadow mode site link graph — sitemap crawl, adjacency, expandable link tree panels.
+ * Shadow mode site link graph — sitemap crawl, adjacency, reviewer-focused graph views.
  */
 (function () {
   'use strict';
@@ -8,11 +8,23 @@
     '#shadow-review-root, .shadow-toolbar, .shadow-modal, #shadow-page-badges, #shadow-seo-overlay, .shadow-seo-badge, #shadow-design-overlay, .shadow-design-badge';
   const LIVE_HOST = 'berkshireyogatraining.co.uk';
   const CRAWL_CONCURRENCY = 5;
+  const SHADOW_ROBOTS_PATTERN = /noindex.*noarchive|noarchive.*noindex/;
+  const GRAPH_VIEWS = [
+    { id: 'this-page', label: 'This page' },
+    { id: 'url-structure', label: 'URL structure' },
+    { id: 'crawl-map', label: 'Crawl map' },
+    { id: 'incoming-links', label: 'Incoming links' }
+  ];
+  const MAX_CRAWL_COLUMN_NODES = 30;
 
   let siteGraph = null;
   let graphBuilding = false;
   let graphBuildPromise = null;
   const expandedGroups = new Set();
+  let activeGraphView = 'this-page';
+  let pendingGraphView = null;
+  let incomingHighlight = false;
+  let legendPopoverOpen = false;
 
   function mapToCurrentOrigin(url) {
     try {
@@ -68,6 +80,36 @@
     return !!(el && el.closest && el.closest(EXCLUDE_SELECTOR));
   }
 
+  function isShadowOverlayRobots(content) {
+    const c = String(content || '').toLowerCase();
+    if (!c.includes('noindex')) return false;
+    return SHADOW_ROBOTS_PATTERN.test(c) || (c.includes('nofollow') && c.includes('noarchive'));
+  }
+
+  function parsePageMeta(doc) {
+    let indexable = true;
+    doc.querySelectorAll('meta[name="robots"], meta[name="googlebot"]').forEach((meta) => {
+      const content = (meta.getAttribute('content') || '').toLowerCase();
+      if (!content.includes('noindex')) return;
+      if (!isShadowOverlayRobots(content)) indexable = false;
+    });
+    let title = '';
+    const titleEl = doc.querySelector('title');
+    if (titleEl) title = (titleEl.textContent || '').trim();
+    if (/shadow mode/i.test(title) || /shadow access/i.test(title)) title = '';
+    return { indexable, title };
+  }
+
+  function getNodeMeta(path) {
+    if (!siteGraph || !siteGraph.nodeMeta) return { indexable: true, title: '' };
+    const p = normalizePath(path);
+    return siteGraph.nodeMeta[p] || { indexable: true, title: '' };
+  }
+
+  function isPathIndexable(path) {
+    return getNodeMeta(path).indexable;
+  }
+
   function collectAnchorsFromDocument(doc, pageUrl) {
     const origin = new URL(pageUrl).origin;
     const outbound = [];
@@ -107,6 +149,7 @@
     const pageUrls = await parseSitemapUrls();
     const edges = [];
     const nodePaths = new Set();
+    const nodeMeta = {};
     let done = 0;
 
     pageUrls.forEach((url) => nodePaths.add(normalizePath(url)));
@@ -121,6 +164,8 @@
             if (!res.ok) return;
             const html = await res.text();
             const doc = new DOMParser().parseFromString(html, 'text/html');
+            const meta = parsePageMeta(doc);
+            nodeMeta[fromPath] = meta;
             const targets = collectAnchorsFromDocument(doc, pageUrl);
             targets.forEach((toPath) => {
               nodePaths.add(toPath);
@@ -136,7 +181,11 @@
       );
     }
 
-    return { edges, nodePaths: [...nodePaths], pageCount: pageUrls.length };
+    nodePaths.forEach((p) => {
+      if (!nodeMeta[p]) nodeMeta[p] = { indexable: true, title: '' };
+    });
+
+    return { edges, nodePaths: [...nodePaths], pageCount: pageUrls.length, nodeMeta };
   }
 
   function buildAdjacency(edges, nodePaths) {
@@ -156,6 +205,158 @@
     });
 
     return { outbound, inbound, pageCount: nodePaths.length };
+  }
+
+  function buildDirectoryTree(nodePaths) {
+    const pathSet = new Set(nodePaths);
+    const protocolNode = {
+      id: 'dir-protocol',
+      type: 'protocol',
+      label: location.protocol.replace(':', ''),
+      segment: '',
+      path: null,
+      children: []
+    };
+    const hostNode = {
+      id: 'dir-host',
+      type: 'host',
+      label: location.hostname,
+      segment: '',
+      path: null,
+      children: []
+    };
+    protocolNode.children.push(hostNode);
+
+    const sorted = [...nodePaths].sort((a, b) => a.localeCompare(b));
+
+    sorted.forEach((pagePath) => {
+      const segments = pagePath === '/' ? [] : pagePath.split('/').filter(Boolean);
+      let current = hostNode;
+
+      if (pagePath === '/') {
+        const homeNode = {
+          id: 'dir-page-/',
+          type: 'page',
+          label: 'Home',
+          segment: '',
+          path: '/',
+          children: []
+        };
+        if (!current.children.some((c) => c.path === '/')) current.children.push(homeNode);
+        return;
+      }
+
+      segments.forEach((seg, i) => {
+        const partial = '/' + segments.slice(0, i + 1).join('/');
+        const isPage = pathSet.has(partial) && i === segments.length - 1;
+        let child = current.children.find((c) => c.segment === seg);
+        if (!child) {
+          child = {
+            id: 'dir-' + partial,
+            type: isPage ? 'page' : 'folder',
+            label: isPage ? pathLabel(partial) : seg,
+            segment: seg,
+            path: isPage ? partial : pathSet.has(partial) ? partial : null,
+            children: []
+          };
+          current.children.push(child);
+        } else if (isPage && child.type !== 'page') {
+          child.type = 'page';
+          child.path = partial;
+          child.label = pathLabel(partial);
+        }
+        current = child;
+      });
+    });
+
+    hostNode.children.sort((a, b) => {
+      const aKey = a.path || a.segment;
+      const bKey = b.path || b.segment;
+      return String(aKey).localeCompare(String(bKey));
+    });
+
+    return protocolNode;
+  }
+
+  function buildCrawlTree() {
+    if (!siteGraph) return { depths: new Map(), columns: [], unreachable: [], maxDepth: 0 };
+
+    const depths = new Map();
+    const start = siteGraph.outbound.has('/') || siteGraph.nodePaths.includes('/') ? '/' : null;
+
+    if (start) {
+      const queue = [start];
+      depths.set(start, 0);
+      while (queue.length) {
+        const current = queue.shift();
+        const depth = depths.get(current);
+        const outs = siteGraph.outbound.get(current) || new Set();
+        [...outs].sort().forEach((to) => {
+          if (!depths.has(to)) {
+            depths.set(to, depth + 1);
+            queue.push(to);
+          }
+        });
+      }
+    }
+
+    const maxDepth = depths.size ? Math.max(...depths.values()) : 0;
+    const columns = [];
+    for (let d = 0; d <= maxDepth; d++) {
+      const paths = [];
+      depths.forEach((depth, path) => {
+        if (depth === d) paths.push(path);
+      });
+      columns.push({ depth: d, paths: paths.sort((a, b) => a.localeCompare(b)) });
+    }
+
+    const unreachable = siteGraph.nodePaths
+      .filter((p) => !depths.has(p))
+      .sort((a, b) => a.localeCompare(b));
+
+    return { depths, columns, unreachable, maxDepth };
+  }
+
+  function getIncomingLinkSources(targetPath) {
+    if (!siteGraph) return [];
+    const target = normalizePath(targetPath);
+    const inbound = siteGraph.inbound.get(target) || new Set();
+    return [...inbound].sort((a, b) => a.localeCompare(b));
+  }
+
+  function getSiteGraphSummary() {
+    if (!siteGraph) {
+      return { ready: false, pageCount: 0, noindexCount: 0, indexableCount: 0 };
+    }
+    const pageCount = siteGraph.pageCount || siteGraph.nodePaths.length;
+    let noindexCount = 0;
+    siteGraph.nodePaths.forEach((p) => {
+      if (!isPathIndexable(p)) noindexCount += 1;
+    });
+    return {
+      ready: true,
+      pageCount,
+      noindexCount,
+      indexableCount: pageCount - noindexCount
+    };
+  }
+
+  function setActiveView(viewId) {
+    if (GRAPH_VIEWS.some((v) => v.id === viewId)) {
+      activeGraphView = viewId;
+      incomingHighlight = viewId === 'incoming-links';
+    }
+  }
+
+  function setPendingView(viewId) {
+    pendingGraphView = viewId;
+  }
+
+  function applyPendingView() {
+    if (pendingGraphView) {
+      setActiveView(pendingGraphView);
+      pendingGraphView = null;
+    }
   }
 
   function buildPathTree(nodePaths) {
@@ -258,15 +459,18 @@
 
     graphBuilding = true;
     graphBuildPromise = crawlSiteEdges(onProgress)
-      .then(({ edges, nodePaths, pageCount }) => {
+      .then(({ edges, nodePaths, pageCount, nodeMeta }) => {
         const adj = buildAdjacency(edges, nodePaths);
         const pathTree = buildPathTree(nodePaths);
+        const directoryTree = buildDirectoryTree(nodePaths);
         siteGraph = {
           builtAt: Date.now(),
           pageCount,
           edgeCount: edges.length,
           nodePaths,
+          nodeMeta,
           pathTree,
+          directoryTree,
           outbound: adj.outbound,
           inbound: adj.inbound
         };
@@ -516,87 +720,244 @@
     );
   }
 
-  function renderSiteMapNode(path, centerPath, depth) {
-    const children = getDirectChildren(path);
-    const isCurrent = normalizePath(path) === normalizePath(centerPath);
-    const label = pathLabel(path);
-    const hasKids = children.length > 0;
-    const key = expandKeyFor(centerPath, 'sitemap', path);
-    const isExpanded = expandedGroups.has(key) || depth === 0;
+  function graphNodeIndexClass(path) {
+    return isPathIndexable(path)
+      ? 'shadow-graph-node--indexable'
+      : 'shadow-graph-node--noindex';
+  }
 
-    if (!hasKids) {
-      return (
-        '<li class="shadow-link-tree-leaf' +
-        (isCurrent ? ' shadow-link-tree-leaf--current' : '') +
+  function graphNodeHighlightClass(path, centerPath, inboundSet, highlightInbound) {
+    if (!highlightInbound || !inboundSet) return '';
+    const p = normalizePath(path);
+    const center = normalizePath(centerPath);
+    if (p === center) return ' shadow-graph-node--current';
+    if (inboundSet.has(p)) return ' shadow-graph-node--highlight-inbound';
+    return ' shadow-graph-node--faded';
+  }
+
+  function renderGraphLegendButton() {
+    return (
+      '<button type="button" class="shadow-graph-legend-btn" aria-label="Colour legend" title="Colour legend">' +
+      '<span aria-hidden="true">i</span></button>' +
+      '<div class="shadow-graph-legend-popover' +
+      (legendPopoverOpen ? ' is-open' : '') +
+      '" role="dialog" aria-label="Link graph legend">' +
+      '<p><span class="shadow-graph-legend-swatch shadow-graph-legend-swatch--indexable"></span> Indexable page</p>' +
+      '<p><span class="shadow-graph-legend-swatch shadow-graph-legend-swatch--noindex"></span> Noindex (not for search)</p>' +
+      '<p><span class="shadow-graph-legend-swatch shadow-graph-legend-swatch--folder"></span> Folder (not a page)</p>' +
+      '<p><span class="shadow-graph-legend-swatch shadow-graph-legend-swatch--inbound"></span> Links to this page</p>' +
+      '<p class="shadow-graph-legend-note">Crawl map: larger nodes are closer to home.</p>' +
+      '</div>'
+    );
+  }
+
+  function renderGraphViewSwitcher() {
+    let html =
+      '<div class="shadow-graph-view-switch" role="tablist" aria-label="Link graph views">';
+    GRAPH_VIEWS.forEach((view) => {
+      const isActive = activeGraphView === view.id;
+      html +=
+        '<button type="button" class="shadow-graph-view-switch-btn' +
+        (isActive ? ' is-active' : '') +
+        '" role="tab" aria-selected="' +
+        (isActive ? 'true' : 'false') +
+        '" data-graph-view="' +
+        escapeAttr(view.id) +
         '">' +
-        renderLinkTreeLeafInner(path, depth) +
+        escapeHtml(view.label) +
+        '</button>';
+    });
+    html += '</div>';
+    return html;
+  }
+
+  function renderIncomingToggle(centerPath, inboundCount, visible) {
+    if (!visible) return '';
+    return (
+      '<label class="shadow-graph-incoming-toggle">' +
+      '<input type="checkbox" class="shadow-graph-incoming-checkbox"' +
+      (incomingHighlight ? ' checked' : '') +
+      '>' +
+      '<span>Show incoming to this page</span>' +
+      (inboundCount > 0
+        ? ' <span class="shadow-graph-incoming-count">(' + inboundCount + ')</span>'
+        : '') +
+      '</label>'
+    );
+  }
+
+  function renderGraphPageNode(path, centerPath, inboundSet, highlightInbound, extraClass) {
+    const p = normalizePath(path);
+    const isCurrent = p === normalizePath(centerPath);
+    const meta = getNodeMeta(p);
+    const label = meta.title || pathLabel(p);
+    const classes =
+      'shadow-graph-page-node ' +
+      graphNodeIndexClass(p) +
+      graphNodeHighlightClass(p, centerPath, inboundSet, highlightInbound) +
+      (isCurrent ? ' shadow-graph-node--current' : '') +
+      (extraClass ? ' ' + extraClass : '');
+
+    return (
+      '<a class="' +
+      classes +
+      '" href="' +
+      escapeAttr(pathToUrl(p)) +
+      '" data-graph-path="' +
+      escapeAttr(p) +
+      '" title="' +
+      escapeAttr(p) +
+      '">' +
+      '<span class="shadow-graph-page-node__label">' +
+      escapeHtml(label) +
+      '</span>' +
+      '<span class="shadow-graph-page-node__path">' +
+      escapeHtml(p) +
+      '</span>' +
+      '</a>'
+    );
+  }
+
+  function renderDirectoryTreeNode(node, centerPath, depth, inboundSet, highlightInbound) {
+    const hasKids = node.children && node.children.length > 0;
+    const isFolder = node.type !== 'page';
+    const expandKey = 'dir:' + node.id;
+    const isExpanded = expandedGroups.has(expandKey) || depth < 2;
+
+    if (node.type === 'page' && node.path) {
+      return (
+        '<li class="shadow-graph-dir-leaf">' +
+        renderGraphPageNode(node.path, centerPath, inboundSet, highlightInbound) +
         '</li>'
       );
     }
 
     let html =
-      '<li class="shadow-link-tree-group shadow-link-tree-group--sitemap' +
+      '<li class="shadow-graph-dir-group shadow-graph-node--folder' +
       (isExpanded ? ' is-expanded' : '') +
-      (isCurrent ? ' shadow-link-tree-group--current' : '') +
-      '">' +
-      '<button type="button" class="shadow-link-tree-row shadow-link-tree-row--group shadow-link-tree-row--sitemap" data-expand-key="' +
-      escapeAttr(key) +
-      '" aria-expanded="' +
-      (isExpanded ? 'true' : 'false') +
-      '">' +
-      '<span class="shadow-link-tree-chevron" aria-hidden="true">' +
-      (isExpanded ? '▼' : '▶') +
-      '</span>' +
-      '<span class="shadow-link-tree-label">' +
-      escapeHtml(label) +
-      '</span>' +
-      '<span class="shadow-link-tree-path">' +
-      escapeHtml(path) +
-      '</span>' +
-      '</button>' +
-      '<ul class="shadow-link-tree shadow-link-tree-children"' +
-      (isExpanded ? '' : ' hidden') +
-      '>';
-    children.forEach((child) => {
-      html += renderSiteMapNode(child, centerPath, depth + 1);
-    });
-    html += '</ul></li>';
+      '">';
+    if (hasKids) {
+      html +=
+        '<button type="button" class="shadow-graph-dir-row" data-expand-key="' +
+        escapeAttr(expandKey) +
+        '" aria-expanded="' +
+        (isExpanded ? 'true' : 'false') +
+        '">' +
+        '<span class="shadow-link-tree-chevron" aria-hidden="true">' +
+        (isExpanded ? '▼' : '▶') +
+        '</span>' +
+        '<span class="shadow-graph-dir-label">' +
+        escapeHtml(node.label) +
+        '</span>' +
+        '</button>' +
+        '<ul class="shadow-graph-dir-children shadow-link-tree-children"' +
+        (isExpanded ? '' : ' hidden') +
+        '>';
+      node.children.forEach((child) => {
+        html += renderDirectoryTreeNode(child, centerPath, depth + 1, inboundSet, highlightInbound);
+      });
+      html += '</ul>';
+    } else {
+      html +=
+        '<span class="shadow-graph-dir-row shadow-graph-dir-row--muted">' +
+        '<span class="shadow-graph-dir-label">' +
+        escapeHtml(node.label) +
+        '</span></span>';
+    }
+    html += '</li>';
     return html;
   }
 
-  function renderSiteMapSection(centerPath) {
-    if (!siteGraph || !siteGraph.pathTree) return '';
-    const rootChildren = getDirectChildren('/');
-    let treeHtml = '';
-    if (siteGraph.pathTree.has('/')) {
-      treeHtml = renderSiteMapNode('/', centerPath, 0);
-    } else {
-      treeHtml = '<ul class="shadow-link-tree shadow-link-tree-root">';
-      rootChildren.forEach((child) => {
-        treeHtml += renderSiteMapNode(child, centerPath, 0);
-      });
-      treeHtml += '</ul>';
+  function renderDirectoryTreeView(centerPath, highlightInbound) {
+    if (!siteGraph || !siteGraph.directoryTree) {
+      return '<p class="shadow-hint">Directory tree not available yet.</p>';
     }
-    return (
-      '<details class="shadow-link-tree-sitemap">' +
-      '<summary class="shadow-link-tree-sitemap-summary">Site map</summary>' +
-      '<div class="shadow-link-tree-sitemap-body">' +
-      treeHtml +
-      '</div></details>'
+    const inboundSet = new Set(getIncomingLinkSources(centerPath));
+    const inboundCount = inboundSet.size;
+    let html =
+      '<div class="shadow-graph-dir-panel">' +
+      '<div class="shadow-graph-dir-toolbar">' +
+      renderIncomingToggle(centerPath, inboundCount, activeGraphView !== 'incoming-links') +
+      '</div>' +
+      '<ul class="shadow-graph-dir-tree shadow-link-tree-root">';
+    html += renderDirectoryTreeNode(
+      siteGraph.directoryTree,
+      centerPath,
+      0,
+      inboundSet,
+      highlightInbound
     );
+    html += '</ul></div>';
+    return html;
   }
 
-  function renderLinkTreePanel(graph) {
-    const s = graph.stats;
+  function renderCrawlMapView(centerPath, highlightInbound) {
+    const crawl = buildCrawlTree();
+    const inboundSet = new Set(getIncomingLinkSources(centerPath));
+    const inboundCount = inboundSet.size;
     let html =
-      '<div class="shadow-link-tree-panel">' +
-      '<header class="shadow-link-tree-header">' +
-      '<code class="shadow-link-tree-page" title="Current page">' +
-      escapeHtml(graph.center) +
-      '</code>' +
-      renderGraphStats(graph) +
-      renderLinkHealth(s) +
-      '</header>' +
+      '<div class="shadow-graph-crawl-panel">' +
+      '<div class="shadow-graph-dir-toolbar">' +
+      renderIncomingToggle(centerPath, inboundCount, activeGraphView !== 'incoming-links') +
+      '</div>' +
+      '<div class="shadow-graph-crawl-map">';
+
+    crawl.columns.forEach((col) => {
+      const depthClass = 'shadow-crawl-depth-' + col.depth;
+      const paths = col.paths;
+      const overflow = paths.length > MAX_CRAWL_COLUMN_NODES;
+      const shown = overflow ? paths.slice(0, MAX_CRAWL_COLUMN_NODES) : paths;
+      html +=
+        '<section class="shadow-graph-crawl-column ' +
+        depthClass +
+        '" aria-label="Depth ' +
+        col.depth +
+        '">' +
+        '<h4 class="shadow-graph-crawl-column-title">Depth ' +
+        col.depth +
+        '</h4>' +
+        '<div class="shadow-graph-crawl-column-body">';
+      shown.forEach((path) => {
+        html +=
+          '<div class="shadow-graph-crawl-node-wrap">' +
+          renderGraphPageNode(
+            path,
+            centerPath,
+            inboundSet,
+            highlightInbound,
+            'shadow-graph-crawl-node shadow-crawl-depth-' + col.depth
+          ) +
+          '</div>';
+      });
+      if (overflow) {
+        html +=
+          '<p class="shadow-graph-crawl-more">+' +
+          (paths.length - MAX_CRAWL_COLUMN_NODES) +
+          ' more in this column</p>';
+      }
+      html += '</div></section>';
+    });
+
+    if (crawl.unreachable.length) {
+      html +=
+        '<section class="shadow-graph-crawl-column shadow-graph-crawl-column--orphan" aria-label="Not reached from home">' +
+        '<h4 class="shadow-graph-crawl-column-title">Not from home</h4>' +
+        '<div class="shadow-graph-crawl-column-body">';
+      crawl.unreachable.forEach((path) => {
+        html +=
+          '<div class="shadow-graph-crawl-node-wrap">' +
+          renderGraphPageNode(path, centerPath, inboundSet, highlightInbound, 'shadow-graph-crawl-node') +
+          '</div>';
+      });
+      html += '</div></section>';
+    }
+
+    html += '</div></div>';
+    return html;
+  }
+
+  function renderThisPageView(graph) {
+    return (
       '<div class="shadow-link-tree-split">' +
       renderLinkTreeSide(
         'Links TO this page',
@@ -613,8 +974,83 @@
         'This page has no internal outbound links'
       ) +
       '</div>' +
-      renderSiteMapSection(graph.center) +
-      '<p class="shadow-link-tree-legend">Grouped by site section · tap to expand</p>' +
+      '<p class="shadow-link-tree-legend">Grouped by site section · tap to expand</p>'
+    );
+  }
+
+  function renderActiveGraphBody(graph) {
+    const center = graph.center;
+    const highlightInbound =
+      incomingHighlight || activeGraphView === 'incoming-links';
+    if (activeGraphView === 'this-page') return renderThisPageView(graph);
+    if (activeGraphView === 'url-structure' || activeGraphView === 'incoming-links') {
+      return renderDirectoryTreeView(center, highlightInbound);
+    }
+    if (activeGraphView === 'crawl-map') {
+      return renderCrawlMapView(center, highlightInbound);
+    }
+    return renderThisPageView(graph);
+  }
+
+  function renderGraphViewHeader(graph) {
+    const inboundCount = graph.stats.inboundCount;
+    let titleExtra = '';
+    if (
+      (incomingHighlight || activeGraphView === 'incoming-links') &&
+      inboundCount > 0
+    ) {
+      titleExtra =
+        ' <span class="shadow-graph-inbound-header-count">' +
+        inboundCount +
+        ' linking here</span>';
+    }
+    return (
+      '<header class="shadow-link-tree-header">' +
+      '<div class="shadow-graph-header-row">' +
+      renderGraphViewSwitcher() +
+      '<div class="shadow-graph-header-actions">' +
+      titleExtra +
+      renderGraphLegendButton() +
+      '</div></div>' +
+      '<code class="shadow-link-tree-page" title="Current page">' +
+      escapeHtml(graph.center) +
+      '</code>' +
+      renderGraphStats(graph) +
+      renderLinkHealth(graph.stats) +
+      '</header>'
+    );
+  }
+
+  function renderGraphSummaryLine() {
+    const summary = getSiteGraphSummary();
+    if (!summary.ready) {
+      return '<p class="shadow-graph-summary-line shadow-graph-summary-line--loading">Building site graph…</p>';
+    }
+    const noindexPart =
+      summary.noindexCount > 0
+        ? ' · ' + summary.noindexCount + ' noindex'
+        : '';
+    return (
+      '<p class="shadow-graph-summary-line">' +
+      '<span>' +
+      summary.pageCount +
+      ' pages' +
+      escapeHtml(noindexPart) +
+      '</span>' +
+      '<button type="button" class="shadow-btn-text shadow-graph-open-structure">Open URL structure</button>' +
+      '</p>'
+    );
+  }
+
+  function renderLinkTreePanel(graph) {
+    let html =
+      '<div class="shadow-link-tree-panel">' +
+      renderGraphViewHeader(graph) +
+      '<div class="shadow-graph-view-body" data-graph-view="' +
+      escapeAttr(activeGraphView) +
+      '">' +
+      renderActiveGraphBody(graph) +
+      '</div>' +
       '<div class="shadow-graph-actions">' +
       '<button type="button" class="shadow-btn shadow-btn-secondary shadow-graph-rebuild">Rebuild graph</button>' +
       '</div></div>';
@@ -651,25 +1087,68 @@
     );
   }
 
-  function toggleLinkTreeGroup(button) {
-    const key = button.getAttribute('data-expand-key');
-    if (!key) return;
-    const willExpand = !expandedGroups.has(key);
-    if (willExpand) expandedGroups.add(key);
-    else expandedGroups.delete(key);
+  function toggleDirectoryGroup(button) {
+    toggleLinkTreeGroup(button);
+  }
 
-    button.setAttribute('aria-expanded', willExpand ? 'true' : 'false');
-    const group = button.closest('.shadow-link-tree-group');
-    if (group) group.classList.toggle('is-expanded', willExpand);
-    const chevron = button.querySelector('.shadow-link-tree-chevron');
-    if (chevron) chevron.textContent = willExpand ? '▼' : '▶';
-    const children = group ? group.querySelector(':scope > .shadow-link-tree-children') : null;
-    if (children) children.hidden = !willExpand;
+  function bindGraphPanelControls(container, centerPath, options) {
+    if (!container) return;
+    const opts = options || {};
+
+    container.querySelectorAll('.shadow-graph-view-switch-btn').forEach((btn) => {
+      if (btn._graphViewBound) return;
+      btn._graphViewBound = true;
+      btn.addEventListener('click', () => {
+        const view = btn.getAttribute('data-graph-view');
+        if (!view) return;
+        setActiveView(view);
+        renderGraphPanel(container, centerPath, opts);
+      });
+    });
+
+    const legendBtn = container.querySelector('.shadow-graph-legend-btn');
+    if (legendBtn && !legendBtn._bound) {
+      legendBtn._bound = true;
+      legendBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        legendPopoverOpen = !legendPopoverOpen;
+        const pop = container.querySelector('.shadow-graph-legend-popover');
+        if (pop) pop.classList.toggle('is-open', legendPopoverOpen);
+      });
+    }
+
+    const incomingCheck = container.querySelector('.shadow-graph-incoming-checkbox');
+    if (incomingCheck && !incomingCheck._bound) {
+      incomingCheck._bound = true;
+      incomingCheck.addEventListener('change', () => {
+        incomingHighlight = incomingCheck.checked;
+        if (activeGraphView === 'incoming-links' && !incomingHighlight) {
+          setActiveView('url-structure');
+        }
+        renderGraphPanel(container, centerPath, opts);
+      });
+    }
+
+    const openStructure = container.querySelector('.shadow-graph-open-structure');
+    if (openStructure && !openStructure._bound) {
+      openStructure._bound = true;
+      openStructure.addEventListener('click', () => {
+        setActiveView('url-structure');
+        if (opts.onOpenStructure) opts.onOpenStructure();
+        else if (container.closest('.shadow-activity-graph')) {
+          renderGraphPanel(container.closest('.shadow-activity-graph') || container, centerPath, opts);
+        } else {
+          renderGraphPanel(container, centerPath, opts);
+        }
+      });
+    }
   }
 
   function bindLinkTreeInteractions(container, centerPath, options) {
     if (!container) return;
     const opts = options || {};
+
+    bindGraphPanelControls(container, centerPath, opts);
 
     if (container._linkTreeBound) {
       container._graphInteractCenter = centerPath;
@@ -681,10 +1160,31 @@
     container._graphInteractOpts = opts;
 
     container.addEventListener('click', (event) => {
+      const viewBtn = event.target.closest('.shadow-graph-view-switch-btn');
+      if (viewBtn) return;
+
+      const legendBtn = event.target.closest('.shadow-graph-legend-btn');
+      if (legendBtn) return;
+
+      const dirBtn = event.target.closest('.shadow-graph-dir-row[data-expand-key]');
+      if (dirBtn) {
+        event.preventDefault();
+        toggleDirectoryGroup(dirBtn);
+        return;
+      }
+
       const groupBtn = event.target.closest('.shadow-link-tree-row--group');
       if (groupBtn) {
         event.preventDefault();
         toggleLinkTreeGroup(groupBtn);
+        return;
+      }
+
+      const pageNode = event.target.closest('.shadow-graph-page-node');
+      if (pageNode && pageNode.tagName === 'A') {
+        event.preventDefault();
+        const path = pageNode.getAttribute('data-graph-path');
+        if (path) location.href = pathToUrl(path);
         return;
       }
 
@@ -698,12 +1198,50 @@
 
     container.addEventListener('keydown', (event) => {
       if (event.key !== 'Enter' && event.key !== ' ') return;
+      const dirBtn = event.target.closest('.shadow-graph-dir-row[data-expand-key]');
+      if (dirBtn) {
+        event.preventDefault();
+        toggleDirectoryGroup(dirBtn);
+        return;
+      }
       const groupBtn = event.target.closest('.shadow-link-tree-row--group');
       if (groupBtn) {
         event.preventDefault();
         toggleLinkTreeGroup(groupBtn);
       }
     });
+
+    document.addEventListener('click', (event) => {
+      if (!legendPopoverOpen) return;
+      if (event.target.closest('.shadow-graph-legend-btn')) return;
+      if (event.target.closest('.shadow-graph-legend-popover')) return;
+      legendPopoverOpen = false;
+      const pop = container.querySelector('.shadow-graph-legend-popover');
+      if (pop) pop.classList.remove('is-open');
+    });
+  }
+
+  function toggleLinkTreeGroup(button) {
+    const key = button.getAttribute('data-expand-key');
+    if (!key) return;
+    const willExpand = !expandedGroups.has(key);
+    if (willExpand) expandedGroups.add(key);
+    else expandedGroups.delete(key);
+
+    button.setAttribute('aria-expanded', willExpand ? 'true' : 'false');
+    const group =
+      button.closest('.shadow-link-tree-group') ||
+      button.closest('.shadow-graph-dir-group');
+    if (group) group.classList.toggle('is-expanded', willExpand);
+    const chevron = button.querySelector('.shadow-link-tree-chevron');
+    if (chevron) chevron.textContent = willExpand ? '▼' : '▶';
+    const children =
+      group
+        ? group.querySelector(
+            ':scope > .shadow-link-tree-children, :scope > .shadow-graph-dir-children'
+          )
+        : null;
+    if (children) children.hidden = !willExpand;
   }
 
   function renderGraphStats(graph) {
@@ -749,6 +1287,8 @@
       return;
     }
 
+    applyPendingView();
+
     let html;
     if (opts.compact) {
       html = renderCompactLinkPreview(graph);
@@ -757,6 +1297,16 @@
     }
     container.innerHTML = html;
     bindLinkTreeInteractions(container, centerPath, opts);
+
+    if (opts.compact && container.parentElement) {
+      const existingLine = container.parentElement.querySelector('.shadow-graph-summary-line');
+      if (existingLine) {
+        const wrap = document.createElement('div');
+        wrap.innerHTML = renderGraphSummaryLine();
+        const newLine = wrap.firstElementChild;
+        if (newLine) existingLine.replaceWith(newLine);
+      }
+    }
 
     const rebuildBtn = container.querySelector('.shadow-graph-rebuild');
     if (rebuildBtn && !rebuildBtn._bound) {
@@ -796,6 +1346,13 @@
     renderMiniPreview,
     renderLinkTreePanel,
     renderGraphStats,
+    renderGraphSummaryLine,
+    getSiteGraphSummary,
+    getIncomingLinkSources,
+    buildDirectoryTree,
+    buildCrawlTree,
+    setActiveView,
+    setPendingView,
     getSectionTree,
     normalizePath,
     hasChildren,
