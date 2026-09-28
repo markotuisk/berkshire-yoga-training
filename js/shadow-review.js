@@ -1780,7 +1780,7 @@
           '<img src="' + escapeAttr(src) + '" alt="" class="shadow-storycard-img">';
       } else {
         preview.innerHTML =
-          '<span class="shadow-storycard-placeholder">Placeholder — no image yet</span>';
+          '<span class="shadow-storycard-placeholder">Placeholder - no image yet</span>';
       }
     }
     if (fileInput) fileInput.value = '';
