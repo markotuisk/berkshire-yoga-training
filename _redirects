@@ -30,3 +30,33 @@
 /partners /research/partners/ 301
 /partners/ /research/partners/ 301
 /partners.html /research/partners/ 301
+
+# Shala-style IA aliases (TWA content, familiar yoga-school paths)
+/courses /services/ 301
+/courses/ /services/ 301
+/courses/foundation-training /services/foundation-training/ 301
+/courses/foundation-training/ /services/foundation-training/ 301
+/courses/cpd /services/cpd/ 301
+/courses/cpd/ /services/cpd/ 301
+/courses/workshops /services/workshops/ 301
+/courses/workshops/ /services/workshops/ 301
+/courses/retreats /services/retreats/ 301
+/courses/retreats/ /services/retreats/ 301
+/teachers /team.html 301
+/teachers/ /team.html 301
+/yoga-teacher /team.html 301
+/yoga-teacher/ /team.html 301
+/faculty /team.html 301
+/faculty/ /team.html 301
+/blog /journal.html 301
+/blog/ /journal.html 301
+/faq /faq.html 301
+/faq/ /faq.html 301
+/faqs /faq.html 301
+/faqs/ /faq.html 301
+/testimonials /testimonials.html 301
+/testimonials/ /testimonials.html 301
+/signup /join.html 301
+/signup/ /join.html 301
+/apply /join.html 301
+/apply/ /join.html 301

@@ -13,7 +13,7 @@
   const navToggle = document.querySelector('.nav-toggle');
   const mainNav = document.querySelector('.main-nav');
   const menuItems = document.querySelectorAll('.nav-item--has-menu');
-  const desktopNavQuery = window.matchMedia('(min-width: 1441px)');
+  const desktopNavQuery = window.matchMedia('(min-width: 992px)');
 
   const isDesktopNav = () => desktopNavQuery.matches;
 
