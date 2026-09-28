@@ -22,7 +22,7 @@
   --muted: #5c6561;
   --danger: #b42318;
 
-  --font-display: "Cormorant Garamond", "Times New Roman", Georgia, serif;
+  --font-display: "Jomhuria", "Times New Roman", Georgia, serif;
   --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
 
   --container: 72rem;
@@ -100,40 +100,41 @@ a:hover {
   width: min(100% - 2.5rem, var(--container-narrow));
 }
 
-/* Typography */
+/* Typography — Jomhuria is a tall display face: larger size, tight leading */
 h1,
 .h1,
 .display {
   font-family: var(--font-display);
-  font-weight: 500;
-  letter-spacing: -0.02em;
-  line-height: 1.12;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 0.9;
   color: var(--ink);
-  margin: 0 0 1rem;
+  margin: 0 0 0.85rem;
 }
 
 h1,
 .h1 {
-  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-size: clamp(3.5rem, 8vw, 5.75rem);
 }
 
 h2,
 .h2 {
   font-family: var(--font-display);
-  font-weight: 500;
-  font-size: clamp(1.85rem, 3vw, 2.75rem);
-  line-height: 1.18;
-  letter-spacing: -0.015em;
-  margin: 0 0 0.85rem;
+  font-weight: 400;
+  font-size: clamp(2.65rem, 5vw, 4rem);
+  line-height: 0.92;
+  letter-spacing: 0.01em;
+  margin: 0 0 0.75rem;
 }
 
 h3,
 .h3 {
   font-family: var(--font-display);
-  font-weight: 500;
-  font-size: clamp(1.35rem, 2vw, 1.75rem);
-  line-height: 1.25;
-  margin: 0 0 0.6rem;
+  font-weight: 400;
+  font-size: clamp(1.9rem, 3vw, 2.5rem);
+  line-height: 0.95;
+  letter-spacing: 0.01em;
+  margin: 0 0 0.55rem;
 }
 
 .lede {
@@ -269,10 +270,10 @@ h3,
 
 .logo-text {
   font-family: var(--font-display);
-  font-size: 1.2rem;
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  line-height: 1.1;
+  font-size: 1.85rem;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 0.88;
 }
 
 .logo-text small {
@@ -428,10 +429,11 @@ h3,
 
 .hero-brand {
   font-family: var(--font-display);
-  font-size: clamp(1.15rem, 2vw, 1.45rem);
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  margin-bottom: 1.25rem;
+  font-size: clamp(1.85rem, 3vw, 2.35rem);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 0.9;
+  margin-bottom: 1.1rem;
   color: rgba(255, 255, 255, 0.92);
 }
 
@@ -649,8 +651,10 @@ h3,
 .quote-card blockquote {
   margin: 0 0 1rem;
   font-family: var(--font-display);
-  font-size: 1.35rem;
-  line-height: 1.35;
+  font-size: 1.85rem;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 0.95;
   color: var(--ink);
 }
 
@@ -863,9 +867,12 @@ h3,
 
 .footer-brand {
   font-family: var(--font-display);
-  font-size: 1.45rem;
+  font-size: 2.15rem;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 0.9;
   color: var(--white);
-  margin: 0 0 0.65rem;
+  margin: 0 0 0.55rem;
 }
 
 .footer-bottom {
@@ -989,7 +996,7 @@ h3,
   }
 
   .logo-text {
-    font-size: 1.05rem;
+    font-size: 1.55rem;
   }
 
   .course-grid {
