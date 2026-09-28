@@ -22,9 +22,18 @@ Full rebuild of Berkshire Yoga Training as **Thames Wellness Academy**, borrowin
 - Legacy CSS preserved: `css/styles.legacy.css`
 - Shadow overlay assets untouched (`js/shadow-*.js`, `css/shadow-review.css`)
 
+## Migrated to site.css
+
+Homepage, About, Teachers, Contact, Apply, Privacy, FAQ, Testimonials, Journal listing + 3 articles, Courses hub + all programme pages, Solutions hub + 3 pathways, Research + Partners, team placeholders (noindex).
+
+## Intentionally on legacy CSS
+
+- `full-home.html` (owners preview rewrite target)
+- `coming-soon.html` / `coming-soon.css` (retired holding page)
+
 ## Still to finish
 
-- Restyle remaining pages: `research.html`, `research/partners/`, `solutions/**`, journal articles, team placeholders
 - Real photography replacing placeholders
 - Domain cutover plan for `thameswellnessacademy.co.uk`
 - Expand privacy policy legal copy
+- Optional: richer journal article bodies from pre-rebuild drafts
