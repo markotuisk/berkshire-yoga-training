@@ -28,6 +28,8 @@
   --container: 72rem;
   --container-narrow: 42rem;
   --header-h: 4.25rem;
+  --pathways-h: 2.375rem;
+  --header-total-h: calc(var(--header-h) + var(--pathways-h));
   --radius: 0.5rem;
   --radius-lg: 1rem; /* cards, media, panels */
   --radius-control: 0.55rem; /* buttons, tags, chips, CTAs */
@@ -233,6 +235,91 @@ h3,
 .site-header.scrolled {
   border-bottom-color: var(--border);
   box-shadow: 0 8px 24px rgba(20, 24, 22, 0.04);
+}
+
+/* Slim pathways utility bar (above main nav) */
+.pathways-bar {
+  background: color-mix(in srgb, var(--river) 10%, var(--mist));
+  border-bottom: 1px solid color-mix(in srgb, var(--river) 14%, transparent);
+  min-height: var(--pathways-h);
+}
+
+.pathways-bar-inner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: var(--pathways-h);
+  padding-block: 0.3rem;
+}
+
+.pathways-label {
+  flex-shrink: 0;
+  font-family: var(--font-display);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--river);
+  line-height: 1;
+}
+
+.pathways-chips {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  mask-image: linear-gradient(to right, #000 92%, transparent);
+  padding-right: 0.75rem;
+}
+
+.pathways-chips::-webkit-scrollbar {
+  display: none;
+}
+
+.pathways-chip {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.28rem 0.7rem;
+  border-radius: var(--radius-control);
+  border: 1px solid color-mix(in srgb, var(--river) 18%, transparent);
+  background: rgba(255, 255, 255, 0.55);
+  color: var(--ink-soft);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background var(--ease), border-color var(--ease), color var(--ease);
+}
+
+.pathways-chip:hover,
+.pathways-chip:focus-visible {
+  background: var(--gold-hover);
+  border-color: var(--gold-hover);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.pathways-chip--more {
+  background: transparent;
+  border-color: transparent;
+  color: var(--river-mid);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
+  padding-inline: 0.45rem;
+}
+
+.pathways-chip--more:hover,
+.pathways-chip--more:focus-visible {
+  background: var(--gold-hover);
+  border-color: var(--gold-hover);
+  color: var(--ink);
+  text-decoration: none;
 }
 
 .header-inner {
@@ -461,7 +548,7 @@ h3,
 /* Hero — full-bleed billboard + bottom cinema rail */
 .hero {
   position: relative;
-  min-height: calc(100svh - var(--header-h));
+  min-height: calc(100svh - var(--header-total-h));
   display: flex;
   flex-direction: column;
   color: var(--white);
@@ -791,7 +878,7 @@ h3,
 /* Tablet and below: stacked billboard, rail remains a full-width band */
 @media (max-width: 991px) {
   .hero {
-    min-height: calc(100svh - var(--header-h));
+    min-height: calc(100svh - var(--header-total-h));
   }
 
   .hero-stage {
@@ -942,7 +1029,7 @@ h3,
 /* Large monitors: billboard type owns the stage */
 @media (min-width: 1441px) {
   .hero {
-    min-height: calc(100svh - var(--header-h));
+    min-height: calc(100svh - var(--header-total-h));
   }
 
   .hero-stage {
@@ -1473,6 +1560,20 @@ h3,
 
 /* Mobile + tablet nav */
 @media (max-width: 991px) {
+  .pathways-bar-inner {
+    gap: 0.55rem;
+    padding-block: 0.25rem;
+  }
+
+  .pathways-label {
+    font-size: 0.625rem;
+  }
+
+  .pathways-chip {
+    padding: 0.22rem 0.58rem;
+    font-size: 0.7rem;
+  }
+
   .nav-toggle {
     display: block;
     order: 3;
@@ -1501,7 +1602,7 @@ h3,
     border-bottom: 1px solid var(--border);
     box-shadow: 0 16px 28px rgba(20, 24, 22, 0.06);
     padding: 0.75rem 1.25rem 1.25rem;
-    max-height: min(70vh, calc(100dvh - var(--header-h) - 0.5rem));
+    max-height: min(70vh, calc(100dvh - var(--header-total-h) - 0.5rem));
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
   }
