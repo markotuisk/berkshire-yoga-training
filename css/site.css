@@ -1097,8 +1097,32 @@ h3,
   padding: 5rem 0;
 }
 
+.section-pd-top-tight {
+  padding-top: 2rem;
+}
+
 .section--mist {
   background: var(--mist);
+}
+
+#form,
+#chat,
+#email,
+#call,
+#all-articles,
+#teacher-training,
+#ashtanga,
+#pregnancy,
+#sound,
+#anatomy,
+#nidra,
+#press-releases,
+#our-story,
+#approach,
+#accreditation,
+#location,
+#policies {
+  scroll-margin-top: calc(var(--header-total-h) + 1rem);
 }
 
 .section--river {
@@ -1328,7 +1352,180 @@ h3,
   color: var(--muted);
 }
 
-/* Journal teasers */
+/* Contact ways + CTA blocks */
+.contact-ways {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 700px) {
+  .contact-ways {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1100px) {
+  .contact-ways {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.contact-way {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 1.25rem 1.35rem;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color var(--ease), box-shadow var(--ease), transform var(--ease);
+}
+
+.contact-way:hover {
+  border-color: var(--river-light);
+  box-shadow: var(--shadow-soft);
+  transform: translateY(-2px);
+  color: inherit;
+  text-decoration: none;
+}
+
+.contact-way-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--river-mid);
+}
+
+.contact-way-title {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.contact-way-desc {
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+
+.contact-side-card {
+  cursor: default;
+}
+
+.contact-side-card:hover {
+  transform: none;
+}
+
+.contact-cta-block {
+  display: grid;
+  gap: 1.5rem;
+  align-items: end;
+}
+
+@media (min-width: 800px) {
+  .contact-cta-block {
+    grid-template-columns: 1.4fr auto;
+    gap: 2.5rem;
+  }
+}
+
+.contact-direct {
+  margin: 1rem 0 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.contact-direct a {
+  color: var(--river-mid);
+}
+
+.contact-direct a:hover {
+  color: var(--river);
+}
+
+/* Journal topics + teasers */
+.journal-topics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.journal-topic-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 0.85rem;
+  border-radius: var(--radius-control);
+  border: 1px solid var(--border-strong);
+  background: var(--white);
+  color: var(--ink);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: border-color var(--ease), background var(--ease), color var(--ease);
+}
+
+.journal-topic-chip:hover {
+  border-color: var(--river-mid);
+  color: var(--river);
+  text-decoration: none;
+}
+
+.journal-topic-chip--all {
+  background: var(--mist);
+}
+
+.journal-topic-stub {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.35rem 1.5rem;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.journal-topic-stub--wide {
+  max-width: 40rem;
+}
+
+.journal-topic-stub .meta {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--river-mid);
+}
+
+.journal-topic-stub .h3 {
+  margin: 0;
+}
+
+.journal-topic-stub p {
+  margin: 0;
+  color: var(--ink-soft);
+}
+
+.journal-topic-stub .card-link {
+  margin-top: 0.75rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--river-mid);
+}
+
+.about-value-card {
+  cursor: default;
+}
+
+.about-value-card:hover {
+  transform: none;
+}
+
 .journal-grid {
   display: grid;
   gap: 1.25rem;
