@@ -53,6 +53,7 @@ body {
   color: var(--ink);
   background: var(--paper);
   -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
 }
 
 img {
@@ -240,6 +241,7 @@ h3,
   justify-content: space-between;
   gap: 1rem;
   min-height: var(--header-h);
+  position: relative;
 }
 
 .logo {
@@ -437,12 +439,14 @@ h3,
   z-index: 1;
   display: grid;
   gap: 2.25rem;
-  align-items: end;
+  align-items: stretch;
   width: 100%;
+  min-width: 0;
 }
 
 .hero-copy {
   max-width: 36rem;
+  min-width: 0;
 }
 
 .hero .eyebrow {
@@ -452,6 +456,7 @@ h3,
 .hero h1 {
   color: var(--white);
   margin-bottom: 1rem;
+  overflow-wrap: break-word;
 }
 
 .hero .lede {
@@ -472,6 +477,8 @@ h3,
 .hero-upcoming {
   width: 100%;
   max-width: 22rem;
+  min-width: 0;
+  box-sizing: border-box;
   padding: 1.4rem 1.5rem 1.5rem;
   border-radius: var(--radius-lg);
   border: 1px solid rgba(255, 255, 255, 0.18);
@@ -517,6 +524,7 @@ h3,
   line-height: 1.25;
   letter-spacing: -0.02em;
   color: var(--white);
+  overflow-wrap: break-word;
 }
 
 .hero-upcoming-meta {
@@ -545,6 +553,7 @@ h3,
   font-size: 0.98rem;
   font-weight: 600;
   color: var(--white);
+  overflow-wrap: break-word;
 }
 
 .hero-upcoming-countdown {
@@ -588,7 +597,84 @@ h3,
   text-decoration: none;
 }
 
-@media (min-width: 900px) {
+/* Phone + tablet: stack copy then upcoming; full-width CTAs.
+   Keep stacked through 991px so layout matches the mobile/tablet nav. */
+@media (max-width: 991px) {
+  .hero {
+    min-height: auto;
+    padding: 5rem 0 3rem;
+  }
+
+  .hero-inner {
+    gap: 1.75rem;
+  }
+
+  .hero-upcoming {
+    max-width: none;
+  }
+
+  .hero .btn-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .hero .btn-row .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 767px) {
+  .container {
+    width: min(100% - 1.75rem, var(--container));
+  }
+
+  .container--narrow {
+    width: min(100% - 1.75rem, var(--container-narrow));
+  }
+
+  .hero {
+    padding: 4.25rem 0 2.5rem;
+  }
+
+  .hero h1 {
+    font-size: clamp(1.85rem, 8.5vw, 2.35rem);
+  }
+
+  .hero-brand {
+    font-size: clamp(1.1rem, 4.5vw, 1.35rem);
+    margin-bottom: 0.85rem;
+  }
+
+  .hero .lede {
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  .hero-upcoming {
+    padding: 1.15rem 1.2rem 1.25rem;
+  }
+
+  .hero-upcoming-title {
+    font-size: 1.1rem;
+    margin-bottom: 0.85rem;
+  }
+
+  .hero-upcoming-meta {
+    gap: 0.65rem 0.75rem;
+  }
+
+  .hero-upcoming-meta dd {
+    font-size: 0.92rem;
+  }
+
+  .hero-upcoming-countdown,
+  .hero-upcoming-location {
+    font-size: 0.88rem;
+  }
+}
+
+@media (min-width: 992px) {
   .hero-inner {
     grid-template-columns: minmax(0, 1fr) minmax(17rem, 22rem);
     gap: 3rem;
@@ -597,6 +683,27 @@ h3,
 
   .hero-upcoming {
     justify-self: end;
+    max-width: 22rem;
+  }
+}
+
+/* Large monitors: more breathing room in the hero */
+@media (min-width: 1441px) {
+  .hero {
+    padding: 7rem 0 5.5rem;
+  }
+
+  .hero-inner {
+    gap: 3.5rem;
+    grid-template-columns: minmax(0, 1fr) minmax(18rem, 24rem);
+  }
+
+  .hero-copy {
+    max-width: 40rem;
+  }
+
+  .hero-upcoming {
+    max-width: 24rem;
   }
 }
 
@@ -1109,11 +1216,14 @@ h3,
   font-weight: 600;
 }
 
-/* Mobile nav */
+/* Mobile + tablet nav */
 @media (max-width: 991px) {
   .nav-toggle {
     display: block;
     order: 3;
+    width: 2.75rem;
+    height: 2.75rem;
+    flex-shrink: 0;
   }
 
   .header-cta {
@@ -1130,10 +1240,15 @@ h3,
     position: absolute;
     left: 0;
     right: 0;
-    top: var(--header-h);
+    top: 100%;
+    z-index: 90;
     background: var(--paper);
     border-bottom: 1px solid var(--border);
-    padding: 1rem 1.25rem 1.5rem;
+    box-shadow: 0 16px 28px rgba(20, 24, 22, 0.06);
+    padding: 0.75rem 1.25rem 1.25rem;
+    max-height: min(70vh, calc(100dvh - var(--header-h) - 0.5rem));
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .main-nav.open {
@@ -1143,6 +1258,14 @@ h3,
   .main-nav ul {
     flex-direction: column;
     align-items: stretch;
+    gap: 0.2rem;
+  }
+
+  .main-nav > ul > li > .nav-link {
+    display: flex;
+    align-items: center;
+    min-height: 2.85rem;
+    padding: 0.75rem 0.85rem;
   }
 
   .nav-item--has-menu > .nav-link {
@@ -1153,7 +1276,7 @@ h3,
   .nav-submenu {
     position: static;
     display: none;
-    margin: 0.4rem 0 0.35rem;
+    margin: 0.25rem 0 0.45rem;
     padding: 0.4rem;
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
@@ -1170,7 +1293,10 @@ h3,
   }
 
   .nav-submenu a {
-    padding: 0.7rem 0.85rem;
+    display: flex;
+    align-items: center;
+    min-height: 2.65rem;
+    padding: 0.75rem 0.9rem;
   }
 
   .logo-img {
@@ -1179,6 +1305,23 @@ h3,
 
   .course-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Laptop: slightly tighter top-level nav so it fits with logo + Apply */
+@media (min-width: 992px) and (max-width: 1100px) {
+  .main-nav a {
+    padding: 0.5rem 0.55rem;
+    font-size: 0.88rem;
+  }
+
+  .nav-submenu {
+    min-width: 14.5rem;
+  }
+
+  .header-cta {
+    padding: 0.5rem 0.9rem;
+    font-size: 0.85rem;
   }
 }
 
