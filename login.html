@@ -12,24 +12,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="assets/favicon.ico" sizes="48x48">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="assets/favicon-32x32.png" type="image/png" sizes="32x32">
+  <link rel="icon" href="assets/favicon-16x16.png" type="image/png" sizes="16x16">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" sizes="180x180">
   <link rel="manifest" href="assets/site.webmanifest">
-  <title>Yoga Teachers and Faculty | Thames Wellness Academy</title>
-  <meta name="description" content="Meet the teachers and founders of Thames Wellness Academy: Raili Maripuu, Katia Major and supporting faculty across Berkshire programmes.">
-  <meta property="og:title" content="Teachers | Thames Wellness Academy">
-  <meta property="og:description" content="Meet the teachers and founders of Thames Wellness Academy: Raili Maripuu, Katia Major and supporting faculty across Berkshire programmes.">
+  <title>Student Login | Thames Wellness Academy</title>
+  <meta name="description" content="Sign in to the Thames Wellness Academy student portal. For enrolled students on Foundation Training, CPD and workshops in Berkshire.">
+  <meta property="og:title" content="Student Login | Thames Wellness Academy">
+  <meta property="og:description" content="Sign in to the Thames Wellness Academy student portal. For enrolled students on Foundation Training, CPD and workshops.">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="en_GB">
   <meta property="og:site_name" content="Thames Wellness Academy">
-  <meta property="og:url" content="https://berkshireyogatraining.co.uk/team.html">
+  <meta property="og:url" content="https://berkshireyogatraining.co.uk/login.html">
   <meta property="og:image" content="https://berkshireyogatraining.co.uk/assets/og-image.jpg">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="canonical" href="https://berkshireyogatraining.co.uk/team.html">
+  <meta name="robots" content="noindex, follow">
+  <link rel="canonical" href="https://berkshireyogatraining.co.uk/login.html">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Archivo:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/site.css?v=20260929l">
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Thames Wellness Academy","url":"https://berkshireyogatraining.co.uk/","employee":[{"@type":"Person","name":"Raili Maripuu","jobTitle":"Co-founder"},{"@type":"Person","name":"Katia Major","jobTitle":"Co-founder"}]}</script>
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -85,28 +87,54 @@
               </li>
             </ul>
           </li>
-          <li><a href="team.html" class="nav-link nav-link--active" aria-current="page">Teachers</a></li>
+          <li><a href="team.html" class="nav-link">Teachers</a></li>
           <li><a href="journal.html" class="nav-link">Journal</a></li>
           <li><a href="about.html" class="nav-link">About</a></li>
           <li><a href="contact.html" class="nav-link">Contact</a></li>
-          <li class="nav-join-mobile"><a href="login.html" class="nav-link">Login</a></li>
+          <li class="nav-join-mobile"><a href="login.html" class="nav-link nav-link--active" aria-current="page">Login</a></li>
           <li class="nav-join-mobile"><a href="join.html" class="nav-link">Apply</a></li>
         </ul>
       </nav>
       <div class="header-actions">
-        <a href="login.html" class="header-login">Login</a>
+        <a href="login.html" class="header-login" aria-current="page">Login</a>
         <a href="join.html" class="header-cta">Apply</a>
       </div>
     </div>
-  </header><main id="main-content">
-<div class="container"><nav class="breadcrumb" aria-label="Breadcrumb"><a href="index.html">Home</a><span class="breadcrumb-sep">/</span><span>Teachers</span></nav></div>
-<header class="page-hero"><div class="container"><p class="eyebrow">Faculty</p><h1>Teachers and educators</h1><p class="lede">Faculty profiles are a core SEO asset on high-authority yoga school sites. Meet the people leading Thames Wellness Academy.</p></div></header>
-<section class="section"><div class="container teacher-grid">
-<article class="teacher-card"><div class="avatar" aria-hidden="true"></div><h2 class="h3">Raili Maripuu</h2><p class="role">Co-founder</p><p>Studio leadership through Goyoga Tallinn and long-form teacher education across Europe.</p></article>
-<article class="teacher-card"><div class="avatar" aria-hidden="true"></div><h2 class="h3">Katia Major</h2><p class="role">Co-founder</p><p>Clinical and studio practice through Yoga Reading, with a focus on professional teaching standards.</p></article>
-<article class="teacher-card"><div class="avatar" aria-hidden="true"></div><h2 class="h3">Senior educators &amp; specialists</h2><p class="role">Faculty</p><p>Programme delivery is supported by senior educators and clinical specialists. Individual profile pages will expand as appointments are confirmed.</p></article>
-</div><div class="container btn-row"><a class="btn btn-primary" href="join.html">Apply or enquire</a><a class="btn btn-secondary" href="services/">Browse courses</a></div></section>
-</main>  <footer class="site-footer">
+  </header>
+
+  <main id="main-content" class="login-page">
+    <div class="login-shell">
+      <div class="login-brand">
+        <img src="assets/logo-twa.png" alt="" class="login-brand-logo" width="68" height="68">
+        <h1 class="login-brand-name">Thames Wellness Academy</h1>
+        <p class="login-brand-note">Student sign-in for enrolled learners on Academy programmes.</p>
+      </div>
+
+      <form class="login-form" id="student-login-form" method="post" action="#" novalidate>
+        <label class="form-field" for="login-email">
+          <span>Email address</span>
+          <input id="login-email" name="email" type="email" autocomplete="username" required placeholder="you@example.com">
+        </label>
+        <label class="form-field" for="login-password">
+          <span>Password</span>
+          <input id="login-password" name="password" type="password" autocomplete="current-password" required placeholder="Enter your password">
+        </label>
+        <div class="login-form-row">
+          <label class="login-remember">
+            <input type="checkbox" name="remember" value="1">
+            <span>Remember me</span>
+          </label>
+          <a class="login-forgot" href="mailto:info@thameswellnessacademy.co.uk?subject=Student%20login%20help">Forgot password?</a>
+        </div>
+        <button class="btn btn-primary login-submit" type="submit">Sign in</button>
+        <p class="login-status" id="login-status" role="status" aria-live="polite" hidden></p>
+      </form>
+
+      <p class="login-prospect">Not enrolled yet? <a href="join.html">Apply to join a course</a></p>
+    </div>
+  </main>
+
+  <footer class="site-footer">
     <div class="container footer-grid">
       <div>
         <p class="footer-brand">Thames Wellness Academy</p>
@@ -133,6 +161,7 @@
       <div>
         <h4>Apply</h4>
         <ul>
+          <li><a href="login.html">Login</a></li>
           <li><a href="join.html">Apply</a></li>
           <li><a href="contact.html">Contact</a></li>
           <li><a href="privacy.html">Privacy</a></li>
@@ -142,5 +171,17 @@
     <div class="container footer-bottom"><p>&copy; 2026 Thames Wellness Academy. All rights reserved.</p></div>
   </footer>
   <script src="js/main.js?v=20260928"></script>
+  <script>
+    (function () {
+      var form = document.getElementById('student-login-form');
+      var status = document.getElementById('login-status');
+      if (!form || !status) return;
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        status.hidden = false;
+        status.textContent = 'Student login will open here soon. If you need access now, email info@thameswellnessacademy.co.uk.';
+      });
+    })();
+  </script>
 </body>
 </html>
