@@ -14,7 +14,7 @@
   --paper: #f7f8f7;
   --white: #ffffff;
   --gold: #c9a227;
-  --gold-hover: #b8911f;
+  --gold-hover: #F5BF03;
   --gold-soft: rgba(201, 162, 39, 0.14);
   --logo-gold: #f5bf03; /* brighter mark/favicon only; site gold stays muted */
   --border: rgba(20, 24, 22, 0.1);
@@ -182,7 +182,8 @@ h3,
   color: var(--ink);
 }
 
-.btn-primary:hover {
+.btn-primary:hover,
+.btn-primary:focus-visible {
   background: var(--gold-hover);
   color: var(--ink);
 }
