@@ -301,7 +301,7 @@ h3,
 .main-nav a:hover,
 .main-nav a.nav-link--active {
   color: var(--ink);
-  background: var(--gold-soft);
+  background: #F5BF03;
 }
 
 .nav-item--has-menu {
