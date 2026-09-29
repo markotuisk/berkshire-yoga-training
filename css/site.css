@@ -1486,8 +1486,8 @@ main:has([data-upcoming-root]:not([hidden])) .hero {
   color: var(--gold);
 }
 
+/* Keep word displays (CPD / Retreats) on the same size as 200 / 300 */
 .path-col-display--word {
-  font-size: clamp(2rem, 3.5vw, 2.65rem);
   letter-spacing: -0.02em;
 }
 
@@ -1530,8 +1530,38 @@ main:has([data-upcoming-root]:not([hidden])) .hero {
   letter-spacing: 0.01em;
 }
 
-/* Four-up: reserve two meta lines so CTAs share a baseline when copy wraps */
-@media (min-width: 1000px) {
+/*
+  Desktop + tablet grids: lock badge / display / title / desc / meta slots so
+  Teacher Training · Advanced Training · CPD Modules · Practice Escapes
+  and 200 · 300 · CPD · Retreats share the same horizontal rows.
+*/
+@media (min-width: 768px) {
+  .path-col-badge {
+    box-sizing: border-box;
+    min-height: 2.35rem;
+    display: inline-flex;
+    align-items: center;
+    max-width: 100%;
+  }
+
+  .path-col-display,
+  .path-col-display--word {
+    box-sizing: border-box;
+    min-height: 3.35rem;
+    display: flex;
+    align-items: flex-end;
+    font-size: clamp(2.45rem, 3.2vw, 3.15rem);
+    line-height: 1;
+  }
+
+  .path-col-title {
+    min-height: calc(1.15rem * 1.25 * 2);
+  }
+
+  .path-col-desc {
+    min-height: calc(0.95rem * 1.55 * 4);
+  }
+
   .path-col-meta {
     min-height: calc(0.78rem * 1.45 * 2);
   }
