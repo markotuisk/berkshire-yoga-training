@@ -35,8 +35,8 @@
   <link rel="canonical" href="https://berkshireyogatraining.co.uk/">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Archivo:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/site.css?v=20260929w">
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Archivo:ital,wght@0,600;0,700;1,600;1,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/site.css?v=20260929x">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -399,38 +399,59 @@
       </div>
     </section>
 
-    <section class="section section--mist" aria-labelledby="pathways-heading">
+    <section class="section section--mist section--choose-path" aria-labelledby="pathways-heading">
       <div class="container">
-        <div class="section-head">
-          <p class="eyebrow">Pathways</p>
-          <h2 id="pathways-heading">Training pathways</h2>
-          <p class="lede">Choose how you enter or deepen your teaching practice: Foundation Training, CPD, specialist workshops or retreats.</p>
+        <div class="section-head section-head--choose">
+          <h2 id="pathways-heading" class="choose-path-title">Choose your <em>path</em></h2>
         </div>
-        <div class="course-grid">
-          <a class="course-card" href="services/foundation-training/">
-            <span class="tag">Flagship</span>
-            <h3>Foundation Training</h3>
-            <p>200 to 500-hour Yoga Alliance Professionals pathways with supervised teaching practice.</p>
-            <span class="card-link">View Foundation Training</span>
+
+        <div class="path-guides">
+          <a class="path-guide" href="services/foundation-training/">
+            <span class="path-guide-copy">New to teaching? Start with the <em>200-Hour</em>.</span>
+            <span class="path-guide-cta">200-Hour</span>
           </a>
-          <a class="course-card" href="services/cpd/">
-            <span class="tag">CPD</span>
-            <h3>Continuing professional development</h3>
-            <p>Evidence-informed modules for qualified teachers who need flexible, practical CPD.</p>
-            <span class="card-link">View CPD</span>
+          <a class="path-guide" href="#path-advanced">
+            <span class="path-guide-copy">Already a teacher? Choose <em>CPDs</em> or the <em>300-Hour</em>.</span>
+            <span class="path-guide-cta">300-Hour &amp; CPDs</span>
           </a>
-          <a class="course-card" href="services/workshops/">
-            <span class="tag">Short courses</span>
-            <h3>Specialist workshops</h3>
-            <p>Focused short courses on breath work, menopause support, trauma-informed teaching and more.</p>
-            <span class="card-link">View workshops</span>
-          </a>
-          <a class="course-card" href="services/retreats/">
-            <span class="tag">Immersive</span>
-            <h3>Retreats</h3>
-            <p>Immersive residential learning that combines practice, study and professional community.</p>
-            <span class="card-link">View retreats</span>
-          </a>
+        </div>
+
+        <div class="path-columns">
+          <article class="path-col" id="path-200">
+            <p class="path-col-badge">Yoga Alliance Professionals</p>
+            <p class="path-col-display" aria-hidden="true">200</p>
+            <h3 class="path-col-title"><em>200-Hour</em> Teacher Training</h3>
+            <p class="path-col-desc">Our Foundation pathway for aspiring teachers: teacher-led, on site, with supervised teaching practice.</p>
+            <p class="path-col-meta">200 hours · In studio · Jan 2027 · £2,450</p>
+            <a class="path-col-cta" href="services/foundation-training/">Explore the 200-Hour</a>
+          </article>
+
+          <article class="path-col" id="path-advanced">
+            <p class="path-col-badge">Yoga Alliance Professionals</p>
+            <p class="path-col-display" aria-hidden="true">300</p>
+            <h3 class="path-col-title"><em>300-Hour</em> Advanced Training</h3>
+            <p class="path-col-desc">Deepen after your 200-hour certification with advanced study toward a fuller professional pathway.</p>
+            <p class="path-col-meta">300 hours · In studio · Enquire for dates</p>
+            <a class="path-col-cta" href="services/foundation-training/">Explore the 300-Hour</a>
+          </article>
+
+          <article class="path-col" id="path-cpd">
+            <p class="path-col-badge">Yoga Alliance Professionals</p>
+            <p class="path-col-display path-col-display--word" aria-hidden="true">CPD</p>
+            <h3 class="path-col-title"><em>CPD</em> modules</h3>
+            <p class="path-col-desc">Flexible modules for qualified teachers: breath work, anatomy, pregnancy, sound, nidra and more.</p>
+            <p class="path-col-meta">Short modules · In studio · from £95</p>
+            <a class="path-col-cta" href="services/cpd/">Browse all CPDs</a>
+          </article>
+
+          <article class="path-col" id="path-retreats">
+            <p class="path-col-badge path-col-badge--quiet">Immersive</p>
+            <p class="path-col-display path-col-display--word" aria-hidden="true">Retreats</p>
+            <h3 class="path-col-title">Practice <em>escapes</em></h3>
+            <p class="path-col-desc">Immersive residential learning that combines practice, study and professional community.</p>
+            <p class="path-col-meta">Berkshire · Register interest</p>
+            <a class="path-col-cta" href="services/retreats/">View retreats</a>
+          </article>
         </div>
       </div>
     </section>
@@ -678,6 +699,6 @@
   </footer>
 
   <script src="js/main.js?v=20260928"></script>
-  <script src="js/upcoming.js?v=20260929d" defer></script>
+  <script src="js/upcoming.js?v=20260929e" defer></script>
 </body>
 </html>

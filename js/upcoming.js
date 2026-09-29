@@ -13,6 +13,12 @@
   /** @typedef {'gold'|'river'|'teal'|'ink'|'mist'} UpcomingTone */
 
   /**
+   * Abstract card themes (CSS class suffix). Assigned by course type when
+   * `tone` is omitted; otherwise the explicit tone wins.
+   * @typedef {UpcomingTone} UpcomingTheme
+   */
+
+  /**
    * @typedef {Object} UpcomingEvent
    * @property {UpcomingType} type
    * @property {string} title
@@ -23,8 +29,7 @@
    * @property {string} [location]       Optional venue / area
    * @property {UpcomingFormat} [format] Delivery format badge
    * @property {string} [teacher]        Optional instructor name
-   * @property {string} [image]          Card background image path
-   * @property {UpcomingTone} [tone]     Colour overlay variant
+   * @property {UpcomingTone} [tone]     Abstract theme (gold/river/teal/ink/mist)
    */
 
   /** @type {UpcomingEvent[]} */
@@ -39,7 +44,6 @@
       location: 'Reading',
       format: 'In studio',
       teacher: 'Katia Major',
-      image: 'assets/partners/yoga-reading-studio.jpg',
       tone: 'gold'
     },
     {
@@ -52,7 +56,6 @@
       location: 'Berkshire',
       format: 'In studio',
       teacher: 'Raili Maripuu',
-      image: 'assets/partners/goyoga-studio.webp',
       tone: 'teal'
     },
     {
@@ -65,13 +68,19 @@
       location: 'Berkshire and Reading',
       format: 'In studio',
       teacher: 'Academy faculty',
-      image: 'assets/og-image.jpg',
       tone: 'river'
     }
   ];
 
   var MS_PER_DAY = 24 * 60 * 60 * 1000;
   var TONES = ['gold', 'river', 'teal', 'ink', 'mist'];
+
+  /** Default abstract theme by course type when `tone` is omitted. */
+  var TYPE_THEME = {
+    Course: 'river',
+    CPD: 'teal',
+    Workshop: 'gold'
+  };
 
   function parseDate(iso) {
     var parts = String(iso).split('-');
@@ -179,6 +188,8 @@
 
   function toneFor(item, index) {
     if (item.tone && TONES.indexOf(item.tone) !== -1) return item.tone;
+    var byType = TYPE_THEME[item.type];
+    if (byType) return byType;
     return TONES[index % TONES.length];
   }
 
@@ -230,14 +241,18 @@
     var dateLabel = start ? formatBritishDateShort(start) : item.startDate;
     var format = item.format || 'In studio';
     var tone = toneFor(item, index);
-    var image = item.image || 'assets/og-image.jpg';
     var teacherHtml = item.teacher
       ? '<p class="upcoming-card-teacher">' + escapeHtml(item.teacher) + '</p>'
       : '';
 
     return (
       '<a class="upcoming-card upcoming-card--' + escapeHtml(tone) + '" href="' + escapeHtml(item.href) + '">' +
-        '<span class="upcoming-card-media" style="background-image:url(\'' + escapeHtml(image) + '\')" aria-hidden="true"></span>' +
+        '<span class="upcoming-card-media" aria-hidden="true">' +
+          '<span class="upcoming-card-orb upcoming-card-orb--a"></span>' +
+          '<span class="upcoming-card-orb upcoming-card-orb--b"></span>' +
+          '<span class="upcoming-card-orb upcoming-card-orb--c"></span>' +
+          '<span class="upcoming-card-grain"></span>' +
+        '</span>' +
         '<span class="upcoming-card-shade" aria-hidden="true"></span>' +
         '<span class="upcoming-card-body">' +
           '<span class="upcoming-card-badge">' + escapeHtml(format) + '</span>' +
