@@ -36,7 +36,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Archivo:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/site.css?v=20260929v">
+  <link rel="stylesheet" href="css/site.css?v=20260929w">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -373,12 +373,38 @@
       </div>
     </aside>
 
-    <section class="section" aria-labelledby="courses-heading">
+    <section class="section section--upcoming-courses" aria-labelledby="courses-heading" data-upcoming-gallery>
+      <div class="container">
+        <div class="section-head section-head--row">
+          <div>
+            <p class="eyebrow">Courses</p>
+            <h2 id="courses-heading">Upcoming courses</h2>
+            <p class="lede">Dates you can join next across Foundation Training, CPD and workshops in Berkshire and Reading.</p>
+          </div>
+          <div class="upcoming-gallery-actions">
+            <div class="upcoming-gallery-arrows" role="group" aria-label="Browse upcoming courses">
+              <button type="button" class="upcoming-gallery-arrow" data-upcoming-prev aria-label="Previous courses">
+                <span aria-hidden="true">&larr;</span>
+              </button>
+              <button type="button" class="upcoming-gallery-arrow" data-upcoming-next aria-label="Next courses">
+                <span aria-hidden="true">&rarr;</span>
+              </button>
+            </div>
+            <a class="upcoming-view-all" href="services/">View all courses</a>
+          </div>
+        </div>
+        <div class="upcoming-gallery-track" data-upcoming-track tabindex="0" aria-label="Upcoming course cards">
+          <!-- Populated by js/upcoming.js -->
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--mist" aria-labelledby="pathways-heading">
       <div class="container">
         <div class="section-head">
-          <p class="eyebrow">Courses</p>
-          <h2 id="courses-heading">Programmes with clear pathways</h2>
-          <p class="lede">Like a strong yoga school site, money pages live one click from home. Start with Foundation Training, then deepen through CPD, workshops and retreats.</p>
+          <p class="eyebrow">Pathways</p>
+          <h2 id="pathways-heading">Training pathways</h2>
+          <p class="lede">Choose how you enter or deepen your teaching practice: Foundation Training, CPD, specialist workshops or retreats.</p>
         </div>
         <div class="course-grid">
           <a class="course-card" href="services/foundation-training/">
@@ -409,7 +435,7 @@
       </div>
     </section>
 
-    <section class="section section--mist" aria-labelledby="flagship-heading">
+    <section class="section" aria-labelledby="flagship-heading">
       <div class="container flagship">
         <div>
           <p class="eyebrow">Yoga teacher training</p>
@@ -652,6 +678,6 @@
   </footer>
 
   <script src="js/main.js?v=20260928"></script>
-  <script src="js/upcoming.js?v=20260929c" defer></script>
+  <script src="js/upcoming.js?v=20260929d" defer></script>
 </body>
 </html>

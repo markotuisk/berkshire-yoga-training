@@ -1,13 +1,16 @@
 /**
- * Homepage “Next up” cinema rail.
+ * Homepage “Next up” cinema rail + upcoming courses gallery.
  *
  * Marko: edit UPCOMING_EVENTS below (or swap to fetch upcoming-events.json later).
- * Keep dates as YYYY-MM-DD. The panel shows the soonest future startDate.
+ * Keep dates as YYYY-MM-DD. The rail shows the soonest future startDate;
+ * the gallery renders every future item.
  */
 (function () {
   'use strict';
 
   /** @typedef {'Course'|'CPD'|'Workshop'} UpcomingType */
+  /** @typedef {'In studio'|'Livestream'} UpcomingFormat */
+  /** @typedef {'gold'|'river'|'teal'|'ink'|'mist'} UpcomingTone */
 
   /**
    * @typedef {Object} UpcomingEvent
@@ -18,6 +21,10 @@
    * @property {string} price            Display string, e.g. "£1,250"
    * @property {string} href             Relative or absolute URL
    * @property {string} [location]       Optional venue / area
+   * @property {UpcomingFormat} [format] Delivery format badge
+   * @property {string} [teacher]        Optional instructor name
+   * @property {string} [image]          Card background image path
+   * @property {UpcomingTone} [tone]     Colour overlay variant
    */
 
   /** @type {UpcomingEvent[]} */
@@ -29,7 +36,11 @@
       lastSignupDate: '2026-10-11',
       price: '£95',
       href: 'services/workshops/',
-      location: 'Reading'
+      location: 'Reading',
+      format: 'In studio',
+      teacher: 'Katia Major',
+      image: 'assets/partners/yoga-reading-studio.jpg',
+      tone: 'gold'
     },
     {
       type: 'CPD',
@@ -38,7 +49,11 @@
       lastSignupDate: '2026-11-01',
       price: '£185',
       href: 'services/cpd/',
-      location: 'Berkshire'
+      location: 'Berkshire',
+      format: 'In studio',
+      teacher: 'Raili Maripuu',
+      image: 'assets/partners/goyoga-studio.webp',
+      tone: 'teal'
     },
     {
       type: 'Course',
@@ -47,11 +62,16 @@
       lastSignupDate: '2026-12-15',
       price: '£2,450',
       href: 'services/foundation-training/',
-      location: 'Berkshire and Reading'
+      location: 'Berkshire and Reading',
+      format: 'In studio',
+      teacher: 'Academy faculty',
+      image: 'assets/og-image.jpg',
+      tone: 'river'
     }
   ];
 
   var MS_PER_DAY = 24 * 60 * 60 * 1000;
+  var TONES = ['gold', 'river', 'teal', 'ink', 'mist'];
 
   function parseDate(iso) {
     var parts = String(iso).split('-');
@@ -80,13 +100,20 @@
     });
   }
 
+  function formatBritishDateShort(date) {
+    return date.toLocaleDateString('en-GB', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric'
+    });
+  }
+
   /**
-   * Prefer soonest future startDate; if none, fall back to soonest lastSignup
-   * that is still in the future.
+   * Future items by startDate; if none, fall back to open signup windows.
    * @param {UpcomingEvent[]} items
-   * @returns {UpcomingEvent|null}
+   * @returns {UpcomingEvent[]}
    */
-  function pickNext(items) {
+  function listUpcoming(items) {
     var today = startOfToday();
     var byStart = items
       .filter(function (item) {
@@ -97,9 +124,9 @@
         return parseDate(a.startDate) - parseDate(b.startDate);
       });
 
-    if (byStart.length) return byStart[0];
+    if (byStart.length) return byStart;
 
-    var bySignup = items
+    return items
       .filter(function (item) {
         var last = parseDate(item.lastSignupDate);
         return last && last >= today;
@@ -107,8 +134,17 @@
       .sort(function (a, b) {
         return parseDate(a.lastSignupDate) - parseDate(b.lastSignupDate);
       });
+  }
 
-    return bySignup[0] || null;
+  /**
+   * Prefer soonest future startDate; if none, fall back to soonest lastSignup
+   * that is still in the future.
+   * @param {UpcomingEvent[]} items
+   * @returns {UpcomingEvent|null}
+   */
+  function pickNext(items) {
+    var list = listUpcoming(items);
+    return list[0] || null;
   }
 
   function signupCountdownLabel(lastSignupDate) {
@@ -124,6 +160,26 @@
   function setText(el, value) {
     if (!el) return;
     el.textContent = value || '';
+  }
+
+  function escapeHtml(value) {
+    return String(value == null ? '' : value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function linkLabel(type) {
+    if (type === 'Course') return 'View course';
+    if (type === 'CPD') return 'View CPD';
+    return 'View workshop';
+  }
+
+  function toneFor(item, index) {
+    if (item.tone && TONES.indexOf(item.tone) !== -1) return item.tone;
+    return TONES[index % TONES.length];
   }
 
   function render(root, item) {
@@ -163,14 +219,79 @@
 
     if (linkEl) {
       linkEl.href = item.href;
-      linkEl.textContent = item.type === 'Course'
-        ? 'View course'
-        : item.type === 'CPD'
-          ? 'View CPD'
-          : 'View workshop';
+      linkEl.textContent = linkLabel(item.type);
     }
 
     root.hidden = false;
+  }
+
+  function buildCard(item, index) {
+    var start = parseDate(item.startDate);
+    var dateLabel = start ? formatBritishDateShort(start) : item.startDate;
+    var format = item.format || 'In studio';
+    var tone = toneFor(item, index);
+    var image = item.image || 'assets/og-image.jpg';
+    var teacherHtml = item.teacher
+      ? '<p class="upcoming-card-teacher">' + escapeHtml(item.teacher) + '</p>'
+      : '';
+
+    return (
+      '<a class="upcoming-card upcoming-card--' + escapeHtml(tone) + '" href="' + escapeHtml(item.href) + '">' +
+        '<span class="upcoming-card-media" style="background-image:url(\'' + escapeHtml(image) + '\')" aria-hidden="true"></span>' +
+        '<span class="upcoming-card-shade" aria-hidden="true"></span>' +
+        '<span class="upcoming-card-body">' +
+          '<span class="upcoming-card-badge">' + escapeHtml(format) + '</span>' +
+          '<span class="upcoming-card-type">' + escapeHtml(item.type) + '</span>' +
+          '<h3 class="upcoming-card-title">' + escapeHtml(item.title) + '</h3>' +
+          teacherHtml +
+          '<span class="upcoming-card-meta">' +
+            '<span class="upcoming-card-date">' + escapeHtml(dateLabel) + '</span>' +
+            '<span class="upcoming-card-price">' + escapeHtml(item.price) + '</span>' +
+          '</span>' +
+          '<span class="upcoming-card-cta">' + escapeHtml(linkLabel(item.type)) + '</span>' +
+        '</span>' +
+      '</a>'
+    );
+  }
+
+  function bindGallery(galleryRoot, items) {
+    var track = galleryRoot.querySelector('[data-upcoming-track]');
+    var prevBtn = galleryRoot.querySelector('[data-upcoming-prev]');
+    var nextBtn = galleryRoot.querySelector('[data-upcoming-next]');
+    if (!track) return;
+
+    track.innerHTML = items.map(buildCard).join('');
+
+    function cardStep() {
+      var card = track.querySelector('.upcoming-card');
+      if (!card) return 280;
+      var styles = window.getComputedStyle(track);
+      var gap = parseFloat(styles.columnGap || styles.gap) || 16;
+      return card.getBoundingClientRect().width + gap;
+    }
+
+    function updateButtons() {
+      var maxScroll = track.scrollWidth - track.clientWidth;
+      var atStart = track.scrollLeft <= 4;
+      var atEnd = track.scrollLeft >= maxScroll - 4;
+      if (prevBtn) prevBtn.disabled = atStart || maxScroll <= 0;
+      if (nextBtn) nextBtn.disabled = atEnd || maxScroll <= 0;
+    }
+
+    if (prevBtn) {
+      prevBtn.addEventListener('click', function () {
+        track.scrollBy({ left: -cardStep(), behavior: 'smooth' });
+      });
+    }
+    if (nextBtn) {
+      nextBtn.addEventListener('click', function () {
+        track.scrollBy({ left: cardStep(), behavior: 'smooth' });
+      });
+    }
+
+    track.addEventListener('scroll', updateButtons, { passive: true });
+    window.addEventListener('resize', updateButtons);
+    updateButtons();
   }
 
   /**
@@ -216,20 +337,31 @@
   }
 
   function init() {
-    var root = document.querySelector('[data-upcoming-root]');
-    if (!root) return;
+    var upcoming = listUpcoming(UPCOMING_EVENTS);
 
-    var next = pickNext(UPCOMING_EVENTS);
-    if (!next) {
-      root.hidden = true;
-      return;
+    var rail = document.querySelector('[data-upcoming-root]');
+    if (rail) {
+      var next = upcoming[0] || pickNext(UPCOMING_EVENTS);
+      if (!next) {
+        rail.hidden = true;
+      } else {
+        render(rail, next);
+        bindOffsets(rail);
+        requestAnimationFrame(function () {
+          syncOffsets(rail);
+        });
+      }
     }
 
-    render(root, next);
-    bindOffsets(root);
-    requestAnimationFrame(function () {
-      syncOffsets(root);
-    });
+    var gallery = document.querySelector('[data-upcoming-gallery]');
+    if (gallery) {
+      if (!upcoming.length) {
+        gallery.hidden = true;
+      } else {
+        gallery.hidden = false;
+        bindGallery(gallery, upcoming);
+      }
+    }
   }
 
   if (document.readyState === 'loading') {
