@@ -36,7 +36,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Archivo:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/site.css?v=20260929a">
+  <link rel="stylesheet" href="css/site.css?v=20260929b">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -149,13 +149,33 @@
   <main id="main-content">
     <section class="hero" aria-label="Homepage hero">
       <div class="hero-inner container">
-        <p class="hero-brand">Thames Wellness Academy</p>
-        <h1>Yoga teacher training in Berkshire and Reading</h1>
-        <p class="lede">Teacher-led, on-site Foundation Training, CPD and specialist workshops for the wellness sector, delivered across studio, corporate and therapeutic settings.</p>
-        <div class="btn-row">
-          <a class="btn btn-primary" href="services/foundation-training/">Explore Foundation Training</a>
-          <a class="btn btn-ghost" href="services/">Browse all courses</a>
+        <div class="hero-copy">
+          <p class="hero-brand">Thames Wellness Academy</p>
+          <h1>Yoga teacher training in Berkshire and Reading</h1>
+          <p class="lede">Teacher-led, on-site Foundation Training, CPD and specialist workshops for the wellness sector, delivered across studio, corporate and therapeutic settings.</p>
+          <div class="btn-row">
+            <a class="btn btn-primary" href="services/foundation-training/">Explore Foundation Training</a>
+            <a class="btn btn-ghost" href="services/">Browse all courses</a>
+          </div>
         </div>
+        <aside class="hero-upcoming" id="hero-upcoming" aria-labelledby="hero-upcoming-heading" data-upcoming-root hidden>
+          <p class="hero-upcoming-label">Coming up next</p>
+          <p class="hero-upcoming-type" data-upcoming="type"></p>
+          <h2 id="hero-upcoming-heading" class="hero-upcoming-title" data-upcoming="title"></h2>
+          <dl class="hero-upcoming-meta">
+            <div>
+              <dt>Starts</dt>
+              <dd data-upcoming="start"></dd>
+            </div>
+            <div>
+              <dt>Price</dt>
+              <dd data-upcoming="price"></dd>
+            </div>
+          </dl>
+          <p class="hero-upcoming-countdown" data-upcoming="countdown"></p>
+          <p class="hero-upcoming-location" data-upcoming="location" hidden></p>
+          <a class="hero-upcoming-link" data-upcoming="link" href="#">View details</a>
+        </aside>
       </div>
     </section>
 
@@ -432,5 +452,6 @@
   </footer>
 
   <script src="js/main.js?v=20260928"></script>
+  <script src="js/upcoming.js?v=20260929b" defer></script>
 </body>
 </html>
