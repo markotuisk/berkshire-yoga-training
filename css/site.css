@@ -252,40 +252,6 @@ h3,
   padding-block: 0.3rem;
 }
 
-.pathways-login {
-  flex-shrink: 0;
-  margin-left: auto;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 1.65rem;
-  padding: 0.2rem 0.75rem;
-  border-radius: var(--radius-control);
-  border: 1px solid color-mix(in srgb, var(--river) 22%, transparent);
-  background: transparent;
-  color: var(--river-mid);
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  text-decoration: none;
-  white-space: nowrap;
-  transition: background var(--ease), border-color var(--ease), color var(--ease);
-}
-
-.pathways-login:hover,
-.pathways-login:focus-visible {
-  background: var(--gold-hover);
-  border-color: var(--gold-hover);
-  color: var(--ink);
-  text-decoration: none;
-}
-
-.pathways-login[aria-current="page"] {
-  border-color: var(--river-light);
-  color: var(--ink);
-  background: rgba(255, 255, 255, 0.55);
-}
-
 .pathways-label {
   flex-shrink: 0;
   font-family: var(--font-display);
@@ -560,7 +526,39 @@ h3,
 .header-actions {
   display: flex;
   align-items: center;
+  gap: 0.5rem;
   flex-shrink: 0;
+}
+
+.header-login {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.4rem;
+  padding: 0.5rem 0.95rem;
+  border-radius: var(--radius-control);
+  border: 1px solid color-mix(in srgb, var(--river) 28%, transparent);
+  background: transparent;
+  color: var(--river-mid);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background var(--ease), border-color var(--ease), color var(--ease);
+}
+
+.header-login:hover,
+.header-login:focus-visible {
+  background: var(--gold-hover);
+  border-color: var(--gold-hover);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.header-login[aria-current="page"] {
+  border-color: var(--river-light);
+  color: var(--ink);
+  background: color-mix(in srgb, var(--river) 8%, var(--paper));
 }
 
 .header-cta {
@@ -575,11 +573,14 @@ h3,
   font-size: 0.9rem;
   font-weight: 600;
   text-decoration: none;
+  white-space: nowrap;
+  transition: background var(--ease), color var(--ease);
 }
 
-.header-cta:hover {
-  background: var(--river-mid);
-  color: var(--white);
+.header-cta:hover,
+.header-cta:focus-visible {
+  background: var(--gold-hover);
+  color: var(--ink);
   text-decoration: none;
 }
 
@@ -1840,12 +1841,6 @@ h3,
     font-size: 0.7rem;
   }
 
-  .pathways-login {
-    min-height: 1.5rem;
-    padding: 0.16rem 0.6rem;
-    font-size: 0.68rem;
-  }
-
   .nav-toggle {
     display: block;
     order: 3;
@@ -1855,19 +1850,20 @@ h3,
   }
 
   .header-actions {
-    display: none;
+    display: flex;
+    order: 2;
+    gap: 0.4rem;
+  }
+
+  .header-login,
+  .header-cta {
+    min-height: 2.15rem;
+    padding: 0.4rem 0.7rem;
+    font-size: 0.8rem;
   }
 
   .nav-join-mobile {
-    display: list-item;
-  }
-
-  .main-nav > ul > .nav-join-mobile {
-    margin-top: 0.75rem;
-  }
-
-  .main-nav > ul > .nav-join-mobile + .nav-join-mobile {
-    margin-top: 0;
+    display: none;
   }
 
   .main-nav {
