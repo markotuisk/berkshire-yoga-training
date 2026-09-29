@@ -1121,7 +1121,11 @@ h3,
 #approach,
 #accreditation,
 #location,
-#policies {
+#policies,
+#driving,
+#train,
+#bus,
+#walking {
   scroll-margin-top: calc(var(--header-total-h) + 1rem);
 }
 
