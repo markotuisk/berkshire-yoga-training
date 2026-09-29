@@ -36,7 +36,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Archivo:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/site.css?v=20260929u">
+  <link rel="stylesheet" href="css/site.css?v=20260929v">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -346,31 +346,32 @@
           </div>
         </div>
       </div>
-      <aside class="hero-rail" id="hero-upcoming" aria-labelledby="hero-upcoming-heading" data-upcoming-root hidden>
-        <div class="hero-rail-inner container">
-          <div class="hero-rail-intro">
-            <p class="hero-upcoming-label">Next up</p>
-            <p class="hero-upcoming-type" data-upcoming="type"></p>
-          </div>
-          <div class="hero-rail-main">
-            <h2 id="hero-upcoming-heading" class="hero-upcoming-title" data-upcoming="title"></h2>
-            <p class="hero-upcoming-countdown" data-upcoming="countdown"></p>
-          </div>
-          <dl class="hero-upcoming-meta">
-            <div>
-              <dt>Starts</dt>
-              <dd data-upcoming="start"></dd>
-            </div>
-            <div>
-              <dt>Price</dt>
-              <dd data-upcoming="price"></dd>
-            </div>
-          </dl>
-          <p class="hero-upcoming-location" data-upcoming="location" hidden></p>
-          <a class="hero-upcoming-link" data-upcoming="link" href="#">View details</a>
-        </div>
-      </aside>
     </section>
+
+    <aside class="hero-rail" id="hero-upcoming" aria-labelledby="hero-upcoming-heading" data-upcoming-root hidden>
+      <div class="hero-rail-inner container">
+        <div class="hero-rail-intro">
+          <p class="hero-upcoming-label">Next up</p>
+          <p class="hero-upcoming-type" data-upcoming="type"></p>
+        </div>
+        <div class="hero-rail-main">
+          <h2 id="hero-upcoming-heading" class="hero-upcoming-title" data-upcoming="title"></h2>
+          <p class="hero-upcoming-countdown" data-upcoming="countdown"></p>
+        </div>
+        <dl class="hero-upcoming-meta">
+          <div>
+            <dt>Starts</dt>
+            <dd data-upcoming="start"></dd>
+          </div>
+          <div class="hero-upcoming-price">
+            <dt>Price</dt>
+            <dd data-upcoming="price"></dd>
+          </div>
+        </dl>
+        <p class="hero-upcoming-location" data-upcoming="location" hidden></p>
+        <a class="hero-upcoming-link" data-upcoming="link" href="#">View details</a>
+      </div>
+    </aside>
 
     <section class="section" aria-labelledby="courses-heading">
       <div class="container">
@@ -651,6 +652,6 @@
   </footer>
 
   <script src="js/main.js?v=20260928"></script>
-  <script src="js/upcoming.js?v=20260929b" defer></script>
+  <script src="js/upcoming.js?v=20260929c" defer></script>
 </body>
 </html>

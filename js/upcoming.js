@@ -173,6 +173,48 @@
     root.hidden = false;
   }
 
+  /**
+   * Keep sticky `top` aligned with the measured pathways + nav bar.
+   * Mobile menu is position:absolute so it does not inflate this height.
+   */
+  function syncHeaderOffset() {
+    var header = document.querySelector('.site-header');
+    if (!header) return;
+    var height = Math.ceil(header.getBoundingClientRect().height);
+    if (height > 0) {
+      document.documentElement.style.setProperty('--header-total-h', height + 'px');
+    }
+  }
+
+  function syncRailHeight(root) {
+    if (!root || root.hidden) return;
+    var height = Math.ceil(root.getBoundingClientRect().height);
+    if (height > 0) {
+      document.documentElement.style.setProperty('--hero-rail-h', height + 'px');
+    }
+  }
+
+  function syncOffsets(root) {
+    syncHeaderOffset();
+    syncRailHeight(root);
+  }
+
+  function bindOffsets(root) {
+    syncOffsets(root);
+    window.addEventListener('resize', function () {
+      syncOffsets(root);
+    });
+
+    if (typeof ResizeObserver === 'undefined') return;
+
+    var observer = new ResizeObserver(function () {
+      syncOffsets(root);
+    });
+    var header = document.querySelector('.site-header');
+    if (header) observer.observe(header);
+    if (root) observer.observe(root);
+  }
+
   function init() {
     var root = document.querySelector('[data-upcoming-root]');
     if (!root) return;
@@ -184,6 +226,10 @@
     }
 
     render(root, next);
+    bindOffsets(root);
+    requestAnimationFrame(function () {
+      syncOffsets(root);
+    });
   }
 
   if (document.readyState === 'loading') {
