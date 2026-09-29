@@ -36,7 +36,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Archivo:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/site.css?v=20260929g">
+  <link rel="stylesheet" href="css/site.css?v=20260929h">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -126,18 +126,39 @@
         <ul>
           <li class="nav-item nav-item--has-menu">
             <a href="services/" class="nav-link">Courses</a>
-            <ul class="nav-submenu">
-              <li><a href="services/" class="nav-link">All courses</a></li>
-              <li><a href="services/foundation-training/" class="nav-link">Foundation Training</a></li>
-              <li><a href="services/cpd/" class="nav-link">CPD</a></li>
-              <li><a href="services/workshops/" class="nav-link">Workshops</a></li>
-              <li><a href="services/retreats/" class="nav-link">Retreats</a></li>
+            <ul class="nav-submenu nav-submenu--products">
+              <li>
+                <a href="services/foundation-training/" class="nav-product">
+                  <span class="nav-product-title">Foundation Training</span>
+                  <span class="nav-product-desc">200 to 500-hour YA Professionals pathways</span>
+                </a>
+              </li>
+              <li>
+                <a href="services/cpd/" class="nav-product">
+                  <span class="nav-product-title">CPD</span>
+                  <span class="nav-product-desc">Evidence-informed modules for qualified teachers</span>
+                </a>
+              </li>
+              <li>
+                <a href="services/workshops/" class="nav-product">
+                  <span class="nav-product-title">Workshops</span>
+                  <span class="nav-product-desc">Focused sessions on specialist teaching themes</span>
+                </a>
+              </li>
+              <li>
+                <a href="services/retreats/" class="nav-product">
+                  <span class="nav-product-title">Retreats</span>
+                  <span class="nav-product-desc">Immersive study away from daily teaching load</span>
+                </a>
+              </li>
+              <li class="nav-submenu-more">
+                <a href="services/" class="nav-product-more">Browse all courses</a>
+              </li>
             </ul>
           </li>
           <li><a href="team.html" class="nav-link">Teachers</a></li>
           <li><a href="journal.html" class="nav-link">Journal</a></li>
           <li><a href="about.html" class="nav-link">About</a></li>
-          <li><a href="faq.html" class="nav-link">FAQ</a></li>
           <li><a href="contact.html" class="nav-link">Contact</a></li>
           <li class="nav-join-mobile"><a href="join.html" class="nav-link">Apply</a></li>
         </ul>
@@ -148,20 +169,27 @@
 
   <main id="main-content">
     <section class="hero" aria-label="Homepage hero">
-      <div class="hero-inner container">
-        <div class="hero-copy">
+      <div class="hero-stage">
+        <div class="hero-copy container">
           <p class="hero-brand">Thames Wellness Academy</p>
           <h1>Yoga teacher training in Berkshire and Reading</h1>
-          <p class="lede">Teacher-led, on-site Foundation Training, CPD and specialist workshops for the wellness sector, delivered across studio, corporate and therapeutic settings.</p>
+          <p class="lede">Teacher-led Foundation Training, CPD and workshops, delivered on site across Berkshire and Reading.</p>
           <div class="btn-row">
             <a class="btn btn-primary" href="services/foundation-training/">Explore Foundation Training</a>
             <a class="btn btn-ghost" href="services/">Browse all courses</a>
           </div>
         </div>
-        <aside class="hero-upcoming" id="hero-upcoming" aria-labelledby="hero-upcoming-heading" data-upcoming-root hidden>
-          <p class="hero-upcoming-label">Coming up next</p>
-          <p class="hero-upcoming-type" data-upcoming="type"></p>
-          <h2 id="hero-upcoming-heading" class="hero-upcoming-title" data-upcoming="title"></h2>
+      </div>
+      <aside class="hero-rail" id="hero-upcoming" aria-labelledby="hero-upcoming-heading" data-upcoming-root hidden>
+        <div class="hero-rail-inner container">
+          <div class="hero-rail-intro">
+            <p class="hero-upcoming-label">Next up</p>
+            <p class="hero-upcoming-type" data-upcoming="type"></p>
+          </div>
+          <div class="hero-rail-main">
+            <h2 id="hero-upcoming-heading" class="hero-upcoming-title" data-upcoming="title"></h2>
+            <p class="hero-upcoming-countdown" data-upcoming="countdown"></p>
+          </div>
           <dl class="hero-upcoming-meta">
             <div>
               <dt>Starts</dt>
@@ -172,11 +200,10 @@
               <dd data-upcoming="price"></dd>
             </div>
           </dl>
-          <p class="hero-upcoming-countdown" data-upcoming="countdown"></p>
           <p class="hero-upcoming-location" data-upcoming="location" hidden></p>
           <a class="hero-upcoming-link" data-upcoming="link" href="#">View details</a>
-        </aside>
-      </div>
+        </div>
+      </aside>
     </section>
 
     <section class="section" aria-labelledby="courses-heading">

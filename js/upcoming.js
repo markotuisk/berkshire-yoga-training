@@ -1,5 +1,5 @@
 /**
- * Homepage “Coming up next” panel.
+ * Homepage “Next up” cinema rail.
  *
  * Marko: edit UPCOMING_EVENTS below (or swap to fetch upcoming-events.json later).
  * Keep dates as YYYY-MM-DD. The panel shows the soonest future startDate.

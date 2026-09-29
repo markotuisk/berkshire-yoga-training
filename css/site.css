@@ -339,21 +339,26 @@ h3,
   opacity: 0.9;
 }
 
-/* Desktop dropdown — mist panel, soft border, no harsh shadow */
+/* Desktop dropdown — product menu, soft panel */
 .main-nav .nav-submenu {
   display: none;
   position: absolute;
   top: calc(100% + 0.35rem);
   left: 0;
   z-index: 110;
-  min-width: 15.5rem;
+  min-width: 18.5rem;
   margin: 0;
-  padding: 0.5rem;
+  padding: 0.45rem;
   list-style: none;
   background: var(--paper);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   box-shadow: 0 12px 32px rgba(20, 24, 22, 0.07);
+}
+
+.main-nav .nav-submenu--products {
+  min-width: 20.5rem;
+  padding: 0.55rem;
 }
 
 /* Invisible hover bridge so the panel does not flicker */
@@ -379,6 +384,7 @@ h3,
   font-size: 0.9rem;
   font-weight: 500;
   line-height: 1.35;
+  text-decoration: none;
 }
 
 .main-nav .nav-submenu a:hover,
@@ -386,6 +392,47 @@ h3,
 .main-nav .nav-submenu a.nav-link--active {
   color: var(--ink);
   background: #F5BF03;
+}
+
+.nav-product {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.75rem 0.9rem;
+}
+
+.nav-product-title {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.3;
+}
+
+.nav-product-desc {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--muted);
+}
+
+.nav-product:hover .nav-product-title,
+.nav-product:focus-visible .nav-product-title,
+.nav-product:hover .nav-product-desc,
+.nav-product:focus-visible .nav-product-desc {
+  color: var(--ink);
+}
+
+.nav-submenu-more {
+  margin-top: 0.35rem;
+  padding-top: 0.35rem;
+  border-top: 1px solid var(--border);
+}
+
+.nav-product-more {
+  font-weight: 600;
+  color: var(--river-mid);
 }
 
 .header-cta {
@@ -411,16 +458,15 @@ h3,
   display: none;
 }
 
-/* Hero — full-bleed */
+/* Hero — full-bleed billboard + bottom cinema rail */
 .hero {
   position: relative;
-  min-height: min(92vh, 52rem);
+  min-height: calc(100svh - var(--header-h));
   display: flex;
-  align-items: flex-end;
-  padding: 6rem 0 4.5rem;
+  flex-direction: column;
   color: var(--white);
   background:
-    linear-gradient(180deg, rgba(20, 24, 22, 0.15) 0%, rgba(20, 24, 22, 0.72) 55%, rgba(20, 24, 22, 0.88) 100%),
+    linear-gradient(180deg, rgba(20, 24, 22, 0.12) 0%, rgba(20, 24, 22, 0.55) 48%, rgba(20, 24, 22, 0.9) 100%),
     linear-gradient(135deg, #1e3a36 0%, #2f5c54 42%, #1a2e2b 100%);
   overflow: hidden;
 }
@@ -430,23 +476,34 @@ h3,
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 60% 50% at 80% 20%, rgba(201, 162, 39, 0.18), transparent 60%),
-    radial-gradient(ellipse 40% 40% at 10% 80%, rgba(74, 122, 112, 0.35), transparent 55%);
+    radial-gradient(ellipse 70% 55% at 72% 28%, rgba(201, 162, 39, 0.2), transparent 58%),
+    radial-gradient(ellipse 45% 40% at 12% 78%, rgba(74, 122, 112, 0.4), transparent 55%);
   pointer-events: none;
 }
 
-.hero-inner {
+.hero-stage {
   position: relative;
   z-index: 1;
-  display: grid;
-  gap: 2.25rem;
-  align-items: stretch;
+  flex: 1 1 auto;
+  display: flex;
+  align-items: flex-end;
+  padding: 5.5rem 0 2.75rem;
   min-width: 0;
 }
 
 .hero-copy {
-  max-width: 36rem;
+  max-width: 38rem;
   min-width: 0;
+  animation: hero-copy-in 650ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes hero-copy-in {
+  from {
+    transform: translateY(0.7rem);
+  }
+  to {
+    transform: translateY(0);
+  }
 }
 
 .hero .eyebrow {
@@ -461,65 +518,99 @@ h3,
 
 .hero .lede {
   color: rgba(255, 255, 255, 0.86);
+  max-width: 32rem;
 }
 
 .hero-brand {
   font-family: var(--font-display);
-  font-size: clamp(1.25rem, 2.2vw, 1.65rem);
+  font-size: clamp(1.35rem, 2.4vw, 1.85rem);
   font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 1.15;
-  margin-bottom: 1.1rem;
-  color: rgba(255, 255, 255, 0.92);
+  margin-bottom: 1rem;
+  color: rgba(255, 255, 255, 0.95);
 }
 
-/* Upcoming panel — interactive info surface on the hero */
-.hero-upcoming {
-  width: 100%;
-  max-width: 22rem;
-  min-width: 0;
-  box-sizing: border-box;
-  padding: 1.4rem 1.5rem 1.5rem;
-  border-radius: var(--radius-lg);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  background:
-    linear-gradient(160deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.05) 100%);
-  box-shadow: 0 18px 48px rgba(10, 16, 14, 0.28);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+/* Cinema rail — flush bottom band on the shared hero surface */
+.hero-rail {
+  position: relative;
+  z-index: 2;
+  margin-top: auto;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  background: linear-gradient(180deg, rgba(12, 18, 16, 0.42) 0%, rgba(12, 18, 16, 0.62) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   color: var(--white);
+  animation: hero-rail-in 700ms cubic-bezier(0.22, 1, 0.36, 1) 80ms both;
 }
 
-.hero-upcoming[hidden] {
+@keyframes hero-rail-in {
+  from {
+    transform: translateY(0.45rem);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-copy,
+  .hero-rail {
+    animation: none;
+  }
+}
+
+.hero-rail[hidden] {
   display: none;
 }
 
+.hero-rail-inner {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  gap: 1rem 1.75rem;
+  align-items: center;
+  padding-block: 1.15rem;
+  min-width: 0;
+}
+
+.hero-rail-intro {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
 .hero-upcoming-label {
-  margin: 0 0 0.65rem;
-  font-size: 0.72rem;
+  margin: 0;
+  font-size: 0.7rem;
   font-weight: 600;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.62);
+  color: rgba(255, 255, 255, 0.58);
 }
 
 .hero-upcoming-type {
-  display: inline-block;
-  margin: 0 0 0.55rem;
-  padding: 0.28rem 0.55rem;
+  display: inline-flex;
+  align-self: flex-start;
+  margin: 0;
+  padding: 0.22rem 0.5rem;
   border-radius: var(--radius-control);
   background: var(--gold-soft);
   color: var(--gold-hover);
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
+.hero-rail-main {
+  min-width: 0;
+}
+
 .hero-upcoming-title {
-  margin: 0 0 1.1rem;
+  margin: 0 0 0.25rem;
   font-family: var(--font-display);
-  font-size: clamp(1.15rem, 2vw, 1.35rem);
+  font-size: clamp(1.05rem, 1.6vw, 1.25rem);
   font-weight: 700;
   line-height: 1.25;
   letter-spacing: -0.02em;
@@ -529,9 +620,9 @@ h3,
 
 .hero-upcoming-meta {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.85rem 1rem;
-  margin: 0 0 1rem;
+  grid-template-columns: auto auto;
+  gap: 0.15rem 1.35rem;
+  margin: 0;
   padding: 0;
 }
 
@@ -540,27 +631,27 @@ h3,
 }
 
 .hero-upcoming-meta dt {
-  margin: 0 0 0.2rem;
-  font-size: 0.7rem;
+  margin: 0 0 0.15rem;
+  font-size: 0.65rem;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .hero-upcoming-meta dd {
   margin: 0;
-  font-size: 0.98rem;
+  font-size: 0.92rem;
   font-weight: 600;
   color: var(--white);
   overflow-wrap: break-word;
 }
 
 .hero-upcoming-countdown {
-  margin: 0 0 0.85rem;
-  font-size: 0.92rem;
+  margin: 0;
+  font-size: 0.88rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.88);
+  color: rgba(255, 255, 255, 0.82);
 }
 
 .hero-upcoming-countdown.is-urgent {
@@ -573,44 +664,70 @@ h3,
 }
 
 .hero-upcoming-location {
-  margin: 0 0 1rem;
-  font-size: 0.88rem;
-  color: rgba(255, 255, 255, 0.7);
+  display: none;
+  margin: 0;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.68);
 }
 
 .hero-upcoming-link {
   display: inline-flex;
   align-items: center;
-  min-height: 2.4rem;
-  font-size: 0.92rem;
+  justify-content: center;
+  min-height: 2.5rem;
+  padding: 0.45rem 1rem;
+  border-radius: var(--radius-control);
+  border: 1px solid rgba(245, 191, 3, 0.55);
+  background: transparent;
+  font-size: 0.9rem;
   font-weight: 600;
   color: var(--gold-hover);
   text-decoration: none;
-  border-bottom: 1px solid transparent;
-  transition: color var(--ease), border-color var(--ease);
+  white-space: nowrap;
+  transition: background var(--ease), color var(--ease), border-color var(--ease);
 }
 
 .hero-upcoming-link:hover,
 .hero-upcoming-link:focus-visible {
-  color: var(--white);
-  border-bottom-color: rgba(255, 255, 255, 0.45);
+  background: #F5BF03;
+  border-color: #F5BF03;
+  color: var(--ink);
   text-decoration: none;
 }
 
-/* Phone + tablet: stack copy then upcoming; full-width CTAs.
-   Keep stacked through 991px so layout matches the mobile/tablet nav. */
+/* Tablet and below: stacked billboard, rail remains a full-width band */
 @media (max-width: 991px) {
   .hero {
     min-height: auto;
-    padding: 5rem 0 3rem;
   }
 
-  .hero-inner {
-    gap: 1.75rem;
+  .hero-stage {
+    flex: 0 1 auto;
+    padding: 4.75rem 0 1.75rem;
   }
 
-  .hero-upcoming {
-    max-width: none;
+  .hero-rail-inner {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+    padding-block: 1.05rem 1.25rem;
+  }
+
+  .hero-rail-intro {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .hero-upcoming-meta {
+    justify-content: start;
+  }
+
+  .hero-upcoming-location:not([hidden]) {
+    display: block;
+  }
+
+  .hero-upcoming-link {
+    justify-self: start;
   }
 
   .hero .btn-row {
@@ -633,8 +750,8 @@ h3,
     width: min(100% - 1.75rem, var(--container-narrow));
   }
 
-  .hero {
-    padding: 4.25rem 0 2.5rem;
+  .hero-stage {
+    padding: 4rem 0 1.85rem;
   }
 
   .hero h1 {
@@ -642,7 +759,7 @@ h3,
   }
 
   .hero-brand {
-    font-size: clamp(1.1rem, 4.5vw, 1.35rem);
+    font-size: clamp(1.15rem, 4.8vw, 1.4rem);
     margin-bottom: 0.85rem;
   }
 
@@ -651,73 +768,53 @@ h3,
     line-height: 1.6;
   }
 
-  .hero-upcoming {
-    padding: 1rem 1.1rem 1.1rem;
-  }
-
-  .hero-upcoming-label {
-    margin-bottom: 0.45rem;
-  }
-
-  .hero-upcoming-type {
-    margin-bottom: 0.4rem;
-  }
-
   .hero-upcoming-title {
-    font-size: 1.1rem;
-    margin-bottom: 0.7rem;
-  }
-
-  .hero-upcoming-meta {
-    gap: 0.55rem 0.75rem;
-    margin-bottom: 0.7rem;
+    font-size: 1.08rem;
   }
 
   .hero-upcoming-meta dd {
-    font-size: 0.92rem;
+    font-size: 0.9rem;
   }
 
   .hero-upcoming-countdown {
-    margin-bottom: 0.55rem;
-    font-size: 0.88rem;
-  }
-
-  .hero-upcoming-location {
-    margin-bottom: 0.7rem;
-    font-size: 0.88rem;
+    font-size: 0.85rem;
   }
 }
 
-@media (min-width: 992px) {
-  .hero-inner {
-    grid-template-columns: minmax(0, 1fr) minmax(17rem, 22rem);
-    gap: 3rem;
-    align-items: end;
+@media (min-width: 992px) and (max-width: 1199px) {
+  .hero-rail-inner {
+    gap: 0.85rem 1.25rem;
   }
 
-  .hero-upcoming {
-    justify-self: end;
-    max-width: 22rem;
+  .hero-upcoming-title {
+    font-size: 1.05rem;
+  }
+
+  .hero-upcoming-meta {
+    gap: 0.15rem 1rem;
+  }
+
+  .hero .btn-row .btn {
+    padding-inline: 1.1rem;
   }
 }
 
-/* Large monitors: more breathing room in the hero */
+/* Large monitors: more stage room above the rail */
 @media (min-width: 1441px) {
   .hero {
-    padding: 7rem 0 5.5rem;
+    min-height: calc(100svh - var(--header-h));
   }
 
-  .hero-inner {
-    gap: 3.5rem;
-    grid-template-columns: minmax(0, 1fr) minmax(18rem, 24rem);
+  .hero-stage {
+    padding: 7rem 0 3.25rem;
   }
 
   .hero-copy {
-    max-width: 40rem;
+    max-width: 42rem;
   }
 
-  .hero-upcoming {
-    max-width: 24rem;
+  .hero-rail-inner {
+    padding-block: 1.35rem;
   }
 }
 
@@ -1315,6 +1412,16 @@ h3,
     padding: 0.75rem 0.9rem;
   }
 
+  .main-nav .nav-product {
+    align-items: flex-start;
+    min-height: 0;
+    padding: 0.8rem 0.9rem;
+  }
+
+  .main-nav .nav-product-more {
+    min-height: 2.65rem;
+  }
+
   .logo-img {
     height: 2.5rem; /* ~40px on smaller screens */
   }
@@ -1324,34 +1431,20 @@ h3,
   }
 }
 
-/* Laptop: tighter nav + hero columns so mid-widths do not feel cramped */
+/* Laptop: tighter top-level nav spacing */
 @media (min-width: 992px) and (max-width: 1199px) {
-  .main-nav a {
+  .main-nav > ul > li > .nav-link {
     padding: 0.5rem 0.55rem;
     font-size: 0.88rem;
   }
 
-  .main-nav .nav-submenu {
-    min-width: 14.5rem;
+  .main-nav .nav-submenu--products {
+    min-width: 19rem;
   }
 
   .header-cta {
     padding: 0.5rem 0.9rem;
     font-size: 0.85rem;
-  }
-
-  .hero-inner {
-    gap: 2rem;
-    grid-template-columns: minmax(0, 1fr) minmax(15.5rem, 19rem);
-  }
-
-  .hero-upcoming {
-    max-width: 19rem;
-    padding: 1.25rem 1.3rem 1.35rem;
-  }
-
-  .hero .btn-row .btn {
-    padding-inline: 1.1rem;
   }
 }
 
