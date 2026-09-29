@@ -1261,6 +1261,7 @@ h3,
   background: var(--white);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
+  scroll-margin-top: calc(var(--header-total-h) + 1rem);
 }
 
 .teacher-card .avatar {
