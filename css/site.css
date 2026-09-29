@@ -2096,7 +2096,151 @@ main:has([data-upcoming-root]:not([hidden])) .hero {
   font-size: 0.95rem;
 }
 
-/* Testimonials */
+/* Testimonials — soft voice row (homepage); quote cards for support page */
+.section--voices {
+  background: var(--paper);
+}
+
+.voices-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+  margin-bottom: 1.75rem;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+@media (min-width: 768px) {
+  .voices-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (min-width: 1100px) {
+  .voices-row {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.voice {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin: 0;
+  padding: 1.65rem 1.4rem 1.5rem;
+  border-top: 1px solid var(--border);
+  min-width: 0;
+}
+
+.voices-row > .voice:first-child {
+  border-top: none;
+}
+
+@media (min-width: 768px) {
+  .voice {
+    border-top: none;
+    border-left: 1px solid var(--border);
+  }
+
+  .voices-row > .voice:nth-child(2n + 1) {
+    border-left: none;
+  }
+
+  .voices-row > .voice:nth-child(n + 3) {
+    border-top: 1px solid var(--border);
+  }
+}
+
+@media (min-width: 1100px) {
+  .voice {
+    border-left: 1px solid var(--border);
+    border-top: none;
+  }
+
+  .voices-row > .voice:first-child,
+  .voices-row > .voice:nth-child(2n + 1) {
+    border-left: 1px solid var(--border);
+  }
+
+  .voices-row > .voice:first-child {
+    border-left: none;
+  }
+
+  .voices-row > .voice:nth-child(n + 3) {
+    border-top: none;
+  }
+}
+
+.voice blockquote {
+  margin: 0;
+  flex: 1;
+}
+
+.voice blockquote::before {
+  content: "“";
+  display: block;
+  margin-bottom: 0.35rem;
+  font-family: var(--font-display);
+  font-size: 2.25rem;
+  font-weight: 700;
+  line-height: 0.8;
+  color: var(--gold);
+}
+
+.voice blockquote p {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.05rem, 1.4vw, 1.2rem);
+  font-weight: 600;
+  font-style: italic;
+  letter-spacing: -0.015em;
+  line-height: 1.35;
+  color: var(--ink-soft);
+}
+
+.voice figcaption {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding-top: 1rem;
+  border-top: 1px solid color-mix(in srgb, var(--river) 12%, transparent);
+}
+
+.voice-name {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.voice-role {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--river-mid);
+}
+
+@media (max-width: 767px) {
+  .voices-row {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+
+  .voice {
+    flex: 0 0 min(82vw, 20rem);
+    border-top: none;
+    border-left: 1px solid var(--border);
+    scroll-snap-align: start;
+  }
+
+  .voices-row > .voice:first-child {
+    border-left: none;
+  }
+}
+
 .quote-grid {
   display: grid;
   gap: 1.25rem;
