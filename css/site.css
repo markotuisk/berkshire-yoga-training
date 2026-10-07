@@ -2689,7 +2689,7 @@ h3,
 
 @media (min-width: 1100px) {
   .contact-ways {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
@@ -2768,6 +2768,55 @@ h3,
 
 .contact-direct a:hover {
   color: var(--river);
+}
+
+.contact-directions {
+  display: grid;
+  gap: 1.25rem;
+  max-width: 48rem;
+}
+
+.contact-directions-address {
+  margin: 0;
+  font-style: normal;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: var(--ink);
+}
+
+.contact-directions-note {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+
+.contact-map {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--mist);
+  aspect-ratio: 16 / 10;
+  min-height: 16rem;
+}
+
+.contact-map iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.contact-map-caption {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.contact-map-links {
+  flex-wrap: wrap;
 }
 
 /* Journal topics + teasers */

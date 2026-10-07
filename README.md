@@ -19,11 +19,11 @@ The full site is served at `/` on Cloudflare Pages (`index.html`). Owner preview
 | Home | `/` |
 | About | `/about.html` |
 | Team | `/team.html` |
-| Services | `/services/` |
-| Foundation Training | `/services/foundation-training/` |
-| CPD | `/services/cpd/` |
-| Workshops | `/services/workshops/` |
-| Retreats | `/services/retreats/` |
+| Services | `/courses/` |
+| Foundation Training | `/courses/foundation-training/` |
+| CPD | `/courses/cpd/` |
+| Workshops | `/courses/workshops/` |
+| Retreats | `/courses/retreats/` |
 | Research | `/research.html` |
 | Journal | `/journal.html` |
 | Contact | `/contact.html` |

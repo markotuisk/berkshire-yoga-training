@@ -198,4 +198,74 @@
       teacherSearch.focus();
     }
   }
+
+  // Deep-link course / topic preselection on Apply and Contact forms
+  // Supports ?course=, ?topic=, or ?interest= (slug or option value)
+  const COURSE_ALIASES = {
+    '200-hour': 'foundation-200',
+    '200hr': 'foundation-200',
+    'foundation': 'foundation-training',
+    'foundation-tt': 'foundation-200',
+    'sound-bath': 'soundbath',
+    'soundbath-training': 'soundbath',
+    'sound-facilitator': 'soundbath',
+    'pregnancy': 'pregnancy-yoga',
+    'nidra': 'yoga-nidra',
+    'anatomy': 'functional-anatomy',
+    'open-day-200': 'open-day-foundation',
+    'open-day-foundation-training': 'open-day-foundation',
+    'cpd-open-day': 'open-day-cpd',
+    'open-day-cpd-courses': 'open-day-cpd',
+    'not-sure-yet': 'not-sure'
+  };
+
+  const COURSE_TEXTAREA = {
+    'foundation-training': 'Foundation Training',
+    'foundation-200': 'Foundation 200 hour TT',
+    'pregnancy-yoga': 'Pregnancy Yoga Training',
+    'functional-anatomy': 'Functional Anatomy Training',
+    'yoga-nidra': 'Yoga Nidra Training',
+    'soundbath': 'SoundBath Training',
+    'open-day-foundation': 'Open Day | Foundation Training 200 hours',
+    'open-day-cpd': 'Open Day | CPD Courses',
+    'cpd': 'CPD',
+    'workshops': 'Workshops',
+    'retreats': 'Retreats'
+  };
+
+  const prefillCourseFromQuery = () => {
+    const params = new URLSearchParams(window.location.search);
+    const raw = (params.get('course') || params.get('topic') || params.get('interest') || '').trim();
+    if (!raw) return;
+
+    const normalised = raw.toLowerCase().replace(/\s+/g, '-');
+    const slug = COURSE_ALIASES[normalised] || normalised;
+
+    const select = document.querySelector('select[name="interest"], select[name="topic"]');
+    if (select) {
+      let matched = select.querySelector(`option[data-slug="${slug}"]`);
+      if (!matched) {
+        matched = Array.from(select.options).find(option => {
+          const value = (option.value || option.textContent || '').trim().toLowerCase();
+          const optionSlug = (option.dataset.slug || '').toLowerCase();
+          return value === raw.toLowerCase()
+            || value === slug
+            || optionSlug === slug
+            || value.replace(/\s+/g, '-') === slug;
+        });
+      }
+      if (matched) {
+        select.value = matched.value || matched.textContent;
+        select.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    }
+
+    const coursesField = document.querySelector('textarea[name="courses"]');
+    const label = COURSE_TEXTAREA[slug];
+    if (coursesField && label && !coursesField.value.trim()) {
+      coursesField.value = label;
+    }
+  };
+
+  prefillCourseFromQuery();
 })();

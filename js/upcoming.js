@@ -50,7 +50,7 @@
       free: true,
       hours: 2,
       hoursLabel: '2 hours',
-      href: 'services/foundation-training/200-hour/open-day/',
+      href: 'courses/foundation-training/200-hour/open-day/',
       location: 'Berkshire and Reading',
       format: 'In studio',
       teacher: 'Raili Maripuu and Katia Major',
@@ -64,7 +64,7 @@
       free: true,
       hours: 2,
       hoursLabel: '2 hours',
-      href: 'services/cpd/open-day/',
+      href: 'courses/cpd/open-day/',
       location: 'Berkshire and Reading',
       format: 'In studio',
       tone: 'gold'
@@ -80,7 +80,7 @@
       hours: 200,
       startTime: '09:30',
       endTime: '17:00',
-      href: 'services/foundation-training/200-hour/',
+      href: 'courses/foundation-training/200-hour/',
       location: 'Berkshire and Reading',
       format: 'In studio',
       teacher: 'Katia Major and Raili Maripuu',
@@ -97,7 +97,7 @@
       hours: 50,
       startTime: '09:30',
       endTime: '17:30',
-      href: 'services/cpd/pregnancy-yoga/',
+      href: 'courses/cpd/pregnancy-yoga/',
       location: 'Berkshire and Reading',
       format: 'Studio days plus self-study',
       tone: 'mist'
@@ -111,7 +111,7 @@
       earlyBird: '£250',
       standard: '£325',
       hours: 30,
-      href: 'services/cpd/yoga-nidra/',
+      href: 'courses/cpd/yoga-nidra/',
       location: 'Berkshire and Reading',
       format: 'Studio days plus self-study',
       tone: 'river'
@@ -127,7 +127,7 @@
       hours: 25,
       startTime: '11:30',
       endTime: '17:00',
-      href: 'services/cpd/functional-anatomy/',
+      href: 'courses/cpd/functional-anatomy/',
       location: 'Berkshire and Reading',
       format: 'In studio',
       tone: 'teal'
@@ -143,7 +143,7 @@
       hours: 30,
       startTime: '10:00',
       endTime: '17:00',
-      href: 'services/cpd/soundbath/',
+      href: 'courses/cpd/soundbath/',
       location: 'Berkshire and Reading',
       format: 'In studio',
       tone: 'mist'

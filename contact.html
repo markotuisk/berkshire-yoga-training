@@ -28,7 +28,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Archivo:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/site.css?v=20260930ab">
+  <link rel="stylesheet" href="css/site.css?v=20261007a">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"LocalBusiness","name":"Thames Wellness Academy","url":"https://berkshireyogatraining.co.uk/","email":"info@thameswellnessacademy.co.uk","areaServed":["Berkshire","Reading"]}</script>
 </head>
 <body>
@@ -42,34 +42,34 @@
       <nav class="main-nav" aria-label="Main navigation">
         <ul>
           <li class="nav-item nav-item--has-menu">
-            <a href="services/" class="nav-link">Courses</a>
+            <a href="courses/" class="nav-link">Courses</a>
             <ul class="nav-submenu nav-submenu--products">
               <li>
-                <a href="services/foundation-training/" class="nav-product">
+                <a href="courses/foundation-training/" class="nav-product">
                   <span class="nav-product-title">Foundation Training</span>
                   <span class="nav-product-desc">200 to 500-hour YA Professionals pathways</span>
                 </a>
               </li>
               <li>
-                <a href="services/cpd/" class="nav-product">
+                <a href="courses/cpd/" class="nav-product">
                   <span class="nav-product-title">CPD</span>
                   <span class="nav-product-desc">Evidence-informed modules for qualified teachers</span>
                 </a>
               </li>
               <li>
-                <a href="services/workshops/" class="nav-product">
+                <a href="courses/workshops/" class="nav-product">
                   <span class="nav-product-title">Workshops</span>
                   <span class="nav-product-desc">Focused sessions on specialist teaching themes</span>
                 </a>
               </li>
               <li>
-                <a href="services/retreats/" class="nav-product">
+                <a href="courses/retreats/" class="nav-product">
                   <span class="nav-product-title">Retreats</span>
                   <span class="nav-product-desc">Immersive study away from daily teaching load</span>
                 </a>
               </li>
               <li class="nav-submenu-more">
-                <a href="services/" class="nav-product-more">Browse all courses</a>
+                <a href="courses/" class="nav-product-more">Browse all courses</a>
               </li>
             </ul>
           </li>
@@ -104,7 +104,7 @@
                 <a href="team.html" class="nav-product-more">All TWA Teachers</a>
               </li>
               <li>
-                <a href="teachers/" class="nav-product-more">Certified Teachers</a>
+                <a href="teachers/" class="nav-product-more">Find a graduate</a>
               </li>
             </ul>
           </li>
@@ -279,6 +279,18 @@
                   <span class="nav-product-desc">Request a callback from the team</span>
                 </a>
               </li>
+              <li>
+                <a href="contact.html#directions" class="nav-product">
+                  <span class="nav-product-title">Directions</span>
+                  <span class="nav-product-desc">Map and links to Yoga Reading</span>
+                </a>
+              </li>
+              <li>
+                <a href="contact.html#parking" class="nav-product">
+                  <span class="nav-product-title">Parking</span>
+                  <span class="nav-product-desc">Driving notes for studio visits</span>
+                </a>
+              </li>
             </ul>
           </li>
         </ul>
@@ -326,6 +338,16 @@
             <span class="contact-way-title">Request a callback</span>
             <span class="contact-way-desc">Ask us to phone you at a convenient time.</span>
           </a>
+          <a href="#directions" class="contact-way">
+            <span class="contact-way-label">Directions</span>
+            <span class="contact-way-title">Find Yoga Reading</span>
+            <span class="contact-way-desc">Map and navigation links for our Reading studio partner.</span>
+          </a>
+          <a href="#parking" class="contact-way">
+            <span class="contact-way-label">Parking</span>
+            <span class="contact-way-title">Arriving by car</span>
+            <span class="contact-way-desc">Honest parking guidance before your joining pack arrives.</span>
+          </a>
         </div>
       </div>
     </section>
@@ -338,13 +360,13 @@
           <p>Each Open Day has its own event page. Open the one that matches the course you care about.</p>
         </div>
         <div class="course-grid">
-          <a class="course-card" id="open-day-foundation" href="services/foundation-training/200-hour/open-day/">
+          <a class="course-card" id="open-day-foundation" href="courses/foundation-training/200-hour/open-day/">
             <span class="tag">Foundation</span>
             <h3>Open Day | Foundation Training 200 hours</h3>
             <p>Saturday 7 November 2026, 12:00-2pm. Free studio session for the 200-hour pathway.</p>
             <span class="card-link">Open this event</span>
           </a>
-          <a class="course-card" id="open-day-cpd" href="services/cpd/open-day/">
+          <a class="course-card" id="open-day-cpd" href="courses/cpd/open-day/">
             <span class="tag">CPD</span>
             <h3>Open Day | CPD Courses</h3>
             <p>Friday 29 January 2027. Free studio session for CPD modules.</p>
@@ -365,14 +387,19 @@
             <label>Email<input type="email" name="email" required></label>
             <label>Topic
               <select name="topic">
-                <option>Foundation Training</option>
-                <option>Open Day | Foundation Training 200 hours</option>
-                <option>Open Day | CPD Courses</option>
-                <option>CPD</option>
-                <option>Workshops</option>
-                <option>Retreats</option>
-                <option>Callback request</option>
-                <option>Other</option>
+                <option value="Foundation Training" data-slug="foundation-training">Foundation Training</option>
+                <option value="Foundation Training 200 hours" data-slug="foundation-200">Foundation Training 200 hours</option>
+                <option value="Pregnancy Yoga Training" data-slug="pregnancy-yoga">Pregnancy Yoga Training</option>
+                <option value="Functional Anatomy Training" data-slug="functional-anatomy">Functional Anatomy Training</option>
+                <option value="Yoga Nidra Training" data-slug="yoga-nidra">Yoga Nidra Training</option>
+                <option value="SoundBath Training" data-slug="soundbath">SoundBath Training</option>
+                <option value="Open Day | Foundation Training 200 hours" data-slug="open-day-foundation">Open Day | Foundation Training 200 hours</option>
+                <option value="Open Day | CPD Courses" data-slug="open-day-cpd">Open Day | CPD Courses</option>
+                <option value="CPD" data-slug="cpd">CPD</option>
+                <option value="Workshops" data-slug="workshops">Workshops</option>
+                <option value="Retreats" data-slug="retreats">Retreats</option>
+                <option value="Callback request" data-slug="callback">Callback request</option>
+                <option value="Other" data-slug="other">Other</option>
               </select>
             </label>
             <label>Courses of interest<textarea name="courses" placeholder="Foundation 200 hour TT, Pregnancy Yoga Training, Functional Anatomy, Sound Facilitator, Yoga Nidra"></textarea></label>
@@ -432,6 +459,53 @@
         </div>
       </div>
     </section>
+
+    <section class="section" id="directions">
+      <div class="container">
+        <div class="section-head">
+          <p class="eyebrow">Directions</p>
+          <h2>Yoga Reading studio</h2>
+          <p>Many Academy sessions in Reading are hosted with our founding studio partner, Yoga Reading. Use the map and navigation links below to plan your journey. Exact venue details for each cohort are confirmed in your joining pack.</p>
+        </div>
+        <div class="contact-directions">
+          <address class="contact-directions-address">
+            <strong>Yoga Reading</strong><br>
+            Reading, Berkshire
+          </address>
+          <p class="contact-directions-note">We do not publish a permanent street address on the website yet. Search maps for <strong>Yoga Reading, Reading, Berkshire</strong>, or ask us when you enquire.</p>
+          <div class="contact-map">
+            <iframe
+              title="Map search for Yoga Reading, Reading, Berkshire"
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+              src="https://www.google.com/maps?q=Yoga%20Reading%2C%20Reading%2C%20Berkshire&amp;output=embed"
+              allowfullscreen></iframe>
+          </div>
+          <p class="contact-map-caption">Map search for Yoga Reading in Reading, Berkshire. Open a navigation app below for turn-by-turn directions. You can also <a href="https://www.openstreetmap.org/search?query=Yoga%20Reading%2C%20Reading%2C%20Berkshire" rel="noopener noreferrer" target="_blank">search on OpenStreetMap</a>.</p>
+          <div class="btn-row contact-map-links">
+            <a class="btn btn-secondary" href="https://maps.apple.com/?q=Yoga%20Reading%2C%20Reading%2C%20Berkshire" rel="noopener noreferrer" target="_blank">Apple Maps</a>
+            <a class="btn btn-secondary" href="https://www.google.com/maps/search/?api=1&amp;query=Yoga%20Reading%2C%20Reading%2C%20Berkshire" rel="noopener noreferrer" target="_blank">Google Maps</a>
+            <a class="btn btn-secondary" href="https://waze.com/ul?q=Yoga%20Reading%2C%20Reading%2C%20Berkshire&amp;navigate=yes" rel="noopener noreferrer" target="_blank">Waze</a>
+          </div>
+          <p class="contact-directions-note"><a href="https://yogareading.co.uk" rel="noopener noreferrer">yogareading.co.uk</a> · Wider travel notes on the <a href="location.html">location</a> page.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--mist" id="parking">
+      <div class="container contact-cta-block">
+        <div>
+          <p class="eyebrow">Parking</p>
+          <h2 class="h3">Arriving by car at Yoga Reading</h2>
+          <p class="lede">Parking arrangements vary by venue and are confirmed in your joining pack. We do not yet list specific car park names, prices or postcodes on the website.</p>
+          <p>If you are driving to a Reading studio session, allow a little extra time for local on-street and public parking near the venue. Ask us when you enquire if you need the latest notes before your joining instructions arrive.</p>
+        </div>
+        <div class="btn-row">
+          <a class="btn btn-primary" href="location.html#driving">Travel guidance</a>
+          <a class="btn btn-secondary" href="#form" data-cta="contact-form">Request parking notes</a>
+        </div>
+      </div>
+    </section>
   </main>
   <footer class="site-footer">
     <div class="container footer-grid">
@@ -442,10 +516,10 @@
       <div>
         <h4>Courses</h4>
         <ul>
-          <li><a href="services/">All courses</a></li>
-          <li><a href="services/foundation-training/">Foundation Training</a></li>
-          <li><a href="services/cpd/">CPD</a></li>
-          <li><a href="services/workshops/">Workshops</a></li>
+          <li><a href="courses/">All courses</a></li>
+          <li><a href="courses/foundation-training/">Foundation Training</a></li>
+          <li><a href="courses/cpd/">CPD</a></li>
+          <li><a href="courses/workshops/">Workshops</a></li>
         </ul>
       </div>
       <div>
@@ -521,6 +595,6 @@
       <span class="footer-cutout-text">Thames Wellness Academy</span>
     </div>
   </footer>
-  <script src="js/main.js?v=20260928"></script>
+  <script src="js/main.js?v=20261007"></script>
 </body>
 </html>

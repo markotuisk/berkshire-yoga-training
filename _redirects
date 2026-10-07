@@ -12,36 +12,30 @@
 /coming-soon / 301
 /coming-soon.html / 301
 
-# Services URL migration (301)
-/foundation-training /services/foundation-training/ 301
-/foundation-training/ /services/foundation-training/ 301
-/foundation-training.html /services/foundation-training/ 301
-/cpd /services/cpd/ 301
-/cpd/ /services/cpd/ 301
-/cpd.html /services/cpd/ 301
-/workshops /services/workshops/ 301
-/workshops/ /services/workshops/ 301
-/workshops.html /services/workshops/ 301
-/retreats /services/retreats/ 301
-/retreats/ /services/retreats/ 301
-/retreats.html /services/retreats/ 301
+# Legacy short programme URLs → courses hub (301)
+/foundation-training /courses/foundation-training/ 301
+/foundation-training/ /courses/foundation-training/ 301
+/foundation-training.html /courses/foundation-training/ 301
+/cpd /courses/cpd/ 301
+/cpd/ /courses/cpd/ 301
+/cpd.html /courses/cpd/ 301
+/workshops /courses/workshops/ 301
+/workshops/ /courses/workshops/ 301
+/workshops.html /courses/workshops/ 301
+/retreats /courses/retreats/ 301
+/retreats/ /courses/retreats/ 301
+/retreats.html /courses/retreats/ 301
 
 # Partners URL migration (301)
 /partners /research/partners/ 301
 /partners/ /research/partners/ 301
 /partners.html /research/partners/ 301
 
-# Shala-style IA aliases (TWA content, familiar yoga-school paths)
-/courses /services/ 301
-/courses/ /services/ 301
-/courses/foundation-training /services/foundation-training/ 301
-/courses/foundation-training/ /services/foundation-training/ 301
-/courses/cpd /services/cpd/ 301
-/courses/cpd/ /services/cpd/ 301
-/courses/workshops /services/workshops/ 301
-/courses/workshops/ /services/workshops/ 301
-/courses/retreats /services/retreats/ 301
-/courses/retreats/ /services/retreats/ 301
+# Former /services/ tree → canonical /courses/ (301)
+/services /courses/ 301
+/services/ /courses/ 301
+/services/* /courses/:splat 301
+
 # /teachers/ is the find-a-teacher directory (teachers/index.html)
 /yoga-teacher /team.html 301
 /yoga-teacher/ /team.html 301
@@ -60,17 +54,11 @@
 /apply /join.html 301
 /apply/ /join.html 301
 
-# 200-hour Foundation course subpage
-/services/foundation-training/200-hour /services/foundation-training/200-hour/ 301
-/courses/foundation-training/200-hour /services/foundation-training/200-hour/ 301
-/courses/foundation-training/200-hour/ /services/foundation-training/200-hour/ 301
-/200-hour /services/foundation-training/200-hour/ 301
-/200-hour/ /services/foundation-training/200-hour/ 301
+# 200-hour Foundation course subpage (trailing-slash + short aliases)
+/courses/foundation-training/200-hour /courses/foundation-training/200-hour/ 301
+/200-hour /courses/foundation-training/200-hour/ 301
+/200-hour/ /courses/foundation-training/200-hour/ 301
 
-# Open Day event pages (one event per course stream)
-/services/foundation-training/200-hour/open-day /services/foundation-training/200-hour/open-day/ 301
-/services/cpd/open-day /services/cpd/open-day/ 301
-/courses/foundation-training/200-hour/open-day /services/foundation-training/200-hour/open-day/ 301
-/courses/foundation-training/200-hour/open-day/ /services/foundation-training/200-hour/open-day/ 301
-/courses/cpd/open-day /services/cpd/open-day/ 301
-/courses/cpd/open-day/ /services/cpd/open-day/ 301
+# Open Day event pages (trailing-slash normalisation)
+/courses/foundation-training/200-hour/open-day /courses/foundation-training/200-hour/open-day/ 301
+/courses/cpd/open-day /courses/cpd/open-day/ 301

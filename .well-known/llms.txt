@@ -38,7 +38,7 @@ Agent authentication instructions: `/auth.md` (public read-only site; no OAuth o
 - [About](https://berkshireyogatraining.co.uk/about.html): Mission, values, story and milestones
 - [Team](https://berkshireyogatraining.co.uk/team.html): Co-founders and faculty
 - [Partners](https://berkshireyogatraining.co.uk/research/partners/): Founding studio partners Yoga Reading (Katia Major) and Goyoga Tallinn (Raili Maripuu)
-- [Services](https://berkshireyogatraining.co.uk/services/): Programme hub
+- [Courses](https://berkshireyogatraining.co.uk/courses/): Programme hub
 - [Solutions](https://berkshireyogatraining.co.uk/solutions/): How TWA supports practitioners, studios and organisations
 - [Contact](https://berkshireyogatraining.co.uk/contact.html): Enquiries and questions
 - [Join](https://berkshireyogatraining.co.uk/join.html): Apply or enquire about training
@@ -46,12 +46,12 @@ Agent authentication instructions: `/auth.md` (public read-only site; no OAuth o
 - [Research](https://berkshireyogatraining.co.uk/research.html): Evidence-informed practice and collaboration
 - [Journal](https://berkshireyogatraining.co.uk/journal.html): Articles from educators and research team
 
-## Services
+## Courses
 
-- [Foundation Training](https://berkshireyogatraining.co.uk/services/foundation-training/): 200-hour to 500-hour Yoga Alliance Professionals certification with supervised practicum
-- [CPD](https://berkshireyogatraining.co.uk/services/cpd/): Continuing professional development for qualified teachers and practitioners
-- [Workshops](https://berkshireyogatraining.co.uk/services/workshops/): Specialist short courses on topics such as breath work, menopause support and trauma-informed teaching
-- [Retreats](https://berkshireyogatraining.co.uk/services/retreats/): Immersive retreat programmes combining academic rigour with restorative practice
+- [Foundation Training](https://berkshireyogatraining.co.uk/courses/foundation-training/): 200-hour to 500-hour Yoga Alliance Professionals certification with supervised practicum
+- [CPD](https://berkshireyogatraining.co.uk/courses/cpd/): Continuing professional development for qualified teachers and practitioners
+- [Workshops](https://berkshireyogatraining.co.uk/courses/workshops/): Specialist short courses on topics such as breath work, menopause support and trauma-informed teaching
+- [Retreats](https://berkshireyogatraining.co.uk/courses/retreats/): Immersive retreat programmes combining academic rigour with restorative practice
 
 ## Solutions
 

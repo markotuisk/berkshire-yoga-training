@@ -27,7 +27,7 @@ All published pages listed in [llms.txt](https://berkshireyogatraining.co.uk/.we
 Example:
 
 ```bash
-curl -H "Accept: text/markdown" https://berkshireyogatraining.co.uk/services/
+curl -H "Accept: text/markdown" https://berkshireyogatraining.co.uk/courses/
 ```
 
 ## Human actions (not available to agents)

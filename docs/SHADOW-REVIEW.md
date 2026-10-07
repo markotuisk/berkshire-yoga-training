@@ -256,7 +256,7 @@ There is **no automatic email or push notification** today. The person who raise
 | POST | `/api/assets` | Upload replacement image to Drive (+ Sheets `asset_upload`) |
 | GET | `/api/audit` | Full JSON export |
 | POST | `/api/audit` | Full replace sync to Sheets |
-| GET | `/api/insights?path=/services/` | Page insights — GSC + GA4 (28 days); link graph stays client-side |
+| GET | `/api/insights?path=/courses/` | Page insights — GSC + GA4 (28 days); link graph stays client-side |
 | GET | `/api/auth/google/start` | Start Google OAuth (redirect to consent) |
 | GET | `/api/auth/google/callback` | OAuth callback (stores tokens in KV) |
 | GET | `/api/auth/google/status` | Connection status (Google account, GSC, GA4) |

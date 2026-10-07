@@ -8,7 +8,7 @@ Full rebuild of Berkshire Yoga Training as **Thames Wellness Academy**, borrowin
 
 ## Borrowed habits
 
-- Courses-first nav and hub (`/services/` + `/courses/` aliases)
+- Courses-first nav and hub (`/courses/` + `/courses/` aliases)
 - Deep flagship course page (Foundation Training) with Course schema
 - Teachers as faculty SEO surface
 - Journal for topical authority + internal links
