@@ -13,6 +13,10 @@ credentials.json
 
 # Local scratch
 Untitled/
+.wrangler/
+.cursor/
 
 # Source doc (not needed for static deploy)
 *.docx
+research/*.csv
+research/INTERNAL-*.md

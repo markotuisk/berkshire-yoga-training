@@ -36,7 +36,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Archivo:ital,wght@0,600;0,700;1,600;1,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/site.css?v=20260929aa">
+  <link rel="stylesheet" href="css/site.css?v=20261006a">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -111,27 +111,33 @@
   }
   </script>
 </head>
-<body>
+<body class="page-home">
   <a href="#main-content" class="skip-link">Skip to main content</a>
-
   <header class="site-header" id="top">
-    <nav class="pathways-bar" aria-label="Pathways">
-      <div class="pathways-bar-inner container">
-        <span class="pathways-label">Pathways</span>
-        <div class="pathways-chips">
-          
-
-<a href="services/foundation-training/" class="pathways-chip">Foundational Teacher Training | 200 &amp; 300 hours</a>
-<a href="services/cpd/" class="pathways-chip">Ashtanga | CPD</a>
-<a href="services/cpd/" class="pathways-chip">Pregnancy | CPD</a>
-<a href="services/cpd/" class="pathways-chip">Sound | CPD</a>
-<a href="services/cpd/" class="pathways-chip">Anatomy | CPD</a>
-<a href="services/cpd/" class="pathways-chip">Nidra | CPD</a>
-<a href="services/" class="pathways-chip pathways-chip--more">See all</a>
-        
+    <aside class="hero-rail" id="hero-upcoming" aria-labelledby="hero-upcoming-heading" data-upcoming-root hidden>
+      <div class="hero-rail-inner container">
+        <div class="hero-rail-intro">
+          <p class="hero-upcoming-label">Next up</p>
+          <p class="hero-upcoming-type" data-upcoming="type"></p>
         </div>
+        <div class="hero-rail-main">
+          <h2 id="hero-upcoming-heading" class="hero-upcoming-title" data-upcoming="title"></h2>
+          <p class="hero-upcoming-countdown" data-upcoming="countdown"></p>
+        </div>
+        <dl class="hero-upcoming-meta">
+          <div>
+            <dt>Starts</dt>
+            <dd data-upcoming="start"></dd>
+          </div>
+          <div class="hero-upcoming-price">
+            <dt>Price</dt>
+            <dd data-upcoming="price"></dd>
+          </div>
+        </dl>
+        <p class="hero-upcoming-location" data-upcoming="location" hidden></p>
+        <a class="hero-upcoming-link" data-upcoming="link" href="#">View details</a>
       </div>
-    </nav>
+    </aside>
     <div class="header-inner container">
       <a href="index.html" class="logo" aria-label="Thames Wellness Academy home">
         <img src="assets/logo-twa.png" alt="Thames Wellness Academy" class="logo-img" width="48" height="48">
@@ -177,31 +183,34 @@
             <a href="team.html" class="nav-link">Teachers</a>
             <ul class="nav-submenu nav-submenu--products">
               <li>
-                <a href="team.html#katia-major" class="nav-product">
+                <a href="team/katia-major.html" class="nav-product">
                   <span class="nav-product-title">Katia Major</span>
                   <span class="nav-product-desc">Co-founder</span>
                 </a>
               </li>
               <li>
-                <a href="team.html#raili-maripuu" class="nav-product">
+                <a href="team/raili-maripuu.html" class="nav-product">
                   <span class="nav-product-title">Raili Maripuu</span>
                   <span class="nav-product-desc">Co-founder</span>
                 </a>
               </li>
               <li>
-                <a href="team.html#lorena-rodrigo" class="nav-product">
+                <a href="team/lorena-rodrigo.html" class="nav-product">
                   <span class="nav-product-title">Lorena Rodrigo</span>
                   <span class="nav-product-desc">Teacher</span>
                 </a>
               </li>
               <li>
-                <a href="team.html#yulia-wind" class="nav-product">
+                <a href="team/yulia-wind.html" class="nav-product">
                   <span class="nav-product-title">Yulia Wind</span>
                   <span class="nav-product-desc">Teacher</span>
                 </a>
               </li>
               <li class="nav-submenu-more">
-                <a href="team.html" class="nav-product-more">Browse all teachers</a>
+                <a href="team.html" class="nav-product-more">All TWA Teachers</a>
+              </li>
+              <li>
+                <a href="teachers/" class="nav-product-more">Certified Teachers</a>
               </li>
             </ul>
           </li>
@@ -253,6 +262,9 @@
               <li class="nav-submenu-more">
                 <a href="journal.html" class="nav-product-more">All articles</a>
               </li>
+              <li class="nav-submenu-more">
+                <a href="journal/authors.html" class="nav-product-more">All Authors</a>
+              </li>
             </ul>
           </li>
           <li class="nav-item nav-item--has-menu">
@@ -262,6 +274,12 @@
                 <a href="about.html#our-story" class="nav-product">
                   <span class="nav-product-title">Our story</span>
                   <span class="nav-product-desc">Who we are and how the Academy began</span>
+                </a>
+              </li>
+              <li>
+                <a href="about/brand.html" class="nav-product">
+                  <span class="nav-product-title">TWA Brand origin</span>
+                  <span class="nav-product-desc">Name, colours, meaning and mission</span>
                 </a>
               </li>
               <li>
@@ -287,6 +305,56 @@
                   <span class="nav-product-title">Policies</span>
                   <span class="nav-product-desc">Privacy and governance documents</span>
                 </a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item nav-item--has-menu">
+            <a href="media.html" class="nav-link">Media</a>
+            <ul class="nav-submenu nav-submenu--products">
+              <li>
+                <a href="media/gallery.html" class="nav-product">
+                  <span class="nav-product-title">Gallery</span>
+                  <span class="nav-product-desc">Academy photography and programme images</span>
+                </a>
+              </li>
+              <li>
+                <a href="media.html#youtube" class="nav-product">
+                  <span class="nav-product-title">YouTube</span>
+                  <span class="nav-product-desc">Video updates from the Academy</span>
+                </a>
+              </li>
+              <li>
+                <a href="media.html#linkedin" class="nav-product">
+                  <span class="nav-product-title">LinkedIn</span>
+                  <span class="nav-product-desc">Professional news and partnerships</span>
+                </a>
+              </li>
+              <li>
+                <a href="media.html#facebook" class="nav-product">
+                  <span class="nav-product-title">Facebook</span>
+                  <span class="nav-product-desc">Community updates and events</span>
+                </a>
+              </li>
+              <li>
+                <a href="media.html#instagram" class="nav-product">
+                  <span class="nav-product-title">Instagram</span>
+                  <span class="nav-product-desc">Visual stories from Academy life</span>
+                </a>
+              </li>
+              <li>
+                <a href="media.html#tiktok" class="nav-product">
+                  <span class="nav-product-title">TikTok</span>
+                  <span class="nav-product-desc">Short-form teaching moments</span>
+                </a>
+              </li>
+              <li>
+                <a href="media/kit.html" class="nav-product">
+                  <span class="nav-product-title">Media Kit</span>
+                  <span class="nav-product-desc">Press assets and brand materials</span>
+                </a>
+              </li>
+              <li class="nav-submenu-more">
+                <a href="media.html" class="nav-product-more">All media</a>
               </li>
             </ul>
           </li>
@@ -331,8 +399,57 @@
   <main id="main-content">
     <section class="hero" aria-label="Homepage hero">
       <div class="hero-atmosphere" aria-hidden="true">
-        <span class="hero-watermark hero-watermark--train">TRAIN</span>
-        <span class="hero-watermark hero-watermark--practise">PRACTISE</span>
+        <svg class="hero-symbol" viewBox="0 0 280 480" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false">
+          <title>Olive branch</title>
+          <g class="hero-symbol-branch" fill="currentColor" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <!-- Main stem -->
+            <path d="M142 22c-2 38-4 86-2 138 3 56 14 112 34 198" fill="none" stroke-width="2.4" opacity="0.85"/>
+            <!-- Left leaves (lower to tip) -->
+            <ellipse cx="108" cy="78" rx="34" ry="13" transform="rotate(-38 108 78)" opacity="0.72"/>
+            <ellipse cx="102" cy="118" rx="38" ry="14" transform="rotate(-28 102 118)" opacity="0.78"/>
+            <ellipse cx="100" cy="162" rx="40" ry="14.5" transform="rotate(-22 100 162)" opacity="0.74"/>
+            <ellipse cx="102" cy="208" rx="42" ry="15" transform="rotate(-16 102 208)" opacity="0.8"/>
+            <ellipse cx="110" cy="254" rx="40" ry="14" transform="rotate(-10 110 254)" opacity="0.7"/>
+            <ellipse cx="122" cy="298" rx="36" ry="13" transform="rotate(-4 122 298)" opacity="0.76"/>
+            <ellipse cx="138" cy="340" rx="32" ry="12" transform="rotate(4 138 340)" opacity="0.68"/>
+            <ellipse cx="156" cy="378" rx="28" ry="11" transform="rotate(12 156 378)" opacity="0.74"/>
+            <ellipse cx="174" cy="412" rx="24" ry="10" transform="rotate(20 174 412)" opacity="0.66"/>
+            <!-- Right leaves -->
+            <ellipse cx="176" cy="96" rx="36" ry="13.5" transform="rotate(32 176 96)" opacity="0.7"/>
+            <ellipse cx="182" cy="138" rx="40" ry="14.5" transform="rotate(24 182 138)" opacity="0.76"/>
+            <ellipse cx="186" cy="182" rx="42" ry="15" transform="rotate(18 186 182)" opacity="0.72"/>
+            <ellipse cx="188" cy="228" rx="40" ry="14.5" transform="rotate(12 188 228)" opacity="0.78"/>
+            <ellipse cx="186" cy="274" rx="38" ry="13.5" transform="rotate(6 186 274)" opacity="0.7"/>
+            <ellipse cx="180" cy="318" rx="34" ry="12.5" transform="rotate(0 180 318)" opacity="0.74"/>
+            <ellipse cx="172" cy="358" rx="30" ry="11.5" transform="rotate(-8 172 358)" opacity="0.66"/>
+            <ellipse cx="164" cy="396" rx="26" ry="10.5" transform="rotate(-14 164 396)" opacity="0.72"/>
+            <!-- Leaf midribs -->
+            <g fill="none" stroke-width="1.1" opacity="0.35">
+              <path d="M88 68l36 22"/>
+              <path d="M78 110l42 22"/>
+              <path d="M74 154l46 22"/>
+              <path d="M74 200l50 22"/>
+              <path d="M84 246l46 20"/>
+              <path d="M100 290l40 18"/>
+              <path d="M120 332l34 16"/>
+              <path d="M140 370l30 14"/>
+              <path d="M160 404l26 12"/>
+              <path d="M154 86l40-18"/>
+              <path d="M158 128l44-16"/>
+              <path d="M162 172l46-14"/>
+              <path d="M166 218l42-12"/>
+              <path d="M166 264l38-10"/>
+              <path d="M162 308l34-8"/>
+              <path d="M156 348l30-6"/>
+              <path d="M150 386l26-4"/>
+            </g>
+            <!-- Small olives -->
+            <ellipse cx="128" cy="148" rx="5.5" ry="7.5" transform="rotate(-18 128 148)" opacity="0.55"/>
+            <ellipse cx="134" cy="236" rx="5" ry="7" transform="rotate(-8 134 236)" opacity="0.5"/>
+            <ellipse cx="158" cy="312" rx="4.8" ry="6.8" transform="rotate(6 158 312)" opacity="0.48"/>
+            <ellipse cx="168" cy="188" rx="5.2" ry="7.2" transform="rotate(14 168 188)" opacity="0.52"/>
+          </g>
+        </svg>
         <span class="hero-glow"></span>
       </div>
       <div class="hero-stage">
@@ -341,37 +458,12 @@
           <h1>Yoga teacher training in Berkshire and Reading</h1>
           <p class="lede">Teacher-led Foundation Training, CPD and workshops, on site across Berkshire and Reading.</p>
           <div class="btn-row">
-            <a class="btn btn-primary" href="services/foundation-training/">Explore Foundation Training</a>
-            <a class="btn btn-ghost" href="services/">Browse all courses</a>
+            <a class="btn btn-primary" href="contact.html#form">Suggest a course</a>
+            <a class="btn btn-secondary" href="services/">Browse all courses</a>
           </div>
         </div>
       </div>
     </section>
-
-    <aside class="hero-rail" id="hero-upcoming" aria-labelledby="hero-upcoming-heading" data-upcoming-root hidden>
-      <div class="hero-rail-inner container">
-        <div class="hero-rail-intro">
-          <p class="hero-upcoming-label">Next up</p>
-          <p class="hero-upcoming-type" data-upcoming="type"></p>
-        </div>
-        <div class="hero-rail-main">
-          <h2 id="hero-upcoming-heading" class="hero-upcoming-title" data-upcoming="title"></h2>
-          <p class="hero-upcoming-countdown" data-upcoming="countdown"></p>
-        </div>
-        <dl class="hero-upcoming-meta">
-          <div>
-            <dt>Starts</dt>
-            <dd data-upcoming="start"></dd>
-          </div>
-          <div class="hero-upcoming-price">
-            <dt>Price</dt>
-            <dd data-upcoming="price"></dd>
-          </div>
-        </dl>
-        <p class="hero-upcoming-location" data-upcoming="location" hidden></p>
-        <a class="hero-upcoming-link" data-upcoming="link" href="#">View details</a>
-      </div>
-    </aside>
 
     <section class="section section--upcoming-courses" aria-labelledby="courses-heading" data-upcoming-gallery>
       <div class="container">
@@ -403,12 +495,12 @@
       <div class="container">
         <div class="section-head section-head--choose">
           <p class="eyebrow">Pathways</p>
-          <h2 id="pathways-heading" class="choose-path-title">Choose your <em>path</em></h2>
+          <h2 id="pathways-heading" class="choose-path-title">Choose your path</h2>
         </div>
 
         <div class="path-guides">
           <a class="path-guide" href="services/foundation-training/">
-            <span class="path-guide-copy">New to teaching? Start with the <em>200-Hour</em>.</span>
+            <span class="path-guide-copy">New to teaching? Start with the <em>200-Hour</em>. Meet faculty at the 7 November Open Day.</span>
             <span class="path-guide-cta">200-Hour</span>
           </a>
           <a class="path-guide" href="#path-advanced">
@@ -422,10 +514,10 @@
             <p class="path-col-badge">Yoga Alliance Professionals</p>
             <p class="path-col-display" aria-hidden="true">200</p>
             <h3 class="path-col-title">Teacher Training</h3>
-            <p class="path-col-desc">Our Foundation pathway for aspiring teachers: teacher-led, on site, with supervised teaching practice.</p>
+            <p class="path-col-desc">200 hours across nine weekends, Feb to Nov 2027. Lead faculty: Katia Major and Raili Maripuu. Open Day 7 November 2026, 12:00-2pm.</p>
             <div class="path-col-foot">
-              <p class="path-col-meta">200 hours · In studio · Jan 2027 · £2,450</p>
-              <a class="path-col-cta" href="services/foundation-training/">Explore the 200-Hour</a>
+              <p class="path-col-meta">200 hours · Feb to Nov 2027 · Early Bird £2,925 · Standard £3,250</p>
+              <a class="path-col-cta" href="services/foundation-training/200-hour/">Explore the 200-Hour</a>
             </div>
           </article>
 
@@ -478,6 +570,10 @@
             <blockquote>
               <p>The teacher-led approach made all the difference. I felt supported from day one, with real feedback during supervised teaching practice.</p>
             </blockquote>
+            <div class="voice-rating" role="img" aria-label="Rated 5 out of 5 stars">
+              <span class="voice-stars" aria-hidden="true">★★★★★</span>
+              <span class="voice-rating-label">5 / 5</span>
+            </div>
             <figcaption>
               <span class="voice-name">Sarah</span>
               <span class="voice-role">Graduate, 200-hour</span>
@@ -488,6 +584,10 @@
             <blockquote>
               <p>Our corporate wellbeing team gained practical, evidence-informed skills we could apply immediately. The CPD format suited our schedules.</p>
             </blockquote>
+            <div class="voice-rating" role="img" aria-label="Rated 5 out of 5 stars">
+              <span class="voice-stars" aria-hidden="true">★★★★★</span>
+              <span class="voice-rating-label">5 / 5</span>
+            </div>
             <figcaption>
               <span class="voice-name">James</span>
               <span class="voice-role">Corporate wellbeing lead</span>
@@ -498,6 +598,10 @@
             <blockquote>
               <p>The anatomy and biomechanics modules were exceptional. I now teach with far greater confidence, especially when adapting for diverse client needs.</p>
             </blockquote>
+            <div class="voice-rating" role="img" aria-label="Rated 5 out of 5 stars">
+              <span class="voice-stars" aria-hidden="true">★★★★★</span>
+              <span class="voice-rating-label">5 / 5</span>
+            </div>
             <figcaption>
               <span class="voice-name">Emma</span>
               <span class="voice-role">Workshop participant</span>
@@ -508,6 +612,10 @@
             <blockquote>
               <p>Yoga Alliance Professionals certification opened doors I had not expected. The 200-hour Foundation gave me a solid base to build my teaching career.</p>
             </blockquote>
+            <div class="voice-rating" role="img" aria-label="Rated 5 out of 5 stars">
+              <span class="voice-stars" aria-hidden="true">★★★★★</span>
+              <span class="voice-rating-label">5 / 5</span>
+            </div>
             <figcaption>
               <span class="voice-name">David</span>
               <span class="voice-role">Graduate, Foundation Training</span>
@@ -553,25 +661,69 @@
       </div>
     </section>
 
-    <section class="section" aria-labelledby="flagship-heading">
+    <section class="section" aria-labelledby="practice-heading">
       <div class="container flagship">
         <div>
-          <p class="eyebrow">Yoga teacher training</p>
-          <h2 id="flagship-heading">Foundation Training for real teaching careers</h2>
-          <p class="lede">Our flagship pathway mirrors what high-performing yoga school sites do well: a deep course landing page, clear outcomes, and a direct apply CTA.</p>
+          <p class="eyebrow">Real classroom practice</p>
+          <h2 id="practice-heading">Learn beside a teacher, assist as a trainee</h2>
+          <p class="lede">We take trainees under our wing in live public classes. You assist, observe, and practise what you have studied, so the leap from student to teacher feels grounded rather than frightening.</p>
+          <p>In the room you hear how experienced teachers cue, hold pace, and keep composure when the unexpected happens. That hands-on assistant experience builds calm confidence long before you stand at the front alone.</p>
           <div class="flagship-meta">
-            <span class="chip">200–500 hour</span>
-            <span class="chip">On site in Berkshire</span>
-            <span class="chip">Supervised teaching practice</span>
-            <span class="chip">YAP certification pathway</span>
+            <span class="chip">Assistant roles in real classes</span>
+            <span class="chip">Guided by academy faculty</span>
+            <span class="chip">Anxiety eased through practice</span>
+            <span class="chip">Composure under real conditions</span>
           </div>
           <div class="btn-row">
-            <a class="btn btn-primary" href="services/foundation-training/">Foundation Training details</a>
-            <a class="btn btn-secondary" href="join.html">Apply or enquire</a>
+            <a class="btn btn-primary" href="services/foundation-training/">See how practice works</a>
+            <a class="btn btn-secondary" href="join.html">Ask about assisting</a>
           </div>
         </div>
-        <div class="flagship-media placeholder-img-tall" role="img" aria-label="Placeholder for Foundation Training classroom photography">
-          <span class="placeholder-label">[Placeholder] Foundation Training</span>
+        <div class="practice-collage" role="group" aria-label="Classroom practice photographs">
+          <figure class="practice-shot practice-shot--featured">
+            <img
+              src="assets/practice/practice-1.jpg"
+              alt="Trainee assisting a teacher during a live public class"
+              width="800"
+              height="1000"
+              loading="lazy"
+              decoding="async"
+            >
+            <figcaption class="placeholder-label">[Placeholder] practice-1.jpg</figcaption>
+          </figure>
+          <figure class="practice-shot practice-shot--b">
+            <img
+              src="assets/practice/practice-2.jpg"
+              alt="Faculty guiding cueing and pace in a studio setting"
+              width="640"
+              height="480"
+              loading="lazy"
+              decoding="async"
+            >
+            <figcaption class="placeholder-label">[Placeholder] practice-2.jpg</figcaption>
+          </figure>
+          <figure class="practice-shot practice-shot--c">
+            <img
+              src="assets/practice/practice-3.jpg"
+              alt="Trainee observing classroom composure and student support"
+              width="640"
+              height="480"
+              loading="lazy"
+              decoding="async"
+            >
+            <figcaption class="placeholder-label">[Placeholder] practice-3.jpg</figcaption>
+          </figure>
+          <figure class="practice-shot practice-shot--d">
+            <img
+              src="assets/practice/practice-4.jpg"
+              alt="Hands-on assisting during a supervised teaching session"
+              width="640"
+              height="520"
+              loading="lazy"
+              decoding="async"
+            >
+            <figcaption class="placeholder-label">[Placeholder] practice-4.jpg</figcaption>
+          </figure>
         </div>
       </div>
     </section>
@@ -585,28 +737,52 @@
         </div>
         <div class="teacher-grid">
           <article class="teacher-card">
-            <div class="avatar" aria-hidden="true">KM</div>
-            <h3>Katia Major</h3>
-            <p class="role">Co-founder</p>
-            <p>Clinical and studio practice through Yoga Reading, with a focus on professional teaching standards.</p>
+            <a class="teacher-card-photo-link" href="team/katia-major.html">
+              <div class="teacher-photo">
+                <img src="assets/team/katia-major-thames-wellness-academy.svg" alt="Katia Major" width="545" height="682" decoding="async">
+              </div>
+            </a>
+            <div class="teacher-card-body">
+              <h3><a class="teacher-card-link" href="team/katia-major.html">Katia Major</a></h3>
+              <p class="role">Co-founder</p>
+              <p>Clinical and studio practice through Yoga Reading, with a focus on professional teaching standards.</p>
+            </div>
           </article>
           <article class="teacher-card">
-            <div class="avatar" aria-hidden="true">RM</div>
-            <h3>Raili Maripuu</h3>
-            <p class="role">Co-founder</p>
-            <p>Studio leadership through Goyoga Tallinn and long-form teacher education across Europe.</p>
+            <a class="teacher-card-photo-link" href="team/raili-maripuu.html">
+              <div class="teacher-photo">
+                <img src="assets/team/raili-maripuu-thames-wellness-academy.svg" alt="Raili Maripuu" width="545" height="682" decoding="async">
+              </div>
+            </a>
+            <div class="teacher-card-body">
+              <h3><a class="teacher-card-link" href="team/raili-maripuu.html">Raili Maripuu</a></h3>
+              <p class="role">Co-founder</p>
+              <p>Studio leadership through Goyoga Tallinn and long-form teacher education across Europe.</p>
+            </div>
           </article>
           <article class="teacher-card">
-            <div class="avatar" aria-hidden="true">LR</div>
-            <h3>Lorena Rodrigo</h3>
-            <p class="role">Teacher</p>
-            <p>Academy teacher supporting teacher-led programmes across Berkshire.</p>
+            <a class="teacher-card-photo-link" href="team/lorena-rodrigo.html">
+              <div class="teacher-photo">
+                <img src="assets/team/lorena-rodrigo-thames-wellness-academy.svg" alt="Lorena Rodrigo" width="545" height="682" decoding="async">
+              </div>
+            </a>
+            <div class="teacher-card-body">
+              <h3><a class="teacher-card-link" href="team/lorena-rodrigo.html">Lorena Rodrigo</a></h3>
+              <p class="role">Teacher</p>
+              <p>Academy teacher supporting teacher-led programmes across Berkshire.</p>
+            </div>
           </article>
           <article class="teacher-card">
-            <div class="avatar" aria-hidden="true">YW</div>
-            <h3>Yulia Wind</h3>
-            <p class="role">Teacher</p>
-            <p>Academy teacher supporting teacher-led programmes across Berkshire.</p>
+            <a class="teacher-card-photo-link" href="team/yulia-wind.html">
+              <div class="teacher-photo">
+                <img src="assets/team/yulia-wind.svg" alt="Yulia Wind" width="545" height="682" decoding="async">
+              </div>
+            </a>
+            <div class="teacher-card-body">
+              <h3><a class="teacher-card-link" href="team/yulia-wind.html">Yulia Wind</a></h3>
+              <p class="role">Teacher</p>
+              <p>Academy teacher supporting teacher-led programmes across Berkshire.</p>
+            </div>
           </article>
         </div>
         <div class="btn-row">
@@ -703,7 +879,6 @@
       <div>
         <p class="footer-brand">Thames Wellness Academy</p>
         <p>Professional wellness education in Berkshire and Reading. Trading as Berkshire Yoga Training.</p>
-        <p><a href="https://www.yogaallianceprofessionals.org/" rel="noopener noreferrer">Yoga Alliance Professionals</a></p>
       </div>
       <div>
         <h4>Courses</h4>
@@ -721,6 +896,7 @@
           <li><a href="about.html">About</a></li>
           <li><a href="team.html">Teachers</a></li>
           <li><a href="journal.html">Journal</a></li>
+          <li><a href="media.html">Media</a></li>
           <li><a href="research.html">Research</a></li>
           <li><a href="testimonials.html">Testimonials</a></li>
           <li><a href="faq.html">FAQ</a></li>
@@ -735,12 +911,64 @@
         </ul>
       </div>
     </div>
+    <div class="container footer-supporters">
+      <h4 class="footer-supporters-heading">Supporters</h4>
+      <ul class="footer-supporters-list">
+        <li>
+          <a class="footer-supporter" href="https://seoestonia.xyz" rel="noopener noreferrer">
+            <span class="footer-supporter-logo-round">
+              <img class="footer-supporter-logo" src="assets/partners/seoestonia-logo.png" width="56" height="56" alt="" decoding="async">
+            </span>
+            <span class="footer-supporter-copy">
+              <span class="footer-supporter-name">SEO Studio Estonia</span>
+              <span class="footer-supporter-blurb">Growth and visibility</span>
+            </span>
+          </a>
+        </li>
+        <li>
+          <a class="footer-supporter" href="https://www.yogaallianceprofessionals.org/" rel="noopener noreferrer">
+            <span class="footer-supporter-logo-frame">
+              <img class="footer-supporter-logo" src="assets/yoga-alliance-professionals-logo.png" width="140" height="43" alt="" decoding="async">
+            </span>
+            <span class="footer-supporter-copy">
+              <span class="footer-supporter-name">Yoga Alliance Professionals</span>
+              <span class="footer-supporter-blurb">Professional accreditation</span>
+            </span>
+          </a>
+        </li>
+        <li>
+          <a class="footer-supporter" href="https://www.goyoga.ee" rel="noopener noreferrer">
+            <span class="footer-supporter-logo-frame">
+              <img class="footer-supporter-logo" src="assets/partners/goyoga-logo.png" width="68" height="40" alt="" decoding="async">
+            </span>
+            <span class="footer-supporter-copy">
+              <span class="footer-supporter-name">Goyoga Tallinn</span>
+              <span class="footer-supporter-blurb">Yoga, Pilates, Aerial Studio</span>
+            </span>
+          </a>
+        </li>
+        <li>
+          <a class="footer-supporter" href="https://yogareading.co.uk" rel="noopener noreferrer">
+            <span class="footer-supporter-logo-frame">
+              <img class="footer-supporter-logo" src="assets/partners/yoga-reading-logo.png" width="48" height="48" alt="" decoding="async">
+            </span>
+            <span class="footer-supporter-copy">
+              <span class="footer-supporter-name">Yoga Reading</span>
+              <span class="footer-supporter-blurb">Yoga, Pilates &amp; Clinic</span>
+            </span>
+          </a>
+        </li>
+      </ul>
+    </div>
     <div class="container footer-bottom">
       <p>&copy; 2026 Thames Wellness Academy. All rights reserved.</p>
+    </div>
+    <div class="footer-cutout" aria-hidden="true">
+      <span class="footer-cutout-text">Thames Wellness Academy</span>
     </div>
   </footer>
 
   <script src="js/main.js?v=20260928"></script>
-  <script src="js/upcoming.js?v=20260929e" defer></script>
+  <script src="js/upcoming.js?v=20261007a" defer></script>
 </body>
 </html>

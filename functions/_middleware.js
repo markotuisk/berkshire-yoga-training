@@ -182,12 +182,50 @@ async function htmlWithShadow(response, pageUrl, opts) {
   });
 }
 
+function isShadowHost(hostname) {
+  const host = String(hostname || '').toLowerCase();
+  return (
+    host === 'shadow.berkshireyogatraining.co.uk' ||
+    host.endsWith('.berkshire-yoga-training-shadow.pages.dev') ||
+    host === 'berkshire-yoga-training-shadow.pages.dev'
+  );
+}
+
 export async function onRequest(context) {
   const { request, next } = context;
   const url = new URL(request.url);
   const { pathname } = url;
   const accept = request.headers.get('Accept') || '';
   const accessPreview = isLinkPreviewCrawler(request.headers.get('User-Agent') || '');
+
+  // Public production must stay clean. Shadow overlay + noindex only on shadow hosts.
+  if (!isShadowHost(url.hostname)) {
+    const response = await next();
+    if (pathname.startsWith('/api/')) return response;
+    if (!['GET', 'HEAD'].includes(request.method)) return response;
+    if (!prefersMarkdown(accept)) return response;
+    if (STATIC_ASSET.test(pathname) || pathname.startsWith('/.well-known/')) return response;
+    if (!isHtmlPagePath(pathname)) return response;
+    if (!response.ok) return response;
+    const contentType = response.headers.get('content-type') || '';
+    if (!/text\/html/i.test(contentType)) return response;
+    const html = await response.text();
+    const markdown = htmlToMarkdown(html, url.href);
+    if (request.method === 'HEAD') {
+      const headers = new Headers(response.headers);
+      headers.set('Content-Type', 'text/markdown; charset=utf-8');
+      headers.set('Vary', 'Accept');
+      applyAgentLinkHeaders(headers);
+      headers.set('x-markdown-tokens', estimateTokens(markdown));
+      headers.set('Content-Signal', 'ai-train=yes, search=yes, ai-input=yes');
+      headers.delete('Content-Encoding');
+      headers.delete('Content-Length');
+      headers.delete('ETag');
+      headers.delete('Last-Modified');
+      return new Response(null, { status: 200, headers });
+    }
+    return markdownResponse(markdown, response.headers);
+  }
 
   if (pathname.startsWith('/api/')) {
     return next();

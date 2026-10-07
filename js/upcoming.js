@@ -8,7 +8,7 @@
 (function () {
   'use strict';
 
-  /** @typedef {'Course'|'CPD'|'Workshop'} UpcomingType */
+  /** @typedef {'Course'|'CPD'|'Workshop'|'Retreat'|'Open day'} UpcomingType */
   /** @typedef {'In studio'|'Livestream'} UpcomingFormat */
   /** @typedef {'gold'|'river'|'teal'|'ink'|'mist'} UpcomingTone */
 
@@ -22,53 +22,131 @@
    * @typedef {Object} UpcomingEvent
    * @property {UpcomingType} type
    * @property {string} title
-   * @property {string} startDate        ISO date YYYY-MM-DD
-   * @property {string} lastSignupDate   ISO date YYYY-MM-DD
-   * @property {string} price            Display string, e.g. "£1,250"
-   * @property {string} href             Relative or absolute URL
-   * @property {string} [location]       Optional venue / area
-   * @property {UpcomingFormat} [format] Delivery format badge
-   * @property {string} [teacher]        Optional instructor name
-   * @property {UpcomingTone} [tone]     Abstract theme (gold/river/teal/ink/mist)
+   * @property {string} startDate          ISO date YYYY-MM-DD
+   * @property {string} [endDate]          ISO date YYYY-MM-DD (multi-day / programme span)
+   * @property {string} lastSignupDate     ISO date YYYY-MM-DD
+   * @property {string} [price]            Single-price display, e.g. "Free"; omit when dual
+   * @property {string} [earlyBird]        Early Bird amount, e.g. "£2,450"; omit → Enquire
+   * @property {string} [standard]         Standard amount, e.g. "£2,900"; omit → Enquire
+   * @property {boolean} [free]            When true, displays as Free (single price)
+   * @property {number} [hours]            Training length in hours
+   * @property {string} [hoursLabel]       Override hours line, e.g. "200 hours"
+   * @property {string} [startTime]        24h HH:MM
+   * @property {string} [endTime]          24h HH:MM
+   * @property {string} href               Relative or absolute URL
+   * @property {string} [location]         Optional venue / area
+   * @property {UpcomingFormat} [format]   Delivery format (not shown on cards)
+   * @property {string} [teacher]          Optional instructor name
+   * @property {UpcomingTone} [tone]       Abstract theme (gold/river/teal/ink/mist)
    */
 
   /** @type {UpcomingEvent[]} */
   var UPCOMING_EVENTS = [
     {
-      type: 'Workshop',
-      title: 'Trauma-informed teaching foundations',
-      startDate: '2026-10-18',
-      lastSignupDate: '2026-10-11',
-      price: '£95',
-      href: 'services/workshops/',
-      location: 'Reading',
+      type: 'Open day',
+      title: 'Open Day | Foundation Training 200 hours',
+      startDate: '2026-11-07',
+      lastSignupDate: '2026-11-05',
+      free: true,
+      hours: 2,
+      hoursLabel: '2 hours',
+      href: 'services/foundation-training/200-hour/open-day/',
+      location: 'Berkshire and Reading',
       format: 'In studio',
-      teacher: 'Katia Major',
+      teacher: 'Raili Maripuu and Katia Major',
       tone: 'gold'
     },
     {
-      type: 'CPD',
-      title: 'Breath work for teaching practice',
-      startDate: '2026-11-08',
-      lastSignupDate: '2026-11-01',
-      price: '£185',
-      href: 'services/cpd/',
-      location: 'Berkshire',
+      type: 'Open day',
+      title: 'Open Day | CPD Courses',
+      startDate: '2027-01-29',
+      lastSignupDate: '2027-01-27',
+      free: true,
+      hours: 2,
+      hoursLabel: '2 hours',
+      href: 'services/cpd/open-day/',
+      location: 'Berkshire and Reading',
       format: 'In studio',
-      teacher: 'Raili Maripuu',
-      tone: 'teal'
+      tone: 'gold'
     },
     {
       type: 'Course',
-      title: 'Foundation Training (200-hour)',
-      startDate: '2027-01-17',
-      lastSignupDate: '2026-12-15',
-      price: '£2,450',
-      href: 'services/foundation-training/',
+      title: 'Foundation 200 Teacher Training',
+      startDate: '2027-02-12',
+      endDate: '2027-11-14',
+      lastSignupDate: '2027-01-29',
+      earlyBird: '£2,925',
+      standard: '£3,250',
+      hours: 200,
+      startTime: '09:30',
+      endTime: '17:00',
+      href: 'services/foundation-training/200-hour/',
       location: 'Berkshire and Reading',
       format: 'In studio',
-      teacher: 'Academy faculty',
+      teacher: 'Katia Major and Raili Maripuu',
+      tone: 'ink'
+    },
+    {
+      type: 'CPD',
+      title: 'Pregnancy Yoga Training',
+      startDate: '2027-03-06',
+      endDate: '2027-03-14',
+      lastSignupDate: '2027-02-27',
+      earlyBird: '£555',
+      standard: '£610',
+      hours: 50,
+      startTime: '09:30',
+      endTime: '17:30',
+      href: 'services/cpd/pregnancy-yoga/',
+      location: 'Berkshire and Reading',
+      format: 'Studio days plus self-study',
+      tone: 'mist'
+    },
+    {
+      type: 'CPD',
+      title: 'Yoga Nidra Training',
+      startDate: '2027-04-09',
+      endDate: '2027-04-18',
+      lastSignupDate: '2027-04-02',
+      earlyBird: '£250',
+      standard: '£325',
+      hours: 30,
+      href: 'services/cpd/yoga-nidra/',
+      location: 'Berkshire and Reading',
+      format: 'Studio days plus self-study',
       tone: 'river'
+    },
+    {
+      type: 'CPD',
+      title: 'Functional Anatomy Training',
+      startDate: '2027-06-20',
+      endDate: '2027-07-04',
+      lastSignupDate: '2027-06-13',
+      earlyBird: '£430',
+      standard: '£480',
+      hours: 25,
+      startTime: '11:30',
+      endTime: '17:00',
+      href: 'services/cpd/functional-anatomy/',
+      location: 'Berkshire and Reading',
+      format: 'In studio',
+      tone: 'teal'
+    },
+    {
+      type: 'CPD',
+      title: 'SoundBath Training',
+      startDate: '2027-10-02',
+      endDate: '2027-11-07',
+      lastSignupDate: '2027-09-25',
+      earlyBird: '£375',
+      standard: '£425',
+      hours: 30,
+      startTime: '10:00',
+      endTime: '17:00',
+      href: 'services/cpd/soundbath/',
+      location: 'Berkshire and Reading',
+      format: 'In studio',
+      tone: 'mist'
     }
   ];
 
@@ -77,10 +155,21 @@
 
   /** Default abstract theme by course type when `tone` is omitted. */
   var TYPE_THEME = {
-    Course: 'river',
-    CPD: 'teal',
-    Workshop: 'gold'
+    Course: 'ink',
+    CPD: 'mist',
+    Workshop: 'gold',
+    Retreat: 'river',
+    'Open day': 'gold'
   };
+
+  /** Pathway tag shown on cards (decision filter). */
+  function pathwayLabel(type) {
+    if (type === 'Course') return 'Foundation';
+    if (type === 'CPD') return 'CPD';
+    if (type === 'Retreat') return 'Retreat';
+    if (type === 'Open day') return 'Open day';
+    return 'Workshop';
+  }
 
   function parseDate(iso) {
     var parts = String(iso).split('-');
@@ -115,6 +204,169 @@
       month: 'short',
       year: 'numeric'
     });
+  }
+
+  /**
+   * Compact British range: "7 Nov 2026", "12–14 Feb 2027", "12 Feb – 14 Nov 2027".
+   * @param {Date} start
+   * @param {Date|null} end
+   * @returns {string}
+   */
+  function formatBritishDateRangeShort(start, end) {
+    if (!end || daysBetween(start, end) === 0) {
+      return formatBritishDateShort(start);
+    }
+
+    var sameYear = start.getFullYear() === end.getFullYear();
+    var sameMonth = sameYear && start.getMonth() === end.getMonth();
+    var startDay = start.getDate();
+    var endDay = end.getDate();
+    var monthShort = start.toLocaleDateString('en-GB', { month: 'short' });
+    var endMonthShort = end.toLocaleDateString('en-GB', { month: 'short' });
+    var year = end.getFullYear();
+
+    if (sameMonth) {
+      return startDay + '–' + endDay + ' ' + monthShort + ' ' + year;
+    }
+
+    if (sameYear) {
+      return (
+        startDay +
+        ' ' +
+        monthShort +
+        ' – ' +
+        endDay +
+        ' ' +
+        endMonthShort +
+        ' ' +
+        year
+      );
+    }
+
+    return formatBritishDateShort(start) + ' – ' + formatBritishDateShort(end);
+  }
+
+  /**
+   * Full British range for the hero rail.
+   * @param {Date} start
+   * @param {Date|null} end
+   * @returns {string}
+   */
+  function formatBritishDateRangeLong(start, end) {
+    if (!end || daysBetween(start, end) === 0) {
+      return formatBritishDate(start);
+    }
+
+    var sameYear = start.getFullYear() === end.getFullYear();
+    var sameMonth = sameYear && start.getMonth() === end.getMonth();
+
+    if (sameMonth) {
+      return (
+        start.getDate() +
+        '–' +
+        end.getDate() +
+        ' ' +
+        start.toLocaleDateString('en-GB', { month: 'long' }) +
+        ' ' +
+        end.getFullYear()
+      );
+    }
+
+    if (sameYear) {
+      return (
+        start.toLocaleDateString('en-GB', { day: 'numeric', month: 'long' }) +
+        ' – ' +
+        end.toLocaleDateString('en-GB', { day: 'numeric', month: 'long' }) +
+        ' ' +
+        end.getFullYear()
+      );
+    }
+
+    return formatBritishDate(start) + ' – ' + formatBritishDate(end);
+  }
+
+  /**
+   * Open Days and explicitly free items stay single-price.
+   * Courses, CPD, workshops and retreats use Early Bird + Standard.
+   * @param {UpcomingEvent} item
+   * @returns {boolean}
+   */
+  function usesDualPricing(item) {
+    if (item.free === true || item.type === 'Open day') return false;
+    if (item.earlyBird != null || item.standard != null) return true;
+    return (
+      item.type === 'Course' ||
+      item.type === 'CPD' ||
+      item.type === 'Workshop' ||
+      item.type === 'Retreat'
+    );
+  }
+
+  /**
+   * Tier amount: published figure, or Enquire when unknown.
+   * @param {string|number|null|undefined} value
+   * @returns {string}
+   */
+  function tierAmount(value) {
+    if (value == null || String(value).trim() === '') return 'Enquire';
+    return String(value);
+  }
+
+  function displayPrice(item) {
+    if (item.free === true || item.price === 0 || item.price === '0' || item.price === '£0') {
+      return 'Free';
+    }
+    if (item.price != null && String(item.price).trim() !== '') {
+      return String(item.price);
+    }
+    return 'Enquire';
+  }
+
+  /**
+   * Plain-text summary for the hero rail (and any single-slot price UI).
+   * @param {UpcomingEvent} item
+   * @returns {string}
+   */
+  function displayPriceSummary(item) {
+    if (!usesDualPricing(item)) return displayPrice(item);
+    return (
+      'Early Bird ' +
+      tierAmount(item.earlyBird) +
+      ' · Standard ' +
+      tierAmount(item.standard)
+    );
+  }
+
+  /**
+   * Card markup: dual Early Bird / Standard, or a single Free / price line.
+   * @param {UpcomingEvent} item
+   * @returns {string}
+   */
+  function buildPriceHtml(item) {
+    if (!usesDualPricing(item)) {
+      return (
+        '<span class="upcoming-card-price">' +
+        escapeHtml(displayPrice(item)) +
+        '</span>'
+      );
+    }
+
+    return (
+      '<span class="upcoming-card-prices" aria-label="Fees">' +
+        '<span class="upcoming-card-price-tier">' +
+          '<span class="upcoming-card-price-label">Early Bird</span>' +
+          '<span class="upcoming-card-price-amount">' +
+            escapeHtml(tierAmount(item.earlyBird)) +
+          '</span>' +
+        '</span>' +
+        '<span class="upcoming-card-price-tier">' +
+          '<span class="upcoming-card-price-label">Standard</span>' +
+          '<span class="upcoming-card-price-amount">' +
+            escapeHtml(tierAmount(item.standard)) +
+          '</span>' +
+        '</span>' +
+      '</span>'
+    );
   }
 
   /**
@@ -181,9 +433,18 @@
   }
 
   function linkLabel(type) {
-    if (type === 'Course') return 'View course';
-    if (type === 'CPD') return 'View CPD';
-    return 'View workshop';
+    if (type === 'Course') return 'Explore Foundation';
+    if (type === 'CPD') return 'Explore CPD';
+    if (type === 'Retreat') return 'Explore retreat';
+    if (type === 'Open day') return 'Find out more';
+    return 'Explore workshop';
+  }
+
+  function formatHours(item) {
+    if (item.hoursLabel) return item.hoursLabel;
+    var n = Number(item.hours);
+    if (!n || n < 0) return '';
+    return n === 1 ? '1 hour' : n + ' hours';
   }
 
   function toneFor(item, index) {
@@ -201,17 +462,36 @@
     var countdownEl = root.querySelector('[data-upcoming="countdown"]');
     var locationEl = root.querySelector('[data-upcoming="location"]');
     var linkEl = root.querySelector('[data-upcoming="link"]');
+    var startDt = startEl && startEl.parentElement
+      ? startEl.parentElement.querySelector('dt')
+      : null;
 
     var start = parseDate(item.startDate);
+    var end = item.endDate ? parseDate(item.endDate) : null;
     var days = parseDate(item.lastSignupDate)
       ? daysBetween(startOfToday(), parseDate(item.lastSignupDate))
       : null;
+    var dateLabel = start
+      ? formatBritishDateRangeLong(start, end)
+      : item.startDate;
 
-    setText(typeEl, item.type);
+    setText(typeEl, pathwayLabel(item.type));
     setText(titleEl, item.title);
-    setText(startEl, start ? formatBritishDate(start) : item.startDate);
-    setText(priceEl, item.price);
+    setText(startEl, dateLabel);
+    setText(priceEl, displayPriceSummary(item));
     setText(countdownEl, signupCountdownLabel(item.lastSignupDate));
+
+    var priceBlock = priceEl && priceEl.closest
+      ? priceEl.closest('.hero-upcoming-price')
+      : null;
+    if (priceBlock) {
+      var priceDt = priceBlock.querySelector('dt');
+      setText(priceDt, usesDualPricing(item) ? 'Fees' : 'Price');
+    }
+
+    if (startDt) {
+      setText(startDt, end && start && daysBetween(start, end) > 0 ? 'Dates' : 'Starts');
+    }
 
     if (countdownEl) {
       countdownEl.classList.toggle('is-urgent', days !== null && days >= 0 && days <= 7);
@@ -238,11 +518,16 @@
 
   function buildCard(item, index) {
     var start = parseDate(item.startDate);
+    // Cards show start day only; endDate remains in data for rail / elsewhere.
     var dateLabel = start ? formatBritishDateShort(start) : item.startDate;
-    var format = item.format || 'In studio';
+    var pathway = pathwayLabel(item.type);
     var tone = toneFor(item, index);
     var teacherHtml = item.teacher
       ? '<p class="upcoming-card-teacher">' + escapeHtml(item.teacher) + '</p>'
+      : '';
+    var hoursLabel = formatHours(item);
+    var hoursHtml = hoursLabel
+      ? '<span class="upcoming-card-hours">' + escapeHtml(hoursLabel) + '</span>'
       : '';
 
     return (
@@ -255,15 +540,17 @@
         '</span>' +
         '<span class="upcoming-card-shade" aria-hidden="true"></span>' +
         '<span class="upcoming-card-body">' +
-          '<span class="upcoming-card-badge">' + escapeHtml(format) + '</span>' +
-          '<span class="upcoming-card-type">' + escapeHtml(item.type) + '</span>' +
+          '<span class="upcoming-card-badge">' + escapeHtml(pathway) + '</span>' +
           '<h3 class="upcoming-card-title">' + escapeHtml(item.title) + '</h3>' +
           teacherHtml +
-          '<span class="upcoming-card-meta">' +
-            '<span class="upcoming-card-date">' + escapeHtml(dateLabel) + '</span>' +
-            '<span class="upcoming-card-price">' + escapeHtml(item.price) + '</span>' +
+          buildPriceHtml(item) +
+          '<span class="upcoming-card-foot">' +
+            '<span class="upcoming-card-meta">' +
+              '<span class="upcoming-card-date">' + escapeHtml(dateLabel) + '</span>' +
+              hoursHtml +
+            '</span>' +
+            '<span class="upcoming-card-cta">' + escapeHtml(linkLabel(item.type)) + '</span>' +
           '</span>' +
-          '<span class="upcoming-card-cta">' + escapeHtml(linkLabel(item.type)) + '</span>' +
         '</span>' +
       '</a>'
     );
@@ -285,8 +572,12 @@
       return card.getBoundingClientRect().width + gap;
     }
 
+    function maxScrollLeft() {
+      return track.scrollWidth - track.clientWidth;
+    }
+
     function updateButtons() {
-      var maxScroll = track.scrollWidth - track.clientWidth;
+      var maxScroll = maxScrollLeft();
       var atStart = track.scrollLeft <= 4;
       var atEnd = track.scrollLeft >= maxScroll - 4;
       if (prevBtn) prevBtn.disabled = atStart || maxScroll <= 0;
@@ -304,13 +595,21 @@
       });
     }
 
-    track.addEventListener('scroll', updateButtons, { passive: true });
+    track.addEventListener(
+      'scroll',
+      function () {
+        updateButtons();
+      },
+      { passive: true }
+    );
+
     window.addEventListener('resize', updateButtons);
+
     updateButtons();
   }
 
   /**
-   * Keep sticky `top` aligned with the measured pathways + nav bar.
+   * Keep sticky header height in sync (home: Next up + nav; other pages: nav).
    * Mobile menu is position:absolute so it does not inflate this height.
    */
   function syncHeaderOffset() {
@@ -359,6 +658,7 @@
       var next = upcoming[0] || pickNext(UPCOMING_EVENTS);
       if (!next) {
         rail.hidden = true;
+        bindOffsets(rail);
       } else {
         render(rail, next);
         bindOffsets(rail);

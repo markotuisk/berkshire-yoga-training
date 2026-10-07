@@ -174,4 +174,28 @@
       });
     });
   });
+
+  // Teachers page search filter
+  const teacherSearch = document.getElementById('teacher-search-input');
+  if (teacherSearch) {
+    const cards = document.querySelectorAll('.teacher-card');
+    const empty = document.querySelector('.teachers-search-empty');
+
+    const filterTeachers = () => {
+      const q = teacherSearch.value.trim().toLowerCase();
+      let visible = 0;
+      cards.forEach(card => {
+        const match = !q || card.textContent.toLowerCase().includes(q);
+        card.classList.toggle('is-hidden', !match);
+        if (match) visible += 1;
+      });
+      if (empty) empty.hidden = visible > 0;
+    };
+
+    teacherSearch.addEventListener('input', filterTeachers);
+
+    if (window.location.hash === '#teachers-search') {
+      teacherSearch.focus();
+    }
+  }
 })();

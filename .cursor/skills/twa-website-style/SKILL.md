@@ -2,52 +2,49 @@
 name: twa-website-style
 description: >-
   Applies Thames Wellness Academy (TWA) website design system rules when editing
-  HTML/CSS, building pages, or matching LearnBuddy layout references. Use when
-  working on thameswellnessacademy.co.uk, css/styles.css, TWA page templates,
-  LearnBuddy-inspired components, or visual consistency for this site.
+  HTML/CSS or building pages. Use when working on thameswellnessacademy.co.uk,
+  css/site.css, TWA page templates, or visual consistency for this site.
 ---
 
 # TWA Website Style
 
-Design-system skill for **Thames Wellness Academy** static HTML site. LearnBuddy is a **layout reference only** — never publish its style-guide page or LMS/app UI on the live site.
+Design-system skill for **Thames Wellness Academy** static HTML site (rebuild v2 on `css/site.css`).
 
 ## When to use
 
 Read this skill before:
 
-- Editing any TWA `.html` file or `css/styles.css`
+- Editing any TWA `.html` file or `css/site.css`
 - Adding pages, sections, cards, forms, or navigation
-- Translating LearnBuddy template layouts into TWA markup
 - Reviewing visual consistency across home, programme, journal, contact, or team pages
 
 ## Critical brand constraints
 
 | Rule | Detail |
 |------|--------|
-| Accent | Vibrant orange `#E8612E`, black `#000000`, pale orange tint `#FDE8DE` |
-| Neutrals | Off-white canvas `#F5F5F5`, white cards, black footer |
-| Typography | **Figtree** (body, UI, nav, buttons, `.display-9`–`.display-5`), **Cormorant Garamond** (default `h1`–`h4`, logo, hero accents) |
-| Gradients | Neutral grey placeholder gradients only (`--gradient-placeholder`). **No warm peach, coral, or orange gradients** |
-| CTA dark sections | Orange gradient (`--gradient-cta`: `#E8612E` → `#D14E1F`) |
-| Tone | Professional wellness education — **not** an app, LMS dashboard, student portal, or gamified UI |
+| Mood | European / British scholarly: parchment, stone corridors, classics, trust, learning |
+| Accent | Antique gold `#c9a227` (Choose your path displays, CTAs, accents). Hover / logo sparkle `#F5BF03` |
+| Neutrals | Parchment `--paper` `#f4efe6`, cream mist `--mist` `#ebe4d8`, white surfaces |
+| Ink | Stone brown-black `--ink` `#1c1915`, soft `--ink-soft` `#3a342c`, muted taupe `#6b6358` |
+| Secondary | Soft woodland olive via `--river*` vars: `#2f3b2e` / `#4a5a45` / `#6b7a64` (not spa teal, not terracotta) |
+| Typography | **Archivo** (display / headlines), **Figtree** (body, UI, nav, buttons) |
+| Tone | Professional wellness education academy — **not** an app, LMS dashboard, or gamified UI |
 | Copy | **British English** (`lang="en-GB"`, `-ise` spellings, UK punctuation). **No em dashes** — use commas, colons, or hyphens |
 | Placeholders | Label draft images with `.placeholder-label`; keep `[Placeholder]` prefix in draft names |
 
 ## Do not
 
-- Create `styles-components.html` or embed the LearnBuddy style guide as site content
-- Import LearnBuddy green (`#01CD74`) or dark accent (`#1C2329`) over TWA tokens
-- Add dashboard cards, course progress bars, login UI, or "student portal" patterns
+- Reintroduce cool spa teal / mint (`#1e3a36`, `#eef1ef`) or terracotta / orange wellness clichés
 - Invent one-off inline styles when an existing class or CSS variable exists
 - Use em dashes in user-facing copy
+- Override antique gold `#c9a227` for path displays with bright logo gold except on hover/logo
 
 ## Workflow for edits
 
-1. **Read** `css/styles.css` and copy patterns from the closest existing page (see mapping below).
+1. **Read** `css/site.css` `:root` tokens and copy patterns from the closest existing page.
 2. **Reuse** shared header/footer markup and existing utility/component classes.
-3. **Extend** `css/styles.css` in the matching section (layout → buttons → page-specific) using `:root` tokens.
-4. **Match** LearnBuddy *layout* (grid, section rhythm, card hierarchy) — adapt colours/fonts to TWA tokens.
-5. **Verify** British English, no em dashes, mint/charcoal palette, responsive breakpoints (991px / 767px / 479px).
+3. **Extend** `css/site.css` using `:root` tokens (keep `--river*` var names; values are woodland).
+4. **Verify** British English, no em dashes, scholarly parchment + antique gold, responsive breakpoints.
 
 ## File structure
 
@@ -71,13 +68,13 @@ thameswellnessacademy.co.uk/
 │   └── retreats/index.html
 ├── research.html
 ├── team/*.html             # Team member profiles (team-member reference)
-├── css/styles.css          # Single stylesheet — extend here
+├── css/site.css            # Rebuild design system — extend here
 └── js/main.js              # Nav toggle, tabs, header scroll
 ```
 
-**Root pages**: `css/styles.css`, `js/main.js`, nav links without `../`  
-**Subfolder pages** (`team/`): `../css/styles.css`, `../js/main.js`, `../` on internal links  
-**Active nav**: `nav-link--active` + `aria-current="page"` on current item
+**Root pages**: `css/site.css`, `js/main.js`, nav links without `../`  
+**Subfolder pages** (`team/`, `services/`): `../css/site.css` or `../../css/site.css`, matching JS and internal links  
+**Active nav**: `aria-current="page"` on current item where applicable
 
 ## LearnBuddy → TWA page mapping
 
