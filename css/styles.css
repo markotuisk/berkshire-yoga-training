@@ -3246,6 +3246,39 @@ a.contact-v1-slide-link:hover {
 
 .footer-nav a:hover { color: var(--accent-text); }
 
+.footer-partners {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--spacing-xsmall) var(--spacing-regular);
+  padding-top: var(--spacing-regular);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.footer-partners-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.footer-partners ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xsmall) var(--spacing-regular);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.footer-partners a {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+}
+
+.footer-partners a:hover { color: var(--accent); }
+
 .footer-copy {
   grid-column: 1 / -1;
   padding-top: var(--spacing-regular);
