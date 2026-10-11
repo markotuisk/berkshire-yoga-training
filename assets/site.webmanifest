@@ -1,6 +1,11 @@
 {
   "name": "Thames Wellness Academy",
   "short_name": "TWA",
+  "description": "Yoga Alliance Professionals-certified wellness education in Berkshire and the Thames Valley.",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "lang": "en-GB",
   "icons": [
     {
       "src": "/assets/android-chrome-192x192.png",
@@ -13,7 +18,7 @@
       "type": "image/png"
     }
   ],
-  "theme_color": "#F5BF03",
-  "background_color": "#F5F5F7",
+  "theme_color": "#c9a227",
+  "background_color": "#f4efe6",
   "display": "standalone"
 }

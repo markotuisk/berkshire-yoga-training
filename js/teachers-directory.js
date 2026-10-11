@@ -39,10 +39,10 @@
     {
       id: 'katia-major',
       name: 'Katia Major',
-      role: 'Co-founder',
+      role: 'Co-Founder and Lead Teacher',
       location: 'Reading, Berkshire',
-      specialties: ['Foundation Training', 'Trauma-informed teaching', 'CPD'],
-      bio: 'Clinical and studio practice through Yoga Reading, with a focus on professional teaching standards.',
+      specialties: ['Ashtanga and Yin Yoga', 'Clinical Soft Tissue Therapy', 'Personal Training'],
+      bio: 'Katia is a movement teacher, soft tissue therapist and studio owner who helps people move well for life.',
       photo: '../assets/team/katia-major-thames-wellness-academy.jpg',
       photoFallback: '../assets/team/katia-major-thames-wellness-academy.svg',
       profileUrl: '../team/katia-major.html',
@@ -51,14 +51,14 @@
     {
       id: 'raili-maripuu',
       name: 'Raili Maripuu',
-      role: 'Co-founder',
-      location: 'Tallinn / Europe',
-      specialties: ['Foundation Training', 'Breath work', 'CPD'],
-      bio: 'Studio leadership through Goyoga Tallinn and long-form teacher education across Europe.',
+      role: 'Co-founder · Ashtanga Yoga Teacher',
+      location: 'Tallinn · Reading · Twyford',
+      specialties: ['Foundation Training', 'Ashtanga CPD', 'CPD'],
+      bio: 'Founder of Goyoga Tallinn and Ashtanga Yoga teacher in Tallinn, Reading and Twyford.',
       photo: '../assets/team/raili-maripuu-thames-wellness-academy.jpg',
       photoFallback: '../assets/team/raili-maripuu-thames-wellness-academy.svg',
       profileUrl: '../team/raili-maripuu.html',
-      externalUrl: 'https://railimaripuu.com'
+      externalUrl: 'https://railimaripuu.com/'
     },
     {
       id: 'lorena-rodrigo',

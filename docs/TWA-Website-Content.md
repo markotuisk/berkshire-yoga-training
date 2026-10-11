@@ -59,7 +59,7 @@
 | `/` | Home | `index.html` |
 | `/about.html` | About the Academy | `about.html` |
 | `/courses/` | Services overview | `courses/index.html` |
-| `/courses/foundation-training/` | Foundation Training | `courses/foundation-training/index.html` |
+| `/courses/foundation-yoga-training/` | Foundation Training | `courses/foundation-yoga-training/index.html` |
 | `/courses/cpd/` | CPD | `courses/cpd/index.html` |
 | `/courses/workshops/` | Workshops | `courses/workshops/index.html` |
 | `/courses/retreats/` | Retreats | `courses/retreats/index.html` |
@@ -164,8 +164,8 @@
 
 ### Foundation Training | Yoga Teacher Training in Berkshire & Buckinghamshire
 
-**URL:** `https://berkshireyogatraining.co.uk/courses/foundation-training/`
-**File:** `courses/foundation-training/index.html`
+**URL:** `https://berkshireyogatraining.co.uk/courses/foundation-yoga-training/`
+**File:** `courses/foundation-yoga-training/index.html`
 
 **Meta description:** Yoga Alliance Professionals-certified Foundation Training from 200-hour to 500-hour Advanced. Teacher-led, on-site programmes across Berkshire and Buckinghamshire.
 

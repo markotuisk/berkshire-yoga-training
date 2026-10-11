@@ -5,6 +5,7 @@
  */
 
 import { htmlToMarkdown } from './lib/html-to-markdown.js';
+import { maybeNotifyBotVisit } from './lib/bot-visit.js';
 
 const STATIC_ASSET = /\.(css|js|mjs|md|png|jpe?g|gif|svg|webp|ico|woff2?|ttf|eot|webmanifest|pdf|map|txt|xml)$/i;
 
@@ -197,6 +198,9 @@ export async function onRequest(context) {
   const { pathname } = url;
   const accept = request.headers.get('Accept') || '';
   const accessPreview = isLinkPreviewCrawler(request.headers.get('User-Agent') || '');
+
+  // Discord #twa-bots: log AI/crawler HTML fetches (secrets via env; no sampling in v1)
+  maybeNotifyBotVisit(context);
 
   // Public production must stay clean. Shadow overlay + noindex only on shadow hosts.
   if (!isShadowHost(url.hostname)) {

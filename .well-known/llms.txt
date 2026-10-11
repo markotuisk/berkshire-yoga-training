@@ -35,20 +35,25 @@ Agent authentication instructions: `/auth.md` (public read-only site; no OAuth o
 ## Key pages
 
 - [Home](https://berkshireyogatraining.co.uk/): Overview of programmes, standards and how to get started
-- [About](https://berkshireyogatraining.co.uk/about.html): Mission, values, story and milestones
-- [Team](https://berkshireyogatraining.co.uk/team.html): Co-founders and faculty
+- [Yoga teacher training guide](https://berkshireyogatraining.co.uk/yoga-teacher-training/): Knowledge / discovery page for search intent around yoga teacher training; explains what, why and how, then routes to Foundation Training, CPD and workshops
+- [About](https://berkshireyogatraining.co.uk/about): Mission, values, story and milestones
+- [Team](https://berkshireyogatraining.co.uk/team): Co-founders and faculty
+- [Location](https://berkshireyogatraining.co.uk/location): Berkshire and Thames Valley delivery locations
 - [Partners](https://berkshireyogatraining.co.uk/research/partners/): Founding studio partners Yoga Reading (Katia Major) and Goyoga Tallinn (Raili Maripuu)
 - [Courses](https://berkshireyogatraining.co.uk/courses/): Programme hub
 - [Solutions](https://berkshireyogatraining.co.uk/solutions/): How TWA supports practitioners, studios and organisations
-- [Contact](https://berkshireyogatraining.co.uk/contact.html): Enquiries and questions
-- [Join](https://berkshireyogatraining.co.uk/join.html): Apply or enquire about training
-- [Privacy](https://berkshireyogatraining.co.uk/privacy.html): Privacy policy
-- [Research](https://berkshireyogatraining.co.uk/research.html): Evidence-informed practice and collaboration
-- [Journal](https://berkshireyogatraining.co.uk/journal.html): Articles from educators and research team
+- [Contact](https://berkshireyogatraining.co.uk/contact): Enquiries and questions
+- [Join](https://berkshireyogatraining.co.uk/join): Apply or enquire about training
+- [Media](https://berkshireyogatraining.co.uk/media): Gallery, social channels and media kit
+- [Privacy](https://berkshireyogatraining.co.uk/privacy): Privacy policy
+- [Research](https://berkshireyogatraining.co.uk/research): Evidence-informed practice and collaboration
+- [Journal](https://berkshireyogatraining.co.uk/journal): Articles from educators and research team
+- [FAQ](https://berkshireyogatraining.co.uk/faq): Frequently asked questions
+- [Testimonials](https://berkshireyogatraining.co.uk/testimonials): Graduate and partner feedback
 
 ## Courses
 
-- [Foundation Training](https://berkshireyogatraining.co.uk/courses/foundation-training/): 200-hour to 500-hour Yoga Alliance Professionals certification with supervised practicum
+- [Foundation Training](https://berkshireyogatraining.co.uk/courses/foundation-yoga-training/): 200-hour to 500-hour Yoga Alliance Professionals certification with supervised practicum
 - [CPD](https://berkshireyogatraining.co.uk/courses/cpd/): Continuing professional development for qualified teachers and practitioners
 - [Workshops](https://berkshireyogatraining.co.uk/courses/workshops/): Specialist short courses on topics such as breath work, menopause support and trauma-informed teaching
 - [Retreats](https://berkshireyogatraining.co.uk/courses/retreats/): Immersive retreat programmes combining academic rigour with restorative practice
@@ -63,14 +68,14 @@ Agent authentication instructions: `/auth.md` (public read-only site; no OAuth o
 
 Studio partners: [Yoga Reading](https://yogareading.co.uk) (Katia Major) and [Goyoga Tallinn](https://goyoga.ee) (Raili Maripuu). Practitioner blessing and support from certified and lineage-led teachers within both studios underpins academy education and skills development.
 
-- [Raili Maripuu](https://berkshireyogatraining.co.uk/team.html#raili-maripuu): Co-founder; [Yoga Pros Senior Yoga Teacher](https://member.theyogapros.com/teacher/raili-maripuu); [AYRI In-Depth Study with Lino Miele](https://2607846.fs1.hubspotusercontent-na1.net/hubfs/2607846/Additional%20Qualifications/Diploma-AYRI-RailiMaripuu-Jun2016.pdf) (June 2016). Founder of [Goyoga Tallinn](https://www.goyoga.ee/en/teacher/raili-maripuu/) (2016 as Goyoga Estonia). Earlier: Estonian Association of the Phonographic Industry MD; IFPI Regional Adviser, Eastern Europe. [railimaripuu.com](https://railimaripuu.com), [LinkedIn](https://www.linkedin.com/in/railimaripuu).
-- [Katia Major](https://berkshireyogatraining.co.uk/team.html#katia-major): Co-founder; 300-hour Ashtanga and Yin teacher; Level 5 Soft Tissue Therapy (Sports and Injury Massage). Owner of [Yoga Reading](https://yogareading.co.uk/yoga-reading-teachers/). Earlier: international education projects (Abu Dhabi, Qatar). [katiamajor.com](https://www.katiamajor.com), [LinkedIn](https://www.linkedin.com/in/katia-major-845026162).
+- [Raili Maripuu](https://berkshireyogatraining.co.uk/team#raili-maripuu): Co-founder; [Yoga Pros Senior Yoga Teacher](https://member.theyogapros.com/teacher/raili-maripuu); [AYRI In-Depth Study with Lino Miele](https://2607846.fs1.hubspotusercontent-na1.net/hubfs/2607846/Additional%20Qualifications/Diploma-AYRI-RailiMaripuu-Jun2016.pdf) (June 2016). Founder of [Goyoga Tallinn](https://www.goyoga.ee/en/teacher/raili-maripuu/) (2016 as Goyoga Estonia). Earlier: Estonian Association of the Phonographic Industry MD; IFPI Regional Adviser, Eastern Europe. [railimaripuu.com](https://railimaripuu.com), [LinkedIn](https://www.linkedin.com/in/railimaripuu).
+- [Katia Major](https://berkshireyogatraining.co.uk/team#katia-major): Co-founder; 300-hour Ashtanga and Yin teacher; Level 5 Soft Tissue Therapy (Sports and Injury Massage). Owner of [Yoga Reading](https://yogareading.co.uk/yoga-reading-teachers/). Earlier: international education projects (Abu Dhabi, Qatar). [katiamajor.com](https://www.katiamajor.com), [LinkedIn](https://www.linkedin.com/in/katia-major-845026162).
 
 ## Journal articles
 
-- [Breath work in professional teaching practice](https://berkshireyogatraining.co.uk/journal/breath-work-in-teaching.html)
-- [Workshops for specialist client needs](https://berkshireyogatraining.co.uk/journal/workshops-specialist-client-needs.html)
-- [Evidence-informed wellness education](https://berkshireyogatraining.co.uk/journal/evidence-informed-wellness-education.html)
+- [Breath work in professional teaching practice](https://berkshireyogatraining.co.uk/journal/breath-work-in-teaching)
+- [Workshops for specialist client needs](https://berkshireyogatraining.co.uk/journal/workshops-specialist-client-needs)
+- [Evidence-informed wellness education](https://berkshireyogatraining.co.uk/journal/evidence-informed-wellness-education)
 
 ## Geographic focus
 

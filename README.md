@@ -20,7 +20,7 @@ The full site is served at `/` on Cloudflare Pages (`index.html`). Owner preview
 | About | `/about.html` |
 | Team | `/team.html` |
 | Services | `/courses/` |
-| Foundation Training | `/courses/foundation-training/` |
+| Foundation Training | `/courses/foundation-yoga-training/` |
 | CPD | `/courses/cpd/` |
 | Workshops | `/courses/workshops/` |
 | Retreats | `/courses/retreats/` |

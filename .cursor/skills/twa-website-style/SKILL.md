@@ -60,7 +60,7 @@ thameswellnessacademy.co.uk/
 ├── join.html               # Enquiry / apply (pricing-style CTA + form)
 ├── contact.html            # Contact (contact-v1 layout reference)
 ├── journal.html            # Blog listing (blog-v3 reference)
-├── services/               # Services hub + programme pages
+├── courses/               # Courses hub + programme pages
 │   ├── index.html
 │   ├── foundation-training/index.html
 │   ├── cpd/index.html
@@ -73,7 +73,7 @@ thameswellnessacademy.co.uk/
 ```
 
 **Root pages**: `css/site.css`, `js/main.js`, nav links without `../`  
-**Subfolder pages** (`team/`, `services/`): `../css/site.css` or `../../css/site.css`, matching JS and internal links  
+**Subfolder pages** (`team/`, `courses/`): `../css/site.css` or `../../css/site.css`, matching JS and internal links  
 **Active nav**: `aria-current="page"` on current item where applicable
 
 ## LearnBuddy → TWA page mapping

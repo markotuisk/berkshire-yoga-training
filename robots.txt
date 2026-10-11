@@ -1,5 +1,15 @@
 User-agent: *
-Disallow: /
+Allow: /
 
-# Shadow review site — not for public indexing.
-# Live site: https://berkshireyogatraining.co.uk/robots.txt
+# Private / non-public surfaces (do not block CSS or JS)
+Disallow: /api/
+Disallow: /owners
+Disallow: /owners/
+Disallow: /index-full
+Disallow: /full-home.html
+Disallow: /coming-soon
+Disallow: /coming-soon.html
+Disallow: /login
+Disallow: /login.html
+
+Sitemap: https://berkshireyogatraining.co.uk/sitemap.xml
