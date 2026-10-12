@@ -4,8 +4,8 @@
 # llms.txt — legacy path redirect (LLM discoverability)
 /llms.txt /.well-known/llms.txt 301
 
-# Sitemap: trailing slash must not return HTML (GSC fetch)
-/sitemap.xml/ /sitemap.xml 301
+# Sitemap: serve XML at both shapes (GSC must get 200 + XML, not HTML/redirect)
+/sitemap.xml/ /sitemap.xml 200
 /Sitemap.xml /sitemap.xml 301
 /SITEMAP.XML /sitemap.xml 301
 
