@@ -4432,11 +4432,12 @@ h3,
 }
 
 .gallery-panel {
-  margin: 1.25rem 0 1.5rem;
-  padding: 1.35rem 1.4rem 1.5rem;
+  margin: 1.75rem 0 1.5rem;
+  padding: 1.6rem 1.55rem 1.7rem;
   background: var(--white);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
 }
 
 .gallery-panel-head {
