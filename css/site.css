@@ -4431,6 +4431,41 @@ h3,
   }
 }
 
+.gallery-panel {
+  margin: 1.25rem 0 1.5rem;
+  padding: 1.35rem 1.4rem 1.5rem;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.gallery-panel-head {
+  margin: 0 0 1rem;
+}
+
+.gallery-panel-head .eyebrow {
+  margin-bottom: 0.35rem;
+}
+
+.gallery-panel-head h3,
+.gallery-panel-head .h3 {
+  margin: 0 0 0.4rem;
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.gallery-panel-head p {
+  margin: 0;
+  color: var(--ink-soft);
+  max-width: 40rem;
+}
+
+.gallery-panel .photo-grid {
+  margin: 0;
+}
+
 .photo-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
