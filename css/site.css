@@ -4467,6 +4467,20 @@ h3,
   margin: 0;
 }
 
+.gallery-panel .schedule-table {
+  margin: 0;
+}
+
+.gallery-panel .schedule-table th,
+.gallery-panel .schedule-table td {
+  border-bottom-color: color-mix(in srgb, var(--border) 85%, var(--mist));
+}
+
+.gallery-panel .schedule-table tr:last-child th,
+.gallery-panel .schedule-table tr:last-child td {
+  border-bottom: none;
+}
+
 .photo-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
