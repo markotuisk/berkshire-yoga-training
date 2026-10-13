@@ -1,6 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://berkshireyogatraining.co.uk/</loc><lastmod>2026-10-08</lastmod></url>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <url>
+    <loc>https://berkshireyogatraining.co.uk/</loc>
+    <lastmod>2026-10-13</lastmod>
+    <image:image>
+      <image:loc>https://berkshireyogatraining.co.uk/assets/practice/thames-wellness-academy-200-hour-foundation-training-raili-maripuu-katia-major.webp</image:loc>
+      <image:title>200-hour Foundation Training classroom practice with Raili Maripuu and Katia Major</image:title>
+      <image:caption>Raili Maripuu and Katia Major leading 200-hour Foundation Training classroom practice at Thames Wellness Academy</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://berkshireyogatraining.co.uk/assets/practice/thames-wellness-academy-200-hour-foundation-training-graduation-raili-maripuu-katia-major.webp</image:loc>
+      <image:title>200-hour Foundation Training graduation with Raili Maripuu and Katia Major</image:title>
+      <image:caption>Raili Maripuu and Katia Major with a 200-hour Foundation Training graduate certificate at Thames Wellness Academy</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://berkshireyogatraining.co.uk/assets/practice/thames-wellness-academy-200-hour-foundation-training-graduates-raili-maripuu-katia-major.webp</image:loc>
+      <image:title>200-hour Foundation Training graduates with Raili Maripuu and Katia Major</image:title>
+      <image:caption>Raili Maripuu and Katia Major celebrating 200-hour Foundation Training graduates at Thames Wellness Academy</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://berkshireyogatraining.co.uk/assets/practice/thames-wellness-academy-200-hour-foundation-training-assisted-practice-raili-maripuu-katia-major.webp</image:loc>
+      <image:title>Assisted practice on the 200-hour Foundation Training</image:title>
+      <image:caption>Assisted practice during 200-hour Foundation Training with Raili Maripuu and Katia Major at Thames Wellness Academy</image:caption>
+    </image:image>
+  </url>
   <url><loc>https://berkshireyogatraining.co.uk/yoga-teacher-training/</loc><lastmod>2026-10-11</lastmod></url>
   <url><loc>https://berkshireyogatraining.co.uk/courses/</loc><lastmod>2026-10-08</lastmod></url>
   <url><loc>https://berkshireyogatraining.co.uk/courses/foundation-yoga-training/</loc><lastmod>2026-10-11</lastmod></url>
