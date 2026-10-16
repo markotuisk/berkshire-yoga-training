@@ -268,7 +268,7 @@ export async function onRequestPost(context) {
         routed,
         message: anyOk
           ? 'Thank you. You are on the journal updates list.'
-          : 'We could not save your subscription. Please email info@thameswellnessacademy.co.uk.'
+          : 'We could not save your subscription. Please email contact@thameswellness.com.'
       },
       anyOk ? 200 : 502
     );
@@ -324,7 +324,7 @@ export async function onRequestPost(context) {
         routed,
         message: anyOk
           ? 'Thank you. Your course suggestion has been sent to the Academy team.'
-          : 'We could not deliver your suggestion. Please email info@thameswellnessacademy.co.uk.'
+          : 'We could not deliver your suggestion. Please email contact@thameswellness.com.'
       },
       anyOk ? 200 : 502
     );
@@ -390,7 +390,7 @@ export async function onRequestPost(context) {
       routed,
       message: anyOk
         ? 'Thank you. Your enquiry has been sent to the Academy team.'
-        : 'We could not deliver the alert. Please email info@thameswellnessacademy.co.uk.'
+        : 'We could not deliver the alert. Please email contact@thameswellness.com.'
     },
     anyOk ? 200 : 502
   );

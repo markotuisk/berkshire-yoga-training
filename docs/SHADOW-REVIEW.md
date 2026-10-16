@@ -4,7 +4,7 @@ Private review copy of Thames Wellness Academy.
 
 - **Shadow URL (custom):** https://shadow.berkshireyogatraining.co.uk  
 - **Shadow preview:** https://berkshire-yoga-training-shadow.pages.dev  
-- **Live URL:** https://berkshireyogatraining.co.uk (unchanged)  
+- **Live URL:** https://thameswellnessacademy.co.uk (unchanged)  
 - **Agent:** Meridian  
 - **Shadow tickets Sheet:** https://docs.google.com/spreadsheets/d/12syDpdZwS0ZtDPqKXLedHHfie0xyhGvJ3HFc_oEUDwY/edit  
   ID: `12syDpdZwS0ZtDPqKXLedHHfie0xyhGvJ3HFc_oEUDwY`  
@@ -203,7 +203,7 @@ Two separate OG sets (middleware on the `shadow` branch):
 
 - **Title:** Thames Wellness Academy · Shadow Access  
 - **Description:** Private partner login for the TWA Shadow review site. One-time email code. For Katia, Raili and Marko only. Not the public Academy site.  
-- **Image:** `https://berkshireyogatraining.co.uk/assets/og-image.jpg`
+- **Image:** `https://thameswellnessacademy.co.uk/assets/og-image.jpg`
 
 **2. Shadow mode** (normal pages after you are logged in)
 
@@ -337,7 +337,7 @@ In the same GCP project, enable:
 Note the **GSC property URL** format:
 
 - Domain property: `sc-domain:berkshireyogatraining.co.uk`
-- URL-prefix property: `https://berkshireyogatraining.co.uk/`
+- URL-prefix property: `https://thameswellnessacademy.co.uk/`
 
 Note the **GA4 numeric Property ID** (Admin → Property settings).
 

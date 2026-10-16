@@ -1,13 +1,13 @@
 {
   "protocolVersion": "1.0",
   "name": "Thames Wellness Academy",
-  "description": "Public content website for Yoga Alliance Professionals-certified wellness education in Berkshire and the Thames Valley. This is not an interactive A2A agent. Programmatic access is read-only via HTML, Markdown content negotiation (Accept: text/markdown), or the site index at /.well-known/llms.txt.",
+  "description": "Public content website for Yoga Professionals Organisation Limited-certified wellness education in Berkshire and the Thames Valley. This is not an interactive A2A agent. Programmatic access is read-only via HTML, Markdown content negotiation (Accept: text/markdown), or the site index at /.well-known/llms.txt.",
   "version": "1.0.0",
-  "documentationUrl": "https://berkshireyogatraining.co.uk/auth.md",
-  "iconUrl": "https://berkshireyogatraining.co.uk/assets/favicon-48x48.png",
+  "documentationUrl": "https://thameswellnessacademy.co.uk/auth.md",
+  "iconUrl": "https://thameswellnessacademy.co.uk/assets/favicon-48x48.png",
   "provider": {
     "organization": "Thames Wellness Academy",
-    "url": "https://berkshireyogatraining.co.uk/"
+    "url": "https://thameswellnessacademy.co.uk/"
   },
   "supportedInterfaces": [],
   "capabilities": {
@@ -25,7 +25,7 @@
       "tags": ["content", "education", "wellness", "public", "read-only"],
       "examples": [
         "Foundation Training programmes in Berkshire",
-        "Yoga Alliance Professionals certification pathways",
+        "Yoga Professionals Organisation Limited certification pathways",
         "Contact details for training enquiries"
       ],
       "inputModes": ["text/plain"],

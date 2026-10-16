@@ -4,7 +4,7 @@
 (function () {
   'use strict';
 
-  const LIVE_CANONICAL_HOST = 'berkshireyogatraining.co.uk';
+  const LIVE_CANONICAL_HOST = 'thameswellnessacademy.co.uk';
   const EXCLUDE_SELECTOR =
     '#shadow-review-root, .shadow-toolbar, .shadow-modal, #shadow-page-badges, #shadow-seo-overlay, .shadow-seo-badge';
 

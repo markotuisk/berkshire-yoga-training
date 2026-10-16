@@ -3,7 +3,7 @@
 Practical founder alerts for Raili Maripuu and Katia Major. Site plumbing posts rich Discord embeds from Cloudflare Pages Functions. **v1 policy: maximum useful context now; trim noise later.**
 
 Project: Cloudflare Pages **`berkshire-yoga-training`**  
-Live site: `https://berkshireyogatraining.co.uk`
+Live site: `https://thameswellnessacademy.co.uk`
 
 ## Channel map
 
@@ -37,7 +37,7 @@ Everything else useful for founders is intentionally verbose in v1.
 2. Form submit with `source` / `form` **`suggest-course`**, topic **Suggest a course**, or slug `suggest-course` → primary `#twa-suggest-a-course`, dual-post `#twa-leads`. Name, email, and suggestion message required. No course fan-out. UI: dedicated form on `/contact` (`#suggest-course`); homepage hero CTA uses `/contact?course=suggest-course#form` (topic preselected on the enquiry form). Contact enquiry form also offers Suggest a course as a topic (same routing).
 3. Other form submits (`POST /api/notify/lead`) → always `#twa-leads`. Topic **Callback request** uses title `Callback request`. If course slug maps to a programme → also the matching course channel (or `#twa-course-alerts` fallback).
 4. Client beacon (`POST /api/notify/event`) → always `#twa-activity`. **Lead-intent** events also dual-post to `#twa-leads`:
-   - Academy inbox mailto (`info@thameswellnessacademy.co.uk`, contact email/chat CTAs, form mailto fallback)
+   - Academy inbox mailto (`contact@thameswellness.com`, contact email/chat CTAs, form mailto fallback)
    - WhatsApp / `wa.me` / `api.whatsapp.com` clicks (detector is live; **no WhatsApp links on the public site yet**)
    - Callback: `data-cta="contact-call"`, `#call`, mailto subject “Callback request”, or form topic Callback
 5. Course-related CTAs / visits also fan out to the course channel when slug matches.

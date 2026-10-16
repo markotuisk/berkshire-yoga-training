@@ -23,14 +23,14 @@
 
 **Client:** Thames Wellness Academy (trading as Berkshire Yoga Training)
 
-**Site purpose:** A professional marketing website for Yoga Alliance Professionals-certified wellness education in Berkshire and Buckinghamshire. The site promotes teacher-led, on-site programmes including Foundation Training (200-hour to 500-hour), CPD, specialist workshops, retreats, and research collaboration.
+**Site purpose:** A professional marketing website for Yoga Professionals Organisation Limited-certified wellness education in Berkshire and Buckinghamshire. The site promotes teacher-led, on-site programmes including Foundation Training (200-hour to 500-hour), CPD, specialist workshops, retreats, and research collaboration.
 
 **Primary regions:** Berkshire and Buckinghamshire (Thames Valley), with delivery across Reading, Windsor, Newbury and surrounding areas.
 
 **Live URLs:**
 - Cloudflare Pages: https://berkshire-yoga-training.pages.dev/
 - GitHub Pages: https://markotuisk.github.io/berkshire-yoga-training/
-- Custom domain (when DNS configured): https://berkshireyogatraining.co.uk/
+- Custom domain (when DNS configured): https://thameswellnessacademy.co.uk/
 
 **Audience:** Aspiring yoga and wellness teachers, qualified practitioners seeking CPD, corporate wellbeing leads, therapists, and organisations booking bespoke training.
 
@@ -42,7 +42,7 @@
 |---------|--------|
 | Brand name | Thames Wellness Academy |
 | Public domain brand | Berkshire Yoga Training |
-| Certification | Yoga Alliance Professionals |
+| Certification | Yoga Professionals Organisation Limited |
 | Delivery model | Teacher-led, on-site (not app-based or automated learning) |
 | Tone | Professional wellness education, academic rigour with personal growth |
 | Language | British English (`en-GB`) |
@@ -85,10 +85,10 @@
 
 ### Thames Wellness Academy | Professional Wellness Education in Berkshire
 
-**URL:** `https://berkshireyogatraining.co.uk/`  
+**URL:** `https://thameswellnessacademy.co.uk/`  
 **File:** `index.html`
 
-**Meta description:** Yoga Alliance Professionals-certified wellness education in Berkshire. Teacher-led Foundation Training, CPD and workshops delivered on site across studio, corporate and therapeutic settings.
+**Meta description:** Yoga Professionals Organisation Limited-certified wellness education in Berkshire. Teacher-led Foundation Training, CPD and workshops delivered on site across studio, corporate and therapeutic settings.
 
 **H1:** Professional wellness education in Berkshire
 
@@ -103,18 +103,18 @@
 - Begin your journey with us
 
 **Key body copy:**
-- Yoga Alliance Professionals Certified · Berkshire Professional wellness education in Berkshire Thames Wellness Academy delivers high-quality further education and certified professional development for the wellness sector, with teacher-led, on-site programmes across studio, corporate and therapeutic settings.
+- Yoga Professionals Organisation Limited Certified · Berkshire Professional wellness education in Berkshire Thames Wellness Academy delivers high-quality further education and certified professional development for the wellness sector, with teacher-led, on-site programmes across studio, corporate and therapeutic settings.
 - Led by senior educators and clinical specialists
 - Experience teacher-led programmes that combine academic rigour with practical, on-site learning for real-world teaching and therapeutic practice.
 - Learn directly from senior educators and clinical specialists in structured, in-person sessions, not pre-recorded modules alone.
-- Graduate with Yoga Alliance Professionals certification, from 200-hour Foundation through to 500-hour Advanced level.
+- Graduate with Yoga Professionals Organisation Limited certification, from 200-hour Foundation through to 500-hour Advanced level.
 - Train in studio, corporate and therapeutic environments across Berkshire, with programmes designed for diverse client needs.
 - Anatomy, physiology and biomechanics sit alongside mindfulness, breath work and holistic wellbeing principles.
 - Supervised teaching practice and specialist workshops build confidence before you step into your own classes.
 
 **Feature cards / highlights:**
 - **Teacher-led, not automated:** Learn directly from senior educators and clinical specialists in structured, in-person sessions, not pre-recorded modules alone.
-- **Recognised certification:** Graduate with Yoga Alliance Professionals certification, from 200-hour Foundation through to 500-hour Advanced level.
+- **Recognised certification:** Graduate with Yoga Professionals Organisation Limited certification, from 200-hour Foundation through to 500-hour Advanced level.
 - **On-site across settings:** Train in studio, corporate and therapeutic environments across Berkshire, with programmes designed for diverse client needs.
 - **Evidence-informed curriculum:** Anatomy, physiology and biomechanics sit alongside mindfulness, breath work and holistic wellbeing principles.
 - **Hands-on practicum:** Supervised teaching practice and specialist workshops build confidence before you step into your own classes.
@@ -130,10 +130,10 @@
 
 ### About the Academy | Thames Wellness Academy
 
-**URL:** `https://berkshireyogatraining.co.uk/about.html`  
+**URL:** `https://thameswellnessacademy.co.uk/about.html`  
 **File:** `about.html`
 
-**Meta description:** About Thames Wellness Academy: women-owned wellness education in Berkshire, founded by Raili Maripuu and Katia Major. Yoga Alliance Professionals certified training.
+**Meta description:** About Thames Wellness Academy: women-owned wellness education in Berkshire, founded by Raili Maripuu and Katia Major. Yoga Professionals Organisation Limited certified training.
 
 **H1:** Recognised standards in wellness education
 
@@ -146,8 +146,8 @@
 **Founders:** Editorial partnership band (women-owned tag, overlapping portraits, partnership quote) followed by alternating magazine-style founder profiles with credential tags, scannable highlights and external links. Raili Maripuu (Goyoga Tallinn, Ashtanga) and Katia Major (Yoga Reading).
 
 **Key body copy:**
-- Certified by Yoga Alliance Professionals, combining academic rigour with personal growth.
-- Certified by Yoga Alliance Professionals, our training programmes combine academic rigour with personal growth. We blend anatomy, physiology and biomechanics with mindfulness, breath work and holistic wellbeing principles to prepare graduates for safe, effective teaching across corporate, studio and therapeutic settings.
+- Certified by Yoga Professionals Organisation Limited, combining academic rigour with personal growth.
+- Certified by Yoga Professionals Organisation Limited, our training programmes combine academic rigour with personal growth. We blend anatomy, physiology and biomechanics with mindfulness, breath work and holistic wellbeing principles to prepare graduates for safe, effective teaching across corporate, studio and therapeutic settings.
 - Explore placeholder profiles of our senior educators and clinical specialists. Full faculty details will be published soon.
 - Whether you are starting your teaching career or deepening your professional practice, we would be delighted to hear from you.
 - Thames Wellness Academy Professional wellness education in Berkshire
@@ -164,10 +164,10 @@
 
 ### Foundation Training | Yoga Teacher Training in Berkshire & Buckinghamshire
 
-**URL:** `https://berkshireyogatraining.co.uk/courses/foundation-yoga-training/`
+**URL:** `https://thameswellnessacademy.co.uk/courses/foundation-yoga-training/`
 **File:** `courses/foundation-yoga-training/index.html`
 
-**Meta description:** Yoga Alliance Professionals-certified Foundation Training from 200-hour to 500-hour Advanced. Teacher-led, on-site programmes across Berkshire and Buckinghamshire.
+**Meta description:** Yoga Professionals Organisation Limited-certified Foundation Training from 200-hour to 500-hour Advanced. Teacher-led, on-site programmes across Berkshire and Buckinghamshire.
 
 **H1:** Foundation Training
 
@@ -181,7 +181,7 @@
 
 **Key body copy:**
 - Internationally recognised teacher training from 200-hour Foundation to 500-hour Advanced level. Delivered on site across Berkshire and Buckinghamshire.
-- Our Teacher Training programmes offer Yoga Alliance Professionals certification for aspiring and experienced teachers. Courses blend anatomy, physiology and biomechanics with mindfulness, breath work and holistic wellbeing principles.
+- Our Teacher Training programmes offer Yoga Professionals Organisation Limited certification for aspiring and experienced teachers. Courses blend anatomy, physiology and biomechanics with mindfulness, breath work and holistic wellbeing principles.
 - Trainees gain a solid foundation in safe, effective teaching, together with the tools to support diverse student needs across corporate, studio and therapeutic settings.
 - Supported by clinical specialists, our training combines academic rigour with personal growth, preparing graduates to deliver transformative, evidence-informed wellness experiences in person.
 - Three progressive pathways from entry-level certification to advanced specialist training. All programmes are teacher-led and delivered on site.
@@ -201,7 +201,7 @@
 
 ### CPD | Continuing Professional Development in Berkshire
 
-**URL:** `https://berkshireyogatraining.co.uk/courses/cpd/`
+**URL:** `https://thameswellnessacademy.co.uk/courses/cpd/`
 **File:** `courses/cpd/index.html`
 
 **Meta description:** On-site CPD for wellness teachers and practitioners in Berkshire and Buckinghamshire. Evidence-informed short courses in anatomy, mobility, pain-aware teaching and more.
@@ -234,7 +234,7 @@
 
 ### Workshops | Specialist Wellness Workshops in Berkshire
 
-**URL:** `https://berkshireyogatraining.co.uk/courses/workshops/`
+**URL:** `https://thameswellnessacademy.co.uk/courses/workshops/`
 **File:** `courses/workshops/index.html`
 
 **Meta description:** Hands-on specialist wellness workshops in Berkshire and Buckinghamshire. Sleep health, breath work, menopause support, trauma-informed teaching and more.
@@ -280,7 +280,7 @@
 
 ### Retreats | Wellness Retreats in Berkshire
 
-**URL:** `https://berkshireyogatraining.co.uk/courses/retreats/`
+**URL:** `https://thameswellnessacademy.co.uk/courses/retreats/`
 **File:** `courses/retreats/index.html`
 
 **Meta description:** Immersive wellness retreats from Thames Wellness Academy. Register your interest for restorative, teacher-led experiences in Berkshire and Buckinghamshire.
@@ -313,7 +313,7 @@
 
 ### Research | Evidence-Based Wellness Education
 
-**URL:** `https://berkshireyogatraining.co.uk/research.html`  
+**URL:** `https://thameswellnessacademy.co.uk/research.html`  
 **File:** `research.html`
 
 **Meta description:** Research at Thames Wellness Academy. Collaborating with universities and clinical colleagues to advance evidence-based wellness education in Berkshire and beyond.
@@ -347,7 +347,7 @@
 
 ### Journal | Thames Wellness Academy
 
-**URL:** `https://berkshireyogatraining.co.uk/journal.html`  
+**URL:** `https://thameswellnessacademy.co.uk/journal.html`  
 **File:** `journal.html`
 
 **Meta description:** Journal articles and insights from Thames Wellness Academy on teacher-led wellness education, evidence-informed practice and professional training in Berkshire.
@@ -361,14 +361,14 @@
 
 **Key body copy:**
 - Perspectives on teacher-led training, on-site wellness education and evidence-informed practice from our Berkshire academy.
-- Evidence-informed wellness education Research 8 August 2026 Workshops for specialist client needs Workshops 1 August 2026 Get journal updates in your inbox Email address Subscribe Latest articles All Teacher training Research Workshops Breath work in professional teaching practice Teaching practice 15 August 2026 Evidence-informed wellness education Research 8 August 2026 Workshops for specialist client needs Workshops 1 August 2026 On-site training benefits for Berkshire practitioners Teacher training Coming soon Yoga Alliance Professionals certification explained Research Coming soon Integrating mindfulness into studio and corporate settings Workshops Coming soon 1 / 1 TWA Follow our journey on social media
-- TWA Thames Wellness Academy Professional wellness education in Berkshire Certified by Yoga Alliance Professionals
+- Evidence-informed wellness education Research 8 August 2026 Workshops for specialist client needs Workshops 1 August 2026 Get journal updates in your inbox Email address Subscribe Latest articles All Teacher training Research Workshops Breath work in professional teaching practice Teaching practice 15 August 2026 Evidence-informed wellness education Research 8 August 2026 Workshops for specialist client needs Workshops 1 August 2026 On-site training benefits for Berkshire practitioners Teacher training Coming soon Yoga Professionals Organisation Limited certification explained Research Coming soon Integrating mindfulness into studio and corporate settings Workshops Coming soon 1 / 1 TWA Follow our journey on social media
+- TWA Thames Wellness Academy Professional wellness education in Berkshire Certified by Yoga Professionals Organisation Limited
 
 ---
 
 ### Breath work in professional teaching practice | Thames Wellness Academy Journal
 
-**URL:** `https://berkshireyogatraining.co.uk/journal/breath-work-in-teaching.html`  
+**URL:** `https://thameswellnessacademy.co.uk/journal/breath-work-in-teaching.html`  
 **File:** `journal/breath-work-in-teaching.html`
 
 **Meta description:** How diaphragmatic breath work supports stress regulation and safe, inclusive class delivery for wellness educators in Berkshire.
@@ -392,7 +392,7 @@
 
 **Feature cards / highlights:**
 - **The impact of diaphragmatic breathing on stress regulation:** Diaphragmatic breathing encourages slower, deeper respiration that can support parasympathetic activation. In our on-site workshops, we observe how simple pacing cues help participants settle before more demanding movement sequences.
-- **[Placeholder] Senior Educator:** Foundation Training Lead · Yoga Alliance Professionals
+- **[Placeholder] Senior Educator:** Foundation Training Lead · Yoga Professionals Organisation Limited
 - **Evidence-informed wellness education:** Why research collaboration matters for credible teacher training and CPD programmes.
 - **Workshops for specialist client needs:** Supporting menopause, sleep health and musculoskeletal wellbeing through focused workshop training.
 
@@ -410,7 +410,7 @@
 
 ### Workshops for specialist client needs | Thames Wellness Academy Journal
 
-**URL:** `https://berkshireyogatraining.co.uk/journal/workshops-specialist-client-needs.html`  
+**URL:** `https://thameswellnessacademy.co.uk/journal/workshops-specialist-client-needs.html`  
 **File:** `journal/workshops-specialist-client-needs.html`
 
 **Meta description:** Supporting menopause, sleep health and musculoskeletal wellbeing through focused workshop training at Thames Wellness Academy in Berkshire.
@@ -424,7 +424,7 @@
 
 **Key body copy:**
 - Supporting menopause, sleep health and musculoskeletal wellbeing through focused, teacher-led workshop training delivered on-site across Berkshire.
-- Each workshop is teacher-led, delivered on-site across Berkshire venues, and aligned with Yoga Alliance Professionals continuing education standards.
+- Each workshop is teacher-led, delivered on-site across Berkshire venues, and aligned with Yoga Professionals Organisation Limited continuing education standards.
 - Menopause affects energy, sleep, joint comfort and confidence. Workshops focus on temperature regulation strategies, strength maintenance and language that normalises experience without medicalising every symptom.
 - Poor sleep affects concentration, mood and recovery from physical activity. Educators learn to structure evening sessions that support relaxation without overstimulating the nervous system before rest.
 - Specialist workshops are not about becoming a clinician. They are about teaching with greater awareness and appropriate humility.
@@ -434,7 +434,7 @@
 
 **Feature cards / highlights:**
 - **Menopause-aware movement and breath:** Menopause affects energy, sleep, joint comfort and confidence. Workshops focus on temperature regulation strategies, strength maintenance and language that normalises experience without medicalising every symptom.
-- **[Placeholder] Therapeutic Educator:** Workshops & Specialist Programmes · Yoga Alliance Professionals
+- **[Placeholder] Therapeutic Educator:** Workshops & Specialist Programmes · Yoga Professionals Organisation Limited
 - **Breath work in professional teaching practice:** How diaphragmatic breath work supports stress regulation and safe, inclusive class delivery.
 - **Evidence-informed wellness education:** Why research collaboration matters for credible teacher training and CPD programmes.
 
@@ -448,7 +448,7 @@
 
 ### Evidence-informed wellness education | Thames Wellness Academy Journal
 
-**URL:** `https://berkshireyogatraining.co.uk/journal/evidence-informed-wellness-education.html`  
+**URL:** `https://thameswellnessacademy.co.uk/journal/evidence-informed-wellness-education.html`  
 **File:** `journal/evidence-informed-wellness-education.html`
 
 **Meta description:** Why research collaboration matters for credible teacher training and CPD programmes at Thames Wellness Academy in Berkshire.
@@ -472,7 +472,7 @@
 
 **Feature cards / highlights:**
 - **How evidence shapes our curriculum design:** Each Foundation Training and CPD module is reviewed against published literature, professional body guidance and feedback from supervised practicum. We distinguish clearly between established findings, emerging research and areas where honest uncerta
-- **[Placeholder] Clinical Specialist:** Research & Curriculum Lead · Yoga Alliance Professionals
+- **[Placeholder] Clinical Specialist:** Research & Curriculum Lead · Yoga Professionals Organisation Limited
 - **Breath work in professional teaching practice:** How diaphragmatic breath work supports stress regulation and safe, inclusive class delivery.
 - **Workshops for specialist client needs:** Supporting menopause, sleep health and musculoskeletal wellbeing through focused workshop training.
 
@@ -486,10 +486,10 @@
 
 ### [Placeholder] Senior Educator | Thames Wellness Academy Team
 
-**URL:** `https://berkshireyogatraining.co.uk/team/senior-educator.html`  
+**URL:** `https://thameswellnessacademy.co.uk/team/senior-educator.html`  
 **File:** `team/senior-educator.html`
 
-**Meta description:** Meet our placeholder Senior Educator: Foundation Training lead at Thames Wellness Academy. Yoga Alliance Professionals-certified, teacher-led wellness education in Berkshire.
+**Meta description:** Meet our placeholder Senior Educator: Foundation Training lead at Thames Wellness Academy. Yoga Professionals Organisation Limited-certified, teacher-led wellness education in Berkshire.
 
 **H1:** [Placeholder] Senior Educator
 
@@ -502,9 +502,9 @@
 
 **Key body copy:**
 - Back to team SE Foundation Training Lead Placeholder profile
-- Yoga Alliance Professionals · Senior Educator
+- Yoga Professionals Organisation Limited · Senior Educator
 - About me This is a placeholder profile for our Foundation Training lead. The educator named here will oversee 200-hour and advanced certification pathways, ensuring every cohort receives structured, teacher-led instruction grounded in anatomy, breath work and therapeutic teaching principles.
-- Based in Berkshire, they will guide trainees through supervised practicum, specialist modules and real-world teaching practice across studio, corporate and clinical settings, always aligned with Yoga Alliance Professionals standards.
+- Based in Berkshire, they will guide trainees through supervised practicum, specialist modules and real-world teaching practice across studio, corporate and clinical settings, always aligned with Yoga Professionals Organisation Limited standards.
 - Full biographical details, qualifications and teaching history will be published when our faculty profiles are finalised. The role encompasses curriculum design, cohort mentorship and quality assurance across Foundation Training programmes.
 - Placeholder article: insights on cohort design, practicum standards and inclusive teaching across Berkshire programmes.
 - Placeholder article: practical guidance on adapting programmes for varied professional contexts.
@@ -515,7 +515,7 @@
 - **Therapeutic teaching in studio and corporate settings:** Placeholder article: practical guidance on adapting programmes for varied professional contexts.
 
 **List items / topics:**
-- Yoga Alliance Professionals Senior Educator (placeholder)
+- Yoga Professionals Organisation Limited Senior Educator (placeholder)
 - Foundation Training curriculum lead: 200-hour and 300-hour pathways
 - Supervised practicum and assessment across Berkshire venues
 - Specialist focus: therapeutic teaching, inclusive practice and pain-aware instruction
@@ -527,10 +527,10 @@
 
 ### [Placeholder] Therapeutic Educator | Thames Wellness Academy Team
 
-**URL:** `https://berkshireyogatraining.co.uk/team/therapeutic-educator.html`  
+**URL:** `https://thameswellnessacademy.co.uk/team/therapeutic-educator.html`  
 **File:** `team/therapeutic-educator.html`
 
-**Meta description:** Meet our placeholder Therapeutic Educator: breath work and therapeutic teaching specialist at Thames Wellness Academy. Yoga Alliance Professionals-certified training in Berkshire.
+**Meta description:** Meet our placeholder Therapeutic Educator: breath work and therapeutic teaching specialist at Thames Wellness Academy. Yoga Professionals Organisation Limited-certified training in Berkshire.
 
 **H1:** [Placeholder] Therapeutic Educator
 
@@ -544,7 +544,7 @@
 **Key body copy:**
 - Back to team TE Breath Work & Therapeutic Teaching Placeholder profile
 - Breath Work & Therapeutic Teaching · Berkshire
-- Yoga Alliance Professionals · Specialist Educator
+- Yoga Professionals Organisation Limited · Specialist Educator
 - About me This placeholder profile represents our therapeutic teaching and breath work specialist, an educator who will lead workshops, CPD sessions and specialist modules across Thames Wellness Academy programmes.
 - With a focus on safe, evidence-informed breath work and trauma-aware practice, they will help trainees and qualified teachers integrate therapeutic principles into studio, corporate and clinical work throughout Berkshire.
 - Full biographical and qualification details will be published when faculty profiles are confirmed. The role spans specialist workshop delivery, CPD facilitation and curriculum input for therapeutic modules.
@@ -569,10 +569,10 @@
 
 ### [Placeholder] Clinical Specialist | Thames Wellness Academy Team
 
-**URL:** `https://berkshireyogatraining.co.uk/team/clinical-specialist.html`  
+**URL:** `https://thameswellnessacademy.co.uk/team/clinical-specialist.html`  
 **File:** `team/clinical-specialist.html`
 
-**Meta description:** Meet our placeholder Clinical Specialist: anatomy and physiology lead at Thames Wellness Academy. Evidence-informed, Yoga Alliance Professionals-certified training in Berkshire.
+**Meta description:** Meet our placeholder Clinical Specialist: anatomy and physiology lead at Thames Wellness Academy. Evidence-informed, Yoga Professionals Organisation Limited-certified training in Berkshire.
 
 **H1:** [Placeholder] Clinical Specialist
 
@@ -585,7 +585,7 @@
 
 **Key body copy:**
 - Back to team CS Anatomy & Physiology Lead Placeholder profile
-- Yoga Alliance Professionals · Clinical Specialist
+- Yoga Professionals Organisation Limited · Clinical Specialist
 - About me This placeholder profile represents our anatomy and physiology lead, a clinical specialist who will ensure every Thames Wellness Academy programme is grounded in credible, evidence-informed movement science.
 - Working across Foundation Training and CPD, they will support educators and trainees in understanding biomechanics, pain-aware teaching and safe adaptation, essential skills for practice across studio, corporate and therapeutic settings in Berkshire and beyond.
 - Detailed qualifications and clinical background will be added when this profile is finalised. The role bridges academic rigour with practical, on-site teaching across our certification pathways.
@@ -611,7 +611,7 @@
 
 ### Contact | Thames Wellness Academy
 
-**URL:** `https://berkshireyogatraining.co.uk/contact.html`  
+**URL:** `https://thameswellnessacademy.co.uk/contact.html`  
 **File:** `contact.html`
 
 **Meta description:** Contact Thames Wellness Academy in Berkshire. Enquire about Foundation Training, CPD, workshops, retreats and research collaborations.
@@ -632,8 +632,8 @@
 - Give us a call Prefer to speak with someone directly? Call us during office hours and we will be happy to discuss our programmes and upcoming dates.
 - First name Last name Email address Phone number Organisation Message Send message This form is not yet connected. Please email us directly in the meantime.
 - Common questions about our teacher-led programmes, certification and how to get started with Thames Wellness Academy.
-- What programmes does Thames Wellness Academy offer? We offer Yoga Alliance Professionals certified Foundation Training, continuing professional development (CPD), specialist workshops, retreats and research collaborations. All programmes are teacher-led and delivered on site.
-- Are your courses certified? Yes. Thames Wellness Academy is certified by Yoga Alliance Professionals. Our Foundation Training pathways meet recognised standards for professional yoga and wellness teaching.
+- What programmes does Thames Wellness Academy offer? We offer Yoga Professionals Organisation Limited certified Foundation Training, continuing professional development (CPD), specialist workshops, retreats and research collaborations. All programmes are teacher-led and delivered on site.
+- Are your courses certified? Yes. Thames Wellness Academy is certified by Yoga Professionals Organisation Limited. Our Foundation Training pathways meet recognised standards for professional yoga and wellness teaching.
 
 **Feature cards / highlights:**
 - **Reading:** Berkshire, United Kingdom
@@ -644,7 +644,7 @@
 
 ### Join Us | Thames Wellness Academy
 
-**URL:** `https://berkshireyogatraining.co.uk/join.html`  
+**URL:** `https://thameswellnessacademy.co.uk/join.html`  
 **File:** `join.html`
 
 **Meta description:** Apply or enquire about Thames Wellness Academy programmes. Foundation Training, CPD, workshops and retreats in Berkshire.
@@ -658,23 +658,23 @@
 **Key body copy:**
 - Whether you are starting your teaching career or deepening your professional practice, we would be delighted to hear from you.
 - Tell us about your goals and which programme interests you. Our team will respond with course details, dates and next steps.
-- Complete the form below and we will be in touch. You can also email us directly at info@thameswellnessacademy.co.uk .
+- Complete the form below and we will be in touch. You can also email us directly at contact@thameswellness.com .
 - This form is not yet connected. Please email us directly in the meantime.
-- Thames Wellness Academy Professional wellness education in Berkshire Certified by Yoga Alliance Professionals
+- Thames Wellness Academy Professional wellness education in Berkshire Certified by Yoga Professionals Organisation Limited
 
 ---
 
 ### Thames Wellness Academy | Coming Soon
 
-**URL:** `https://berkshireyogatraining.co.uk/coming-soon.html`  
+**URL:** `https://thameswellnessacademy.co.uk/coming-soon.html`  
 **File:** `coming-soon.html`
 
-**Meta description:** Yoga Alliance Professionals-certified wellness education in Berkshire and Buckinghamshire. Teacher-led Foundation Training, CPD and workshops delivered on site. Full website launching soon.
+**Meta description:** Yoga Professionals Organisation Limited-certified wellness education in Berkshire and Buckinghamshire. Teacher-led Foundation Training, CPD and workshops delivered on site. Full website launching soon.
 
 **H1:** Get notified when we launch
 
 **Key body copy:**
-- Thames Wellness Academy delivers Yoga Alliance Professionals-certified teacher training across Berkshire and Buckinghamshire. Teacher-led Foundation Training, CPD and workshops delivered on site, not through an app or online learning platform.
+- Thames Wellness Academy delivers Yoga Professionals Organisation Limited-certified teacher training across Berkshire and Buckinghamshire. Teacher-led Foundation Training, CPD and workshops delivered on site, not through an app or online learning platform.
 - This form is not yet connected to a mailing list. Email us directly in the meantime.
 - 200-hour teacher training delivered in person across Berkshire.
 
@@ -690,15 +690,15 @@
 | Locale | `en_GB` |
 | Default OG image | `https://markotuisk.github.io/berkshire-yoga-training/assets/og-image.jpg` (1200×630) |
 | Twitter card | `summary_large_image` |
-| Canonical strategy | Production URLs use `https://berkshireyogatraining.co.uk` when live; current HTML uses GitHub Pages host until custom domain DNS is active |
+| Canonical strategy | Production URLs use `https://thameswellnessacademy.co.uk` when live; current HTML uses GitHub Pages host until custom domain DNS is active |
 
 ### Page titles and meta descriptions
 
 | Page | Title | Meta description |
 |------|-------|------------------|
-| Home | Thames Wellness Academy \| Professional Wellness Education in Berkshire | Yoga Alliance Professionals-certified wellness education in Berkshire. Teacher-led Foundation Training, CPD and workshop... |
-| About the Academy | About the Academy \| Thames Wellness Academy | About Thames Wellness Academy: Yoga Alliance Professionals certified wellness education in Berkshire, blending academic ... |
-| Foundation Training | Foundation Training \| Yoga Teacher Training in Berkshire & Buckinghamshire | Yoga Alliance Professionals-certified Foundation Training from 200-hour to 500-hour Advanced. Teacher-led, on-site progr... |
+| Home | Thames Wellness Academy \| Professional Wellness Education in Berkshire | Yoga Professionals Organisation Limited-certified wellness education in Berkshire. Teacher-led Foundation Training, CPD and workshop... |
+| About the Academy | About the Academy \| Thames Wellness Academy | About Thames Wellness Academy: Yoga Professionals Organisation Limited certified wellness education in Berkshire, blending academic ... |
+| Foundation Training | Foundation Training \| Yoga Teacher Training in Berkshire & Buckinghamshire | Yoga Professionals Organisation Limited-certified Foundation Training from 200-hour to 500-hour Advanced. Teacher-led, on-site progr... |
 | CPD | CPD \| Continuing Professional Development in Berkshire | On-site CPD for wellness teachers and practitioners in Berkshire and Buckinghamshire. Evidence-informed short courses in... |
 | Workshops | Workshops \| Specialist Wellness Workshops in Berkshire | Hands-on specialist wellness workshops in Berkshire and Buckinghamshire. Sleep health, breath work, menopause support, t... |
 | Retreats | Retreats \| Wellness Retreats in Berkshire | Immersive wellness retreats from Thames Wellness Academy. Register your interest for restorative, teacher-led experience... |
@@ -707,12 +707,12 @@
 | Article: Breath work in teaching | Breath work in professional teaching practice \| Thames Wellness Academy Journal | How diaphragmatic breath work supports stress regulation and safe, inclusive class delivery for wellness educators in Be... |
 | Article: Workshops for specialist client needs | Workshops for specialist client needs \| Thames Wellness Academy Journal | Supporting menopause, sleep health and musculoskeletal wellbeing through focused workshop training at Thames Wellness Ac... |
 | Article: Evidence-informed wellness education | Evidence-informed wellness education \| Thames Wellness Academy Journal | Why research collaboration matters for credible teacher training and CPD programmes at Thames Wellness Academy in Berksh... |
-| Team: Senior Educator | [Placeholder] Senior Educator \| Thames Wellness Academy Team | Meet our placeholder Senior Educator: Foundation Training lead at Thames Wellness Academy. Yoga Alliance Professionals-c... |
+| Team: Senior Educator | [Placeholder] Senior Educator \| Thames Wellness Academy Team | Meet our placeholder Senior Educator: Foundation Training lead at Thames Wellness Academy. Yoga Professionals Organisation Limited-c... |
 | Team: Therapeutic Educator | [Placeholder] Therapeutic Educator \| Thames Wellness Academy Team | Meet our placeholder Therapeutic Educator: breath work and therapeutic teaching specialist at Thames Wellness Academy. Y... |
 | Team: Clinical Specialist | [Placeholder] Clinical Specialist \| Thames Wellness Academy Team | Meet our placeholder Clinical Specialist: anatomy and physiology lead at Thames Wellness Academy. Evidence-informed, Yog... |
 | Contact | Contact \| Thames Wellness Academy | Contact Thames Wellness Academy in Berkshire. Enquire about Foundation Training, CPD, workshops, retreats and research c... |
 | Join / Apply | Join Us \| Thames Wellness Academy | Apply or enquire about Thames Wellness Academy programmes. Foundation Training, CPD, workshops and retreats in Berkshire... |
-| Coming Soon (pre-launch) | Thames Wellness Academy \| Coming Soon | Yoga Alliance Professionals-certified wellness education in Berkshire and Buckinghamshire. Teacher-led Foundation Traini... |
+| Coming Soon (pre-launch) | Thames Wellness Academy \| Coming Soon | Yoga Professionals Organisation Limited-certified wellness education in Berkshire and Buckinghamshire. Teacher-led Foundation Traini... |
 
 ### Open Graph and social sharing
 
@@ -775,7 +775,7 @@ Source: `css/styles.css` (LearnBuddy-inspired layout, TWA brand tokens)
 |----------|-----|-------|
 | Cloudflare Pages | https://berkshire-yoga-training.pages.dev/ | Project: `berkshire-yoga-training` |
 | GitHub Pages | https://markotuisk.github.io/berkshire-yoga-training/ | Auto-deploy from `main` |
-| Custom domain | https://berkshireyogatraining.co.uk/ | DNS via Cloudflare (CNAME to Pages) |
+| Custom domain | https://thameswellnessacademy.co.uk/ | DNS via Cloudflare (CNAME to Pages) |
 
 ### Deploy workflow
 

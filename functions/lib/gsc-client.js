@@ -96,7 +96,7 @@ function pathToLivePageUrl(path, siteUrl) {
     if (normalized === '/') return base.origin + '/';
     return base.origin + (normalized.startsWith('/') ? normalized : '/' + normalized) + '/';
   } catch (e) {
-    return 'https://berkshireyogatraining.co.uk' + (normalized === '/' ? '/' : normalized + '/');
+    return 'https://thameswellnessacademy.co.uk' + (normalized === '/' ? '/' : normalized + '/');
   }
 }
 

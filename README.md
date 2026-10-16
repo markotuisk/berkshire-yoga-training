@@ -6,7 +6,7 @@ Static marketing site for professional wellness education in Berkshire and Bucki
 
 | Audience | Link |
 |----------|------|
-| **Public** | [https://berkshireyogatraining.co.uk/](https://berkshireyogatraining.co.uk/) **LIVE** (Cloudflare) |
+| **Public** | [https://thameswellnessacademy.co.uk/](https://thameswellnessacademy.co.uk/) **LIVE** (Cloudflare) |
 | **Preview** | [https://berkshire-yoga-training.pages.dev/](https://berkshire-yoga-training.pages.dev/) |
 | **GitHub Pages** | [https://markotuisk.github.io/berkshire-yoga-training/](https://markotuisk.github.io/berkshire-yoga-training/) |
 
@@ -29,16 +29,16 @@ The full site is served at `/` on Cloudflare Pages (`index.html`). Owner preview
 | Contact | `/contact.html` |
 | Join | `/join.html` |
 
-**Custom domain:** `berkshireyogatraining.co.uk` is **LIVE** on Cloudflare Pages (apex only; `www` is not configured). See `DEPLOY.md`.
+**Custom domain:** `thameswellnessacademy.co.uk` is **LIVE** on Cloudflare Pages (apex only; `www` is not configured). See `DEPLOY.md`.
 
-Social previews use `assets/og-image.jpg` and Open Graph meta on every page. `og:url`, `canonical`, and `twitter:image` use `https://berkshireyogatraining.co.uk`.
+Social previews use `assets/og-image.jpg` and Open Graph meta on every page. `og:url`, `canonical`, and `twitter:image` use `https://thameswellnessacademy.co.uk`.
 
-**Test social previews** (paste a production URL, e.g. `https://berkshireyogatraining.co.uk/about.html`):
+**Test social previews** (paste a production URL, e.g. `https://thameswellnessacademy.co.uk/about.html`):
 
 - [opengraph.xyz](https://www.opengraph.xyz/)
 - [LinkedIn Post Inspector](https://www.linkedin.com/post-inspector/)
 
-Example image URL: `https://berkshireyogatraining.co.uk/assets/og-image.jpg`
+Example image URL: `https://thameswellnessacademy.co.uk/assets/og-image.jpg`
 
 ## Local preview
 

@@ -10,7 +10,7 @@
 
   const LINK_TIMEOUT_MS = 8000;
   const CRAWL_CONCURRENCY = 5;
-  const LIVE_HOST = 'berkshireyogatraining.co.uk';
+  const LIVE_HOST = 'thameswellnessacademy.co.uk';
 
   let crawlAbort = null;
 

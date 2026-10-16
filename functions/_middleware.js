@@ -31,7 +31,7 @@ const SHADOW_STYLE_SCRIPT = `
 <script src="/js/shadow-review.js?v=${SHADOW_ASSET_VERSION}" defer></script>
 `;
 
-const OG_IMAGE = 'https://berkshireyogatraining.co.uk/assets/og-image.jpg';
+const OG_IMAGE = 'https://thameswellnessacademy.co.uk/assets/og-image.jpg';
 
 /**
  * Access gate link previews — shown to social crawlers (WhatsApp, iMessage, Slack)
@@ -193,9 +193,21 @@ function isShadowHost(hostname) {
 }
 
 export async function onRequest(context) {
-  const { request, next } = context;
+  const { request, next, env } = context;
   const url = new URL(request.url);
   const { pathname } = url;
+
+  // SEO domain migration: 301 old host -> new host (path + query preserved).
+  // Gate with Pages env ENABLE_DOMAIN_MIGRATION_REDIRECTS=1 after thameswellnessacademy.co.uk resolves.
+  if (String(env?.ENABLE_DOMAIN_MIGRATION_REDIRECTS || '') === '1') {
+    const host = url.hostname.toLowerCase();
+    if (host === 'berkshireyogatraining.co.uk' || host === 'www.berkshireyogatraining.co.uk') {
+      const dest = new URL(url.href);
+      dest.protocol = 'https:';
+      dest.hostname = 'thameswellnessacademy.co.uk';
+      return Response.redirect(dest.toString(), 301);
+    }
+  }
   const accept = request.headers.get('Accept') || '';
   const accessPreview = isLinkPreviewCrawler(request.headers.get('User-Agent') || '');
 

@@ -1,96 +1,72 @@
-# Deployment: berkshireyogatraining.co.uk
+# Deployment: thameswellnessacademy.co.uk
 
 ## Custom domain status
 
 | Domain | Status |
 |--------|--------|
-| `berkshireyogatraining.co.uk` | **LIVE** (Cloudflare Pages, HTTPS, HTTP→HTTPS redirect) |
-| `www.berkshireyogatraining.co.uk` | Not configured (no DNS record) |
-
-## Public site (live)
-
-| Audience | URL | What you see |
-|----------|-----|----------------|
-| **Public** | [https://berkshireyogatraining.co.uk/](https://berkshireyogatraining.co.uk/) | Full site (`index.html` at `/`) |
-| **Owners / dev preview** | [https://berkshireyogatraining.co.uk/owners](https://berkshireyogatraining.co.uk/owners) | Homepage backup (`full-home.html`) |
-| **GitHub Pages** | [https://markotuisk.github.io/berkshire-yoga-training/](https://markotuisk.github.io/berkshire-yoga-training/) | Full site at `/` (GitHub Pages does **not** read `_redirects`) |
-
-**Cloudflare Pages preview host:** [https://berkshire-yoga-training.pages.dev/](https://berkshire-yoga-training.pages.dev/) mirrors the custom domain.
-
-**Custom domain:** `berkshireyogatraining.co.uk` is attached on the Pages project and DNS is active on Cloudflare.
-
-## What is live
-
-| Host | Root `/` | Notes |
-|------|----------|-------|
-| Cloudflare Pages (production + pages.dev) | `index.html` (full homepage) | `/coming-soon.html` redirects to `/` |
-| GitHub Pages | `index.html` (full site) | Same as always |
-
-Legacy `/coming-soon.html` requests receive a 301 redirect to `/` via `_redirects`.
+| `thameswellnessacademy.co.uk` | **Primary** — Cloudflare Pages custom domain (HTTPS) |
+| `www.thameswellnessacademy.co.uk` | Pages custom domain (CNAME → same project) |
+| `berkshireyogatraining.co.uk` | Legacy — path-preserving **301** to matching `thameswellnessacademy.co.uk` URLs |
 
 ## Cloudflare Pages
 
-| Setting | Value |
-|---------|--------|
-| Project name | `berkshire-yoga-training` |
-| Production branch | `main` |
-| Build command | (none, static HTML) |
-| Build output | `/` (repo root) |
-| Preview URL | `https://berkshire-yoga-training.pages.dev` |
+- **Account:** Markotuisk (`bc3f6c1145456bef0f781f62744c74ed`)
+- **Project:** `berkshire-yoga-training`
+- **Production URL:** https://thameswellnessacademy.co.uk/
+- **DNS zone for new domain:** Raili.maripuu account (`a40062723d2f712d6608f25f92a855f2`), zone `aa4cbc2d35767a2d305d684e6a8bbdb3` — proxied CNAMEs to `berkshire-yoga-training.pages.dev`
+- **Legacy zone:** `berkshireyogatraining.co.uk` in Marko account — Single Redirect rule (301, path + query preserved)
 
-## Custom domain
-
-1. Add `berkshireyogatraining.co.uk` (and optionally `www`) in Cloudflare Pages → Custom domains.
-2. If the domain is already on Cloudflare, DNS records are added automatically.
-3. If the domain is elsewhere, point nameservers to Cloudflare or add a CNAME to the Pages hostname.
-
-## GitHub Actions secrets (required for auto-deploy)
-
-In the GitHub repo → Settings → Secrets and variables → Actions, add:
-
-| Secret | Where to find it |
-|--------|------------------|
-| `CLOUDFLARE_API_TOKEN` | Cloudflare dashboard → My Profile → API Tokens → Create token with **Cloudflare Pages Edit** |
-| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare dashboard → any zone → right sidebar **Account ID** |
-
-
-Before the workflow deploys, set repository variable **CLOUDFLARE_PAGES_ENABLED** to `true` (Settings → Secrets and variables → Actions → Variables). Leave it unset or `false` until secrets below are ready; pushes will then skip Cloudflare deploy without failing.
-After secrets are set, every push to `main` redeploys the site. Previous workflow runs failed because these secrets were not configured.
-
-## Manual deploy (without GitHub Actions)
+## Deploy
 
 ```bash
-npx wrangler login
 npx wrangler pages deploy . --project-name=berkshire-yoga-training --branch=main
 ```
 
-Or set `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` in your environment.
-
-## Open Graph
-
-- Default share image: `assets/og-image.jpg` (1200×630)
-- Canonical URLs use `https://berkshireyogatraining.co.uk`
-- All main HTML pages include `og:*` and `twitter:*` meta tags
-
-## Sitemap and search indexing
-
-- `sitemap.xml` and `robots.txt` live at the repo root and are served at `/sitemap.xml` and `/robots.txt`.
-- Canonical URLs in the sitemap use `https://berkshireyogatraining.co.uk`.
-- Submit `https://berkshireyogatraining.co.uk/sitemap.xml` in [Google Search Console](https://search.google.com/search-console) (Sitemaps) for the property.
-
-## First-time setup in the Cloudflare dashboard (no API token)
-
-If you prefer not to use GitHub Actions secrets yet:
-
-1. Log in to [Cloudflare](https://dash.cloudflare.com) → **Workers & Pages** → **Create** → **Pages** → **Connect to Git**.
-2. Authorise GitHub and select **markotuisk/berkshire-yoga-training**, branch **main**.
-3. Build settings: **Framework preset** None, **Build command** empty, **Build output directory** `/` (site files at repo root).
-4. Deploy, then **Custom domains** → add **berkshireyogatraining.co.uk** (and **www** if needed). DNS is created automatically when the zone is on Cloudflare nameservers.
-5. Optional: disable the GitHub Actions workflow or add the same secrets so pushes to `main` also deploy via Actions.
-
-After a manual `wrangler` deploy, add the domain with:
+Optional Pages env (backup to zone redirect rule):
 
 ```bash
-npx wrangler pages project list
-npx wrangler pages domain add berkshire-yoga-training berkshireyogatraining.co.uk
+npx wrangler pages secret put ENABLE_DOMAIN_MIGRATION_REDIRECTS --project-name=berkshire-yoga-training
+# value: 1
 ```
+
+Middleware in `functions/_middleware.js` 301s old hosts when that env is `1`.
+
+## Domain migration (SEO cutover)
+
+Primary public hostname: `https://thameswellnessacademy.co.uk`
+
+### Done
+- Absolute canonicals, Open Graph, JSON-LD, sitemap, robots, and agent files use `thameswellnessacademy.co.uk`.
+- New domain serves the same Pages project (same paths).
+- Old zone Single Redirect: old host `/*` → `https://thameswellnessacademy.co.uk` + path (301, preserve query).
+
+### Search Console
+1. Verify `sc-domain:thameswellnessacademy.co.uk` (or URL-prefix).
+2. Submit `https://thameswellnessacademy.co.uk/sitemap.xml`.
+3. On the old property: **Change of Address** → new domain (after 301s work).
+4. Spot-check URL Inspection on home, foundation 200-hour, team pages.
+
+Keep the old domain registered and redirecting for at least 180 days (prefer 12+ months).
+
+
+### Search Console / DNS status (2026-10-14)
+
+- Verified Domain + URL-prefix for thames; legacy berkshire Domain + URL-prefix kept.
+- Sitemap submitted on URL-prefix: `/sitemap.xml` → Success (43 pages).
+- URL Inspection + indexing requested for home, foundation 200-hour, Katia.
+- Change of Address: filed (old property Settings shows move to `thameswellnessacademy.co.uk`; Cancel move available).
+- Live DNS stays on Raili’s zone (NS gerald/pearl). Google MX + SPF + soft DMARC (`p=none`) added via Raili API token (Keychain: `cloudflare-api-token-thameswellnessacademy` / `raili-maripuu`).
+- Marko duplicate pending zone (jamie/yahir) removed — do not switch registrar NS.
+- Still needed from Google Admin: DKIM TXT (`google._domainkey`) after Workspace domain verification.
+- Keep old domain 301s for 180+ days.
+
+### Email addresses (policy)
+
+| Role | Address | Where it appears |
+|------|---------|------------------|
+| Public contact | `contact@thameswellness.com` | Site mailto, schema `email`, contact copy, `security.txt`, form fallbacks |
+| System / transactional From | `noreply@thameswellnessacademy.co.uk` | Send-only automated mail (confirmations, receipts). **Never** shown as a contact address on the site |
+
+- Google Workspace on `thameswellnessacademy.co.uk` handles inbound for real people/aliases if needed; `noreply@` is not a public inbox.
+- Enabling Cloudflare Email Routing on the apex would conflict with Google MX — do not turn it on for this domain.
+- To send as `noreply@…`, onboard the domain in Resend (or Cloudflare Email Sending) and add their SPF/DKIM records on Raili’s zone; keep public contact on `@thameswellness.com`.

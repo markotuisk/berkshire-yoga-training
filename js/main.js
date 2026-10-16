@@ -501,7 +501,7 @@
           /suggest/i.test(String(topic)) ||
           String(payload.slug || '') === 'suggest-course';
         const mailtoBase = form.getAttribute('data-mailto-fallback')
-          || 'mailto:info@thameswellnessacademy.co.uk';
+          || 'mailto:contact@thameswellness.com';
         const subjectText = isCallback
           ? 'Callback request'
           : isJournal
@@ -530,7 +530,7 @@
           text: topic,
           leadIntent: '1',
           intent: isCallback ? 'callback' : 'form_mailto_fallback',
-          mailtoTo: 'info@thameswellnessacademy.co.uk',
+          mailtoTo: 'contact@thameswellness.com',
           mailtoSubject: subjectText,
           fallbackReason: reason || 'lead_api_failed',
           slug: isCallback ? 'callback' : (payload.slug || '')
@@ -572,7 +572,7 @@
           );
           return;
         }
-        showStatus(data.error || 'Something went wrong. Please email info@thameswellnessacademy.co.uk.', false);
+        showStatus(data.error || 'Something went wrong. Please email contact@thameswellness.com.', false);
         restoreBtn();
       } catch (err) {
         openMailtoFallback(err && err.message ? err.message : 'network_error');

@@ -217,7 +217,7 @@ When reading the LearnBuddy style guide, map concepts — not hex values:
 - [ ] British English spelling and phrasing
 - [ ] No em dashes
 - [ ] Professional, teacher-led, on-site delivery (not app-based learning)
-- [ ] Yoga Alliance Professionals certification mentioned where relevant
+- [ ] Yoga Professionals Organisation Limited certification mentioned where relevant
 - [ ] Placeholder content clearly marked until real assets exist
 
 ## Additional reference

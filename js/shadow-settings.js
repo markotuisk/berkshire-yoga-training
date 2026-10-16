@@ -58,7 +58,7 @@
       '<ul class="shadow-insights-hints-list">' +
       '<li><code>GOOGLE_OAUTH_CLIENT_ID</code> and <code>GOOGLE_OAUTH_CLIENT_SECRET</code> — OAuth client for partner Connect Google</li>' +
       '<li><code>GOOGLE_SERVICE_ACCOUNT_JSON</code> — fallback service account (full JSON)</li>' +
-      '<li><code>GSC_SITE_URL</code> — e.g. <code>sc-domain:berkshireyogatraining.co.uk</code></li>' +
+      '<li><code>GSC_SITE_URL</code> — e.g. <code>sc-domain:thameswellnessacademy.co.uk</code></li>' +
       '<li><code>GA4_PROPERTY_ID</code> — numeric GA4 property ID</li>' +
       '<li>Redirect URI: <code>https://shadow.berkshireyogatraining.co.uk/api/auth/google/callback</code> (and pages.dev URL for testing)</li>' +
       '</ul></details>'

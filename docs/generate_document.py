@@ -43,7 +43,7 @@ SEO = {
 }
 
 BASE_URLS = {
-    "production": "https://berkshireyogatraining.co.uk",
+    "production": "https://thameswellnessacademy.co.uk",
     "cloudflare": "https://berkshire-yoga-training.pages.dev",
     "github": "https://markotuisk.github.io/berkshire-yoga-training",
 }
@@ -166,7 +166,7 @@ def build_markdown(pages: dict) -> str:
         "",
         "**Client:** Thames Wellness Academy (trading as Berkshire Yoga Training)",
         "",
-        "**Site purpose:** A professional marketing website for Yoga Alliance Professionals-certified "
+        "**Site purpose:** A professional marketing website for Yoga Professionals Organisation Limited-certified "
         "wellness education in Berkshire and Buckinghamshire. The site promotes teacher-led, on-site "
         "programmes including Foundation Training (200-hour to 500-hour), CPD, specialist workshops, "
         "retreats, and research collaboration.",
@@ -190,7 +190,7 @@ def build_markdown(pages: dict) -> str:
         "|---------|--------|",
         "| Brand name | Thames Wellness Academy |",
         "| Public domain brand | Berkshire Yoga Training |",
-        "| Certification | Yoga Alliance Professionals |",
+        "| Certification | Yoga Professionals Organisation Limited |",
         "| Delivery model | Teacher-led, on-site (not app-based or automated learning) |",
         "| Tone | Professional wellness education, academic rigour with personal growth |",
         "| Language | British English (`en-GB`) |",
@@ -472,7 +472,7 @@ def build_pdf(pages: dict):
     pdf.section_title("1. Executive Summary", 1)
     pdf.body_text(
         "Client: Thames Wellness Academy (Berkshire Yoga Training). "
-        "A professional marketing website for Yoga Alliance Professionals-certified wellness education "
+        "A professional marketing website for Yoga Professionals Organisation Limited-certified wellness education "
         "in Berkshire and Buckinghamshire. Teacher-led, on-site programmes: Foundation Training, CPD, "
         "workshops, retreats, and research."
     )
@@ -484,7 +484,7 @@ def build_pdf(pages: dict):
     pdf.add_page()
     pdf.section_title("2. Brand and Positioning", 1)
     for line in [
-        "Certification: Yoga Alliance Professionals",
+        "Certification: Yoga Professionals Organisation Limited",
         "Delivery: Teacher-led, on-site (not app-based)",
         "Tone: Professional wellness education, academic rigour with personal growth",
         "Language: British English (en-GB)",

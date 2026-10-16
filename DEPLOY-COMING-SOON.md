@@ -2,14 +2,14 @@
 
 > **Status: retired (August 2026).** The full site is live at `/`. Legacy `/coming-soon.html` redirects to the homepage. This document is kept for reference only.
 
-Use this when **berkshireyogatraining.co.uk** should show the holding page at `/` while the full site remains in the repo for owners and developers.
+Use this when **thameswellnessacademy.co.uk** should show the holding page at `/` while the full site remains in the repo for owners and developers.
 
 ## URLs (current setup)
 
 | Audience | URL |
 |----------|-----|
-| Public | [https://berkshireyogatraining.co.uk/](https://berkshireyogatraining.co.uk/) |
-| Owners on custom domain (Cloudflare) | [https://berkshireyogatraining.co.uk/owners](https://berkshireyogatraining.co.uk/owners) |
+| Public | [https://thameswellnessacademy.co.uk/](https://thameswellnessacademy.co.uk/) |
+| Owners on custom domain (Cloudflare) | [https://thameswellnessacademy.co.uk/owners](https://thameswellnessacademy.co.uk/owners) |
 | Owners on GitHub Pages (full site at `/`, no `_redirects`) | [https://markotuisk.github.io/berkshire-yoga-training/](https://markotuisk.github.io/berkshire-yoga-training/) |
 | Cloudflare pages.dev (same rewrite as custom domain) | [https://berkshire-yoga-training.pages.dev/](https://berkshire-yoga-training.pages.dev/) → coming soon; full homepage at `/owners` (`/index.html` redirects to `/` on Cloudflare) |
 
@@ -69,7 +69,7 @@ git push
 
 ### Option C: Cloudflare dashboard redirect
 
-In Cloudflare → Rules → Redirect Rules (or Page Rules), redirect `berkshireyogatraining.co.uk/` to `/coming-soon.html`. No file changes required; remove the rule at go-live.
+In Cloudflare → Rules → Redirect Rules (or Page Rules), redirect `thameswellnessacademy.co.uk/` to `/coming-soon.html`. No file changes required; remove the rule at go-live.
 
 ## Email sign-up form
 
@@ -77,7 +77,7 @@ The subscribe form in `coming-soon.html` is **markup only** (no backend). To col
 
 - **Formspree / Netlify Forms / Cloudflare Workers**: set `action` on the form
 - **Mailchimp / Buttondown** embed
-- **mailto fallback**: footer link `info@thameswellnessacademy.co.uk` works today
+- **mailto fallback**: footer link `contact@thameswellness.com` works today
 
 Until connected, the note under the form tells visitors to email directly.
 

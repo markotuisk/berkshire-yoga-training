@@ -6,7 +6,7 @@
 
   const EXCLUDE_SELECTOR =
     '#shadow-review-root, .shadow-toolbar, .shadow-modal, #shadow-page-badges, #shadow-seo-overlay, .shadow-seo-badge, #shadow-design-overlay, .shadow-design-badge';
-  const LIVE_HOST = 'berkshireyogatraining.co.uk';
+  const LIVE_HOST = 'thameswellnessacademy.co.uk';
   const CRAWL_CONCURRENCY = 5;
   const SHADOW_ROBOTS_PATTERN = /noindex.*noarchive|noarchive.*noindex/;
   const GRAPH_VIEWS = [

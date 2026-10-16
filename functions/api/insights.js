@@ -43,7 +43,7 @@ function buildHints(env, oauthAvailable) {
   }
   if (!isGscConfigured(env)) {
     hints.push(
-      'Set GSC_SITE_URL (e.g. sc-domain:berkshireyogatraining.co.uk or https://berkshireyogatraining.co.uk/) and grant access in Search Console.'
+      'Set GSC_SITE_URL (e.g. sc-domain:berkshireyogatraining.co.uk or https://thameswellnessacademy.co.uk/) and grant access in Search Console.'
     );
   }
   if (!isGa4Configured(env)) {

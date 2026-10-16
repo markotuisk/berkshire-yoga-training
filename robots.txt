@@ -12,4 +12,4 @@ Disallow: /coming-soon.html
 Disallow: /login
 Disallow: /login.html
 
-Sitemap: https://berkshireyogatraining.co.uk/sitemap.xml
+Sitemap: https://thameswellnessacademy.co.uk/sitemap.xml
