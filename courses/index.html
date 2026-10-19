@@ -28,7 +28,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Archivo:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/site.css?v=20261019d">
+  <link rel="stylesheet" href="../css/site.css?v=20261019e">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -351,8 +351,8 @@
       <div class="container">
         <div class="section-head">
           <p class="eyebrow">Browse</p>
-          <h2 id="courses-catalog-heading">All courses, CPD and workshops</h2>
-          <p>Filter by pathway. Switch between card view and a chronological list grouped by year and month.</p>
+          <h2 id="courses-catalog-heading">All courses and CPD</h2>
+          <p>Filter by pathway. Switch between card view and a chronological list grouped by year and month. Workshops and retreats open their own hubs.</p>
         </div>
 
         <form class="courses-catalog-filters" id="courses-catalog-filters" aria-label="Filter courses" onsubmit="return false;">
@@ -362,8 +362,8 @@
               <button type="button" class="courses-catalog-chip is-active" data-type="all" aria-pressed="true">All</button>
               <button type="button" class="courses-catalog-chip" data-type="foundation" aria-pressed="false">Foundation</button>
               <button type="button" class="courses-catalog-chip" data-type="cpd" aria-pressed="false">CPD</button>
-              <button type="button" class="courses-catalog-chip" data-type="workshops" aria-pressed="false">Workshops</button>
-              <button type="button" class="courses-catalog-chip" data-type="retreats" aria-pressed="false">Retreats</button>
+              <a href="workshops/" class="courses-catalog-chip">Workshops</a>
+              <a href="retreats/" class="courses-catalog-chip">Retreats</a>
             </div>
           </div>
           <div class="courses-catalog-field courses-catalog-field--view">
@@ -421,18 +421,6 @@
               <h3>SoundBath Training</h3>
               <p>30-hour Sound Facilitator pathway. Next advertised intake October to November 2027.</p>
               <span class="card-link">Open this course</span>
-            </a>
-            <a class="course-card" href="workshops/" data-type="workshops" data-start="" data-date-label="Dates on enquiry" data-search="specialist workshops breath work menopause trauma-informed short courses">
-              <span class="tag">Workshops</span>
-              <h3>Specialist workshops</h3>
-              <p>Focused short courses on breath work, menopause support, trauma-informed teaching and related themes.</p>
-              <span class="card-link">Open workshops</span>
-            </a>
-            <a class="course-card" href="retreats/" data-type="retreats" data-start="" data-date-label="Dates on enquiry" data-search="retreats immersive residential professional community">
-              <span class="tag">Retreats</span>
-              <h3>Retreats</h3>
-              <p>Immersive learning that combines practice, study and professional community away from daily teaching load.</p>
-              <span class="card-link">Open retreats</span>
             </a>
           </div>
           <div class="courses-catalog-list" id="courses-catalog-list" hidden aria-live="polite"></div>
@@ -533,6 +521,6 @@
       <span class="footer-cutout-text">Thames Wellness Academy</span>
     </div>
   </footer>
-  <script src="../js/main.js?v=20261019d"></script>
+  <script src="../js/main.js?v=20261019e"></script>
 </body>
 </html>

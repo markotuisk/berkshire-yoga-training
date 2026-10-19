@@ -753,7 +753,7 @@
   const coursesCatalogRoot = document.getElementById('courses-catalog');
   const coursesCatalogGrid = document.getElementById('courses-catalog-grid');
   if (coursesCatalogRoot && coursesCatalogGrid) {
-    const chips = Array.from(document.querySelectorAll('.courses-catalog-chip'));
+    const chips = Array.from(document.querySelectorAll('button.courses-catalog-chip[data-type]'));
     const viewButtons = Array.from(document.querySelectorAll('.courses-catalog-view-btn'));
     const countEl = document.getElementById('courses-catalog-count');
     const emptyEl = document.getElementById('courses-catalog-empty');
@@ -767,6 +767,14 @@
     const typeFromHash = (window.location.hash || '').replace(/^#/, '').toLowerCase();
     const requestedType = typeFromQuery || typeFromHash;
     const knownTypes = new Set(chips.map((chip) => chip.dataset.type).filter(Boolean));
+    if (requestedType === 'workshops') {
+      window.location.replace('workshops/');
+      return;
+    }
+    if (requestedType === 'retreats') {
+      window.location.replace('retreats/');
+      return;
+    }
     if (requestedType && knownTypes.has(requestedType)) {
       activeType = requestedType;
     }
