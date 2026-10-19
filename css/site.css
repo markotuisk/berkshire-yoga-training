@@ -4758,14 +4758,59 @@ body.lead-confirm-open {
 }
 
 .teacher-graduate-text {
-  margin: 0.2rem 0 0;
+  margin: 0.35rem 0 0;
   font-size: 0.92rem;
-  line-height: 1.45;
+  line-height: 1.5;
   color: var(--ink-soft);
 }
 
+.teacher-graduate-text a {
+  font-weight: 600;
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--gold) 55%, transparent);
+  text-underline-offset: 0.15em;
+}
+
+.teacher-graduate-text a:hover {
+  color: var(--woodland);
+  text-decoration-color: var(--gold);
+}
+
+.teacher-graduate-points {
+  list-style: none;
+  margin: 0.65rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.teacher-graduate-points li {
+  position: relative;
+  padding: 0.45rem 0.65rem 0.45rem 1.55rem;
+  border-radius: var(--radius-control);
+  background: color-mix(in srgb, var(--white) 72%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gold) 22%, var(--border));
+  font-size: 0.86rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--ink-soft);
+}
+
+.teacher-graduate-points li::before {
+  content: "";
+  position: absolute;
+  left: 0.65rem;
+  top: 0.75rem;
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--gold) 22%, transparent);
+}
+
 .teacher-graduate-link {
-  margin-top: 0.35rem;
+  margin-top: 0.55rem;
   width: fit-content;
   font-size: 0.9rem;
   font-weight: 700;
