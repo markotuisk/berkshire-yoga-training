@@ -170,13 +170,13 @@ export const ACADEMY_CONTACTS = {
   founders: [
     {
       name: 'Katia Major',
-      role: 'Co-founder',
+      role: 'Co-Founder and Faculty Lead Teacher',
       email: 'Katia.major@thameswellness.com',
       profile: `${SITE}/team/katia-major`
     },
     {
       name: 'Raili Maripuu',
-      role: 'Co-founder',
+      role: 'Co-Founder and Faculty Lead Teacher',
       email: 'raili.maripuu@thameswellness.com',
       profile: `${SITE}/team/raili-maripuu`
     }
