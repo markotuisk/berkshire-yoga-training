@@ -28,7 +28,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Archivo:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/site.css?v=20261019c">
+  <link rel="stylesheet" href="../css/site.css?v=20261019d">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -352,14 +352,10 @@
         <div class="section-head">
           <p class="eyebrow">Browse</p>
           <h2 id="courses-catalog-heading">All courses, CPD and workshops</h2>
-          <p>Filter by pathway or search by name. Switch between card view and a chronological list grouped by year and month.</p>
+          <p>Filter by pathway. Switch between card view and a chronological list grouped by year and month.</p>
         </div>
 
-        <form class="courses-catalog-filters" id="courses-catalog-filters" role="search" aria-label="Filter courses" onsubmit="return false;">
-          <div class="courses-catalog-field">
-            <label for="courses-catalog-search">Search</label>
-            <input type="search" id="courses-catalog-search" name="q" placeholder="Search courses, CPD or workshops" autocomplete="off">
-          </div>
+        <form class="courses-catalog-filters" id="courses-catalog-filters" aria-label="Filter courses" onsubmit="return false;">
           <div class="courses-catalog-field courses-catalog-field--types">
             <span class="courses-catalog-field-label" id="courses-catalog-type-label">Type</span>
             <div class="courses-catalog-type-row" role="group" aria-labelledby="courses-catalog-type-label">
@@ -380,7 +376,7 @@
         </form>
 
         <p class="courses-catalog-count" id="courses-catalog-count" aria-live="polite"></p>
-        <p class="courses-catalog-empty" id="courses-catalog-empty" hidden>No programmes match those filters. Try another type or clear the search.</p>
+        <p class="courses-catalog-empty" id="courses-catalog-empty" hidden>No programmes match that type. Try another filter.</p>
 
         <div class="courses-catalog" id="courses-catalog" data-view="cards">
           <div class="course-grid courses-catalog-grid" id="courses-catalog-grid">
@@ -537,6 +533,6 @@
       <span class="footer-cutout-text">Thames Wellness Academy</span>
     </div>
   </footer>
-  <script src="../js/main.js?v=20261019c"></script>
+  <script src="../js/main.js?v=20261019d"></script>
 </body>
 </html>

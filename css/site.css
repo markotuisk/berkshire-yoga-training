@@ -1225,9 +1225,9 @@ h3,
   border-radius: var(--radius-lg);
 }
 
-@media (min-width: 900px) {
+@media (min-width: 700px) {
   .courses-catalog-filters {
-    grid-template-columns: minmax(12rem, 18rem) 1fr auto;
+    grid-template-columns: 1fr auto;
     align-items: end;
   }
 }
@@ -1242,28 +1242,6 @@ h3,
   font-size: 0.875rem;
   font-weight: 600;
   color: var(--ink-soft);
-}
-
-.courses-catalog-field input[type="search"] {
-  width: 100%;
-  min-height: 2.85rem;
-  padding: 0.7rem 0.95rem;
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius-control);
-  font: inherit;
-  background: var(--white);
-  color: var(--ink);
-  transition: border-color var(--ease), box-shadow var(--ease);
-}
-
-.courses-catalog-field input[type="search"]:hover {
-  border-color: color-mix(in srgb, var(--river) 35%, var(--border-strong));
-}
-
-.courses-catalog-field input[type="search"]:focus-visible {
-  outline: none;
-  border-color: var(--gold);
-  box-shadow: 0 0 0 3px var(--gold-soft);
 }
 
 .courses-catalog-type-row {

@@ -753,7 +753,6 @@
   const coursesCatalogRoot = document.getElementById('courses-catalog');
   const coursesCatalogGrid = document.getElementById('courses-catalog-grid');
   if (coursesCatalogRoot && coursesCatalogGrid) {
-    const searchInput = document.getElementById('courses-catalog-search');
     const chips = Array.from(document.querySelectorAll('.courses-catalog-chip'));
     const viewButtons = Array.from(document.querySelectorAll('.courses-catalog-view-btn'));
     const countEl = document.getElementById('courses-catalog-count');
@@ -800,15 +799,9 @@
       if (listEl) listEl.hidden = activeView !== 'list';
     };
 
-    const cardMatches = (card, q) => {
+    const cardMatches = (card) => {
       const type = (card.dataset.type || '').toLowerCase();
-      const haystack = [
-        card.dataset.search || '',
-        card.textContent || ''
-      ].join(' ').toLowerCase();
-      const typeMatch = activeType === 'all' || type === activeType;
-      const textMatch = !q || haystack.includes(q);
-      return typeMatch && textMatch;
+      return activeType === 'all' || type === activeType;
     };
 
     const buildListView = (visibleCards) => {
@@ -910,11 +903,10 @@
     };
 
     const filterCourses = () => {
-      const q = (searchInput ? searchInput.value : '').trim().toLowerCase();
       const visibleCards = [];
 
       cards.forEach((card) => {
-        const match = cardMatches(card, q);
+        const match = cardMatches(card);
         card.classList.toggle('is-hidden', !match);
         if (match) visibleCards.push(card);
       });
@@ -966,10 +958,6 @@
         filterCourses();
       });
     });
-
-    if (searchInput) {
-      searchInput.addEventListener('input', filterCourses);
-    }
 
     filterCourses();
   }
