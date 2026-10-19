@@ -840,23 +840,37 @@
         months.get(month).push(card);
       });
 
+      const escapeHtml = (value) => String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+
       const appendListItem = (ul, card) => {
         const title = (card.querySelector('h3') || {}).textContent || 'Programme';
         const summary = (card.querySelector('p') || {}).textContent || '';
         const tag = (card.querySelector('.tag') || {}).textContent || '';
         const cta = (card.querySelector('.card-link') || {}).textContent || 'Open';
         const dateLabel = card.dataset.dateLabel || 'Dates on enquiry';
+        const type = (card.dataset.type || 'other').toLowerCase();
+        const start = (card.dataset.start || '').trim();
+        const hasDate = /^\d{4}-\d{2}-\d{2}$/.test(start);
+        const day = hasDate ? String(Number(start.slice(8, 10))) : '';
         const li = document.createElement('li');
-        li.className = 'courses-catalog-list-item';
+        li.className = 'courses-catalog-list-item courses-catalog-list-item--' + type +
+          (hasDate ? '' : ' courses-catalog-list-item--undated');
         li.innerHTML =
-          '<a class="courses-catalog-list-link" href="' + card.getAttribute('href') + '">' +
-            '<span class="courses-catalog-list-date">' + dateLabel + '</span>' +
-            '<span class="courses-catalog-list-main">' +
-              (tag ? '<span class="courses-catalog-list-tag">' + tag + '</span>' : '') +
-              '<p class="courses-catalog-list-title">' + title + '</p>' +
-              (summary ? '<p class="courses-catalog-list-summary">' + summary + '</p>' : '') +
+          '<a class="courses-catalog-list-link" href="' + escapeHtml(card.getAttribute('href') || '#') + '">' +
+            '<span class="courses-catalog-list-date">' +
+              (hasDate ? '<span class="courses-catalog-list-day">' + escapeHtml(day) + '</span>' : '') +
+              '<span class="courses-catalog-list-date-full">' + escapeHtml(dateLabel) + '</span>' +
             '</span>' +
-            '<span class="courses-catalog-list-cta">' + cta + '</span>' +
+            '<span class="courses-catalog-list-main">' +
+              (tag ? '<span class="courses-catalog-list-tag">' + escapeHtml(tag) + '</span>' : '') +
+              '<p class="courses-catalog-list-title">' + escapeHtml(title) + '</p>' +
+              (summary ? '<p class="courses-catalog-list-summary">' + escapeHtml(summary) + '</p>' : '') +
+            '</span>' +
+            '<span class="courses-catalog-list-cta">' + escapeHtml(cta) + '</span>' +
           '</a>';
         ul.appendChild(li);
       };
