@@ -749,6 +749,82 @@
     }
   }
 
+  // Courses hub catalog filter (type chips + search)
+  const coursesCatalog = document.getElementById('courses-catalog-grid');
+  if (coursesCatalog) {
+    const searchInput = document.getElementById('courses-catalog-search');
+    const chips = Array.from(document.querySelectorAll('.courses-catalog-chip'));
+    const countEl = document.getElementById('courses-catalog-count');
+    const emptyEl = document.getElementById('courses-catalog-empty');
+    const cards = Array.from(coursesCatalog.querySelectorAll('.course-card'));
+    let activeType = 'all';
+
+    const params = new URLSearchParams(window.location.search);
+    const typeFromQuery = (params.get('type') || params.get('category') || '').toLowerCase();
+    const typeFromHash = (window.location.hash || '').replace(/^#/, '').toLowerCase();
+    const requestedType = typeFromQuery || typeFromHash;
+    const knownTypes = new Set(chips.map((chip) => chip.dataset.type).filter(Boolean));
+    if (requestedType && knownTypes.has(requestedType)) {
+      activeType = requestedType;
+    }
+
+    const setActiveChip = (type) => {
+      chips.forEach((chip) => {
+        const isActive = chip.dataset.type === type;
+        chip.classList.toggle('is-active', isActive);
+        chip.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+      });
+    };
+
+    const filterCourses = () => {
+      const q = (searchInput ? searchInput.value : '').trim().toLowerCase();
+      let visible = 0;
+
+      cards.forEach((card) => {
+        const type = (card.dataset.type || '').toLowerCase();
+        const haystack = [
+          card.dataset.search || '',
+          card.textContent || ''
+        ].join(' ').toLowerCase();
+        const typeMatch = activeType === 'all' || type === activeType;
+        const textMatch = !q || haystack.includes(q);
+        const match = typeMatch && textMatch;
+        card.classList.toggle('is-hidden', !match);
+        if (match) visible += 1;
+      });
+
+      if (countEl) {
+        const label = activeType === 'all' ? 'programmes' : activeType;
+        countEl.textContent = visible === 1
+          ? 'Showing 1 ' + label.replace(/s$/, '')
+          : 'Showing ' + visible + ' ' + label;
+      }
+      if (emptyEl) emptyEl.hidden = visible > 0;
+    };
+
+    setActiveChip(activeType);
+    chips.forEach((chip) => {
+      chip.addEventListener('click', () => {
+        activeType = chip.dataset.type || 'all';
+        setActiveChip(activeType);
+        const url = new URL(window.location.href);
+        if (activeType === 'all') {
+          url.searchParams.delete('type');
+        } else {
+          url.searchParams.set('type', activeType);
+        }
+        window.history.replaceState({}, '', url);
+        filterCourses();
+      });
+    });
+
+    if (searchInput) {
+      searchInput.addEventListener('input', filterCourses);
+    }
+
+    filterCourses();
+  }
+
   // Deep-link course / topic preselection on Apply and Contact forms
   // Supports ?course=, ?topic=, or ?interest= (slug or option value)
   const COURSE_ALIASES = {

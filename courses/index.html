@@ -28,7 +28,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Archivo:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/site.css?v=20260930ab">
+  <link rel="stylesheet" href="../css/site.css?v=20261019a">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -39,8 +39,12 @@
     "isPartOf": { "@type": "WebSite", "url": "https://thameswellnessacademy.co.uk/" },
     "hasPart": [
       { "@type": "Course", "name": "Foundation Training", "url": "https://thameswellnessacademy.co.uk/courses/foundation-yoga-training/" },
-      { "@type": "Course", "name": "CPD", "url": "https://thameswellnessacademy.co.uk/courses/cpd/" },
-      { "@type": "Course", "name": "Workshops", "url": "https://thameswellnessacademy.co.uk/courses/workshops/" },
+      { "@type": "Course", "name": "200-hour Foundation Training", "url": "https://thameswellnessacademy.co.uk/courses/foundation-yoga-training/200-hour/" },
+      { "@type": "Course", "name": "Pregnancy Yoga Training", "url": "https://thameswellnessacademy.co.uk/courses/cpd/pregnancy-yoga/" },
+      { "@type": "Course", "name": "Yoga Nidra Training", "url": "https://thameswellnessacademy.co.uk/courses/cpd/yoga-nidra/" },
+      { "@type": "Course", "name": "SoundBath Training", "url": "https://thameswellnessacademy.co.uk/courses/cpd/soundbath/" },
+      { "@type": "Course", "name": "Functional Anatomy Training", "url": "https://thameswellnessacademy.co.uk/courses/cpd/functional-anatomy/" },
+      { "@type": "Course", "name": "Specialist workshops", "url": "https://thameswellnessacademy.co.uk/courses/workshops/" },
       { "@type": "Course", "name": "Retreats", "url": "https://thameswellnessacademy.co.uk/courses/retreats/" }
     ]
   }
@@ -343,37 +347,108 @@
       </div>
     </header>
 
-    <section class="section">
-      <div class="container course-grid">
-        <a class="course-card" href="foundation-yoga-training/200-hour/">
-          <span class="tag">Flagship YTT</span>
-          <h3>200-hour Foundation Training</h3>
-          <p>Deep 200-hour course page under Foundation Training, with fees, placeholder schedule, curriculum and Apply CTAs.</p>
-          <span class="card-link">Open 200-hour course</span>
-        </a>
-        <a class="course-card" href="cpd/">
-          <span class="tag">CPD</span>
-          <h3>Continuing professional development</h3>
-          <p>Modular CPD for qualified teachers who need practical, evidence-informed development.</p>
-          <span class="card-link">Open CPD</span>
-        </a>
-        <a class="course-card" href="workshops/">
-          <span class="tag">Short courses</span>
-          <h3>Specialist workshops</h3>
-          <p>Focused workshops for breath work, specialist populations and contemporary teaching themes.</p>
-          <span class="card-link">Open workshops</span>
-        </a>
-        <a class="course-card" href="retreats/">
-          <span class="tag">Immersive</span>
-          <h3>Retreats</h3>
-          <p>Residential and immersive learning that combines practice, study and professional community.</p>
-          <span class="card-link">Open retreats</span>
-        </a>
-      </div>
-      <div class="container btn-row">
-        <a class="btn btn-primary" href="../join.html">Apply or enquire</a>
-        <a class="btn btn-secondary" href="../yoga-teacher-training/">Yoga teacher training guide</a>
-        <a class="btn btn-secondary" href="../faq.html">Read the FAQ</a>
+    <section class="section" aria-labelledby="courses-catalog-heading">
+      <div class="container">
+        <div class="section-head">
+          <p class="eyebrow">Browse</p>
+          <h2 id="courses-catalog-heading">All courses, CPD and workshops</h2>
+          <p>Filter by pathway or search by name. Every card opens the dedicated page for that programme.</p>
+        </div>
+
+        <form class="courses-catalog-filters" id="courses-catalog-filters" role="search" aria-label="Filter courses" onsubmit="return false;">
+          <div class="courses-catalog-field">
+            <label for="courses-catalog-search">Search</label>
+            <input type="search" id="courses-catalog-search" name="q" placeholder="Search courses, CPD or workshops" autocomplete="off">
+          </div>
+          <div class="courses-catalog-field courses-catalog-field--types">
+            <span class="courses-catalog-field-label" id="courses-catalog-type-label">Type</span>
+            <div class="courses-catalog-type-row" role="group" aria-labelledby="courses-catalog-type-label">
+              <button type="button" class="courses-catalog-chip is-active" data-type="all" aria-pressed="true">All</button>
+              <button type="button" class="courses-catalog-chip" data-type="foundation" aria-pressed="false">Foundation</button>
+              <button type="button" class="courses-catalog-chip" data-type="cpd" aria-pressed="false">CPD</button>
+              <button type="button" class="courses-catalog-chip" data-type="workshops" aria-pressed="false">Workshops</button>
+              <button type="button" class="courses-catalog-chip" data-type="retreats" aria-pressed="false">Retreats</button>
+            </div>
+          </div>
+        </form>
+
+        <p class="courses-catalog-count" id="courses-catalog-count" aria-live="polite"></p>
+        <p class="courses-catalog-empty" id="courses-catalog-empty" hidden>No programmes match those filters. Try another type or clear the search.</p>
+
+        <div class="course-grid courses-catalog-grid" id="courses-catalog-grid">
+          <a class="course-card" href="foundation-yoga-training/200-hour/" data-type="foundation" data-search="200-hour foundation teacher training ytt flagship berkshire">
+            <span class="tag">Foundation</span>
+            <h3>200-hour Foundation Training</h3>
+            <p>Flagship Yoga Professionals pathway with fees, schedule, curriculum and Apply CTAs. Nine weekends from February to November 2027.</p>
+            <span class="card-link">Open 200-hour course</span>
+          </a>
+          <a class="course-card" href="foundation-yoga-training/" data-type="foundation" data-search="foundation training 200 300 500 hour pathways overview">
+            <span class="tag">Foundation</span>
+            <h3>Foundation Training hub</h3>
+            <p>200 to 500-hour pathways overview, Open Day details and how Foundation connects to CPD.</p>
+            <span class="card-link">Open Foundation hub</span>
+          </a>
+          <a class="course-card" href="foundation-yoga-training/200-hour/open-day/" data-type="foundation" data-search="open day foundation training meet faculty">
+            <span class="tag">Open Day</span>
+            <h3>Open Day | Foundation Training</h3>
+            <p>Meet the lead faculty, ask about the 200-hour pathway and see whether the Academy is the right fit.</p>
+            <span class="card-link">Register for Open Day</span>
+          </a>
+          <a class="course-card" href="cpd/pregnancy-yoga/" data-type="cpd" data-search="pregnancy yoga training prenatal cpd 50 hour">
+            <span class="tag">CPD</span>
+            <h3>Pregnancy Yoga Training</h3>
+            <p>50-hour listed pathway for teachers supporting prenatal students. Next cohort March 2027.</p>
+            <span class="card-link">Open this course</span>
+          </a>
+          <a class="course-card" href="cpd/yoga-nidra/" data-type="cpd" data-search="yoga nidra training restorative rest cpd 30 hour">
+            <span class="tag">CPD</span>
+            <h3>Yoga Nidra Training</h3>
+            <p>30-hour listed pathway in Yoga Nidra and restorative rest. Next cohort April 2027.</p>
+            <span class="card-link">Open this course</span>
+          </a>
+          <a class="course-card" href="cpd/soundbath/" data-type="cpd" data-search="soundbath sound bath facilitator training cpd 30 hour">
+            <span class="tag">CPD</span>
+            <h3>SoundBath Training</h3>
+            <p>30-hour Sound Facilitator pathway. Next advertised intake October to November 2027.</p>
+            <span class="card-link">Open this course</span>
+          </a>
+          <a class="course-card" href="cpd/functional-anatomy/" data-type="cpd" data-search="functional anatomy training biomechanics cpd 30 hour">
+            <span class="tag">CPD</span>
+            <h3>Functional Anatomy Training</h3>
+            <p>30-hour applied anatomy pathway for safer class delivery. Next cohort June to July 2027.</p>
+            <span class="card-link">Open this course</span>
+          </a>
+          <a class="course-card" href="cpd/" data-type="cpd" data-search="continuing professional development cpd hub modules">
+            <span class="tag">CPD</span>
+            <h3>CPD hub</h3>
+            <p>All continuing professional development modules for qualified yoga and wellness teachers.</p>
+            <span class="card-link">Open CPD hub</span>
+          </a>
+          <a class="course-card" href="cpd/open-day/" data-type="cpd" data-search="open day cpd courses modules">
+            <span class="tag">Open Day</span>
+            <h3>Open Day | CPD Courses</h3>
+            <p>Learn about the CPD series, ask faculty questions and choose your next module.</p>
+            <span class="card-link">Register for Open Day</span>
+          </a>
+          <a class="course-card" href="workshops/" data-type="workshops" data-search="specialist workshops breath work menopause trauma-informed short courses">
+            <span class="tag">Workshops</span>
+            <h3>Specialist workshops</h3>
+            <p>Focused short courses on breath work, menopause support, trauma-informed teaching and related themes.</p>
+            <span class="card-link">Open workshops</span>
+          </a>
+          <a class="course-card" href="retreats/" data-type="retreats" data-search="retreats immersive residential professional community">
+            <span class="tag">Retreats</span>
+            <h3>Retreats</h3>
+            <p>Immersive learning that combines practice, study and professional community away from daily teaching load.</p>
+            <span class="card-link">Open retreats</span>
+          </a>
+        </div>
+
+        <div class="btn-row">
+          <a class="btn btn-primary" href="../join.html">Apply or enquire</a>
+          <a class="btn btn-secondary" href="../yoga-teacher-training/">Yoga teacher training guide</a>
+          <a class="btn btn-secondary" href="../faq.html">Read the FAQ</a>
+        </div>
       </div>
     </section>
   </main>
@@ -464,6 +539,6 @@
       <span class="footer-cutout-text">Thames Wellness Academy</span>
     </div>
   </footer>
-  <script src="../js/main.js?v=20261008"></script>
+  <script src="../js/main.js?v=20261019a"></script>
 </body>
 </html>

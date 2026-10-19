@@ -1208,6 +1208,120 @@ h3,
   color: var(--river-mid);
 }
 
+.course-card.is-hidden {
+  display: none;
+}
+
+/* Courses hub catalog — browse / filter */
+.courses-catalog-filters {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-bottom: 1.15rem;
+  padding: 1.15rem 1.25rem;
+  background:
+    linear-gradient(165deg, color-mix(in srgb, var(--mist) 70%, var(--white)) 0%, var(--white) 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+@media (min-width: 800px) {
+  .courses-catalog-filters {
+    grid-template-columns: minmax(12rem, 18rem) 1fr;
+    align-items: end;
+  }
+}
+
+.courses-catalog-field {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.courses-catalog-field label,
+.courses-catalog-field-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.courses-catalog-field input[type="search"] {
+  width: 100%;
+  min-height: 2.85rem;
+  padding: 0.7rem 0.95rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-control);
+  font: inherit;
+  background: var(--white);
+  color: var(--ink);
+  transition: border-color var(--ease), box-shadow var(--ease);
+}
+
+.courses-catalog-field input[type="search"]:hover {
+  border-color: color-mix(in srgb, var(--river) 35%, var(--border-strong));
+}
+
+.courses-catalog-field input[type="search"]:focus-visible {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px var(--gold-soft);
+}
+
+.courses-catalog-type-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.courses-catalog-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.45rem;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-control);
+  background: var(--white);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color var(--ease), background var(--ease), color var(--ease);
+}
+
+.courses-catalog-chip:hover {
+  border-color: var(--river-mid);
+  color: var(--river);
+}
+
+.courses-catalog-chip.is-active {
+  border-color: var(--river);
+  background: color-mix(in srgb, var(--river) 12%, var(--white));
+  color: var(--river);
+}
+
+.courses-catalog-chip:focus-visible {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px var(--gold-soft);
+}
+
+.courses-catalog-count {
+  margin: 0 0 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.courses-catalog-empty {
+  margin: 0 0 1rem;
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+}
+
+.courses-catalog-grid {
+  margin-bottom: 1.75rem;
+}
+
 /* Choose your path — hairline columns (Shala IA, TWA brand) */
 .section--choose-path {
   background: var(--mist);
