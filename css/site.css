@@ -59,6 +59,72 @@ body {
   overflow-x: clip;
 }
 
+/* Teacher profile pages — soft distinct parchment atmospheres */
+body.teacher-page--katia {
+  background:
+    radial-gradient(ellipse 70% 45% at 8% 0%, color-mix(in srgb, var(--gold) 18%, transparent), transparent 58%),
+    linear-gradient(168deg, #f9f3e7 0%, var(--paper) 42%, #ebe1d0 100%);
+}
+
+body.teacher-page--katia .page-hero {
+  background:
+    linear-gradient(160deg, color-mix(in srgb, var(--gold) 14%, var(--mist)) 0%, var(--mist) 100%);
+}
+
+body.teacher-page--katia .section--mist {
+  background: color-mix(in srgb, var(--gold) 7%, var(--mist));
+}
+
+body.teacher-page--raili {
+  background:
+    radial-gradient(ellipse 65% 48% at 92% 0%, color-mix(in srgb, var(--river-light) 22%, transparent), transparent 56%),
+    linear-gradient(168deg, #eef1ea 0%, #f2efe6 40%, #e5e8df 100%);
+}
+
+body.teacher-page--raili .page-hero {
+  background:
+    linear-gradient(160deg, color-mix(in srgb, var(--river-light) 16%, var(--mist)) 0%, var(--mist) 100%);
+}
+
+body.teacher-page--raili .section--mist {
+  background: color-mix(in srgb, var(--river-light) 10%, var(--mist));
+}
+
+body.teacher-page--lorena {
+  background:
+    radial-gradient(ellipse 60% 42% at 12% 8%, color-mix(in srgb, var(--river-mid) 12%, transparent), transparent 55%),
+    linear-gradient(168deg, #f3f0ea 0%, #f0ebe3 48%, #e7e3d9 100%);
+}
+
+body.teacher-page--lorena .page-hero {
+  background:
+    linear-gradient(160deg, color-mix(in srgb, var(--river-mid) 10%, var(--mist)) 0%, var(--mist) 100%);
+}
+
+body.teacher-page--lorena .section--mist {
+  background: color-mix(in srgb, var(--river-mid) 8%, var(--mist));
+}
+
+body.teacher-page--yulia {
+  background:
+    radial-gradient(ellipse 68% 46% at 88% 4%, color-mix(in srgb, #c4b49a 28%, transparent), transparent 58%),
+    linear-gradient(168deg, #f7f2eb 0%, #f3ece3 44%, #ebe4d8 100%);
+}
+
+body.teacher-page--yulia .page-hero {
+  background:
+    linear-gradient(160deg, color-mix(in srgb, #c4b49a 18%, var(--mist)) 0%, var(--mist) 100%);
+}
+
+body.teacher-page--yulia .section--mist {
+  background: color-mix(in srgb, #c4b49a 12%, var(--mist));
+}
+
+body.teacher-page--draft {
+  background:
+    linear-gradient(168deg, #f2efe9 0%, var(--paper) 50%, #e8e2d6 100%);
+}
+
 img {
   max-width: 100%;
   height: auto;
