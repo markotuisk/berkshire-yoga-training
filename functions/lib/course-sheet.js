@@ -40,9 +40,22 @@ const SHEETS_SCOPE = 'https://www.googleapis.com/auth/spreadsheets';
  * @param {Record<string, unknown>} payload
  */
 export async function courseSheetRequest(env, payload) {
-  if (env && env.COURSE_SHEETS_SPREADSHEET_ID && isGoogleConfigured(env)) {
-    return sheetsApiRequest(env, payload);
+  const canSheets =
+    !!(env && env.COURSE_SHEETS_SPREADSHEET_ID && isGoogleConfigured(env));
+  const canWebhook = !!(env && env.COURSE_SHEETS_WEBHOOK_URL);
+
+  if (canSheets) {
+    const result = await sheetsApiRequest(env, payload);
+    if (result && result.ok) return result;
+    // Fall back to Apps Script when Sheets API is disabled or denied
+    if (canWebhook) {
+      console.error('Sheets API failed; falling back to Apps Script', result);
+      const fallback = await appsScriptRequest(env, payload);
+      return { ...fallback, sheetsApiError: result };
+    }
+    return result;
   }
+
   return appsScriptRequest(env, payload);
 }
 
@@ -123,7 +136,14 @@ async function sheetsApiRequest(env, payload) {
     return { ok: false, error: 'Unknown action' };
   } catch (err) {
     console.error('Sheets API course sheet failed', err);
-    return { ok: false, error: String(err && err.message ? err.message : err) };
+    if (err && typeof err === 'object' && err.ok === false) {
+      return err;
+    }
+    return {
+      ok: false,
+      error: String(err && err.message ? err.message : err),
+      data: err && err.data
+    };
   }
 }
 
@@ -181,10 +201,16 @@ async function sheetsFetch(accessToken, path, init = {}) {
     data = { raw: text.slice(0, 400) };
   }
   if (!res.ok) {
-    const err = new Error(`Sheets API ${res.status}`);
-    err.status = res.status;
-    err.data = data;
-    throw err;
+    const message =
+      (data && data.error && data.error.message) ||
+      (data && data.raw) ||
+      `Sheets API ${res.status}`;
+    return Promise.reject({
+      ok: false,
+      status: res.status,
+      error: message,
+      data
+    });
   }
   return data;
 }
