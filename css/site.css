@@ -11,6 +11,9 @@
   --river: #2f3b2e;
   --river-mid: #4a5a45;
   --river-light: #6b7a64;
+  --woodland: var(--river);
+  --woodland-mid: var(--river-mid);
+  --woodland-light: var(--river-light);
   --mist: #ebe4d8;
   --paper: #f4efe6;
   --white: #ffffff;
