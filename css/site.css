@@ -4446,11 +4446,11 @@ body.lead-confirm-open {
 
 /* Teacher entity pages (team/{slug}.html) */
 .teacher-entity-hero {
-  padding: 2rem 0 3rem;
+  padding: 2rem 0 1.25rem;
   background:
     radial-gradient(ellipse 80% 60% at 90% 10%, color-mix(in srgb, var(--gold) 12%, transparent), transparent 55%),
     linear-gradient(180deg, var(--mist) 0%, var(--paper) 100%);
-  border-bottom: 1px solid color-mix(in srgb, var(--ink) 8%, transparent);
+  border-bottom: 0;
 }
 
 .teacher-entity-hero-inner {
@@ -4510,6 +4510,146 @@ body.lead-confirm-open {
   aspect-ratio: 545 / 682;
   object-fit: cover;
   object-position: center top;
+}
+
+/* Presence strip under teacher hero — studios, site, social */
+.teacher-presence {
+  padding: 1.15rem 0 1.5rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--ink) 8%, transparent);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--white) 55%, transparent) 0%, transparent 100%);
+}
+
+.teacher-presence-eyebrow {
+  margin: 0 0 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.teacher-presence-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.65rem;
+}
+
+@media (min-width: 700px) {
+  .teacher-presence-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1100px) {
+  .teacher-presence-list {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.teacher-presence-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 4.25rem;
+  padding: 0.7rem 0.85rem;
+  border-radius: calc(var(--radius-lg) - 0.25rem);
+  border: 1px solid var(--border-strong);
+  text-decoration: none;
+  color: inherit;
+  background: var(--white);
+  box-shadow: 0 1px 0 rgba(28, 25, 21, 0.03);
+  transition: transform var(--ease), box-shadow var(--ease), border-color var(--ease);
+}
+
+.teacher-presence-card:hover {
+  text-decoration: none;
+  color: inherit;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-soft);
+}
+
+.teacher-presence-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  flex-shrink: 0;
+  border-radius: var(--radius-control);
+  overflow: hidden;
+}
+
+.teacher-presence-mark img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.teacher-presence-copy {
+  display: grid;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.teacher-presence-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.25;
+}
+
+.teacher-presence-meta {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.teacher-presence-card--yoga-reading {
+  border-color: color-mix(in srgb, #2a6b8a 28%, var(--border));
+  background:
+    linear-gradient(135deg, color-mix(in srgb, #2a6b8a 12%, var(--white)) 0%, var(--white) 70%);
+}
+
+.teacher-presence-card--yoga-reading .teacher-presence-mark {
+  background: #fff;
+  border: 1px solid color-mix(in srgb, #2a6b8a 18%, var(--border));
+}
+
+.teacher-presence-card--website {
+  border-color: color-mix(in srgb, var(--river-mid) 32%, var(--border));
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--river-mid) 14%, var(--white)) 0%, var(--white) 70%);
+}
+
+.teacher-presence-card--website .teacher-presence-mark {
+  background: color-mix(in srgb, var(--river) 12%, var(--white));
+  color: var(--river);
+}
+
+.teacher-presence-card--instagram {
+  border-color: color-mix(in srgb, #c13584 30%, var(--border));
+  background:
+    linear-gradient(135deg, color-mix(in srgb, #f58529 14%, var(--white)) 0%, color-mix(in srgb, #c13584 10%, var(--white)) 55%, var(--white) 100%);
+}
+
+.teacher-presence-card--instagram .teacher-presence-mark {
+  background: linear-gradient(135deg, #f58529, #dd2a7b 50%, #8134af);
+  color: #fff;
+}
+
+.teacher-presence-card--linkedin {
+  border-color: color-mix(in srgb, #0a66c2 32%, var(--border));
+  background:
+    linear-gradient(135deg, color-mix(in srgb, #0a66c2 14%, var(--white)) 0%, var(--white) 70%);
+}
+
+.teacher-presence-card--linkedin .teacher-presence-mark {
+  background: #0a66c2;
+  color: #fff;
 }
 
 .teacher-entity-layout {
