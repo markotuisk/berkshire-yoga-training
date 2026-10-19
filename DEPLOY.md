@@ -62,11 +62,42 @@ Keep the old domain registered and redirecting for at least 180 days (prefer 12+
 
 ### Email addresses (policy)
 
-| Role | Address | Where it appears |
-|------|---------|------------------|
-| Public contact | `contact@thameswellness.com` | Site mailto, schema `email`, contact copy, `security.txt`, form fallbacks |
-| System / transactional From | `noreply@thameswellnessacademy.co.uk` | Send-only automated mail (confirmations, receipts). **Never** shown as a contact address on the site |
+| Role | Address / domain | Use |
+|------|------------------|-----|
+| Website → people (automated) | `noreply@thameswellnessacademy.co.uk` | All site-originated outbound to visitors/applicants (confirmations, form receipts, system notices). **Send-only.** Never shown as a contact address on the site. |
+| Teachers + company (human) | `@thameswellness.com` (e.g. `contact@thameswellness.com`, staff mailboxes) | Visible contact, mailto, schema, `security.txt`, form fallbacks, teacher and company correspondence |
 
-- Google Workspace on `thameswellnessacademy.co.uk` handles inbound for real people/aliases if needed; `noreply@` is not a public inbox.
-- Enabling Cloudflare Email Routing on the apex would conflict with Google MX — do not turn it on for this domain.
-- To send as `noreply@…`, onboard the domain in Resend (or Cloudflare Email Sending) and add their SPF/DKIM records on Raili’s zone; keep public contact on `@thameswellness.com`.
+- Split is intentional: academy domain for machine mail from the website; `thameswellness.com` for people.
+- `noreply@…` is not a public inbox; do not publish it on pages.
+- Google MX/SPF/DMARC (and pending Workspace DKIM) on `thameswellnessacademy.co.uk` support Google domain auth for that host.
+- **Resend (live):** domain `thameswellnessacademy.co.uk` verified in `eu-west-1` (id `31f80f57-7590-4413-ae6a-35befd29dcba`). Send From: `noreply@thameswellnessacademy.co.uk`. Keychain: `resend-api-key-thameswellnessacademy` / `thameswellnessacademy`. DNS on Raili’s zone: `resend._domainkey` (TXT), `send` + `rsend` (CNAME) — all verified. Do not enable Cloudflare Email Routing on this apex (would conflict with Google MX).
+
+### Course email automation (forms → Resend → Sheet → reminders)
+
+Form posts to `/api/notify/lead` still hit Discord, then:
+
+1. Branded confirmation to the visitor (if email present)
+2. Staff alert to `raili.maripuu@thameswellness.com` and `Katia.major@thameswellness.com`
+3. Upsert row on the course **Leads** Google Sheet (`Status=Interested`)
+
+Daily cron `/api/cron/course-reminders` sends −14 / −7 / −3 day reminders for rows with `Status=Paid` and a `CourseStartDate`. Mark paid + payment email: `POST /api/course/mark-paid`.
+
+**Pages secrets (berkshire-yoga-training):**
+
+| Secret | Purpose |
+|--------|---------|
+| `RESEND_API_KEY` | Send all automated mail |
+| `COURSE_SHEETS_WEBHOOK_URL` | Apps Script `/exec` URL |
+| `COURSE_SHEETS_SECRET` | Shared with Apps Script + mark-paid auth |
+| `CRON_SECRET` | Auth for `/api/cron/course-reminders` |
+
+```bash
+npx wrangler pages secret put RESEND_API_KEY --project-name=berkshire-yoga-training
+npx wrangler pages secret put COURSE_SHEETS_WEBHOOK_URL --project-name=berkshire-yoga-training
+npx wrangler pages secret put COURSE_SHEETS_SECRET --project-name=berkshire-yoga-training
+npx wrangler pages secret put CRON_SECRET --project-name=berkshire-yoga-training
+```
+
+Sheet setup and column reference: [`docs/COURSE-EMAIL-SHEET.md`](docs/COURSE-EMAIL-SHEET.md). Apps Script source: [`docs/course-sheets-apps-script.js`](docs/course-sheets-apps-script.js).
+
+Visitor emails include course link + key details, founder contacts (Katia / Raili + `contact@thameswellness.com`), Apple and Google/Android calendar buttons, and QR codes for contact vCard (`/api/contacts/academy`) and calendar ICS (`/api/calendar/course`).

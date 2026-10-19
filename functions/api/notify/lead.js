@@ -13,6 +13,7 @@ import {
   inferCourseSlug,
   postDiscordEmbed
 } from '../../lib/discord.js';
+import { runLeadEmailAutomation } from '../../lib/course-email.js';
 import {
   clientMeta,
   contextFields,
@@ -85,6 +86,20 @@ function extraFormFields(body, used) {
   return fields;
 }
 
+/**
+ * Visitor confirm + staff alert + Sheet upsert (non-blocking for Discord path).
+ * @param {Record<string, string|undefined>} env
+ * @param {Record<string, unknown>} lead
+ */
+async function fireEmailAutomation(env, lead) {
+  try {
+    return await runLeadEmailAutomation(env, lead);
+  } catch (err) {
+    console.error('Lead email automation failed', err);
+    return { ok: false, error: String(err && err.message ? err.message : err) };
+  }
+}
+
 export async function onRequestPost(context) {
   const { request, env } = context;
 
@@ -126,10 +141,18 @@ export async function onRequestPost(context) {
   const isJournal = isJournalSubscribeSource(source);
   const isSuggest = !isJournal && isSuggestCourse(source, topic, slug);
 
-  // Journal subscribe stays email-only. Other leads need email or phone (or both).
-  if (isJournal) {
+  const isContact = /^contact$/i.test(source);
+
+  // Journal + contact: email required. Other leads: email or phone (or both).
+  if (isJournal || isContact) {
     if (!email || !EMAIL_RE.test(email)) {
       return json({ error: 'A valid email is required.' }, 400);
+    }
+    if (isContact && !name) {
+      return json({ error: 'Please include your name.' }, 400);
+    }
+    if (isContact && !topic) {
+      return json({ error: 'Please choose a topic.' }, 400);
     }
   } else {
     if (email && !EMAIL_RE.test(email)) {
@@ -262,12 +285,29 @@ export async function onRequestPost(context) {
       );
     }
 
+    const emailAutomation = anyOk
+      ? await fireEmailAutomation(env, {
+          name: displayName,
+          email,
+          phone,
+          topic: journalTopic,
+          slug: '',
+          source,
+          message: '',
+          page: page || meta.pageUrl || '',
+          isJournal: true
+        })
+      : null;
+
     return json(
       {
         ok: anyOk,
         routed,
+        emailAutomation,
         message: anyOk
-          ? 'Thank you. You are on the journal updates list.'
+          ? email
+            ? 'Thank you. You are on the journal updates list. Please check your email for a confirmation.'
+            : 'Thank you. You are on the journal updates list.'
           : 'We could not save your subscription. Please email contact@thameswellness.com.'
       },
       anyOk ? 200 : 502
@@ -318,12 +358,29 @@ export async function onRequestPost(context) {
       );
     }
 
+    const emailAutomation = anyOk
+      ? await fireEmailAutomation(env, {
+          name: displayName,
+          email,
+          phone,
+          topic: suggestTopic,
+          slug: slug || 'suggest-course',
+          source,
+          message,
+          page: page || meta.pageUrl || '',
+          isSuggest: true
+        })
+      : null;
+
     return json(
       {
         ok: anyOk,
         routed,
+        emailAutomation,
         message: anyOk
-          ? 'Thank you. Your course suggestion has been sent to the Academy team.'
+          ? email
+            ? 'Thank you. Your course suggestion has been sent. Please check your email for a confirmation.'
+            : 'Thank you. Your course suggestion has been sent to the Academy team.'
           : 'We could not deliver your suggestion. Please email contact@thameswellness.com.'
       },
       anyOk ? 200 : 502
@@ -384,12 +441,30 @@ export async function onRequestPost(context) {
     );
   }
 
+  const emailAutomation = anyOk
+    ? await fireEmailAutomation(env, {
+        name: displayName,
+        email,
+        phone,
+        topic: topic || (isCallback ? 'Callback request' : ''),
+        slug,
+        courseTitle: topic || '',
+        courses,
+        source,
+        message: message || experience || '',
+        page: page || meta.pageUrl || ''
+      })
+    : null;
+
   return json(
     {
       ok: anyOk,
       routed,
+      emailAutomation,
       message: anyOk
-        ? 'Thank you. Your enquiry has been sent to the Academy team.'
+        ? email
+          ? 'Thank you. Your enquiry has been sent. Please check your email for a confirmation.'
+          : 'Thank you. Your enquiry has been sent to the Academy team.'
         : 'We could not deliver the alert. Please email contact@thameswellness.com.'
     },
     anyOk ? 200 : 502

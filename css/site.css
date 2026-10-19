@@ -1998,13 +1998,14 @@ h3,
   border: 1px solid var(--border);
 }
 
-/* Real classroom practice — featured + three asymmetric collage */
+/* Real classroom practice — featured stretches to match the three right shots */
 .practice-collage {
   display: grid;
   grid-template-columns: 1.35fr 1fr;
-  grid-template-rows: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(3, auto);
   gap: 0.65rem;
   align-self: start;
+  align-items: stretch;
   width: 100%;
 }
 
@@ -2024,26 +2025,30 @@ h3,
 .practice-shot--featured {
   grid-column: 1;
   grid-row: 1 / -1;
-  aspect-ratio: 4 / 5;
+  align-self: stretch;
   height: auto;
+  min-height: 100%;
   border-radius: var(--radius-lg) 0.45rem 0.45rem var(--radius-lg);
 }
 
 .practice-shot--b {
   grid-column: 2;
   grid-row: 1;
+  aspect-ratio: 4 / 3;
   border-radius: 0.45rem var(--radius-lg) 0.35rem 0.35rem;
 }
 
 .practice-shot--c {
   grid-column: 2;
   grid-row: 2;
+  aspect-ratio: 4 / 3;
   border-radius: 0.35rem;
 }
 
 .practice-shot--d {
   grid-column: 2;
   grid-row: 3;
+  aspect-ratio: 4 / 3;
   border-radius: 0.35rem var(--radius-lg) var(--radius-lg) 0.45rem;
 }
 
@@ -3139,6 +3144,104 @@ h3,
   font-weight: 400;
   color: var(--muted);
   font-size: 0.9em;
+}
+
+.form-stack--compact {
+  gap: 0.85rem;
+  max-width: 28rem;
+}
+
+.form-stack--compact textarea {
+  min-height: 4.5rem;
+}
+
+/* Confirm details before send */
+body.lead-confirm-open {
+  overflow: hidden;
+}
+
+.lead-confirm {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+}
+
+.lead-confirm__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(28, 25, 21, 0.45);
+}
+
+.lead-confirm__panel {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 26rem);
+  max-height: min(90vh, 36rem);
+  overflow: auto;
+  padding: 1.5rem 1.4rem 1.35rem;
+  border-radius: var(--radius, 1rem);
+  background: var(--paper, #f4efe6);
+  border: 1px solid rgba(201, 162, 39, 0.35);
+  box-shadow: 0 18px 48px rgba(28, 25, 21, 0.22);
+}
+
+.lead-confirm__title {
+  margin: 0 0 0.4rem;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.lead-confirm__lede {
+  margin: 0 0 1rem;
+  font-size: 0.95rem;
+  color: var(--ink-soft, #5c564c);
+}
+
+.lead-confirm__list {
+  margin: 0 0 1.25rem;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.lead-confirm__row {
+  display: grid;
+  gap: 0.15rem;
+  padding-bottom: 0.55rem;
+  border-bottom: 1px solid rgba(28, 25, 21, 0.08);
+}
+
+.lead-confirm__row:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.lead-confirm__row dt {
+  margin: 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted, #8a8174);
+  font-weight: 600;
+}
+
+.lead-confirm__row dd {
+  margin: 0;
+  font-size: 0.98rem;
+  color: var(--ink);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.lead-confirm__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  justify-content: flex-end;
 }
 
 /* Journal newsletter subscribe */

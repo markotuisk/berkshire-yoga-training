@@ -387,18 +387,19 @@
   const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   /**
-   * Lead forms: email or phone (at least one). Journal subscribe: email required.
+   * Lead forms: email or phone (at least one). Contact/journal: email required.
    * @param {HTMLFormElement} form
    * @param {boolean} isJournalForm
+   * @param {boolean} requireEmail
    * @returns {string} empty when valid, else British English error
    */
-  const validateLeadContactChannel = (form, isJournalForm) => {
+  const validateLeadContactChannel = (form, isJournalForm, requireEmail) => {
     const emailEl = form.querySelector('input[name="email"]');
     const phoneEl = form.querySelector('input[name="phone"]');
     const email = emailEl instanceof HTMLInputElement ? emailEl.value.trim() : '';
     const phone = phoneEl instanceof HTMLInputElement ? phoneEl.value.trim() : '';
 
-    if (isJournalForm) {
+    if (isJournalForm || requireEmail) {
       if (!email || !EMAIL_RE.test(email)) {
         return 'Please enter a valid email address.';
       }
@@ -414,6 +415,84 @@
     return '';
   };
 
+  /**
+   * Confirm details modal before sending forms with data-confirm-details.
+   * @param {Record<string, string>} payload
+   * @returns {Promise<boolean>} true to send, false to edit
+   */
+  const confirmLeadDetails = (payload) => {
+    const rows = [
+      ['Name', payload.name],
+      ['Email', payload.email],
+      ['Topic', payload.topic || payload.interest],
+      ['Phone', payload.phone],
+      ['Message', payload.message]
+    ].filter(([, v]) => v && String(v).trim());
+
+    return new Promise((resolve) => {
+      const existing = document.getElementById('lead-confirm-dialog');
+      if (existing) existing.remove();
+
+      const dialog = document.createElement('div');
+      dialog.id = 'lead-confirm-dialog';
+      dialog.className = 'lead-confirm';
+      dialog.setAttribute('role', 'dialog');
+      dialog.setAttribute('aria-modal', 'true');
+      dialog.setAttribute('aria-labelledby', 'lead-confirm-title');
+
+      const listHtml = rows
+        .map(
+          ([label, value]) =>
+            `<div class="lead-confirm__row"><dt>${label}</dt><dd>${String(value)
+              .replace(/&/g, '&amp;')
+              .replace(/</g, '&lt;')
+              .replace(/>/g, '&gt;')
+              .replace(/"/g, '&quot;')}</dd></div>`
+        )
+        .join('');
+
+      dialog.innerHTML = `
+        <div class="lead-confirm__backdrop" data-lead-confirm="edit"></div>
+        <div class="lead-confirm__panel">
+          <h2 class="lead-confirm__title" id="lead-confirm-title">Are these details correct?</h2>
+          <p class="lead-confirm__lede">We will email you a copy of everything below once it is sent.</p>
+          <dl class="lead-confirm__list">${listHtml}</dl>
+          <div class="lead-confirm__actions">
+            <button type="button" class="btn btn-secondary" data-lead-confirm="edit">Edit</button>
+            <button type="button" class="btn btn-primary" data-lead-confirm="send">Looks correct — send</button>
+          </div>
+        </div>`;
+
+      const finish = (ok) => {
+        document.removeEventListener('keydown', onKey);
+        dialog.remove();
+        document.body.classList.remove('lead-confirm-open');
+        resolve(ok);
+      };
+
+      const onKey = (e) => {
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          finish(false);
+        }
+      };
+
+      dialog.addEventListener('click', (e) => {
+        const t = e.target;
+        if (!(t instanceof HTMLElement)) return;
+        const action = t.getAttribute('data-lead-confirm');
+        if (action === 'edit') finish(false);
+        if (action === 'send') finish(true);
+      });
+
+      document.addEventListener('keydown', onKey);
+      document.body.classList.add('lead-confirm-open');
+      document.body.appendChild(dialog);
+      const sendBtn = dialog.querySelector('[data-lead-confirm="send"]');
+      if (sendBtn instanceof HTMLElement) sendBtn.focus();
+    });
+  };
+
   // Enquiry forms → /api/notify/lead (Discord), mailto fallback if API unavailable
   document.querySelectorAll('form.form-stack[data-notify-form]').forEach((form) => {
     form.addEventListener('submit', async (event) => {
@@ -423,6 +502,8 @@
       const formSource = form.getAttribute('data-notify-form') || '';
       const isJournalForm = /journal[-_]?subscribe/i.test(formSource);
       const isSuggestForm = /suggest[-_]?course/i.test(formSource);
+      const isContactForm = /^contact$/i.test(formSource);
+      const needsConfirm = form.hasAttribute('data-confirm-details');
 
       const showStatus = (msg, ok) => {
         let status = form.querySelector('.form-notify-status');
@@ -438,26 +519,36 @@
         status.dataset.state = ok ? 'ok' : 'error';
       };
 
-      const channelError = validateLeadContactChannel(form, isJournalForm);
+      const channelError = validateLeadContactChannel(
+        form,
+        isJournalForm,
+        isContactForm || needsConfirm
+      );
       if (channelError) {
         showStatus(channelError, false);
         const emailEl = form.querySelector('input[name="email"]');
         const phoneEl = form.querySelector('input[name="phone"]');
         const focusEl =
-          !isJournalForm && phoneEl instanceof HTMLInputElement && !emailEl?.value?.trim()
+          !isJournalForm &&
+          !isContactForm &&
+          !needsConfirm &&
+          phoneEl instanceof HTMLInputElement &&
+          !emailEl?.value?.trim()
             ? phoneEl
             : emailEl;
         if (focusEl instanceof HTMLElement) focusEl.focus();
         return;
       }
 
-      if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.textContent = isJournalForm
-          ? 'Subscribing…'
-          : isSuggestForm
-            ? 'Sending suggestion…'
-            : 'Sending…';
+      if (isContactForm) {
+        const topicEl = form.querySelector('select[name="topic"], select[name="interest"]');
+        const topicVal =
+          topicEl instanceof HTMLSelectElement ? topicEl.value.trim() : '';
+        if (!topicVal) {
+          showStatus('Please choose a topic.', false);
+          if (topicEl instanceof HTMLElement) topicEl.focus();
+          return;
+        }
       }
 
       const fd = new FormData(form);
@@ -481,6 +572,25 @@
       fd.forEach((value, key) => {
         if (typeof value === 'string') payload[key] = value;
       });
+
+      if (needsConfirm) {
+        const confirmed = await confirmLeadDetails(payload);
+        if (!confirmed) {
+          showStatus('Edit your details below, then review again.', false);
+          const nameEl = form.querySelector('input[name="name"]');
+          if (nameEl instanceof HTMLElement) nameEl.focus();
+          return;
+        }
+      }
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = isJournalForm
+          ? 'Subscribing…'
+          : isSuggestForm
+            ? 'Sending suggestion…'
+            : 'Sending…';
+      }
 
       const restoreBtn = () => {
         if (submitBtn) {
@@ -558,7 +668,8 @@
         const data = await res.json().catch(() => ({}));
         if (res.ok && data.ok) {
           showStatus(
-            data.message || 'Thank you. Your enquiry has been sent to the Academy team.',
+            data.message ||
+              'Thank you. Your enquiry has been sent. Please check your email for a confirmation.',
             true
           );
           form.reset();

@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Workshop Diploma of Attendance | Thames Wellness Academy</title>
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="description" content="Printable studio diploma of attendance for Thames Wellness Academy workshop participants. Local academy award, not Yoga Professionals Organisation Limited certification.">
+  <link rel="icon" href="../favicon.ico" sizes="48x48">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=Figtree:wght@400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #1c1915;
+      --ink-soft: #3a342c;
+      --muted: #6b6358;
+      --paper: #f4efe6;
+      --mist: #ebe4d8;
+      --white: #ffffff;
+      --gold: #c9a227;
+      --gold-deep: #a8841c;
+      --river: #2f3b2e;
+      --border: rgba(28, 25, 21, 0.14);
+      --font-display: "Archivo", system-ui, sans-serif;
+      --font-body: "Figtree", system-ui, sans-serif;
+      --font-script: "Great Vibes", cursive;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: var(--font-body);
+      color: var(--ink);
+      background:
+        radial-gradient(ellipse at 20% 0%, rgba(201, 162, 39, 0.12), transparent 45%),
+        linear-gradient(180deg, #ebe4d8 0%, #f4efe6 40%, #e8e0d2 100%);
+      min-height: 100vh;
+    }
+
+    .toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.85rem 1.25rem;
+      background: rgba(244, 239, 230, 0.94);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(8px);
+    }
+
+    .toolbar p {
+      margin: 0;
+      max-width: 40rem;
+      font-size: 0.92rem;
+      color: var(--ink-soft);
+      line-height: 1.45;
+    }
+
+    .toolbar-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .btn {
+      appearance: none;
+      border: 1px solid transparent;
+      border-radius: 0.55rem;
+      padding: 0.55rem 1rem;
+      font: inherit;
+      font-weight: 600;
+      font-size: 0.92rem;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: var(--gold);
+      color: var(--ink);
+    }
+
+    .btn-primary:hover { filter: brightness(1.05); }
+
+    .btn-secondary {
+      background: var(--white);
+      border-color: var(--border);
+      color: var(--ink);
+    }
+
+    .stage {
+      padding: 1.5rem 1rem 3rem;
+      display: flex;
+      justify-content: center;
+    }
+
+    .sheet {
+      width: min(100%, 297mm);
+      aspect-ratio: 297 / 210;
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.7), rgba(244, 239, 230, 0.35)),
+        var(--paper);
+      border: 1px solid var(--border);
+      box-shadow: 0 18px 50px rgba(28, 25, 21, 0.12);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .sheet::before {
+      content: "";
+      position: absolute;
+      inset: 10mm;
+      border: 1.5px solid rgba(201, 162, 39, 0.55);
+      pointer-events: none;
+    }
+
+    .sheet::after {
+      content: "";
+      position: absolute;
+      inset: 12.5mm;
+      border: 1px solid rgba(47, 59, 46, 0.18);
+      pointer-events: none;
+    }
+
+    .sheet-inner {
+      position: relative;
+      z-index: 1;
+      height: 100%;
+      padding: 16mm 18mm 14mm;
+      display: grid;
+      grid-template-rows: auto auto 1fr auto auto;
+      gap: 0.55rem;
+      text-align: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+    }
+
+    .brand img {
+      width: 48px;
+      height: 48px;
+      display: block;
+    }
+
+    .brand-text {
+      text-align: left;
+    }
+
+    .brand-name {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: var(--ink);
+    }
+
+    .brand-place {
+      margin: 0.1rem 0 0;
+      font-size: 0.78rem;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow {
+      margin: 0.35rem 0 0;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--gold-deep);
+    }
+
+    .title {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: clamp(1.7rem, 3.2vw, 2.35rem);
+      font-weight: 700;
+      line-height: 1.15;
+      color: var(--ink);
+    }
+
+    .subtitle {
+      margin: 0.15rem 0 0;
+      font-size: 0.95rem;
+      color: var(--ink-soft);
+    }
+
+    .body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 0.55rem;
+      padding: 0.35rem 0;
+    }
+
+    .lead {
+      margin: 0;
+      font-size: 1rem;
+      color: var(--ink-soft);
+    }
+
+    .field {
+      display: block;
+      width: min(100%, 28rem);
+      margin: 0 auto;
+      padding: 0.2rem 0.4rem;
+      border: none;
+      border-bottom: 1.5px solid rgba(201, 162, 39, 0.65);
+      background: transparent;
+      font: inherit;
+      text-align: center;
+      color: var(--ink);
+      outline: none;
+    }
+
+    .field:focus {
+      border-bottom-color: var(--gold);
+      background: rgba(201, 162, 39, 0.06);
+    }
+
+    .participant {
+      font-family: var(--font-script);
+      font-size: clamp(2rem, 4.2vw, 2.85rem);
+      line-height: 1.2;
+      border-bottom-width: 2px;
+      min-height: 1.3em;
+    }
+
+    .workshop {
+      font-family: var(--font-display);
+      font-size: clamp(1.15rem, 2.2vw, 1.45rem);
+      font-weight: 700;
+      min-height: 1.4em;
+    }
+
+    .meta {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+      margin-top: 0.35rem;
+      text-align: center;
+    }
+
+    .meta label {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.2rem;
+    }
+
+    .meta .field {
+      width: 100%;
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    .disclaimer {
+      margin: 0.2rem auto 0;
+      max-width: 42rem;
+      font-size: 0.78rem;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .signatures {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1rem;
+      align-items: end;
+      margin-top: 0.4rem;
+    }
+
+    .sign {
+      text-align: center;
+    }
+
+    .sign-line {
+      min-height: 2.4rem;
+      border-bottom: 1px solid rgba(28, 25, 21, 0.28);
+      margin-bottom: 0.35rem;
+      font-family: var(--font-script);
+      font-size: 1.45rem;
+      color: var(--river);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .sign-line[contenteditable="true"]:empty::before {
+      content: attr(data-placeholder);
+      color: rgba(107, 99, 88, 0.45);
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      font-style: italic;
+    }
+
+    .sign strong {
+      display: block;
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+
+    .sign span {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .foot {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      align-items: baseline;
+      margin-top: 0.35rem;
+      font-size: 0.72rem;
+      color: var(--muted);
+      letter-spacing: 0.02em;
+    }
+
+    .foot a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    @media (max-width: 900px) {
+      .sheet {
+        aspect-ratio: auto;
+        min-height: 210mm;
+      }
+
+      .meta,
+      .signatures {
+        grid-template-columns: 1fr;
+      }
+
+      .sheet-inner {
+        padding: 18mm 14mm;
+      }
+    }
+
+    @media print {
+      @page {
+        size: A4 landscape;
+        margin: 0;
+      }
+
+      body {
+        background: white;
+      }
+
+      .toolbar {
+        display: none !important;
+      }
+
+      .stage {
+        padding: 0;
+      }
+
+      .sheet {
+        width: 297mm;
+        height: 210mm;
+        aspect-ratio: auto;
+        border: none;
+        box-shadow: none;
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+
+      .field,
+      .sign-line {
+        border-bottom-color: rgba(28, 25, 21, 0.35);
+      }
+
+      .field:focus {
+        background: transparent;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <p>
+      Local <strong>studio diploma of attendance</strong> for workshop participants.
+      Fill the fields, then print or save as PDF. This is an Academy award, not Yoga Professionals Organisation Limited certification.
+    </p>
+    <div class="toolbar-actions">
+      <button class="btn btn-secondary" type="button" id="reset-fields">Clear fields</button>
+      <button class="btn btn-primary" type="button" id="print-diploma">Print / Save PDF</button>
+    </div>
+  </div>
+
+  <div class="stage">
+    <article class="sheet" aria-label="Workshop diploma of attendance">
+      <div class="sheet-inner">
+        <header class="brand">
+          <img src="../logo-twa.svg" width="48" height="48" alt="">
+          <div class="brand-text">
+            <p class="brand-name">Thames Wellness Academy</p>
+            <p class="brand-place">Berkshire · Reading</p>
+          </div>
+        </header>
+
+        <div>
+          <p class="eyebrow">Studio diploma of attendance</p>
+          <h1 class="title">Diploma of Attendance</h1>
+          <p class="subtitle">Specialist workshop programme</p>
+        </div>
+
+        <div class="body">
+          <p class="lead">This is to certify that</p>
+          <input class="field participant" id="participant" type="text" placeholder="Participant full name" autocomplete="name" aria-label="Participant full name">
+          <p class="lead">has attended and completed the workshop</p>
+          <input class="field workshop" id="workshop" type="text" placeholder="Workshop title" aria-label="Workshop title">
+          <div class="meta">
+            <div>
+              <label for="date">Date</label>
+              <input class="field" id="date" type="text" placeholder="e.g. 19 October 2026" aria-label="Workshop date">
+            </div>
+            <div>
+              <label for="duration">Duration</label>
+              <input class="field" id="duration" type="text" placeholder="e.g. Half-day / 6 hours" aria-label="Workshop duration">
+            </div>
+            <div>
+              <label for="location">Venue</label>
+              <input class="field" id="location" type="text" placeholder="e.g. Reading studio" aria-label="Workshop venue" value="Berkshire / Reading">
+            </div>
+          </div>
+          <p class="disclaimer">
+            Awarded by Thames Wellness Academy as a local studio diploma of attendance for workshop participation.
+            It is not a Yoga Professionals Organisation Limited teacher training certificate or regulated qualification.
+          </p>
+        </div>
+
+        <div class="signatures">
+          <div class="sign">
+            <div class="sign-line" contenteditable="true" data-placeholder="Sign here" role="textbox" aria-label="Signature: Katia Major"></div>
+            <strong>Katia Major</strong>
+            <span>Co-founder</span>
+          </div>
+          <div class="sign">
+            <div class="sign-line" contenteditable="true" data-placeholder="Sign here" role="textbox" aria-label="Signature: Raili Maripuu"></div>
+            <strong>Raili Maripuu</strong>
+            <span>Co-founder</span>
+          </div>
+          <div class="sign">
+            <div class="sign-line" contenteditable="true" data-placeholder="Optional seal / id" role="textbox" aria-label="Certificate reference" id="cert-ref"></div>
+            <strong>Certificate ref.</strong>
+            <span>TWA-WS-····</span>
+          </div>
+        </div>
+
+        <footer class="foot">
+          <span>thameswellnessacademy.co.uk</span>
+          <span>contact@thameswellness.com</span>
+        </footer>
+      </div>
+    </article>
+  </div>
+
+  <script>
+    (function () {
+      var printBtn = document.getElementById('print-diploma');
+      var resetBtn = document.getElementById('reset-fields');
+      var fields = ['participant', 'workshop', 'date', 'duration', 'location'];
+
+      printBtn.addEventListener('click', function () {
+        window.print();
+      });
+
+      resetBtn.addEventListener('click', function () {
+        fields.forEach(function (id) {
+          var el = document.getElementById(id);
+          if (!el) return;
+          if (id === 'location') {
+            el.value = 'Berkshire / Reading';
+          } else {
+            el.value = '';
+          }
+        });
+        document.querySelectorAll('.sign-line').forEach(function (line) {
+          line.textContent = '';
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

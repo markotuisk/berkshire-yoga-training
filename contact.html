@@ -28,7 +28,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Archivo:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/site.css?v=20261007c">
+  <link rel="stylesheet" href="css/site.css?v=20261019a">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"LocalBusiness","name":"Thames Wellness Academy","url":"https://thameswellnessacademy.co.uk/","email":"contact@thameswellness.com","areaServed":["Berkshire","Reading"]}</script>
 </head>
 <body>
@@ -475,14 +475,14 @@
         <div>
           <p class="eyebrow">Form</p>
           <h2 class="h3">Send a programme enquiry</h2>
-          <p class="lede">Use this form for the open day, Foundation Training, CPD, workshops or general questions. We review messages personally. To suggest a new course, use <a href="#suggest-course">Suggest a course</a> above.</p>
-          <form class="form-stack" action="/api/notify/lead" method="post" data-notify-form="contact" data-mailto-fallback="mailto:contact@thameswellness.com">
+          <p class="lede">Name, email and topic are required. Phone and message are optional. You will confirm your details before we send, and we email you a copy of everything submitted. To suggest a new course, use <a href="#suggest-course">Suggest a course</a> above.</p>
+          <form class="form-stack form-stack--compact" action="/api/notify/lead" method="post" data-notify-form="contact" data-confirm-details="1" data-mailto-fallback="mailto:contact@thameswellness.com">
             <label class="form-honeypot" aria-hidden="true">Company website<input name="website" tabindex="-1" autocomplete="off"></label>
             <label>Name<input name="name" required autocomplete="name"></label>
-            <label>Email <span class="form-optional">(or phone)</span><input type="email" name="email" autocomplete="email"></label>
-            <label>Phone <span class="form-optional">(or email)</span><input name="phone" autocomplete="tel"></label>
+            <label>Email<input type="email" name="email" required autocomplete="email"></label>
             <label>Topic
-              <select name="topic">
+              <select name="topic" required>
+                <option value="" disabled selected>Choose a topic</option>
                 <option value="Foundation Training" data-slug="foundation-training">Foundation Training</option>
                 <option value="Foundation Training 200 hours" data-slug="foundation-200">Foundation Training 200 hours</option>
                 <option value="Pregnancy Yoga Training" data-slug="pregnancy-yoga">Pregnancy Yoga Training</option>
@@ -499,9 +499,10 @@
                 <option value="Other" data-slug="other">Other</option>
               </select>
             </label>
-            <label>Courses of interest<textarea name="courses" placeholder="Foundation 200 hour TT, Pregnancy Yoga Training, Functional Anatomy, Sound Facilitator, Yoga Nidra"></textarea></label>
-            <label>Message<textarea name="message" required></textarea></label>
-            <button class="btn btn-primary" type="submit" data-cta="contact-form">Send message</button>
+            <label>Phone <span class="form-optional">(optional)</span><input name="phone" autocomplete="tel"></label>
+            <label>Message <span class="form-optional">(optional)</span><textarea name="message" rows="3" placeholder="Anything else we should know?"></textarea></label>
+            <button class="btn btn-primary" type="submit" data-cta="contact-form">Review and send</button>
+            <p class="form-notify-status" role="status" aria-live="polite" hidden></p>
           </form>
         </div>
         <div class="course-card contact-side-card">
@@ -645,6 +646,6 @@
       <span class="footer-cutout-text">Thames Wellness Academy</span>
     </div>
   </footer>
-  <script src="js/main.js?v=20261008"></script>
+  <script src="js/main.js?v=20261019a"></script>
 </body>
 </html>
