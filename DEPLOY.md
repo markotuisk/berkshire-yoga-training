@@ -87,17 +87,21 @@ Daily cron `/api/cron/course-reminders` sends −14 / −7 / −3 day reminders 
 | Secret | Purpose |
 |--------|---------|
 | `RESEND_API_KEY` | Send all automated mail |
-| `COURSE_SHEETS_WEBHOOK_URL` | Apps Script `/exec` URL |
-| `COURSE_SHEETS_SECRET` | Shared with Apps Script + mark-paid auth |
+| `COURSE_SHEETS_SPREADSHEET_ID` | Live leads Sheet id |
+| `GOOGLE_SERVICE_ACCOUNT_JSON` | Sheets API writes (Editor on the Sheet) |
+| `COURSE_SHEETS_SECRET` | Auth for mark-paid (+ optional Apps Script) |
+| `COURSE_SHEETS_WEBHOOK_URL` | Optional Apps Script `/exec` fallback |
 | `CRON_SECRET` | Auth for `/api/cron/course-reminders` |
 
 ```bash
 npx wrangler pages secret put RESEND_API_KEY --project-name=berkshire-yoga-training
-npx wrangler pages secret put COURSE_SHEETS_WEBHOOK_URL --project-name=berkshire-yoga-training
+npx wrangler pages secret put COURSE_SHEETS_SPREADSHEET_ID --project-name=berkshire-yoga-training
+npx wrangler pages secret put GOOGLE_SERVICE_ACCOUNT_JSON --project-name=berkshire-yoga-training
 npx wrangler pages secret put COURSE_SHEETS_SECRET --project-name=berkshire-yoga-training
 npx wrangler pages secret put CRON_SECRET --project-name=berkshire-yoga-training
 ```
 
-Sheet setup and column reference: [`docs/COURSE-EMAIL-SHEET.md`](docs/COURSE-EMAIL-SHEET.md). Apps Script source: [`docs/course-sheets-apps-script.js`](docs/course-sheets-apps-script.js).
+Live Sheet: https://docs.google.com/spreadsheets/d/1RpJ-Opimnhr4-khVEDNgM8ZWkVUYsSNiRHG8gAQpLg8/edit  
+Setup and columns: [`docs/COURSE-EMAIL-SHEET.md`](docs/COURSE-EMAIL-SHEET.md). Apps Script source (fallback): [`docs/course-sheets-apps-script.js`](docs/course-sheets-apps-script.js).
 
 Visitor emails include course link + key details, founder contacts (Katia / Raili + `contact@thameswellness.com`), Apple and Google/Android calendar buttons, and QR codes for contact vCard (`/api/contacts/academy`) and calendar ICS (`/api/calendar/course`).
