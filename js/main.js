@@ -749,15 +749,19 @@
     }
   }
 
-  // Courses hub catalog filter (type chips + search)
-  const coursesCatalog = document.getElementById('courses-catalog-grid');
-  if (coursesCatalog) {
+  // Courses hub catalog filter (type chips + search) and card/list views
+  const coursesCatalogRoot = document.getElementById('courses-catalog');
+  const coursesCatalogGrid = document.getElementById('courses-catalog-grid');
+  if (coursesCatalogRoot && coursesCatalogGrid) {
     const searchInput = document.getElementById('courses-catalog-search');
     const chips = Array.from(document.querySelectorAll('.courses-catalog-chip'));
+    const viewButtons = Array.from(document.querySelectorAll('.courses-catalog-view-btn'));
     const countEl = document.getElementById('courses-catalog-count');
     const emptyEl = document.getElementById('courses-catalog-empty');
-    const cards = Array.from(coursesCatalog.querySelectorAll('.course-card'));
+    const listEl = document.getElementById('courses-catalog-list');
+    const cards = Array.from(coursesCatalogGrid.querySelectorAll('.course-card'));
     let activeType = 'all';
+    let activeView = 'cards';
 
     const params = new URLSearchParams(window.location.search);
     const typeFromQuery = (params.get('type') || params.get('category') || '').toLowerCase();
@@ -767,6 +771,15 @@
     if (requestedType && knownTypes.has(requestedType)) {
       activeType = requestedType;
     }
+    const viewFromQuery = (params.get('view') || '').toLowerCase();
+    if (viewFromQuery === 'list' || viewFromQuery === 'cards') {
+      activeView = viewFromQuery;
+    }
+
+    const monthNames = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
 
     const setActiveChip = (type) => {
       chips.forEach((chip) => {
@@ -776,44 +789,166 @@
       });
     };
 
+    const setActiveView = (view) => {
+      activeView = view === 'list' ? 'list' : 'cards';
+      coursesCatalogRoot.dataset.view = activeView;
+      viewButtons.forEach((btn) => {
+        const isActive = btn.dataset.view === activeView;
+        btn.classList.toggle('is-active', isActive);
+        btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+      });
+      if (listEl) listEl.hidden = activeView !== 'list';
+    };
+
+    const cardMatches = (card, q) => {
+      const type = (card.dataset.type || '').toLowerCase();
+      const haystack = [
+        card.dataset.search || '',
+        card.textContent || ''
+      ].join(' ').toLowerCase();
+      const typeMatch = activeType === 'all' || type === activeType;
+      const textMatch = !q || haystack.includes(q);
+      return typeMatch && textMatch;
+    };
+
+    const buildListView = (visibleCards) => {
+      if (!listEl) return;
+      listEl.innerHTML = '';
+      if (!visibleCards.length) return;
+
+      const dated = [];
+      const undated = [];
+      visibleCards.forEach((card) => {
+        const start = (card.dataset.start || '').trim();
+        if (/^\d{4}-\d{2}-\d{2}$/.test(start)) {
+          dated.push(card);
+        } else {
+          undated.push(card);
+        }
+      });
+
+      dated.sort((a, b) => String(a.dataset.start).localeCompare(String(b.dataset.start)));
+
+      const years = new Map();
+      dated.forEach((card) => {
+        const start = card.dataset.start;
+        const year = start.slice(0, 4);
+        const month = Number(start.slice(5, 7));
+        if (!years.has(year)) years.set(year, new Map());
+        const months = years.get(year);
+        if (!months.has(month)) months.set(month, []);
+        months.get(month).push(card);
+      });
+
+      const appendListItem = (ul, card) => {
+        const title = (card.querySelector('h3') || {}).textContent || 'Programme';
+        const summary = (card.querySelector('p') || {}).textContent || '';
+        const tag = (card.querySelector('.tag') || {}).textContent || '';
+        const cta = (card.querySelector('.card-link') || {}).textContent || 'Open';
+        const dateLabel = card.dataset.dateLabel || 'Dates on enquiry';
+        const li = document.createElement('li');
+        li.className = 'courses-catalog-list-item';
+        li.innerHTML =
+          '<a class="courses-catalog-list-link" href="' + card.getAttribute('href') + '">' +
+            '<span class="courses-catalog-list-date">' + dateLabel + '</span>' +
+            '<span class="courses-catalog-list-main">' +
+              (tag ? '<span class="courses-catalog-list-tag">' + tag + '</span>' : '') +
+              '<p class="courses-catalog-list-title">' + title + '</p>' +
+              (summary ? '<p class="courses-catalog-list-summary">' + summary + '</p>' : '') +
+            '</span>' +
+            '<span class="courses-catalog-list-cta">' + cta + '</span>' +
+          '</a>';
+        ul.appendChild(li);
+      };
+
+      years.forEach((months, year) => {
+        const yearBlock = document.createElement('section');
+        yearBlock.className = 'courses-catalog-year';
+        yearBlock.innerHTML = '<h3 class="courses-catalog-year-title">' + year + '</h3>';
+        const sortedMonths = Array.from(months.keys()).sort((a, b) => a - b);
+        sortedMonths.forEach((month) => {
+          const monthBlock = document.createElement('div');
+          monthBlock.className = 'courses-catalog-month';
+          monthBlock.innerHTML =
+            '<h4 class="courses-catalog-month-title">' + monthNames[month - 1] + '</h4>';
+          const ul = document.createElement('ul');
+          ul.className = 'courses-catalog-list-items';
+          months.get(month).forEach((card) => appendListItem(ul, card));
+          monthBlock.appendChild(ul);
+          yearBlock.appendChild(monthBlock);
+        });
+        listEl.appendChild(yearBlock);
+      });
+
+      if (undated.length) {
+        const yearBlock = document.createElement('section');
+        yearBlock.className = 'courses-catalog-year';
+        yearBlock.innerHTML = '<h3 class="courses-catalog-year-title">Dates on enquiry</h3>';
+        const monthBlock = document.createElement('div');
+        monthBlock.className = 'courses-catalog-month';
+        const ul = document.createElement('ul');
+        ul.className = 'courses-catalog-list-items';
+        undated.forEach((card) => appendListItem(ul, card));
+        monthBlock.appendChild(ul);
+        yearBlock.appendChild(monthBlock);
+        listEl.appendChild(yearBlock);
+      }
+    };
+
     const filterCourses = () => {
       const q = (searchInput ? searchInput.value : '').trim().toLowerCase();
-      let visible = 0;
+      const visibleCards = [];
 
       cards.forEach((card) => {
-        const type = (card.dataset.type || '').toLowerCase();
-        const haystack = [
-          card.dataset.search || '',
-          card.textContent || ''
-        ].join(' ').toLowerCase();
-        const typeMatch = activeType === 'all' || type === activeType;
-        const textMatch = !q || haystack.includes(q);
-        const match = typeMatch && textMatch;
+        const match = cardMatches(card, q);
         card.classList.toggle('is-hidden', !match);
-        if (match) visible += 1;
+        if (match) visibleCards.push(card);
       });
+
+      if (activeView === 'list') {
+        buildListView(visibleCards);
+      }
 
       if (countEl) {
         const label = activeType === 'all' ? 'programmes' : activeType;
-        countEl.textContent = visible === 1
+        countEl.textContent = visibleCards.length === 1
           ? 'Showing 1 ' + label.replace(/s$/, '')
-          : 'Showing ' + visible + ' ' + label;
+          : 'Showing ' + visibleCards.length + ' ' + label;
       }
-      if (emptyEl) emptyEl.hidden = visible > 0;
+      if (emptyEl) emptyEl.hidden = visibleCards.length > 0;
+    };
+
+    const writeUrlState = () => {
+      const url = new URL(window.location.href);
+      if (activeType === 'all') {
+        url.searchParams.delete('type');
+      } else {
+        url.searchParams.set('type', activeType);
+      }
+      if (activeView === 'cards') {
+        url.searchParams.delete('view');
+      } else {
+        url.searchParams.set('view', activeView);
+      }
+      window.history.replaceState({}, '', url);
     };
 
     setActiveChip(activeType);
+    setActiveView(activeView);
+
     chips.forEach((chip) => {
       chip.addEventListener('click', () => {
         activeType = chip.dataset.type || 'all';
         setActiveChip(activeType);
-        const url = new URL(window.location.href);
-        if (activeType === 'all') {
-          url.searchParams.delete('type');
-        } else {
-          url.searchParams.set('type', activeType);
-        }
-        window.history.replaceState({}, '', url);
+        writeUrlState();
+        filterCourses();
+      });
+    });
+
+    viewButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        setActiveView(btn.dataset.view || 'cards');
+        writeUrlState();
         filterCourses();
       });
     });
