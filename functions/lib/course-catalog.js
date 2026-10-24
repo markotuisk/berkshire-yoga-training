@@ -45,13 +45,13 @@ const BY_SLUG = {
     url: `${SITE}/courses/foundation-yoga-training/200-hour/open-day/`,
     summary: 'Free 2-hour Open Day introducing the 200-hour Foundation Training pathway.',
     details: [
-      'Date: Saturday 7 November 2026',
+      'Date: Saturday 21 November 2026',
       'Time: 12:00-14:00',
       'Free to attend',
       'Meet co-founders Katia Major and Raili Maripuu'
     ],
-    startDate: '2026-11-07',
-    endDate: '2026-11-07',
+    startDate: '2026-11-21',
+    endDate: '2026-11-21',
     startTime: '12:00',
     endTime: '14:00',
     venue: 'Berkshire / Reading (confirmed on registration)',

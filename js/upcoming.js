@@ -45,8 +45,8 @@
     {
       type: 'Open day',
       title: 'Open Day | Foundation Training 200 hours',
-      startDate: '2026-11-07',
-      lastSignupDate: '2026-11-05',
+      startDate: '2026-11-21',
+      lastSignupDate: '2026-11-19',
       free: true,
       hours: 2,
       hoursLabel: '2 hours',
