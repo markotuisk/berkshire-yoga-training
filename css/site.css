@@ -3512,11 +3512,11 @@ a.courses-catalog-chip:hover {
 }
 
 .journal-byline img {
-  width: 1.85rem;
-  height: 1.85rem;
-  border-radius: 50%;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 0.45rem;
   object-fit: cover;
-  object-position: center 15%;
+  object-position: center 18%;
   flex-shrink: 0;
 }
 
@@ -3527,7 +3527,17 @@ a.courses-catalog-chip:hover {
 }
 
 .page-hero .journal-byline {
-  margin: 0.65rem 0 0.15rem;
+  display: flex;
+  width: fit-content;
+  margin: 0.2rem 0 1.05rem;
+  gap: 0.8rem;
+  font-size: 1.05rem;
+}
+
+.page-hero .journal-byline img {
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 0.7rem;
 }
 
 .journal-card-cover {
