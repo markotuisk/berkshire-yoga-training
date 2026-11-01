@@ -2028,6 +2028,18 @@ a.courses-catalog-chip:hover {
   text-decoration: none;
 }
 
+.upcoming-related {
+  margin: 1rem 0 0;
+  max-width: 40rem;
+  font-size: 0.98rem;
+  color: var(--ink-soft);
+}
+
+.upcoming-related a {
+  font-weight: 700;
+  color: var(--ink);
+}
+
 .upcoming-gallery-track {
   display: flex;
   gap: 1rem;
