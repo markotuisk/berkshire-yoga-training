@@ -55,7 +55,7 @@ Agent authentication instructions: `/auth.md` (public read-only site; no OAuth o
 
 ## Courses
 
-- [Foundation Training](https://thameswellnessacademy.co.uk/courses/foundation-yoga-training/): 200-hour to 500-hour Yoga Professionals Organisation Limited certification with supervised practicum
+- [Foundation Training](https://thameswellnessacademy.co.uk/courses/foundation-yoga-training/): 200-hour to 500-hour Yoga Professionals Organisation Limited certification with supervised practicum. Supported by [SEO for Wellness](https://seoforwellness.com). Links to the evidence-informed and workshops Journal articles.
 - [CPD](https://thameswellnessacademy.co.uk/courses/cpd/): Continuing professional development for qualified teachers and practitioners
 - [Workshops](https://thameswellnessacademy.co.uk/courses/workshops/): Specialist short courses on topics such as breath work, menopause support and trauma-informed teaching
 - [Retreats](https://thameswellnessacademy.co.uk/courses/retreats/): Immersive retreat programmes combining academic rigour with restorative practice
