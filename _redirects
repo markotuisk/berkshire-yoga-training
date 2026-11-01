@@ -7,6 +7,9 @@
 
 # Sitemap: serve XML at both shapes (GSC must get 200 + XML, not HTML/redirect)
 /sitemap.xml/ /sitemap.xml 200
+
+# Journal RSS: serve the feed at both shapes
+/journal/feed.xml/ /journal/feed.xml 200
 /Sitemap.xml /sitemap.xml 301
 /SITEMAP.XML /sitemap.xml 301
 

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Thames Wellness Academy Journal</title>
+    <link>https://thameswellnessacademy.co.uk/journal</link>
+    <atom:link href="https://thameswellnessacademy.co.uk/journal/feed.xml" rel="self" type="application/rss+xml"/>
+    <description>Evidence-informed articles for yoga and wellness teachers from Thames Wellness Academy: teaching practice, research and specialist workshops.</description>
+    <language>en-GB</language>
+    <lastBuildDate>Sun, 01 Nov 2026 00:00:00 GMT</lastBuildDate>
+    <item>
+      <title>What are the entry requirements for 200h teacher training</title>
+      <link>https://thameswellnessacademy.co.uk/what-are-the-entry-requirements-for-200h-teacher-training</link>
+      <guid isPermaLink="true">https://thameswellnessacademy.co.uk/what-are-the-entry-requirements-for-200h-teacher-training</guid>
+      <pubDate>Sun, 01 Nov 2026 00:00:00 GMT</pubDate>
+      <dc:creator>Raili Maripuu</dc:creator>
+      <description>Entry requirements for 200-hour yoga teacher training at Thames Wellness Academy. The pathway is for people new to teaching. Free Open Day, 21 November 2026.</description>
+    </item>
+    <item>
+      <title>How to become a yoga teacher</title>
+      <link>https://thameswellnessacademy.co.uk/how-to-become-a-yoga-teacher</link>
+      <guid isPermaLink="true">https://thameswellnessacademy.co.uk/how-to-become-a-yoga-teacher</guid>
+      <pubDate>Sun, 01 Nov 2026 00:00:00 GMT</pubDate>
+      <dc:creator>Katia Major</dc:creator>
+      <description>How to become a yoga teacher in the UK: practise, complete an accredited course, then arrange insurance, first aid, and teaching experience. Free open days at Thames Wellness Academy.</description>
+    </item>
+    <item>
+      <title>Breath work in professional teaching practice</title>
+      <link>https://thameswellnessacademy.co.uk/journal/breath-work-in-teaching</link>
+      <guid isPermaLink="true">https://thameswellnessacademy.co.uk/journal/breath-work-in-teaching</guid>
+      <pubDate>Sat, 15 Aug 2026 00:00:00 GMT</pubDate>
+      <dc:creator>Thames Wellness Academy</dc:creator>
+      <description>How diaphragmatic breath work supports stress regulation and safe, inclusive class delivery for wellness educators in Berkshire.</description>
+    </item>
+    <item>
+      <title>Evidence-informed wellness education</title>
+      <link>https://thameswellnessacademy.co.uk/journal/evidence-informed-wellness-education</link>
+      <guid isPermaLink="true">https://thameswellnessacademy.co.uk/journal/evidence-informed-wellness-education</guid>
+      <pubDate>Sat, 08 Aug 2026 00:00:00 GMT</pubDate>
+      <dc:creator>SEO for Wellness</dc:creator>
+      <description>Why research collaboration matters for credible teacher training and CPD programmes at Thames Wellness Academy.</description>
+    </item>
+    <item>
+      <title>Workshop highlights and practitioner tips</title>
+      <link>https://thameswellnessacademy.co.uk/journal/workshops-specialist-client-needs</link>
+      <guid isPermaLink="true">https://thameswellnessacademy.co.uk/journal/workshops-specialist-client-needs</guid>
+      <pubDate>Sat, 01 Aug 2026 00:00:00 GMT</pubDate>
+      <dc:creator>SEO for Wellness</dc:creator>
+      <description>Insights from specialist workshops on sleep health, menopause support and trauma-informed teaching.</description>
+    </item>
+  </channel>
+</rss>

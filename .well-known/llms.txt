@@ -83,6 +83,7 @@ Each item lists the canonical article, the credited teacher, and the main intern
 - [Workshop highlights and practitioner tips](https://thameswellnessacademy.co.uk/journal/workshops-specialist-client-needs). Supported by [SEO for Wellness](https://seoforwellness.com). Links to workshops, CPD, Foundation Training, and the evidence-informed article.
 - [Evidence-informed wellness education](https://thameswellnessacademy.co.uk/journal/evidence-informed-wellness-education). Supported by [SEO for Wellness](https://seoforwellness.com). Links to Foundation Training, CPD, the teacher-training articles, and research.
 - [Journal index](https://thameswellnessacademy.co.uk/journal) and [authors](https://thameswellnessacademy.co.uk/journal/authors).
+- [Journal RSS feed](https://thameswellnessacademy.co.uk/journal/feed.xml): the five published articles, newest first. Pathway stubs are not included.
 
 ## Geographic focus
 
