@@ -3540,6 +3540,16 @@ a.courses-catalog-chip:hover {
   border-radius: 0.7rem;
 }
 
+.journal-byline--partner img {
+  object-fit: contain;
+  background: var(--white);
+  padding: 0.15rem;
+}
+
+.page-hero .journal-byline--partner img {
+  padding: 0.28rem;
+}
+
 .journal-card-cover {
   position: absolute;
   inset: 0;
