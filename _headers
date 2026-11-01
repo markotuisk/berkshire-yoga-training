@@ -26,6 +26,15 @@
 /.well-known/llms.txt
   Content-Type: text/plain; charset=utf-8
 
+/llms.txt
+  Content-Type: text/plain; charset=utf-8
+
+/.well-known/llms-full.txt
+  Content-Type: text/plain; charset=utf-8
+
+/llms-full.txt
+  Content-Type: text/plain; charset=utf-8
+
 /.well-known/security.txt
   Content-Type: text/plain; charset=utf-8
 

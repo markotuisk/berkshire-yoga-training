@@ -20,7 +20,9 @@ Example:
 curl -H "Accept: text/markdown" https://thameswellnessacademy.co.uk/
 ```
 
-Machine-readable site index: `/.well-known/llms.txt` (also at `/llms.txt`).
+Machine-readable site index: `https://thameswellnessacademy.co.uk/llms.txt` (same file at `/.well-known/llms.txt`).
+Full article text and internal links: `https://thameswellnessacademy.co.uk/llms-full.txt`.
+XML sitemap: `https://thameswellnessacademy.co.uk/sitemap.xml`.
 
 Agent authentication instructions: `/auth.md` (public read-only site; no OAuth or API registration required).
 
@@ -68,16 +70,19 @@ Agent authentication instructions: `/auth.md` (public read-only site; no OAuth o
 
 Studio partners: [Yoga Reading](https://yogareading.co.uk) (Katia Major) and [Goyoga Tallinn](https://goyoga.ee) (Raili Maripuu). Practitioner blessing and support from certified and lineage-led teachers within both studios underpins academy education and skills development.
 
-- [Raili Maripuu](https://thameswellnessacademy.co.uk/team#raili-maripuu): Co-founder; [Yoga Pros Senior Yoga Teacher](https://member.theyogapros.com/teacher/raili-maripuu); [AYRI In-Depth Study with Lino Miele](https://2607846.fs1.hubspotusercontent-na1.net/hubfs/2607846/Additional%20Qualifications/Diploma-AYRI-RailiMaripuu-Jun2016.pdf) (June 2016). Founder of [Goyoga Tallinn](https://www.goyoga.ee/en/teacher/raili-maripuu/) (2016 as Goyoga Estonia). Earlier: Estonian Association of the Phonographic Industry MD; IFPI Regional Adviser, Eastern Europe. [railimaripuu.com](https://railimaripuu.com), [LinkedIn](https://www.linkedin.com/in/railimaripuu).
-- [Katia Major](https://thameswellnessacademy.co.uk/team#katia-major): Co-founder; 300-hour Ashtanga and Yin teacher; Level 5 Soft Tissue Therapy (Sports and Injury Massage). Owner of [Yoga Reading](https://yogareading.co.uk/yoga-reading-teachers/). Earlier: international education projects (Abu Dhabi, Qatar). [katiamajor.com](https://www.katiamajor.com), [LinkedIn](https://www.linkedin.com/in/katia-major-845026162).
+- [Raili Maripuu](https://thameswellnessacademy.co.uk/team/raili-maripuu): Co-Founder and Faculty Lead Teacher. [Yoga Pros Senior Yoga Teacher](https://member.theyogapros.com/teacher/raili-maripuu); [AYRI In-Depth Study with Lino Miele](https://2607846.fs1.hubspotusercontent-na1.net/hubfs/2607846/Additional%20Qualifications/Diploma-AYRI-RailiMaripuu-Jun2016.pdf) (June 2016). Founder of [Goyoga Tallinn](https://www.goyoga.ee/en/teacher/raili-maripuu/) (2016 as Goyoga Estonia). Earlier: Estonian Association of the Phonographic Industry MD; IFPI Regional Adviser, Eastern Europe. [railimaripuu.com](https://railimaripuu.com), [LinkedIn](https://www.linkedin.com/in/railimaripuu).
+- [Katia Major](https://thameswellnessacademy.co.uk/team/katia-major): Co-Founder and Faculty Lead Teacher. 300-hour Ashtanga and Yin teacher; Level 5 Soft Tissue Therapy (Sports and Injury Massage). Owner of [Yoga Reading](https://yogareading.co.uk/yoga-reading-teachers/). Earlier: international education projects (Abu Dhabi, Qatar). [katiamajor.com](https://www.katiamajor.com), [LinkedIn](https://www.linkedin.com/in/katia-major-845026162).
 
 ## Journal articles
 
-- [How to become a yoga teacher](https://thameswellnessacademy.co.uk/how-to-become-a-yoga-teacher)
-- [What are the entry requirements for 200h teacher training](https://thameswellnessacademy.co.uk/what-are-the-entry-requirements-for-200h-teacher-training)
-- [Breath work in professional teaching practice](https://thameswellnessacademy.co.uk/journal/breath-work-in-teaching)
-- [Workshops for specialist client needs](https://thameswellnessacademy.co.uk/journal/workshops-specialist-client-needs)
-- [Evidence-informed wellness education](https://thameswellnessacademy.co.uk/journal/evidence-informed-wellness-education)
+Each item lists the canonical article, the credited teacher, and the main internal links.
+
+- [How to become a yoga teacher](https://thameswellnessacademy.co.uk/how-to-become-a-yoga-teacher). Teacher Training, 1 November 2026. By [Katia Major](https://thameswellnessacademy.co.uk/team/katia-major). Links to [200-hour entry requirements](https://thameswellnessacademy.co.uk/what-are-the-entry-requirements-for-200h-teacher-training), [Foundation Open Day, 21 November 2026](https://thameswellnessacademy.co.uk/courses/foundation-yoga-training/200-hour/open-day/), [200-hour course](https://thameswellnessacademy.co.uk/courses/foundation-yoga-training/200-hour/), [CPD Open Day, 29 January 2027](https://thameswellnessacademy.co.uk/courses/cpd/open-day/), and [contact](https://thameswellnessacademy.co.uk/contact).
+- [What are the entry requirements for 200h teacher training](https://thameswellnessacademy.co.uk/what-are-the-entry-requirements-for-200h-teacher-training). Teacher Training, 1 November 2026. By [Raili Maripuu](https://thameswellnessacademy.co.uk/team/raili-maripuu). Links to [How to become a yoga teacher](https://thameswellnessacademy.co.uk/how-to-become-a-yoga-teacher), [200-hour course](https://thameswellnessacademy.co.uk/courses/foundation-yoga-training/200-hour/), [Foundation Open Day](https://thameswellnessacademy.co.uk/courses/foundation-yoga-training/200-hour/open-day/), [Foundation Training](https://thameswellnessacademy.co.uk/courses/foundation-yoga-training/), [CPD](https://thameswellnessacademy.co.uk/courses/cpd/), [workshops](https://thameswellnessacademy.co.uk/courses/workshops/), [apply](https://thameswellnessacademy.co.uk/join), and [contact](https://thameswellnessacademy.co.uk/contact).
+- [Breath work in professional teaching practice](https://thameswellnessacademy.co.uk/journal/breath-work-in-teaching). Academy byline.
+- [Workshops for specialist client needs](https://thameswellnessacademy.co.uk/journal/workshops-specialist-client-needs). Academy byline.
+- [Evidence-informed wellness education](https://thameswellnessacademy.co.uk/journal/evidence-informed-wellness-education). Academy byline.
+- [Journal index](https://thameswellnessacademy.co.uk/journal) and [authors](https://thameswellnessacademy.co.uk/journal/authors).
 
 ## Geographic focus
 
