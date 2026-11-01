@@ -38,7 +38,7 @@ Agent authentication instructions: `/auth.md` (public read-only site; no OAuth o
 
 - [Home](https://thameswellnessacademy.co.uk/): Overview of programmes, standards and how to get started
 - [Yoga teacher training guide](https://thameswellnessacademy.co.uk/yoga-teacher-training/): Knowledge / discovery page for search intent around yoga teacher training; explains what, why and how, then routes to Foundation Training, CPD and workshops
-- [About](https://thameswellnessacademy.co.uk/about): Mission, values, story and milestones
+- [About](https://thameswellnessacademy.co.uk/about): Mission, values, story, and the company section. Founders and owners are [Raili Maripuu](https://thameswellnessacademy.co.uk/team/raili-maripuu) and [Katia Major](https://thameswellnessacademy.co.uk/team/katia-major). General contact: contact@thameswellness.com. Reading sessions are hosted with Yoga Reading, RG1 8NQ.
 - [Team](https://thameswellnessacademy.co.uk/team): Co-founders and faculty
 - [Location](https://thameswellnessacademy.co.uk/location): Berkshire and Thames Valley delivery locations
 - [Partners](https://thameswellnessacademy.co.uk/research/partners/): Founding studio partners Yoga Reading (Katia Major) and Goyoga Tallinn (Raili Maripuu)

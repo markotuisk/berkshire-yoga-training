@@ -3422,6 +3422,53 @@ a.courses-catalog-chip:hover {
   color: var(--river-mid);
 }
 
+.course-grid.course-grid--pair {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 800px) {
+  .course-grid.course-grid--pair {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.about-founder-card .journal-byline {
+  display: flex;
+  width: fit-content;
+  margin-bottom: 0.85rem;
+  gap: 0.75rem;
+  font-size: 1.05rem;
+}
+
+.about-founder-card .journal-byline img {
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 0.7rem;
+}
+
+.about-founder-card .teacher-entity-role {
+  margin: 0 0 0.65rem;
+}
+
+.about-founder-card p {
+  margin: 0 0 0.75rem;
+}
+
+.about-founder-card .card-link {
+  margin-top: auto;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--river-mid);
+}
+
+.about-company-facts {
+  margin-top: 1.75rem;
+}
+
+.about-company-facts a {
+  color: var(--river-mid);
+}
+
 .about-value-card {
   cursor: default;
 }
