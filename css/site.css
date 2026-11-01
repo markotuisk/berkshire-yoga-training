@@ -3442,6 +3442,7 @@ a.courses-catalog-chip:hover {
 }
 
 .journal-card {
+  position: relative;
   display: flex;
   flex-direction: column;
   text-decoration: none;
@@ -3482,6 +3483,72 @@ a.courses-catalog-chip:hover {
   margin: 0.4rem 0 0;
   color: var(--muted);
   font-size: 0.95rem;
+}
+
+.journal-byline-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.75rem;
+  margin-bottom: 0.55rem;
+}
+
+.journal-byline-row .meta {
+  margin: 0;
+}
+
+.journal-byline {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--ink);
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  text-decoration: none;
+}
+
+.journal-byline img {
+  width: 1.85rem;
+  height: 1.85rem;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center 15%;
+  flex-shrink: 0;
+}
+
+.journal-byline:hover,
+.journal-byline:focus-visible {
+  color: var(--gold);
+  text-decoration: none;
+}
+
+.page-hero .journal-byline {
+  margin: 0.65rem 0 0.15rem;
+}
+
+.journal-card-cover {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.journal-card h2 a,
+.journal-card h3 a {
+  position: relative;
+  z-index: 2;
+  color: inherit;
+  text-decoration: none;
+}
+
+.journal-card h2 a:hover,
+.journal-card h3 a:hover,
+.journal-card h2 a:focus-visible,
+.journal-card h3 a:focus-visible {
+  color: var(--gold);
 }
 
 /* FAQ */
@@ -5347,6 +5414,10 @@ body.lead-confirm-open {
   color: var(--river-mid);
   font-weight: 600;
   text-decoration: none;
+}
+
+.journal-author-articles .journal-byline {
+  color: var(--ink);
 }
 
 .journal-author-articles a:hover,
