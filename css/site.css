@@ -4464,6 +4464,16 @@ body.lead-confirm-open {
 
 .prose h2 {
   margin-top: 1.75rem;
+  font-size: clamp(1.35rem, 2.2vw, 1.7rem);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+.prose h3 {
+  margin-top: 1.5rem;
+  font-size: clamp(1.35rem, 2.2vw, 1.7rem);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
 }
 
 .prose .journal-note p {
