@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="545" height="682" viewBox="0 0 545 682" role="img" aria-label="Jo Harris">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ebe4d8"/>
+      <stop offset="55%" stop-color="#f4efe6"/>
+      <stop offset="100%" stop-color="#e4dccf"/>
+    </linearGradient>
+  </defs>
+  <rect width="545" height="682" fill="url(#bg)"/>
+  <circle cx="272.5" cy="250" r="92" fill="#d9d0c2"/>
+  <rect x="156" y="360" width="233" height="260" rx="116" fill="#d9d0c2"/>
+  <text x="272.5" y="620" text-anchor="middle" font-family="Archivo, Figtree, sans-serif" font-size="28" font-weight="700" fill="#3a342c">Jo Harris</text>
+</svg>

@@ -81,6 +81,17 @@
       photo: '../assets/team/yulia-wind.jpg',
       photoFallback: '../assets/team/yulia-wind.svg',
       profileUrl: '../team/yulia-wind.html'
+    },
+    {
+      id: 'jo-harris',
+      name: 'Jo Harris',
+      role: 'Lead Teacher · Pregnancy and Postnatal',
+      location: 'Reading',
+      specialties: ['Pregnancy Yoga', 'Postnatal Yoga', 'Yoga Nidra', 'CPD'],
+      bio: 'Yoga teacher and birth and postnatal doula supporting people through pregnancy, birth and motherhood.',
+      photo: '../assets/team/jo-harris.jpg',
+      photoFallback: '../assets/team/jo-harris.svg',
+      profileUrl: '../team/jo-harris.html'
     }
   ];
 
