@@ -5283,6 +5283,19 @@ body.lead-confirm-open {
   text-decoration: none;
 }
 
+.credential-issuer-text {
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.25;
+  text-decoration: none;
+}
+
+.credential-issuer-link .credential-issuer-text {
+  color: inherit;
+}
+
 .credential-issuer-link img {
   display: block;
   max-width: 6.5rem;
