@@ -101,6 +101,23 @@ const BY_SLUG = {
     startDate: '2027-10-02',
     venue: 'Berkshire / Reading'
   },
+  'ashtanga-assistant-tt': {
+    slug: 'ashtanga-assistant-tt',
+    title: 'Ashtanga Assistant Teacher Training 120hrs (invitation enquiry)',
+    url: `${SITE}/courses/ashtanga-assistant-teacher-training/`,
+    summary:
+      'Invitation-only Development Course (Level 1). Not open public enrolment. Foundation certificate required.',
+    details: [
+      'Cohort: from September 2027 · Exact module dates TBA',
+      'Fees: £1,450 · Deposit £450 · Payment plans available',
+      'Lead teacher: Raili Maripuu',
+      'Venue: Yoga Reading or CCG (confirmed for invitees)',
+      'Accreditation: Yoga Professionals Organisation Limited (YogaPros)'
+    ],
+    startDate: '2027-09-01',
+    venue: 'Yoga Reading or CCG',
+    locationLabel: 'Berkshire, Reading, United Kingdom'
+  },
   cpd: {
     slug: 'cpd',
     title: 'CPD courses',
@@ -130,6 +147,9 @@ BY_SLUG['foundation-yoga-training'] = BY_SLUG['foundation-200'];
 BY_SLUG['200-hour'] = BY_SLUG['foundation-200'];
 BY_SLUG.foundation = BY_SLUG['foundation-200'];
 BY_SLUG['open-day-200'] = BY_SLUG['open-day-foundation'];
+BY_SLUG['ashtanga-assistant-teacher-training'] = BY_SLUG['ashtanga-assistant-tt'];
+BY_SLUG['ashtanga-120'] = BY_SLUG['ashtanga-assistant-tt'];
+BY_SLUG['assistant-teacher-training'] = BY_SLUG['ashtanga-assistant-tt'];
 
 /**
  * @param {string} [slug]

@@ -989,6 +989,10 @@
     'open-day-foundation-training': 'open-day-foundation',
     'cpd-open-day': 'open-day-cpd',
     'open-day-cpd-courses': 'open-day-cpd',
+    'ashtanga-assistant-teacher-training': 'ashtanga-assistant-tt',
+    'ashtanga-120': 'ashtanga-assistant-tt',
+    'assistant-teacher-training': 'ashtanga-assistant-tt',
+    'ashtanga-assistant': 'ashtanga-assistant-tt',
     'not-sure-yet': 'not-sure',
     suggest: 'suggest-course',
     'suggest-a-course': 'suggest-course'
@@ -997,6 +1001,7 @@
   const COURSE_TEXTAREA = {
     'foundation-training': 'Foundation Training',
     'foundation-200': 'Foundation 200 hour TT',
+    'ashtanga-assistant-tt': 'Ashtanga Assistant Teacher Training (invitation enquiry)',
     'pregnancy-yoga': 'Pregnancy Yoga Training',
     'functional-anatomy': 'Functional Anatomy Training',
     'yoga-nidra': 'Yoga Nidra Training',

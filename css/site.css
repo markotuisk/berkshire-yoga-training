@@ -2588,6 +2588,13 @@ a.courses-catalog-chip:hover {
   margin: 1rem 0 1.25rem;
 }
 
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  align-items: center;
+}
+
 .chip {
   display: inline-flex;
   padding: 0.35rem 0.7rem;
