@@ -145,15 +145,26 @@
   const notifySessionKey = 'twa_notify_sid';
   const getSessionId = () => {
     try {
-      let id = sessionStorage.getItem(notifySessionKey);
+      let id = sessionStorage.getItem(notifySessionKey) || localStorage.getItem(notifySessionKey);
       if (!id) {
         id = `s_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 10)}`;
-        sessionStorage.setItem(notifySessionKey, id);
       }
+      sessionStorage.setItem(notifySessionKey, id);
+      localStorage.setItem(notifySessionKey, id);
       return id;
     } catch {
       return `s_${Date.now().toString(36)}`;
     }
+  };
+
+  const rotateSessionId = () => {
+    try {
+      sessionStorage.removeItem(notifySessionKey);
+      localStorage.removeItem(notifySessionKey);
+    } catch {
+      /* ignore */
+    }
+    return getSessionId();
   };
 
   const courseSlugFromHref = (href) => {
@@ -558,6 +569,200 @@
     }
   });
 
+  // Join form draft: keep answers for this browser session until Submit enquiry
+  const JOIN_DRAFT_KEY = 'twa_join_draft_v1';
+  const JOIN_SUBMITTED_KEY = 'twa_join_submitted_sessions_v1';
+  const JOIN_DRAFT_SKIP = new Set(['website', 'company_url']);
+
+  const readJsonStorage = (key, fallback) => {
+    try {
+      const raw = localStorage.getItem(key);
+      if (!raw) return fallback;
+      return JSON.parse(raw);
+    } catch {
+      return fallback;
+    }
+  };
+
+  const writeJsonStorage = (key, value) => {
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch {
+      /* private mode / quota */
+    }
+  };
+
+  const getSubmittedJoinSessions = () => {
+    const list = readJsonStorage(JOIN_SUBMITTED_KEY, []);
+    return Array.isArray(list) ? list.map(String) : [];
+  };
+
+  const markJoinSessionSubmitted = (sessionId) => {
+    if (!sessionId) return;
+    const next = getSubmittedJoinSessions().filter((id) => id !== sessionId);
+    next.push(sessionId);
+    writeJsonStorage(JOIN_SUBMITTED_KEY, next.slice(-30));
+  };
+
+  const isJoinSessionSubmitted = (sessionId) =>
+    getSubmittedJoinSessions().includes(String(sessionId || ''));
+
+  const collectJoinDraftValues = (form) => {
+    /** @type {Record<string, string>} */
+    const values = {};
+    form.querySelectorAll('input, select, textarea').forEach((el) => {
+      if (!(el instanceof HTMLInputElement || el instanceof HTMLSelectElement || el instanceof HTMLTextAreaElement)) {
+        return;
+      }
+      const name = el.name;
+      if (!name || JOIN_DRAFT_SKIP.has(name) || el.type === 'submit' || el.type === 'button') return;
+      if (el.type === 'checkbox' || el.type === 'radio') {
+        if (el.checked) values[name] = el.value;
+        return;
+      }
+      // Keep draft values even when foundation fields are temporarily disabled
+      values[name] = el.value;
+    });
+    return values;
+  };
+
+  const applyJoinDraftValues = (form, values) => {
+    if (!values || typeof values !== 'object') return;
+    Object.entries(values).forEach(([name, value]) => {
+      const field = form.querySelector(`[name="${CSS.escape(name)}"]`);
+      if (!(field instanceof HTMLInputElement || field instanceof HTMLSelectElement || field instanceof HTMLTextAreaElement)) {
+        return;
+      }
+      if (field.type === 'checkbox' || field.type === 'radio') {
+        field.checked = field.value === value;
+        return;
+      }
+      field.disabled = false;
+      field.value = String(value == null ? '' : value);
+    });
+    syncJoinFoundationFields(form);
+  };
+
+  const setJoinDraftStatus = (form, message, state) => {
+    let status = form.querySelector('[data-join-draft-status]');
+    if (!status) {
+      status = document.createElement('p');
+      status.className = 'form-draft-status';
+      status.setAttribute('data-join-draft-status', '');
+      status.setAttribute('role', 'status');
+      status.setAttribute('aria-live', 'polite');
+      const submitBtn = form.querySelector('[type="submit"]');
+      if (submitBtn) form.insertBefore(status, submitBtn);
+      else form.appendChild(status);
+    }
+    if (!message) {
+      status.hidden = true;
+      status.textContent = '';
+      status.removeAttribute('data-state');
+      return;
+    }
+    status.hidden = false;
+    status.textContent = message;
+    if (state) status.dataset.state = state;
+    else status.removeAttribute('data-state');
+  };
+
+  const saveJoinDraft = (form, { silent } = {}) => {
+    const sessionId = getSessionId();
+    if (isJoinSessionSubmitted(sessionId)) {
+      try {
+        localStorage.removeItem(JOIN_DRAFT_KEY);
+      } catch {
+        /* ignore */
+      }
+      return false;
+    }
+    const values = collectJoinDraftValues(form);
+    const hasContent = Object.values(values).some((v) => String(v || '').trim());
+    if (!hasContent) {
+      try {
+        localStorage.removeItem(JOIN_DRAFT_KEY);
+      } catch {
+        /* ignore */
+      }
+      if (!silent) setJoinDraftStatus(form, '');
+      return false;
+    }
+    writeJsonStorage(JOIN_DRAFT_KEY, {
+      sessionId,
+      savedAt: new Date().toISOString(),
+      values
+    });
+    if (!silent) {
+      setJoinDraftStatus(
+        form,
+        'Draft saved in this browser. You can leave and come back to edit until you submit.',
+        'saved'
+      );
+    }
+    return true;
+  };
+
+  const clearJoinDraftAfterSubmit = (form) => {
+    const sessionId = getSessionId();
+    markJoinSessionSubmitted(sessionId);
+    try {
+      localStorage.removeItem(JOIN_DRAFT_KEY);
+    } catch {
+      /* ignore */
+    }
+    rotateSessionId();
+    setJoinDraftStatus(
+      form,
+      'Enquiry submitted. This draft can no longer be restored.',
+      'locked'
+    );
+  };
+
+  const restoreJoinDraft = (form) => {
+    const sessionId = getSessionId();
+    if (isJoinSessionSubmitted(sessionId)) {
+      try {
+        localStorage.removeItem(JOIN_DRAFT_KEY);
+      } catch {
+        /* ignore */
+      }
+      setJoinDraftStatus(
+        form,
+        'An enquiry was already submitted in this browser session. Start a new one below if needed.',
+        'locked'
+      );
+      return false;
+    }
+
+    const draft = readJsonStorage(JOIN_DRAFT_KEY, null);
+    if (!draft || typeof draft !== 'object') return false;
+    if (String(draft.sessionId || '') !== sessionId) return false;
+    if (!draft.values || typeof draft.values !== 'object') return false;
+
+    applyJoinDraftValues(form, draft.values);
+    setJoinDraftStatus(
+      form,
+      'Draft restored. You can keep editing until you submit the enquiry.',
+      'restored'
+    );
+    return true;
+  };
+
+  document.querySelectorAll('form[data-notify-form="join"]').forEach((form) => {
+    let draftTimer = 0;
+    const queueDraftSave = () => {
+      window.clearTimeout(draftTimer);
+      draftTimer = window.setTimeout(() => saveJoinDraft(form), 400);
+    };
+
+    restoreJoinDraft(form);
+
+    form.addEventListener('input', queueDraftSave);
+    form.addEventListener('change', queueDraftSave);
+    window.addEventListener('pagehide', () => saveJoinDraft(form, { silent: true }));
+  });
+
   // Enquiry forms → /api/notify/lead (Discord), mailto fallback if API unavailable
   document.querySelectorAll('form.form-stack[data-notify-form]').forEach((form) => {
     form.addEventListener('submit', async (event) => {
@@ -754,7 +959,13 @@
               'Thank you. Your enquiry has been sent. Please check your email for a confirmation.',
             true
           );
+          if (formSource === 'join') {
+            clearJoinDraftAfterSubmit(form);
+          }
           form.reset();
+          if (formSource === 'join') {
+            syncJoinFoundationFields(form);
+          }
           restoreBtn();
           return;
         }

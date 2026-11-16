@@ -3752,6 +3752,23 @@ a.courses-catalog-chip:hover {
   color: #7a3b2e;
 }
 
+.form-draft-status {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--ink-soft);
+  line-height: 1.4;
+}
+
+.form-draft-status[data-state="saved"],
+.form-draft-status[data-state="restored"] {
+  color: var(--river-deep, #2f3b2e);
+}
+
+.form-draft-status[data-state="locked"] {
+  color: #7a3b2e;
+}
+
 .form-optional {
   font-weight: 400;
   color: var(--muted);
