@@ -3826,6 +3826,10 @@ a.courses-catalog-chip:hover {
   gap: 1rem;
 }
 
+.form-stack [data-join-general-fields][hidden] {
+  display: none;
+}
+
 .form-contact-channel {
   margin: 0;
   padding: 0;

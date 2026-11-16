@@ -611,9 +611,13 @@
     }
 
     if (experienceInput instanceof HTMLTextAreaElement) {
+      // Foundation applications already cover practice history; do not ask twice.
       experienceInput.disabled = showFoundation;
       experienceInput.required = !showFoundation;
-      if (showFoundation) experienceInput.value = '';
+      if (showFoundation) {
+        experienceInput.value = '';
+        experienceInput.removeAttribute('required');
+      }
     }
 
     syncJoinContactLabels(form);
