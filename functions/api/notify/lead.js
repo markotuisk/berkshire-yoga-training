@@ -131,31 +131,15 @@ export async function onRequestPost(context) {
   }
 
   const name = cleanText(body.name, 160);
-  const contactChannel = cleanText(body.contactChannel, 20).toLowerCase();
   let email = cleanText(body.email, 200).toLowerCase();
   let phone = cleanText(body.phone, 60);
   // Keep email and phone in separate Sheet columns; never cross-fill.
-  if (contactChannel === 'email') {
-    phone = '';
-  } else if (contactChannel === 'phone') {
-    email = '';
-  } else if (email && phone) {
-    // If both arrived without a channel choice, prefer typed shape.
-    if (EMAIL_RE.test(email) && EMAIL_RE.test(phone)) {
-      phone = '';
-    } else if (!EMAIL_RE.test(email) && EMAIL_RE.test(phone)) {
-      email = phone.toLowerCase();
-      phone = '';
-    } else if (EMAIL_RE.test(email) && !EMAIL_RE.test(phone)) {
-      // already separated correctly
-    }
-  }
   if (phone && EMAIL_RE.test(phone)) {
     if (!email) email = phone.toLowerCase();
     phone = '';
   }
-  if (email && !EMAIL_RE.test(email) && !EMAIL_RE.test(phone)) {
-    // Digits-only "email" almost certainly belongs in phone.
+  if (email && !EMAIL_RE.test(email)) {
+    // Digits-only value in email almost certainly belongs in phone.
     const digits = email.replace(/\D/g, '');
     if (digits.length >= 7 && !email.includes('@')) {
       if (!phone) phone = email;

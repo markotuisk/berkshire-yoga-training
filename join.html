@@ -28,7 +28,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Archivo:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/site.css?v=20261116d">
+  <link rel="stylesheet" href="css/site.css?v=20261116e">
   
 </head>
 <body>
@@ -320,36 +320,26 @@
     <form class="form-stack form-stack--application" action="/api/notify/lead" method="post" data-notify-form="join" data-mailto-fallback="mailto:contact@thameswellness.com" id="join-form">
       <label class="form-honeypot" aria-hidden="true">Company website<input name="website" tabindex="-1" autocomplete="off"></label>
 
-      <label>Please tell us your name
+      <p class="form-help" data-join-form-help>Fields marked <span class="form-required">required</span> must be completed. For contact details, leave at least an email or a phone number.</p>
+
+      <label>Please tell us your name <span class="form-required">required</span>
         <input name="name" required autocomplete="name">
       </label>
 
-      <fieldset class="form-contact-channel" data-join-contact-channel>
-        <legend>How should we contact you?</legend>
-        <p class="form-application-lede" data-join-contact-hint>Choose email or phone first. Only that detail is saved to the matching sheet column.</p>
-        <div class="form-choice-row" role="radiogroup" aria-label="Contact method">
-          <label class="form-choice">
-            <input type="radio" name="contactChannel" value="email" checked data-join-contact-choice>
-            <span>Email</span>
-          </label>
-          <label class="form-choice" data-join-phone-choice>
-            <input type="radio" name="contactChannel" value="phone" data-join-contact-choice>
-            <span>Phone</span>
-          </label>
-        </div>
-      </fieldset>
-
       <label data-join-email-wrap>
         <span data-join-email-label>Please tell us your email</span>
+        <span class="form-required" data-join-email-req>required if no phone</span>
         <input type="email" name="email" autocomplete="email" inputmode="email" data-join-email>
       </label>
 
-      <label data-join-phone-wrap hidden>Please tell us your phone number
+      <label data-join-phone-wrap>
+        Please tell us your phone number
+        <span class="form-optional" data-join-phone-req>optional if you leave an email</span>
         <input type="tel" name="phone" autocomplete="tel" inputmode="tel" data-join-phone>
       </label>
 
-      <label>Interest
-        <select name="interest" data-join-interest>
+      <label>Interest <span class="form-required">required</span>
+        <select name="interest" data-join-interest required>
           <option value="Foundation Training" data-slug="foundation-training">Foundation Training</option>
           <option value="Foundation Training 200 hours" data-slug="foundation-200">Foundation Training 200 hours</option>
           <option value="Foundation Training 300 hours" data-slug="foundation-300">Foundation Training 300 hours</option>
@@ -367,48 +357,48 @@
       </label>
 
       <div data-join-general-fields>
-        <label>Your experience
+        <label>Your experience <span class="form-required">required</span>
           <textarea name="experience" required placeholder="Tell us about your practice and goals" data-join-experience></textarea>
         </label>
       </div>
 
       <fieldset class="form-application" data-join-foundation-fields hidden>
         <legend>Foundation Training application</legend>
-        <p class="form-application-lede">These questions help faculty review your place on Foundation Training pathways (200-hour, 300-hour and related).</p>
+        <p class="form-application-lede">All questions below are <span class="form-required">required</span>. They help faculty review your place on Foundation Training pathways (200-hour, 300-hour and related).</p>
 
-        <label>And your date of birth
+        <label>And your date of birth <span class="form-required">required</span>
           <input type="date" name="dateOfBirth" autocomplete="bday" data-foundation-field>
         </label>
 
-        <label>When did you start practising yoga and what form of yoga?
+        <label>When did you start practising yoga and what form of yoga? <span class="form-required">required</span>
           <textarea name="yogaPracticeStart" rows="3" data-foundation-field placeholder="Year or period, and the style or method you practise"></textarea>
         </label>
 
-        <label>Who is your current main yoga teacher?
+        <label>Who is your current main yoga teacher? <span class="form-required">required</span>
           <input name="mainYogaTeacher" data-foundation-field autocomplete="off">
         </label>
 
-        <label>What is your current profession/studies?
+        <label>What is your current profession/studies? <span class="form-required">required</span>
           <input name="professionStudies" data-foundation-field autocomplete="organization-title">
         </label>
 
-        <label>Education history/college/university/other
+        <label>Education history/college/university/other <span class="form-required">required</span>
           <textarea name="educationHistory" rows="3" data-foundation-field></textarea>
         </label>
 
-        <label>Do you have any experience of teaching in any context?
+        <label>Do you have any experience of teaching in any context? <span class="form-required">required</span>
           <textarea name="teachingExperience" rows="3" data-foundation-field></textarea>
         </label>
 
-        <label>Do you have any diagnosed medical conditions including mental health conditions?
+        <label>Do you have any diagnosed medical conditions including mental health conditions? <span class="form-required">required</span>
           <textarea name="medicalConditions" rows="3" data-foundation-field></textarea>
         </label>
 
-        <label>Please list any acute or chronic injuries that may need special attention
+        <label>Please list any acute or chronic injuries that may need special attention <span class="form-required">required</span>
           <textarea name="injuries" rows="3" data-foundation-field></textarea>
         </label>
 
-        <label>Write a brief overview describing your yoga journey, including why are you practising and why you think yoga is important in people’s lives.
+        <label>Write a brief overview describing your yoga journey, including why are you practising and why you think yoga is important in people’s lives. <span class="form-required">required</span>
           <textarea name="yogaJourney" rows="6" data-foundation-field></textarea>
         </label>
       </fieldset>
@@ -520,6 +510,6 @@
       <span class="footer-cutout-text">Thames Wellness Academy</span>
     </div>
   </footer>
-  <script src="js/main.js?v=20261116d"></script>
+  <script src="js/main.js?v=20261116e"></script>
 </body>
 </html>
