@@ -249,7 +249,11 @@ export async function onRequestPost(context) {
     'website',
     'company_url',
     'url',
-    ...FOUNDATION_APPLICATION_FIELDS.map((field) => field.key)
+    ...FOUNDATION_APPLICATION_FIELDS.map((field) => field.key),
+    'dobYear',
+    'dobMonth',
+    'dobDay',
+    'contactChannel'
   ]);
 
   /** @type {Array<{ name: string, value: string, inline?: boolean }>} */

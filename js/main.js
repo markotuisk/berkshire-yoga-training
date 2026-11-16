@@ -588,6 +588,146 @@
     }
   };
 
+  const DOB_MONTHS = [
+    ['01', 'January'],
+    ['02', 'February'],
+    ['03', 'March'],
+    ['04', 'April'],
+    ['05', 'May'],
+    ['06', 'June'],
+    ['07', 'July'],
+    ['08', 'August'],
+    ['09', 'September'],
+    ['10', 'October'],
+    ['11', 'November'],
+    ['12', 'December']
+  ];
+
+  const daysInMonth = (year, month) => {
+    const y = Number(year);
+    const m = Number(month);
+    if (!y || !m) return 31;
+    return new Date(y, m, 0).getDate();
+  };
+
+  const syncJoinDobValue = (form) => {
+    const yearEl = form.querySelector('[data-join-dob-year]');
+    const monthEl = form.querySelector('[data-join-dob-month]');
+    const dayEl = form.querySelector('[data-join-dob-day]');
+    const valueEl = form.querySelector('[data-join-dob-value]');
+    if (
+      !(yearEl instanceof HTMLSelectElement) ||
+      !(monthEl instanceof HTMLSelectElement) ||
+      !(dayEl instanceof HTMLSelectElement) ||
+      !(valueEl instanceof HTMLInputElement)
+    ) {
+      return '';
+    }
+    const year = yearEl.value;
+    const month = monthEl.value;
+    const day = dayEl.value;
+    if (year && month && day) {
+      valueEl.value = `${year}-${month}-${day}`;
+    } else {
+      valueEl.value = '';
+    }
+    return valueEl.value;
+  };
+
+  const refreshJoinDobDays = (form, { keepDay } = {}) => {
+    const yearEl = form.querySelector('[data-join-dob-year]');
+    const monthEl = form.querySelector('[data-join-dob-month]');
+    const dayEl = form.querySelector('[data-join-dob-day]');
+    if (
+      !(yearEl instanceof HTMLSelectElement) ||
+      !(monthEl instanceof HTMLSelectElement) ||
+      !(dayEl instanceof HTMLSelectElement)
+    ) {
+      return;
+    }
+    const previousDay = keepDay || dayEl.value;
+    const maxDay = daysInMonth(yearEl.value, monthEl.value);
+    dayEl.innerHTML = '<option value="">Day</option>';
+    for (let d = 1; d <= maxDay; d += 1) {
+      const value = String(d).padStart(2, '0');
+      const opt = document.createElement('option');
+      opt.value = value;
+      opt.textContent = String(d);
+      dayEl.appendChild(opt);
+    }
+    if (previousDay && Number(previousDay) <= maxDay) {
+      dayEl.value = previousDay;
+    }
+    syncJoinDobValue(form);
+  };
+
+  const setJoinDobFromIso = (form, iso) => {
+    const yearEl = form.querySelector('[data-join-dob-year]');
+    const monthEl = form.querySelector('[data-join-dob-month]');
+    const dayEl = form.querySelector('[data-join-dob-day]');
+    const valueEl = form.querySelector('[data-join-dob-value]');
+    if (
+      !(yearEl instanceof HTMLSelectElement) ||
+      !(monthEl instanceof HTMLSelectElement) ||
+      !(dayEl instanceof HTMLSelectElement)
+    ) {
+      return;
+    }
+    const match = String(iso || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (!match) {
+      yearEl.value = '';
+      monthEl.value = '';
+      refreshJoinDobDays(form);
+      if (valueEl instanceof HTMLInputElement) valueEl.value = '';
+      return;
+    }
+    yearEl.value = match[1];
+    monthEl.value = match[2];
+    refreshJoinDobDays(form, { keepDay: match[3] });
+  };
+
+  const initJoinDob = (form) => {
+    const yearEl = form.querySelector('[data-join-dob-year]');
+    const monthEl = form.querySelector('[data-join-dob-month]');
+    const dayEl = form.querySelector('[data-join-dob-day]');
+    if (
+      !(yearEl instanceof HTMLSelectElement) ||
+      !(monthEl instanceof HTMLSelectElement) ||
+      !(dayEl instanceof HTMLSelectElement)
+    ) {
+      return;
+    }
+    if (!yearEl.dataset.ready) {
+      const now = new Date();
+      const maxYear = now.getFullYear() - 16;
+      const minYear = 1925;
+      yearEl.innerHTML = '<option value="">Year</option>';
+      for (let y = maxYear; y >= minYear; y -= 1) {
+        const opt = document.createElement('option');
+        opt.value = String(y);
+        opt.textContent = String(y);
+        yearEl.appendChild(opt);
+      }
+      monthEl.innerHTML = '<option value="">Month</option>';
+      DOB_MONTHS.forEach(([value, label]) => {
+        const opt = document.createElement('option');
+        opt.value = value;
+        opt.textContent = label;
+        monthEl.appendChild(opt);
+      });
+      refreshJoinDobDays(form);
+      yearEl.dataset.ready = '1';
+      monthEl.dataset.ready = '1';
+    }
+
+    const onChange = () => {
+      refreshJoinDobDays(form, { keepDay: dayEl.value });
+    };
+    yearEl.addEventListener('change', onChange);
+    monthEl.addEventListener('change', onChange);
+    dayEl.addEventListener('change', () => syncJoinDobValue(form));
+  };
+
   const syncJoinFoundationFields = (form) => {
     if (!(form instanceof HTMLFormElement)) return;
     const interest = form.querySelector('[data-join-interest]');
@@ -600,11 +740,30 @@
     foundationBlock.hidden = !showFoundation;
 
     foundationBlock.querySelectorAll('[data-foundation-field]').forEach((field) => {
-      if (!(field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement)) return;
+      if (
+        !(
+          field instanceof HTMLInputElement ||
+          field instanceof HTMLTextAreaElement ||
+          field instanceof HTMLSelectElement
+        )
+      ) {
+        return;
+      }
       field.disabled = !showFoundation;
-      field.required = showFoundation;
+      if (field instanceof HTMLInputElement && field.type === 'hidden') {
+        field.required = false;
+      } else {
+        field.required = showFoundation;
+      }
       if (!showFoundation) field.value = '';
     });
+
+    if (!showFoundation) {
+      refreshJoinDobDays(form);
+      syncJoinDobValue(form);
+    } else {
+      syncJoinDobValue(form);
+    }
 
     if (generalBlock instanceof HTMLElement) {
       generalBlock.hidden = showFoundation;
@@ -624,6 +783,7 @@
   };
 
   document.querySelectorAll('form[data-notify-form="join"]').forEach((form) => {
+    initJoinDob(form);
     const interest = form.querySelector('[data-join-interest]');
     if (interest instanceof HTMLSelectElement) {
       interest.addEventListener('change', () => syncJoinFoundationFields(form));
@@ -634,7 +794,14 @@
   // Join form draft: keep answers for this browser session until Submit enquiry
   const JOIN_DRAFT_KEY = 'twa_join_draft_v1';
   const JOIN_SUBMITTED_KEY = 'twa_join_submitted_sessions_v1';
-  const JOIN_DRAFT_SKIP = new Set(['website', 'company_url', 'contactChannel']);
+  const JOIN_DRAFT_SKIP = new Set([
+    'website',
+    'company_url',
+    'contactChannel',
+    'dobYear',
+    'dobMonth',
+    'dobDay'
+  ]);
 
   const readJsonStorage = (key, fallback) => {
     try {
@@ -670,6 +837,7 @@
     getSubmittedJoinSessions().includes(String(sessionId || ''));
 
   const collectJoinDraftValues = (form) => {
+    syncJoinDobValue(form);
     /** @type {Record<string, string>} */
     const values = {};
     form.querySelectorAll('input, select, textarea').forEach((el) => {
@@ -691,6 +859,7 @@
   const applyJoinDraftValues = (form, values) => {
     if (!values || typeof values !== 'object') return;
     Object.entries(values).forEach(([name, value]) => {
+      if (name === 'dateOfBirth') return;
       const field = form.querySelector(`[name="${CSS.escape(name)}"]`);
       if (!(field instanceof HTMLInputElement || field instanceof HTMLSelectElement || field instanceof HTMLTextAreaElement)) {
         return;
@@ -703,6 +872,9 @@
       field.value = String(value == null ? '' : value);
     });
     syncJoinFoundationFields(form);
+    if (values.dateOfBirth) {
+      setJoinDobFromIso(form, values.dateOfBirth);
+    }
   };
 
   const setJoinDraftStatus = (form, message, state) => {
@@ -896,6 +1068,13 @@
             false
           );
           if (emailEl instanceof HTMLElement) emailEl.focus();
+          return;
+        }
+        const dob = syncJoinDobValue(form);
+        if (!dob) {
+          showStatus('Please choose your date of birth: year, then month, then day.', false);
+          const yearEl = form.querySelector('[data-join-dob-year]');
+          if (yearEl instanceof HTMLElement) yearEl.focus();
           return;
         }
       }

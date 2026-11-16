@@ -3907,6 +3907,39 @@ a.courses-catalog-chip:hover {
   line-height: 1.45;
 }
 
+.form-dob {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.form-dob-hint {
+  margin: 0;
+  font-size: 0.86rem;
+  font-weight: 400;
+  color: var(--ink-soft);
+}
+
+.form-dob-row {
+  display: grid;
+  grid-template-columns: 1.1fr 1.35fr 0.9fr;
+  gap: 0.55rem;
+}
+
+.form-dob-part {
+  display: grid;
+  gap: 0.3rem;
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+@media (max-width: 520px) {
+  .form-dob-row {
+    grid-template-columns: 1fr;
+  }
+}
+
 .form-application textarea {
   min-height: 5.5rem;
 }

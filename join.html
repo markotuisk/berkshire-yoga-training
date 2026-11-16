@@ -28,7 +28,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Archivo:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/site.css?v=20261116g">
+  <link rel="stylesheet" href="css/site.css?v=20261116h">
   
 </head>
 <body>
@@ -382,13 +382,34 @@
         <legend>Foundation Training application</legend>
         <p class="form-application-lede">All questions below are <span class="form-required">required</span>. They help faculty review your place on Foundation Training pathways (200-hour, 300-hour and related).</p>
 
-        <label>
+        <div class="form-dob" data-join-dob>
           <span class="form-label-row">
             <span>And your date of birth</span>
             <span class="form-required">required</span>
           </span>
-          <input type="date" name="dateOfBirth" autocomplete="bday" data-foundation-field>
-        </label>
+          <p class="form-dob-hint">Choose year first, then month, then day.</p>
+          <div class="form-dob-row">
+            <label class="form-dob-part">
+              <span>Year</span>
+              <select name="dobYear" data-join-dob-year data-foundation-field autocomplete="bday-year">
+                <option value="">Year</option>
+              </select>
+            </label>
+            <label class="form-dob-part">
+              <span>Month</span>
+              <select name="dobMonth" data-join-dob-month data-foundation-field autocomplete="bday-month">
+                <option value="">Month</option>
+              </select>
+            </label>
+            <label class="form-dob-part">
+              <span>Day</span>
+              <select name="dobDay" data-join-dob-day data-foundation-field autocomplete="bday-day">
+                <option value="">Day</option>
+              </select>
+            </label>
+          </div>
+          <input type="hidden" name="dateOfBirth" value="" data-join-dob-value data-foundation-field>
+        </div>
 
         <label>
           <span class="form-label-row">
@@ -562,6 +583,6 @@
       <span class="footer-cutout-text">Thames Wellness Academy</span>
     </div>
   </footer>
-  <script src="js/main.js?v=20261116g"></script>
+  <script src="js/main.js?v=20261116h"></script>
 </body>
 </html>
