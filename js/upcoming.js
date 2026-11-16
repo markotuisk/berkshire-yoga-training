@@ -8,7 +8,7 @@
 (function () {
   'use strict';
 
-  /** @typedef {'Course'|'CPD'|'Workshop'|'Retreat'|'Open day'} UpcomingType */
+  /** @typedef {'Course'|'CPD'|'Development'|'Workshop'|'Retreat'|'Open day'} UpcomingType */
   /** @typedef {'In studio'|'Livestream'} UpcomingFormat */
   /** @typedef {'gold'|'river'|'teal'|'ink'|'mist'} UpcomingTone */
 
@@ -133,6 +133,20 @@
       tone: 'teal'
     },
     {
+      type: 'Development',
+      title: 'Ashtanga Assistant Teacher Training 120hrs',
+      startDate: '2027-09-01',
+      lastSignupDate: '2027-08-15',
+      price: '£1,450',
+      hours: 120,
+      hoursLabel: '120 hours · Invitation only',
+      href: 'courses/ashtanga-assistant-teacher-training/',
+      location: 'Yoga Reading or CCG',
+      format: 'In studio',
+      teacher: 'Raili Maripuu',
+      tone: 'river'
+    },
+    {
       type: 'CPD',
       title: 'SoundBath Training',
       startDate: '2027-10-02',
@@ -157,6 +171,7 @@
   var TYPE_THEME = {
     Course: 'ink',
     CPD: 'mist',
+    Development: 'river',
     Workshop: 'gold',
     Retreat: 'river',
     'Open day': 'gold'
@@ -166,6 +181,7 @@
   function pathwayLabel(type) {
     if (type === 'Course') return 'Foundation';
     if (type === 'CPD') return 'CPD';
+    if (type === 'Development') return 'Development';
     if (type === 'Retreat') return 'Retreat';
     if (type === 'Open day') return 'Open day';
     return 'Workshop';
@@ -435,6 +451,7 @@
   function linkLabel(type) {
     if (type === 'Course') return 'Explore Foundation';
     if (type === 'CPD') return 'Explore CPD';
+    if (type === 'Development') return 'Request invitation';
     if (type === 'Retreat') return 'Explore retreat';
     if (type === 'Open day') return 'Find out more';
     return 'Explore workshop';
