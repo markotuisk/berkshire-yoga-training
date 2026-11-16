@@ -3793,6 +3793,53 @@ a.courses-catalog-chip:hover {
   gap: 1rem;
 }
 
+.form-contact-channel {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  display: grid;
+  gap: 0.65rem;
+  min-inline-size: 0;
+}
+
+.form-contact-channel legend {
+  padding: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.form-choice-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.form-choice {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0.55rem 0.85rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-control, var(--radius));
+  background: var(--white);
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.form-choice:has(input:checked) {
+  border-color: var(--gold);
+  background: var(--mist);
+}
+
+.form-choice input {
+  width: auto;
+  margin: 0;
+  accent-color: var(--gold);
+}
+
 .form-application {
   margin: 0;
   padding: 1.1rem 1.15rem 1.2rem;

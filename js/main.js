@@ -404,14 +404,53 @@
    * @param {boolean} requireEmail
    * @returns {string} empty when valid, else British English error
    */
+  const looksLikeEmail = (value) => EMAIL_RE.test(String(value || '').trim());
+  const looksLikePhone = (value) => {
+    const raw = String(value || '').trim();
+    if (!raw || looksLikeEmail(raw)) return false;
+    const digits = raw.replace(/\D/g, '');
+    return digits.length >= 7;
+  };
+
   const validateLeadContactChannel = (form, isJournalForm, requireEmail) => {
     const emailEl = form.querySelector('input[name="email"]');
     const phoneEl = form.querySelector('input[name="phone"]');
-    const email = emailEl instanceof HTMLInputElement ? emailEl.value.trim() : '';
-    const phone = phoneEl instanceof HTMLInputElement ? phoneEl.value.trim() : '';
+    const channelEl = form.querySelector('input[name="contactChannel"]:checked');
+    const channel =
+      channelEl instanceof HTMLInputElement ? channelEl.value : '';
+    let email = emailEl instanceof HTMLInputElement ? emailEl.value.trim() : '';
+    let phone = phoneEl instanceof HTMLInputElement ? phoneEl.value.trim() : '';
+
+    // Join form: keep email and phone in separate columns (never mix).
+    if (form.getAttribute('data-notify-form') === 'join' && channel) {
+      if (channel === 'email') {
+        phone = '';
+        if (phoneEl instanceof HTMLInputElement) phoneEl.value = '';
+      } else if (channel === 'phone') {
+        email = '';
+        if (emailEl instanceof HTMLInputElement) emailEl.value = '';
+      }
+    }
 
     if (isJournalForm || requireEmail) {
-      if (!email || !EMAIL_RE.test(email)) {
+      if (!email || !looksLikeEmail(email)) {
+        return 'Please enter a valid email address.';
+      }
+      return '';
+    }
+
+    if (form.getAttribute('data-notify-form') === 'join' && channel === 'phone') {
+      if (!looksLikePhone(phone)) {
+        return 'Please enter a valid phone number.';
+      }
+      if (looksLikeEmail(phone)) {
+        return 'That looks like an email. Choose Email, or enter a phone number.';
+      }
+      return '';
+    }
+
+    if (form.getAttribute('data-notify-form') === 'join' && channel === 'email') {
+      if (!email || !looksLikeEmail(email)) {
         return 'Please enter a valid email address.';
       }
       return '';
@@ -420,8 +459,11 @@
     if (!email && !phone) {
       return CONTACT_CHANNEL_MSG;
     }
-    if (email && !EMAIL_RE.test(email)) {
+    if (email && !looksLikeEmail(email)) {
       return 'Please enter a valid email address.';
+    }
+    if (phone && looksLikeEmail(phone)) {
+      return 'Please put email addresses in the email field, not the phone field.';
     }
     return '';
   };
@@ -520,13 +562,79 @@
     );
   };
 
+  const getJoinContactChannel = (form) => {
+    const checked = form.querySelector('input[name="contactChannel"]:checked');
+    return checked instanceof HTMLInputElement && checked.value === 'phone'
+      ? 'phone'
+      : 'email';
+  };
+
+  const syncJoinContactChannel = (form, { preserveOther } = {}) => {
+    if (!(form instanceof HTMLFormElement)) return;
+    const interest = form.querySelector('[data-join-interest]');
+    const showFoundation =
+      interest instanceof HTMLSelectElement &&
+      isFoundationApplicationInterest(interest);
+    const phoneChoice = form.querySelector('[data-join-phone-choice]');
+    const hint = form.querySelector('[data-join-contact-hint]');
+    const emailWrap = form.querySelector('[data-join-email-wrap]');
+    const phoneWrap = form.querySelector('[data-join-phone-wrap]');
+    const emailLabel = form.querySelector('[data-join-email-label]');
+    const emailInput = form.querySelector('[data-join-email]');
+    const phoneInput = form.querySelector('[data-join-phone]');
+    const emailRadio = form.querySelector('input[name="contactChannel"][value="email"]');
+    const phoneRadio = form.querySelector('input[name="contactChannel"][value="phone"]');
+
+    if (showFoundation) {
+      if (emailRadio instanceof HTMLInputElement) emailRadio.checked = true;
+      if (phoneRadio instanceof HTMLInputElement) {
+        phoneRadio.checked = false;
+        phoneRadio.disabled = true;
+      }
+      if (phoneChoice instanceof HTMLElement) phoneChoice.hidden = true;
+      if (hint instanceof HTMLElement) {
+        hint.textContent =
+          'Foundation Training needs an email so we can send course material. That address is saved only in the email column.';
+      }
+    } else {
+      if (phoneRadio instanceof HTMLInputElement) phoneRadio.disabled = false;
+      if (phoneChoice instanceof HTMLElement) phoneChoice.hidden = false;
+      if (hint instanceof HTMLElement) {
+        hint.textContent =
+          'Choose email or phone first. Only that detail is saved to the matching sheet column.';
+      }
+    }
+
+    const channel = showFoundation ? 'email' : getJoinContactChannel(form);
+    const useEmail = channel === 'email';
+
+    if (emailWrap instanceof HTMLElement) emailWrap.hidden = !useEmail;
+    if (phoneWrap instanceof HTMLElement) phoneWrap.hidden = useEmail;
+
+    if (emailLabel instanceof HTMLElement) {
+      emailLabel.textContent = showFoundation
+        ? 'Please tell us your email (the one you want course material sent to)'
+        : 'Please tell us your email';
+    }
+
+    if (emailInput instanceof HTMLInputElement) {
+      emailInput.disabled = !useEmail;
+      emailInput.required = useEmail;
+      if (!useEmail && !preserveOther) emailInput.value = '';
+    }
+
+    if (phoneInput instanceof HTMLInputElement) {
+      phoneInput.disabled = useEmail;
+      phoneInput.required = !useEmail;
+      if (useEmail && !preserveOther) phoneInput.value = '';
+    }
+  };
+
   const syncJoinFoundationFields = (form) => {
     if (!(form instanceof HTMLFormElement)) return;
     const interest = form.querySelector('[data-join-interest]');
     const foundationBlock = form.querySelector('[data-join-foundation-fields]');
     const generalBlock = form.querySelector('[data-join-general-fields]');
-    const emailLabel = form.querySelector('[data-join-email-label]');
-    const emailInput = form.querySelector('[data-join-email]');
     const experienceInput = form.querySelector('[data-join-experience]');
     if (!foundationBlock || !(interest instanceof HTMLSelectElement)) return;
 
@@ -550,29 +658,25 @@
       if (showFoundation) experienceInput.value = '';
     }
 
-    if (emailLabel instanceof HTMLElement) {
-      emailLabel.innerHTML = showFoundation
-        ? 'Please tell us your email (the one you want course material sent to)'
-        : 'Please tell us your email <span class="form-optional">(or phone)</span>';
-    }
-
-    if (emailInput instanceof HTMLInputElement) {
-      emailInput.required = showFoundation;
-    }
+    syncJoinContactChannel(form);
   };
 
   document.querySelectorAll('form[data-notify-form="join"]').forEach((form) => {
     const interest = form.querySelector('[data-join-interest]');
     if (interest instanceof HTMLSelectElement) {
       interest.addEventListener('change', () => syncJoinFoundationFields(form));
-      syncJoinFoundationFields(form);
     }
+    form.querySelectorAll('[data-join-contact-choice]').forEach((radio) => {
+      radio.addEventListener('change', () => syncJoinContactChannel(form));
+    });
+    syncJoinFoundationFields(form);
   });
 
   // Join form draft: keep answers for this browser session until Submit enquiry
   const JOIN_DRAFT_KEY = 'twa_join_draft_v1';
   const JOIN_SUBMITTED_KEY = 'twa_join_submitted_sessions_v1';
   const JOIN_DRAFT_SKIP = new Set(['website', 'company_url']);
+  // contactChannel radios are restored explicitly via applyJoinDraftValues
 
   const readJsonStorage = (key, fallback) => {
     try {
@@ -629,6 +733,15 @@
   const applyJoinDraftValues = (form, values) => {
     if (!values || typeof values !== 'object') return;
     Object.entries(values).forEach(([name, value]) => {
+      if (name === 'contactChannel') {
+        const radio = form.querySelector(
+          `input[name="contactChannel"][value="${CSS.escape(String(value))}"]`
+        );
+        if (radio instanceof HTMLInputElement && !radio.disabled) {
+          radio.checked = true;
+        }
+        return;
+      }
       const field = form.querySelector(`[name="${CSS.escape(name)}"]`);
       if (!(field instanceof HTMLInputElement || field instanceof HTMLSelectElement || field instanceof HTMLTextAreaElement)) {
         return;
@@ -641,6 +754,7 @@
       field.value = String(value == null ? '' : value);
     });
     syncJoinFoundationFields(form);
+    syncJoinContactChannel(form, { preserveOther: true });
   };
 
   const setJoinDraftStatus = (form, message, state) => {
@@ -824,6 +938,9 @@
       const interestSelect = form.querySelector('select[name="interest"]');
       const isFoundationJoin =
         formSource === 'join' && isFoundationApplicationInterest(interestSelect);
+      if (formSource === 'join') {
+        syncJoinContactChannel(form, { preserveOther: true });
+      }
       if (isFoundationJoin) {
         const emailEl = form.querySelector('input[name="email"]');
         const emailVal =

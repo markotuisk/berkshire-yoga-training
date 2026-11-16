@@ -28,7 +28,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Archivo:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/site.css?v=20261116c">
+  <link rel="stylesheet" href="css/site.css?v=20261116d">
   
 </head>
 <body>
@@ -324,12 +324,28 @@
         <input name="name" required autocomplete="name">
       </label>
 
-      <label data-join-email-label>Please tell us your email <span class="form-optional">(or phone)</span>
-        <input type="email" name="email" autocomplete="email" data-join-email>
+      <fieldset class="form-contact-channel" data-join-contact-channel>
+        <legend>How should we contact you?</legend>
+        <p class="form-application-lede" data-join-contact-hint>Choose email or phone first. Only that detail is saved to the matching sheet column.</p>
+        <div class="form-choice-row" role="radiogroup" aria-label="Contact method">
+          <label class="form-choice">
+            <input type="radio" name="contactChannel" value="email" checked data-join-contact-choice>
+            <span>Email</span>
+          </label>
+          <label class="form-choice" data-join-phone-choice>
+            <input type="radio" name="contactChannel" value="phone" data-join-contact-choice>
+            <span>Phone</span>
+          </label>
+        </div>
+      </fieldset>
+
+      <label data-join-email-wrap>
+        <span data-join-email-label>Please tell us your email</span>
+        <input type="email" name="email" autocomplete="email" inputmode="email" data-join-email>
       </label>
 
-      <label>Phone <span class="form-optional">(or email)</span>
-        <input name="phone" autocomplete="tel">
+      <label data-join-phone-wrap hidden>Please tell us your phone number
+        <input type="tel" name="phone" autocomplete="tel" inputmode="tel" data-join-phone>
       </label>
 
       <label>Interest
@@ -351,9 +367,6 @@
       </label>
 
       <div data-join-general-fields>
-        <label>Courses of interest
-          <textarea name="courses" placeholder="Foundation 200 hour TT, Pregnancy Yoga Training, Functional Anatomy, Sound Facilitator, Yoga Nidra"></textarea>
-        </label>
         <label>Your experience
           <textarea name="experience" required placeholder="Tell us about your practice and goals" data-join-experience></textarea>
         </label>
@@ -507,6 +520,6 @@
       <span class="footer-cutout-text">Thames Wellness Academy</span>
     </div>
   </footer>
-  <script src="js/main.js?v=20261116c"></script>
+  <script src="js/main.js?v=20261116d"></script>
 </body>
 </html>
