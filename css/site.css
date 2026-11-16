@@ -3767,6 +3767,49 @@ a.courses-catalog-chip:hover {
   min-height: 4.5rem;
 }
 
+.form-stack--application {
+  max-width: 40rem;
+}
+
+.form-stack [data-join-general-fields] {
+  display: grid;
+  gap: 1rem;
+}
+
+.form-application {
+  margin: 0;
+  padding: 1.1rem 1.15rem 1.2rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--mist);
+  display: grid;
+  gap: 1rem;
+}
+
+.form-application[hidden] {
+  display: none;
+}
+
+.form-application legend {
+  padding: 0 0.35rem;
+  font-family: var(--font-display, "Archivo", sans-serif);
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--ink);
+}
+
+.form-application-lede {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 400;
+  color: var(--ink-soft);
+  line-height: 1.45;
+}
+
+.form-application textarea {
+  min-height: 5.5rem;
+}
+
 /* Confirm details before send */
 body.lead-confirm-open {
   overflow: hidden;

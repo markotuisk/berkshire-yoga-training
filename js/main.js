@@ -493,6 +493,71 @@
     });
   };
 
+  // Join form: show Foundation Training intake questions for foundation pathways
+  const isFoundationApplicationInterest = (select) => {
+    if (!(select instanceof HTMLSelectElement)) return false;
+    const option = select.options[select.selectedIndex];
+    const slug = String(option?.dataset?.slug || '').toLowerCase();
+    const value = String(select.value || '').toLowerCase();
+    if (slug.includes('open-day') || value.includes('open day')) return false;
+    return (
+      slug === 'foundation-training' ||
+      slug === 'foundation-200' ||
+      slug === 'foundation-300' ||
+      (/foundation/.test(slug) && !/open-day/.test(slug)) ||
+      (/foundation/.test(value) && !/open day/.test(value))
+    );
+  };
+
+  const syncJoinFoundationFields = (form) => {
+    if (!(form instanceof HTMLFormElement)) return;
+    const interest = form.querySelector('[data-join-interest]');
+    const foundationBlock = form.querySelector('[data-join-foundation-fields]');
+    const generalBlock = form.querySelector('[data-join-general-fields]');
+    const emailLabel = form.querySelector('[data-join-email-label]');
+    const emailInput = form.querySelector('[data-join-email]');
+    const experienceInput = form.querySelector('[data-join-experience]');
+    if (!foundationBlock || !(interest instanceof HTMLSelectElement)) return;
+
+    const showFoundation = isFoundationApplicationInterest(interest);
+    foundationBlock.hidden = !showFoundation;
+
+    foundationBlock.querySelectorAll('[data-foundation-field]').forEach((field) => {
+      if (!(field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement)) return;
+      field.disabled = !showFoundation;
+      field.required = showFoundation;
+      if (!showFoundation) field.value = '';
+    });
+
+    if (generalBlock instanceof HTMLElement) {
+      generalBlock.hidden = showFoundation;
+    }
+
+    if (experienceInput instanceof HTMLTextAreaElement) {
+      experienceInput.disabled = showFoundation;
+      experienceInput.required = !showFoundation;
+      if (showFoundation) experienceInput.value = '';
+    }
+
+    if (emailLabel instanceof HTMLElement) {
+      emailLabel.innerHTML = showFoundation
+        ? 'Please tell us your email (the one you want course material sent to)'
+        : 'Please tell us your email <span class="form-optional">(or phone)</span>';
+    }
+
+    if (emailInput instanceof HTMLInputElement) {
+      emailInput.required = showFoundation;
+    }
+  };
+
+  document.querySelectorAll('form[data-notify-form="join"]').forEach((form) => {
+    const interest = form.querySelector('[data-join-interest]');
+    if (interest instanceof HTMLSelectElement) {
+      interest.addEventListener('change', () => syncJoinFoundationFields(form));
+      syncJoinFoundationFields(form);
+    }
+  });
+
   // Enquiry forms → /api/notify/lead (Discord), mailto fallback if API unavailable
   document.querySelectorAll('form.form-stack[data-notify-form]').forEach((form) => {
     form.addEventListener('submit', async (event) => {
@@ -547,6 +612,23 @@
         if (!topicVal) {
           showStatus('Please choose a topic.', false);
           if (topicEl instanceof HTMLElement) topicEl.focus();
+          return;
+        }
+      }
+
+      const interestSelect = form.querySelector('select[name="interest"]');
+      const isFoundationJoin =
+        formSource === 'join' && isFoundationApplicationInterest(interestSelect);
+      if (isFoundationJoin) {
+        const emailEl = form.querySelector('input[name="email"]');
+        const emailVal =
+          emailEl instanceof HTMLInputElement ? emailEl.value.trim() : '';
+        if (!emailVal) {
+          showStatus(
+            'Please leave the email you want course material sent to.',
+            false
+          );
+          if (emailEl instanceof HTMLElement) emailEl.focus();
           return;
         }
       }
@@ -979,6 +1061,9 @@
     'foundation-yoga': 'foundation-training',
     'foundation-yoga-training': 'foundation-training',
     'foundation-tt': 'foundation-200',
+    '300-hour': 'foundation-300',
+    '300hr': 'foundation-300',
+    'foundation-300-hour': 'foundation-300',
     'sound-bath': 'soundbath',
     'soundbath-training': 'soundbath',
     'sound-facilitator': 'soundbath',
@@ -1001,6 +1086,7 @@
   const COURSE_TEXTAREA = {
     'foundation-training': 'Foundation Training',
     'foundation-200': 'Foundation 200 hour TT',
+    'foundation-300': 'Foundation 300 hour TT',
     'ashtanga-assistant-tt': 'Ashtanga Assistant Teacher Training (invitation enquiry)',
     'pregnancy-yoga': 'Pregnancy Yoga Training',
     'functional-anatomy': 'Functional Anatomy Training',

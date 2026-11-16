@@ -267,7 +267,8 @@ function submissionEchoHtml(lead) {
     ['Topic', lead.topic || lead.courseTitle],
     ['Phone', lead.phone],
     ['Courses of interest', lead.courses],
-    ['Message', lead.message]
+    ['Message', lead.message],
+    ['Foundation application', lead.foundationNotes]
   ].filter(([, v]) => v && String(v).trim());
 
   if (!rows.length) return '';
@@ -298,7 +299,8 @@ function submissionEchoText(lead) {
     ['Topic', lead.topic || lead.courseTitle],
     ['Phone', lead.phone],
     ['Courses of interest', lead.courses],
-    ['Message', lead.message]
+    ['Message', lead.message],
+    ['Foundation application', lead.foundationNotes]
   ].filter(([, v]) => v && String(v).trim());
   if (!rows.length) return '';
   return `\nWhat you sent us\n${rows.map(([k, v]) => `${k}: ${v}`).join('\n')}\n`;
@@ -371,7 +373,8 @@ export function staffLeadAlertEmail(lead) {
     ['Course URL', course && course.slug ? course.url : ''],
     ['Source form', lead.source],
     ['Page', lead.page],
-    ['Message', lead.message]
+    ['Message', lead.message],
+    ['Foundation application', lead.foundationNotes]
   ].filter(([, v]) => v);
 
   const tableRows = rows

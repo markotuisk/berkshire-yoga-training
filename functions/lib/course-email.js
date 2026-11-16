@@ -10,7 +10,7 @@ import {
   STAFF_NOTIFY_TO,
   CONTACT_EMAIL
 } from './email-templates.js';
-import { upsertLead } from './course-sheet.js';
+import { appendFoundationApplication, upsertLead } from './course-sheet.js';
 
 /**
  * @param {Record<string, string|undefined>} env
@@ -25,13 +25,15 @@ import { upsertLead } from './course-sheet.js';
  *   message?: string,
  *   courses?: string,
  *   page?: string,
+ *   notes?: string,
+ *   foundationApplication?: Record<string, unknown> | null,
  *   isJournal?: boolean,
  *   isSuggest?: boolean
  * }} lead
  */
 export async function runLeadEmailAutomation(env, lead) {
   /** @type {Record<string, unknown>} */
-  const results = { visitor: null, staff: null, sheet: null };
+  const results = { visitor: null, staff: null, sheet: null, foundationSheet: null };
 
   const sheetLead = {
     name: lead.name || '',
@@ -43,7 +45,8 @@ export async function runLeadEmailAutomation(env, lead) {
     message: lead.message || '',
     status: 'Interested',
     page: lead.page || '',
-    notes: lead.isJournal ? 'journal-subscribe' : lead.isSuggest ? 'suggest-course' : ''
+    notes: lead.notes
+      || (lead.isJournal ? 'journal-subscribe' : lead.isSuggest ? 'suggest-course' : '')
   };
 
   // Order: visitor branded mail, then staff alert, then Sheet upsert
@@ -60,6 +63,7 @@ export async function runLeadEmailAutomation(env, lead) {
       courseTitle: lead.courseTitle,
       courses: lead.courses,
       message: lead.message,
+      foundationNotes: lead.notes || '',
       source: lead.source,
       isJournal: lead.isJournal
     });
@@ -83,6 +87,7 @@ export async function runLeadEmailAutomation(env, lead) {
     slug: lead.slug,
     source: lead.source,
     message: lead.message,
+    foundationNotes: lead.notes || '',
     page: lead.page
   });
   results.staff = await sendEmail(env, {
@@ -95,6 +100,19 @@ export async function runLeadEmailAutomation(env, lead) {
   });
 
   results.sheet = await upsertLead(env, sheetLead);
+
+  if (lead.foundationApplication) {
+    results.foundationSheet = await appendFoundationApplication(env, {
+      name: lead.name || '',
+      email: lead.email || '',
+      values: lead.foundationApplication.values || lead.foundationApplication,
+      interest: lead.topic || lead.courseTitle || '',
+      phone: lead.phone || '',
+      page: lead.page || ''
+    });
+  } else {
+    results.foundationSheet = { skipped: true, reason: 'not a foundation application' };
+  }
 
   return results;
 }

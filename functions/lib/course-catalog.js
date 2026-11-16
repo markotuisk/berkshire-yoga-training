@@ -146,6 +146,15 @@ BY_SLUG['foundation-training'] = BY_SLUG['foundation-200'];
 BY_SLUG['foundation-yoga-training'] = BY_SLUG['foundation-200'];
 BY_SLUG['200-hour'] = BY_SLUG['foundation-200'];
 BY_SLUG.foundation = BY_SLUG['foundation-200'];
+BY_SLUG['foundation-300'] = {
+  ...BY_SLUG['foundation-200'],
+  slug: 'foundation-300',
+  title: 'Foundation Training 300 hours',
+  url: `${SITE}/courses/foundation-yoga-training/`,
+  summary:
+    'Advanced Foundation pathway building on 200-hour teacher training. Dates and fees confirmed with applicants.'
+};
+BY_SLUG['300-hour'] = BY_SLUG['foundation-300'];
 BY_SLUG['open-day-200'] = BY_SLUG['open-day-foundation'];
 BY_SLUG['ashtanga-assistant-teacher-training'] = BY_SLUG['ashtanga-assistant-tt'];
 BY_SLUG['ashtanga-120'] = BY_SLUG['ashtanga-assistant-tt'];

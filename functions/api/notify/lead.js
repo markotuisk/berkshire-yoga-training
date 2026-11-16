@@ -15,6 +15,11 @@ import {
 } from '../../lib/discord.js';
 import { runLeadEmailAutomation } from '../../lib/course-email.js';
 import {
+  extractFoundationApplication,
+  isFoundationApplication,
+  FOUNDATION_APPLICATION_FIELDS
+} from '../../lib/foundation-application.js';
+import {
   clientMeta,
   contextFields,
   isSameOrigin,
@@ -140,6 +145,8 @@ export async function onRequestPost(context) {
   const meta = clientMeta(request, body);
   const isJournal = isJournalSubscribeSource(source);
   const isSuggest = !isJournal && isSuggestCourse(source, topic, slug);
+  const foundationApp = extractFoundationApplication(body, cleanText);
+  const isFoundationJoin = isFoundationApplication(topic, slug, source);
 
   const isContact = /^contact$/i.test(source);
 
@@ -158,6 +165,15 @@ export async function onRequestPost(context) {
     if (email && !EMAIL_RE.test(email)) {
       return json({ error: 'Please enter a valid email address.' }, 400);
     }
+    if (isFoundationJoin && (!email || !EMAIL_RE.test(email))) {
+      return json(
+        {
+          error:
+            'Please leave the email you want course material sent to for Foundation Training applications.'
+        },
+        400
+      );
+    }
     if (!email && !phone) {
       return json(
         {
@@ -169,7 +185,17 @@ export async function onRequestPost(context) {
     if (!name) {
       return json({ error: 'Please include your name.' }, 400);
     }
-    if (!message && !topic && !experience) {
+    if (isFoundationJoin) {
+      const missing = FOUNDATION_APPLICATION_FIELDS.find(
+        (field) => !foundationApp.values[field.key]
+      );
+      if (missing) {
+        return json(
+          { error: `Please complete: ${missing.label}` },
+          400
+        );
+      }
+    } else if (!message && !topic && !experience) {
       return json({ error: 'Please include a topic or message.' }, 400);
     }
     if (isSuggest && !message) {
@@ -209,7 +235,8 @@ export async function onRequestPost(context) {
     'pathname',
     'website',
     'company_url',
-    'url'
+    'url',
+    ...FOUNDATION_APPLICATION_FIELDS.map((field) => field.key)
   ]);
 
   /** @type {Array<{ name: string, value: string, inline?: boolean }>} */
@@ -233,6 +260,11 @@ export async function onRequestPost(context) {
   if (message) leadExtras.push({ name: 'Message', value: message, inline: false });
   if (experience && experience !== message) {
     leadExtras.push({ name: 'Experience', value: experience, inline: false });
+  }
+  if (isFoundationJoin) {
+    for (const f of foundationApp.fields) {
+      leadExtras.push(f);
+    }
   }
   for (const f of extraFormFields(body, usedKeys)) {
     leadExtras.push(f);
@@ -451,7 +483,12 @@ export async function onRequestPost(context) {
         courseTitle: topic || '',
         courses,
         source,
-        message: message || experience || '',
+        message:
+          message ||
+          experience ||
+          (isFoundationJoin ? foundationApp.values.yogaJourney || '' : ''),
+        notes: isFoundationJoin ? foundationApp.notes : '',
+        foundationApplication: isFoundationJoin ? foundationApp : null,
         page: page || meta.pageUrl || ''
       })
     : null;

@@ -9,6 +9,11 @@
  */
 
 import { getGoogleAccessToken, isGoogleConfigured } from './google-auth.js';
+import {
+  FOUNDATION_APPLICATION_HEADERS,
+  FOUNDATION_APPLICATION_SHEET_ID_DEFAULT,
+  FOUNDATION_APPLICATION_FIELDS
+} from './foundation-application.js';
 
 const LEADS = 'Leads';
 const COURSES = 'Courses';
@@ -153,6 +158,45 @@ async function sheetsApiRequest(env, payload) {
  */
 export function upsertLead(env, lead) {
   return courseSheetRequest(env, { action: 'lead_upsert', lead });
+}
+
+/**
+ * Append a Foundation Training application to the dedicated responses Sheet.
+ * @param {Record<string, string|undefined>} env
+ * @param {Record<string, unknown>} application
+ */
+export async function appendFoundationApplication(env, application) {
+  const canSheets =
+    !!(env && isGoogleConfigured(env));
+  if (!canSheets) {
+    return {
+      skipped: true,
+      reason: 'GOOGLE_SERVICE_ACCOUNT_JSON not set'
+    };
+  }
+
+  const token = await getGoogleAccessToken(env, SHEETS_SCOPE);
+  if (!token.ok) {
+    return { ok: false, error: token.error || 'Google auth failed', detail: token.detail };
+  }
+
+  const spreadsheetId =
+    (env && env.FOUNDATION_APPLICATIONS_SHEET_ID) ||
+    FOUNDATION_APPLICATION_SHEET_ID_DEFAULT;
+
+  try {
+    return await appendFoundationApplication_(
+      token.accessToken,
+      spreadsheetId,
+      application || {}
+    );
+  } catch (err) {
+    console.error('Foundation application sheet failed', err);
+    return {
+      ok: false,
+      error: String(err && err.message ? err.message : err)
+    };
+  }
 }
 
 /**
@@ -393,6 +437,54 @@ async function appendLeadRow_(accessToken, spreadsheetId, row) {
       body: JSON.stringify({ values: [row] })
     }
   );
+}
+
+async function resolveFirstSheetTitle_(accessToken, spreadsheetId) {
+  const meta = await sheetsFetch(
+    accessToken,
+    `/${spreadsheetId}?fields=sheets.properties`
+  );
+  const first = (meta.sheets || [])[0];
+  return (first && first.properties && first.properties.title) || 'Sheet1';
+}
+
+async function appendFoundationApplication_(accessToken, spreadsheetId, application) {
+  const tab = await resolveFirstSheetTitle_(accessToken, spreadsheetId);
+
+  // Only seed headers when the tab is empty. Never rewrite an existing Form responses header row.
+  const existing = await sheetsFetch(
+    accessToken,
+    `/${spreadsheetId}/values/${encodeURIComponent(`${tab}!A1:${colLetter(FOUNDATION_APPLICATION_HEADERS.length)}1`)}`
+  );
+  const headerRow = (existing.values && existing.values[0]) || [];
+  if (!headerRow.length) {
+    await ensureHeaderRow_(
+      accessToken,
+      spreadsheetId,
+      tab,
+      FOUNDATION_APPLICATION_HEADERS
+    );
+  }
+
+  const values = application.values || {};
+  const row = [
+    application.timestamp || new Date().toISOString(),
+    application.name || '',
+    application.email || '',
+    ...FOUNDATION_APPLICATION_FIELDS.map((field) => values[field.key] || '')
+  ];
+
+  const range = encodeURIComponent(`${tab}!A:A`);
+  await sheetsFetch(
+    accessToken,
+    `/${spreadsheetId}/values/${range}:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`,
+    {
+      method: 'POST',
+      body: JSON.stringify({ values: [row] })
+    }
+  );
+
+  return { ok: true, created: true, via: 'sheets_api', spreadsheetId, tab };
 }
 
 async function leadUpsert_(accessToken, spreadsheetId, lead) {
