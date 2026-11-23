@@ -59,8 +59,8 @@
     {
       type: 'Open day',
       title: 'Open Day | CPD Courses',
-      startDate: '2027-01-29',
-      lastSignupDate: '2027-01-27',
+      startDate: '2027-02-06',
+      lastSignupDate: '2027-02-04',
       free: true,
       hours: 2,
       hoursLabel: '2 hours',
