@@ -1538,7 +1538,7 @@
   const COURSE_TEXTAREA = {
     'foundation-training': 'Foundation Training',
     'foundation-200': 'Foundation 200 hour TT',
-    'foundation-300': 'Foundation 300 hour TT',
+    'foundation-300': '300-Hour Advanced Yoga Teacher Training',
     'ashtanga-assistant-tt': 'Ashtanga Assistant Teacher Training (invitation enquiry)',
     'pregnancy-yoga': 'Pregnancy Yoga Training',
     'functional-anatomy': 'Functional Anatomy Training',

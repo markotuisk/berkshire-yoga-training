@@ -147,12 +147,22 @@ BY_SLUG['foundation-yoga-training'] = BY_SLUG['foundation-200'];
 BY_SLUG['200-hour'] = BY_SLUG['foundation-200'];
 BY_SLUG.foundation = BY_SLUG['foundation-200'];
 BY_SLUG['foundation-300'] = {
-  ...BY_SLUG['foundation-200'],
   slug: 'foundation-300',
-  title: 'Foundation Training 300 hours',
-  url: `${SITE}/courses/foundation-yoga-training/`,
+  title: '300-Hour Advanced Yoga Teacher Training',
+  url: `${SITE}/courses/foundation-yoga-training/300-hour/`,
   summary:
-    'Advanced Foundation pathway building on 200-hour teacher training. Dates and fees confirmed with applicants.'
+    '200-hour Foundation plus 100-hour Advanced Extension. Broader teaching toolkit in styles, adjustments, applied anatomy, sequencing and practicum.',
+  details: [
+    'Full pathway fee: £3,850 (inclusive of TWA 200-hour Foundation TT)',
+    'Hours: 200 Foundation + 80 advanced contact + 20 advanced non-contact',
+    'Join at enrolment or upgrade during the Foundation, subject to space',
+    'Lead trainers: Katia Major and Raili Maripuu',
+    'Advanced module dates, Early Bird, deposit and upgrade fees: ask the Academy',
+    'Location: Berkshire and Reading (venue in joining pack)'
+  ],
+  startDate: '2027-02-12',
+  venue: 'Berkshire / Reading (venue confirmed in joining pack)',
+  locationLabel: 'Berkshire, Reading, United Kingdom'
 };
 BY_SLUG['300-hour'] = BY_SLUG['foundation-300'];
 BY_SLUG['open-day-200'] = BY_SLUG['open-day-foundation'];
