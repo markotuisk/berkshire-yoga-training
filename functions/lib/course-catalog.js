@@ -22,7 +22,7 @@ const BY_SLUG = {
   'foundation-200': {
     slug: 'foundation-200',
     title: 'Foundation Training 200 hours',
-    url: `${SITE}/yoga-teacher-training-course/foundation-yoga-training/200-hour/`,
+    url: `${SITE}/yoga-teacher-training-course/200-hour-yoga-teacher-training/`,
     summary:
       '200-hour teacher training across nine in-studio weekends in Berkshire and Reading, with supervised practice and self-study modules.',
     details: [
@@ -42,7 +42,7 @@ const BY_SLUG = {
   'open-day-foundation': {
     slug: 'open-day-foundation',
     title: 'Open Day | Foundation Training 200 hours',
-    url: `${SITE}/yoga-teacher-training-course/foundation-yoga-training/200-hour/open-day/`,
+    url: `${SITE}/yoga-teacher-training-course/200-hour-yoga-teacher-training/open-day/`,
     summary: 'Free 2-hour Open Day introducing the 200-hour Foundation Training pathway.',
     details: [
       'Date: Saturday 21 November 2026',

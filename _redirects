@@ -17,6 +17,11 @@
 /yoga-teacher-training /yoga-teacher-training/ 301
 /yoga-teacher-training-course /yoga-teacher-training-course/ 301
 
+# Former /courses/.../200-hour → new 200-hour slug (before courses splat)
+/courses/foundation-yoga-training/200-hour /yoga-teacher-training-course/200-hour-yoga-teacher-training/ 301
+/courses/foundation-yoga-training/200-hour/ /yoga-teacher-training-course/200-hour-yoga-teacher-training/ 301
+/courses/foundation-yoga-training/200-hour/* /yoga-teacher-training-course/200-hour-yoga-teacher-training/:splat 301
+
 # Former /courses/ tree → /yoga-teacher-training-course/ (301)
 /courses /yoga-teacher-training-course/ 301
 /courses/ /yoga-teacher-training-course/ 301
@@ -82,11 +87,15 @@
 /apply /join 301
 /apply/ /join 301
 
-# 200-hour Foundation course subpage (trailing-slash + short aliases)
-/yoga-teacher-training-course/foundation-yoga-training/200-hour /yoga-teacher-training-course/foundation-yoga-training/200-hour/ 301
-/200-hour /yoga-teacher-training-course/foundation-yoga-training/200-hour/ 301
-/200-hour/ /yoga-teacher-training-course/foundation-yoga-training/200-hour/ 301
+# 200-hour course (canonical slug + short aliases + legacy foundation path)
+/yoga-teacher-training-course/200-hour-yoga-teacher-training /yoga-teacher-training-course/200-hour-yoga-teacher-training/ 301
+/yoga-teacher-training-course/200-hour-yoga-teacher-training/open-day /yoga-teacher-training-course/200-hour-yoga-teacher-training/open-day/ 301
+/yoga-teacher-training-course/200-hour-yoga-teacher-training/accommodation /yoga-teacher-training-course/200-hour-yoga-teacher-training/accommodation/ 301
+/200-hour /yoga-teacher-training-course/200-hour-yoga-teacher-training/ 301
+/200-hour/ /yoga-teacher-training-course/200-hour-yoga-teacher-training/ 301
+/yoga-teacher-training-course/foundation-yoga-training/200-hour /yoga-teacher-training-course/200-hour-yoga-teacher-training/ 301
+/yoga-teacher-training-course/foundation-yoga-training/200-hour/ /yoga-teacher-training-course/200-hour-yoga-teacher-training/ 301
+/yoga-teacher-training-course/foundation-yoga-training/200-hour/* /yoga-teacher-training-course/200-hour-yoga-teacher-training/:splat 301
 
 # Open Day event pages (trailing-slash normalisation)
-/yoga-teacher-training-course/foundation-yoga-training/200-hour/open-day /yoga-teacher-training-course/foundation-yoga-training/200-hour/open-day/ 301
 /yoga-teacher-training-course/cpd/open-day /yoga-teacher-training-course/cpd/open-day/ 301
