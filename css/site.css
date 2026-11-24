@@ -290,7 +290,7 @@ h3,
   margin-top: 1.5rem;
 }
 
-/* Header — glazed frosted masthead */
+/* Header — glazed frosted masthead (dense enough for readable ink text) */
 .site-header {
   position: sticky;
   top: 0;
@@ -300,15 +300,15 @@ h3,
   background:
     linear-gradient(
       180deg,
-      rgba(255, 252, 247, 0.72) 0%,
-      rgba(247, 243, 235, 0.58) 100%
+      rgba(255, 252, 247, 0.92) 0%,
+      rgba(247, 243, 235, 0.88) 100%
     );
-  backdrop-filter: blur(20px) saturate(1.18);
-  -webkit-backdrop-filter: blur(20px) saturate(1.18);
-  border-bottom: 1px solid rgba(201, 162, 39, 0.22);
+  backdrop-filter: blur(18px) saturate(1.12);
+  -webkit-backdrop-filter: blur(18px) saturate(1.12);
+  border-bottom: 1px solid rgba(201, 162, 39, 0.28);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.7),
-    0 10px 28px rgba(28, 25, 21, 0.06);
+    inset 0 1px 0 rgba(255, 255, 255, 0.75),
+    0 10px 28px rgba(28, 25, 21, 0.07);
   transition: border-color var(--ease), box-shadow var(--ease), background var(--ease);
 }
 
@@ -320,9 +320,9 @@ h3,
   pointer-events: none;
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.35) 0%,
-    rgba(255, 255, 255, 0.08) 42%,
-    transparent 78%
+    rgba(255, 255, 255, 0.28) 0%,
+    rgba(255, 255, 255, 0.06) 45%,
+    transparent 80%
   );
 }
 
@@ -330,13 +330,13 @@ h3,
   background:
     linear-gradient(
       180deg,
-      rgba(255, 252, 247, 0.82) 0%,
-      rgba(247, 243, 235, 0.72) 100%
+      rgba(255, 252, 247, 0.96) 0%,
+      rgba(247, 243, 235, 0.94) 100%
     );
-  border-bottom-color: rgba(201, 162, 39, 0.32);
+  border-bottom-color: rgba(201, 162, 39, 0.36);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.75),
-    0 12px 32px rgba(28, 25, 21, 0.08);
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    0 12px 32px rgba(28, 25, 21, 0.09);
 }
 
 /* Homepage: Next up sits in the sticky header */
@@ -406,19 +406,23 @@ h3,
 .main-nav a {
   display: inline-block;
   padding: 0.55rem 0.7rem;
-  color: var(--ink-soft);
+  color: var(--ink);
   text-decoration: none;
   font-family: var(--font-body);
   font-size: 0.92rem;
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: 0.015em;
   border-radius: 0.2rem;
   transition: color var(--ease), background var(--ease), box-shadow var(--ease);
 }
 
+.main-nav > ul > li > .nav-link {
+  color: var(--ink);
+}
+
 .main-nav a:hover,
 .main-nav a:focus-visible {
-  color: var(--gold);
+  color: var(--ink);
   background: transparent;
   box-shadow: inset 0 -1.5px 0 var(--gold);
 }
@@ -427,7 +431,7 @@ h3,
   color: var(--ink);
   background: transparent;
   box-shadow: inset 0 -1.5px 0 var(--gold);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .nav-item--has-menu {
