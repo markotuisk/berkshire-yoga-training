@@ -149,7 +149,7 @@ BY_SLUG.foundation = BY_SLUG['foundation-200'];
 BY_SLUG['foundation-300'] = {
   slug: 'foundation-300',
   title: '300-Hour Advanced Yoga Teacher Training',
-  url: `${SITE}/yoga-teacher-training-course/foundation-yoga-training/300-hour/`,
+  url: `${SITE}/yoga-teacher-training-course/300-hour-yoga-teacher-training/`,
   summary:
     '200-hour Foundation plus 100-hour Advanced Extension. Broader teaching toolkit in styles, adjustments, applied anatomy, sequencing and practicum.',
   details: [

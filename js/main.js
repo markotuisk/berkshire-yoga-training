@@ -1516,6 +1516,7 @@
     '300-hour': 'foundation-300',
     '300hr': 'foundation-300',
     'foundation-300-hour': 'foundation-300',
+    '300-hour-yoga-teacher-training': 'foundation-300',
     'sound-bath': 'soundbath',
     'soundbath-training': 'soundbath',
     'sound-facilitator': 'soundbath',
