@@ -27,7 +27,7 @@ All published pages listed in [llms.txt](https://thameswellnessacademy.co.uk/.we
 Example:
 
 ```bash
-curl -H "Accept: text/markdown" https://thameswellnessacademy.co.uk/courses/
+curl -H "Accept: text/markdown" https://thameswellnessacademy.co.uk/yoga-teacher-training-course/
 ```
 
 ## Human actions (not available to agents)

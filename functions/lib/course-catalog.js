@@ -22,7 +22,7 @@ const BY_SLUG = {
   'foundation-200': {
     slug: 'foundation-200',
     title: 'Foundation Training 200 hours',
-    url: `${SITE}/courses/foundation-yoga-training/200-hour/`,
+    url: `${SITE}/yoga-teacher-training-course/foundation-yoga-training/200-hour/`,
     summary:
       '200-hour teacher training across nine in-studio weekends in Berkshire and Reading, with supervised practice and self-study modules.',
     details: [
@@ -42,7 +42,7 @@ const BY_SLUG = {
   'open-day-foundation': {
     slug: 'open-day-foundation',
     title: 'Open Day | Foundation Training 200 hours',
-    url: `${SITE}/courses/foundation-yoga-training/200-hour/open-day/`,
+    url: `${SITE}/yoga-teacher-training-course/foundation-yoga-training/200-hour/open-day/`,
     summary: 'Free 2-hour Open Day introducing the 200-hour Foundation Training pathway.',
     details: [
       'Date: Saturday 21 November 2026',
@@ -60,7 +60,7 @@ const BY_SLUG = {
   'open-day-cpd': {
     slug: 'open-day-cpd',
     title: 'Open Day | CPD Courses',
-    url: `${SITE}/courses/cpd/open-day/`,
+    url: `${SITE}/yoga-teacher-training-course/cpd/open-day/`,
     summary: 'Open Day for CPD pathways at Thames Wellness Academy.',
     details: ['See the Open Day page for the next date and programme notes.'],
     venue: 'Berkshire / Reading'
@@ -68,7 +68,7 @@ const BY_SLUG = {
   'pregnancy-yoga': {
     slug: 'pregnancy-yoga',
     title: 'Pregnancy Yoga Training (CPD)',
-    url: `${SITE}/courses/cpd/pregnancy-yoga/`,
+    url: `${SITE}/yoga-teacher-training-course/cpd/pregnancy-yoga/`,
     summary: 'CPD for teaching yoga safely in pregnancy.',
     details: ['Early Bird and Standard fees published on the course page.', 'On-site delivery in Berkshire.'],
     startDate: '2027-03-06',
@@ -77,7 +77,7 @@ const BY_SLUG = {
   'yoga-nidra': {
     slug: 'yoga-nidra',
     title: 'Yoga Nidra Training (CPD)',
-    url: `${SITE}/courses/cpd/yoga-nidra/`,
+    url: `${SITE}/yoga-teacher-training-course/cpd/yoga-nidra/`,
     summary: 'CPD in Yoga Nidra teaching practice.',
     details: ['On-site CPD module in Berkshire.'],
     startDate: '2027-04-09',
@@ -86,7 +86,7 @@ const BY_SLUG = {
   'functional-anatomy': {
     slug: 'functional-anatomy',
     title: 'Functional Anatomy Training (CPD)',
-    url: `${SITE}/courses/cpd/functional-anatomy/`,
+    url: `${SITE}/yoga-teacher-training-course/cpd/functional-anatomy/`,
     summary: 'Evidence-informed anatomy for yoga teachers.',
     details: ['On-site CPD module in Berkshire.'],
     startDate: '2027-06-20',
@@ -95,7 +95,7 @@ const BY_SLUG = {
   soundbath: {
     slug: 'soundbath',
     title: 'SoundBath Training (CPD)',
-    url: `${SITE}/courses/cpd/soundbath/`,
+    url: `${SITE}/yoga-teacher-training-course/cpd/soundbath/`,
     summary: 'CPD in sound practice for wellness teaching.',
     details: ['On-site CPD module in Berkshire.'],
     startDate: '2027-10-02',
@@ -104,7 +104,7 @@ const BY_SLUG = {
   'ashtanga-assistant-tt': {
     slug: 'ashtanga-assistant-tt',
     title: 'Ashtanga Assistant Teacher Training 120hrs (invitation enquiry)',
-    url: `${SITE}/courses/ashtanga-assistant-teacher-training/`,
+    url: `${SITE}/yoga-teacher-training-course/ashtanga-assistant-teacher-training/`,
     summary:
       'Invitation-only Development Course (Level 1). Not open public enrolment. Foundation certificate required.',
     details: [
@@ -121,21 +121,21 @@ const BY_SLUG = {
   cpd: {
     slug: 'cpd',
     title: 'CPD courses',
-    url: `${SITE}/courses/cpd/`,
+    url: `${SITE}/yoga-teacher-training-course/cpd/`,
     summary: 'Continuing professional development modules for qualified teachers.',
     details: ['Browse CPD pathways on the Academy site.']
   },
   workshops: {
     slug: 'workshops',
     title: 'Specialist workshops',
-    url: `${SITE}/courses/workshops/`,
+    url: `${SITE}/yoga-teacher-training-course/workshops/`,
     summary: 'Focused studio sessions on specialist teaching themes. Completers receive a studio diploma of attendance.',
     details: ['Half-day and day intensives · in studio · enquire for dates.']
   },
   retreats: {
     slug: 'retreats',
     title: 'Retreats',
-    url: `${SITE}/courses/retreats/`,
+    url: `${SITE}/yoga-teacher-training-course/retreats/`,
     summary: 'Immersive study away from daily teaching load.',
     details: ['See retreats page for upcoming dates.']
   }
@@ -149,7 +149,7 @@ BY_SLUG.foundation = BY_SLUG['foundation-200'];
 BY_SLUG['foundation-300'] = {
   slug: 'foundation-300',
   title: '300-Hour Advanced Yoga Teacher Training',
-  url: `${SITE}/courses/foundation-yoga-training/300-hour/`,
+  url: `${SITE}/yoga-teacher-training-course/foundation-yoga-training/300-hour/`,
   summary:
     '200-hour Foundation plus 100-hour Advanced Extension. Broader teaching toolkit in styles, adjustments, applied anatomy, sequencing and practicum.',
   details: [
@@ -184,7 +184,7 @@ export function resolveCourse(slug, overrides = {}) {
   const venue = overrides.venue || (base && base.venue) || 'Berkshire / Reading';
   const url =
     (base && base.url) ||
-    (key ? `${SITE}/courses/` : `${SITE}/courses/`);
+    (key ? `${SITE}/yoga-teacher-training-course/` : `${SITE}/yoga-teacher-training-course/`);
 
   return {
     slug: (base && base.slug) || key || '',

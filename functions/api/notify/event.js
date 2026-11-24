@@ -286,7 +286,7 @@ export async function onRequestPost(context) {
       type === 'callback' ||
       type === 'header_cta' ||
       type === 'visit' ||
-      /join\.html|course=|\/courses\//i.test(`${href} ${page} ${label}`));
+      /join\.html|course=|\/(courses|yoga-teacher-training-course)\//i.test(`${href} ${page} ${label}`));
 
   if (courseWorthy && courseChannel) {
     const courseResult = await postDiscordEmbed(env, courseChannel, {

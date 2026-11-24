@@ -343,7 +343,7 @@
   }
 
   function isCoursePage() {
-    return pathIncludes(['/courses/', '/course/', '/programme', '/training', '/diploma', '/retreat']);
+    return pathIncludes(['/yoga-teacher-training-course/', '/course/', '/programme', '/training', '/diploma', '/retreat']);
   }
 
   function isArticlePage() {

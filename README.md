@@ -19,11 +19,11 @@ The full site is served at `/` on Cloudflare Pages (`index.html`). Owner preview
 | Home | `/` |
 | About | `/about.html` |
 | Team | `/team.html` |
-| Services | `/courses/` |
-| Foundation Training | `/courses/foundation-yoga-training/` |
-| CPD | `/courses/cpd/` |
-| Workshops | `/courses/workshops/` |
-| Retreats | `/courses/retreats/` |
+| Services | `/yoga-teacher-training-course/` |
+| Foundation Training | `/yoga-teacher-training-course/foundation-yoga-training/` |
+| CPD | `/yoga-teacher-training-course/cpd/` |
+| Workshops | `/yoga-teacher-training-course/workshops/` |
+| Retreats | `/yoga-teacher-training-course/retreats/` |
 | Research | `/research.html` |
 | Journal | `/journal.html` |
 | Contact | `/contact.html` |

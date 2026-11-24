@@ -285,7 +285,7 @@
     const isCourseCta =
       isJoin ||
       /course=/i.test(href) ||
-      /\/courses\//i.test(href) && el.classList.contains('btn');
+      /\/(courses|yoga-teacher-training-course)\//i.test(href) && el.classList.contains('btn');
 
     if (
       !ctaId &&
