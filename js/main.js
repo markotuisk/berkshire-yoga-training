@@ -1,12 +1,56 @@
 (function () {
   'use strict';
 
-  // Sticky header shadow
+  // Sticky header: shadow + hide on scroll down, show on scroll up
   const header = document.querySelector('.site-header');
   if (header) {
-    window.addEventListener('scroll', () => {
-      header.classList.toggle('scrolled', window.scrollY > 20);
-    }, { passive: true });
+    let lastScrollY = window.scrollY;
+    let ticking = false;
+    const topRevealY = 24;
+    const minDelta = 6;
+
+    const updateHeaderScroll = () => {
+      const y = window.scrollY;
+      const delta = y - lastScrollY;
+      header.classList.toggle('scrolled', y > 20);
+
+      const navOpen = document.querySelector('.main-nav.open');
+      if (navOpen) {
+        header.classList.remove('header-hidden');
+        lastScrollY = y;
+        ticking = false;
+        return;
+      }
+
+      if (y <= topRevealY) {
+        header.classList.remove('header-hidden');
+      } else if (delta > minDelta) {
+        header.classList.add('header-hidden');
+        // Close any open desktop/mobile submenus while hidden
+        document.querySelectorAll('.nav-item--has-menu.is-open').forEach((item) => {
+          item.classList.remove('is-open');
+          item.querySelector(':scope > .nav-link')?.setAttribute('aria-expanded', 'false');
+          item.querySelector(':scope > .nav-submenu')?.setAttribute('aria-hidden', 'true');
+        });
+      } else if (delta < -minDelta) {
+        header.classList.remove('header-hidden');
+      }
+
+      lastScrollY = y;
+      ticking = false;
+    };
+
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (!ticking) {
+          window.requestAnimationFrame(updateHeaderScroll);
+          ticking = true;
+        }
+      },
+      { passive: true }
+    );
+    updateHeaderScroll();
   }
 
   // Mobile nav toggle + dropdown menus
